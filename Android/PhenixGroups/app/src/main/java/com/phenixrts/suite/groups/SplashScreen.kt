@@ -26,6 +26,11 @@ class SplashScreen : Fragment() {
         super.onStart()
         thread {
             // TODO (YM): init PhenixSDK
+            fragmentManager?.run {
+                beginTransaction()
+                    .replace(R.id.fragment, CallSettingsScreen())
+                    .commit()
+            }
         }
     }
 }

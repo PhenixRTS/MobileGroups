@@ -1,3 +1,13 @@
+<!--
+  ~ Copyright 2019 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+  -->
+
 <resources>
+    <!--    General    -->
     <string name="app_name">Phenix Groups</string>
+
+    <!--    Call Settings screen    -->
+    <string name="join_meeting_button_label">Join Meeting</string>
+    <string name="new_meeting_button_label">New Meeting</string>
+    <string name="preview_icon_content_description">Preview Icon</string>
 </resources>
