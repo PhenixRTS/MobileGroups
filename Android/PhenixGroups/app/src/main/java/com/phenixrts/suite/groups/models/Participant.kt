@@ -5,10 +5,11 @@
 package com.phenixrts.suite.groups.models
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 
 data class Participant(
     val nickname: LiveData<String>,
-    val isVideoEnabled: LiveData<Boolean>,
-    val isMicrophoneEnabled: LiveData<Boolean>,
+    val isVideoEnabled: MutableLiveData<Boolean>,
+    val isMicrophoneEnabled: MutableLiveData<Boolean>,
     val isLocal: Boolean = false
 )

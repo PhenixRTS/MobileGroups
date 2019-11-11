@@ -4,7 +4,6 @@
 
 package com.phenixrts.suite.groups.viewmodels
 
-import android.util.Log
 import androidx.databinding.ObservableArrayList
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

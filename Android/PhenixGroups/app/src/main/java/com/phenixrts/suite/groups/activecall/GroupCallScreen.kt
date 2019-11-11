@@ -35,7 +35,6 @@ class GroupCallScreen : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         servicePager.adapter = GroupCallScreenPageAdapter(resources, childFragmentManager)
     }
 
