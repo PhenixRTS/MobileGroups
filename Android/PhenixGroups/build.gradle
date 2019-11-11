@@ -22,6 +22,16 @@ allprojects {
     repositories {
         google()
         jcenter()
+        maven {
+            url project.findProperty("phenixMavenRepositoryUrl") ?: "https://maven.pkg.github.com/PhenixRTS/AndroidSDK"
+
+            if (url.toString().contains("maven.pkg.github.com")) {
+                credentials {
+                    username githubUser
+                    password githubPackageToken
+                }
+            }
+        }
     }
 }
 

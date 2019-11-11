@@ -54,4 +54,6 @@ dependencies {
     // optional - ReactiveStreams support for LiveData
     implementation "androidx.lifecycle:lifecycle-reactivestreams-ktx:$lifecycle_version"
     testImplementation "androidx.arch.core:core-testing:$lifecycle_version"
+
+    implementation "com.phenixrts.android:phenix-sdk-android:2019.2.3"
 }

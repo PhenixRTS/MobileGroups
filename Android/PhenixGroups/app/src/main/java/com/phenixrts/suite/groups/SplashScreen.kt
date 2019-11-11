@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.phenixrts.suite.groups.phenix.PhenixComponent
 import kotlin.concurrent.thread
 
 
@@ -25,7 +26,7 @@ class SplashScreen : Fragment() {
     override fun onStart() {
         super.onStart()
         thread {
-            // TODO (YM): init PhenixSDK
+            PhenixComponent.initialize(context!!)
             fragmentManager?.run {
                 beginTransaction()
                     .replace(R.id.fragment, CallSettingsScreen())
