@@ -3,11 +3,19 @@
   -->
 
 <resources>
-    <!--    General    -->
+    <!--  General  -->
     <string name="app_name">Phenix Groups</string>
 
-    <!--    Call Settings screen    -->
+    <!--  Call Settings screen  -->
     <string name="join_meeting_button_label">Join Meeting</string>
     <string name="new_meeting_button_label">New Meeting</string>
     <string name="preview_icon_content_description">Preview Icon</string>
+
+    <!--  Room call screen  -->
+    <string name="participants_page_title">Participants</string>
+    <string name="chat_page_title">Chat</string>
+    <string name="call_info_page_title">Info</string>
+
+    <!--  Participants list  -->
+    <string name="preview_mic_off_icon_content_description">Microphone is off</string>
 </resources>

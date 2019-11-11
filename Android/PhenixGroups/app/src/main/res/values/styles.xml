@@ -19,5 +19,6 @@
         <item name="backgroundTint">@color/checkable_fab_background</item>
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
+        <item name="android:tint">@color/checkable_fab_drawable_tint</item>
     </style>
 </resources>

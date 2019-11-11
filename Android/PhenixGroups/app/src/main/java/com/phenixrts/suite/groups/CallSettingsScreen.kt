@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.phenixrts.suite.groups.activecall.GroupCallScreen
 import com.phenixrts.suite.groups.databinding.CallSettingsScreenBinding
 import com.phenixrts.suite.groups.models.UserSettings
 import com.phenixrts.suite.groups.utils.EasyPermissionFragment
@@ -39,6 +40,9 @@ class CallSettingsScreen : EasyPermissionFragment() {
 
         cameraButton.setOnCheckedChangeListener(::setCameraPreviewEnabled)
         microphoneButton.setOnCheckedChangeListener(::setMicrophoneEnabled)
+
+        newMeetingButton.setOnClickListener { startGroupCall() }
+        joinMeetingButton.setOnClickListener { startGroupCall() }
     }
 
     private fun setCameraPreviewEnabled(enabled: Boolean) {
@@ -60,6 +64,15 @@ class CallSettingsScreen : EasyPermissionFragment() {
                     microphoneButton.isChecked = false
                 }
             }
+        }
+    }
+
+    private fun startGroupCall() {
+        fragmentManager?.run {
+            beginTransaction()
+                .add(R.id.fragment, GroupCallScreen())
+                .addToBackStack("Call Screen")
+                .commit()
         }
     }
 }
