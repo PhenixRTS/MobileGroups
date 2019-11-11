@@ -20,6 +20,10 @@ class GroupCallScreen : Fragment() {
     private val roomViewModel: RoomViewModel by viewModels({ activity!! })
     private val userSettings: UserSettings by viewModels({ activity!! })
 
+    init {
+        retainInstance = true
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         roomViewModel.startCall(userSettings)
@@ -35,7 +39,7 @@ class GroupCallScreen : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        servicePager.adapter = GroupCallScreenPageAdapter(resources, childFragmentManager)
+        servicePager?.adapter = GroupCallScreenPageAdapter(resources, childFragmentManager)
     }
 
     override fun onDestroy() {

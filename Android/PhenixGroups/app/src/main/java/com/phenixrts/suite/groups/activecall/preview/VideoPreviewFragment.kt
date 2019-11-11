@@ -23,6 +23,10 @@ class VideoPreviewFragment : Fragment() {
 
     private val areControlsShown = ObservableBoolean(false)
 
+    init {
+        retainInstance = true
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

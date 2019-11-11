@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright 2019 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <fragment
+        android:id="@+id/active_user_preview"
+        android:name="com.phenixrts.suite.groups.activecall.preview.VideoPreviewFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:layout="@layout/group_call_preview" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

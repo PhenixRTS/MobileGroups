@@ -13,7 +13,10 @@ class MainActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
 
-        // set initial screen
-        supportFragmentManager.beginTransaction().replace(R.id.fragment, SplashScreen()).commit()
+        if (savedInstanceState == null) {
+            // set initial screen
+            supportFragmentManager.beginTransaction().replace(R.id.fragment, SplashScreen())
+                .commit()
+        }
     }
 }
