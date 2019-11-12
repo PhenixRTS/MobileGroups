@@ -9,15 +9,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.phenixrts.suite.groups.R
+import androidx.fragment.app.viewModels
+import com.phenixrts.suite.groups.databinding.GroupCallChatFragmentBinding
+import com.phenixrts.suite.groups.viewmodels.ChatViewModel
 
 class ChatFragment : Fragment() {
+
+    private val chatViewModel: ChatViewModel by viewModels({ activity!! })
+    private lateinit var binding: GroupCallChatFragmentBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.group_call_chat_fragment, container, false)
+        binding = GroupCallChatFragmentBinding.inflate(inflater)
+        binding.lifecycleOwner = this
+        binding.chatViewModel = chatViewModel
+        binding.chatHistory.adapter = ChatListAdapter(chatViewModel.roomChat)
+        return binding.root
     }
 }

@@ -12,12 +12,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.models.UserSettings
+import com.phenixrts.suite.groups.viewmodels.ChatViewModel
 import com.phenixrts.suite.groups.viewmodels.RoomViewModel
 import kotlinx.android.synthetic.main.group_call_fragment.*
 
 class GroupCallScreen : Fragment() {
 
     private val roomViewModel: RoomViewModel by viewModels({ activity!! })
+    private val chatViewModel: ChatViewModel by viewModels({ activity!! })
     private val userSettings: UserSettings by viewModels({ activity!! })
 
     init {

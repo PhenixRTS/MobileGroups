@@ -18,4 +18,8 @@
 
     <!--  Participants list  -->
     <string name="preview_mic_off_icon_content_description">Microphone is off</string>
+
+    <!--  Chat  -->
+    <string name="group_call_chat_message_hint">Message</string>
+    <string name="group_call_chat_send_button_content_descrition">Send Button</string>
 </resources>
