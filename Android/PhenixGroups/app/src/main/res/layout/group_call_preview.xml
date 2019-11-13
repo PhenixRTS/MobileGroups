@@ -101,7 +101,7 @@
                 style="@style/Widget.MaterialComponents.FloatingActionButton.Checkable"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="@={participant.isMicrophoneEnabled()}"
+                android:checked="@{participant.isMicrophoneEnabled()}"
                 android:src="@drawable/checkable_microphone" />
 
             <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -121,7 +121,7 @@
                 style="@style/Widget.MaterialComponents.FloatingActionButton.Checkable"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:checked="@={participant.isVideoEnabled()}"
+                android:checked="@{participant.isVideoEnabled()}"
                 android:src="@drawable/checkable_camera" />
         </LinearLayout>
 

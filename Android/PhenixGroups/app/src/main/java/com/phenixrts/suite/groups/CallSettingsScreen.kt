@@ -11,10 +11,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.phenixrts.suite.groups.activecall.GroupCallScreen
 import com.phenixrts.suite.groups.databinding.CallSettingsScreenBinding
-import com.phenixrts.suite.groups.models.UserSettings
 import com.phenixrts.suite.groups.utils.EasyPermissionFragment
+import com.phenixrts.suite.groups.viewmodels.CallSettingsViewModel
 import kotlinx.android.synthetic.main.call_settings_screen.*
 
 /**
@@ -22,7 +23,8 @@ import kotlinx.android.synthetic.main.call_settings_screen.*
  */
 class CallSettingsScreen : EasyPermissionFragment() {
 
-    private val userSettings = UserSettings()
+    private val callSettings: CallSettingsViewModel by viewModels({ activity!! })
+
     private lateinit var binding: CallSettingsScreenBinding
 
     override fun onCreateView(
@@ -30,7 +32,7 @@ class CallSettingsScreen : EasyPermissionFragment() {
         savedInstanceState: Bundle?
     ): View? {
         binding = CallSettingsScreenBinding.inflate(inflater)
-        binding.userSettings = userSettings
+        binding.callSettings = callSettings
         binding.lifecycleOwner = this
         return binding.root
     }

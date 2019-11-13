@@ -10,12 +10,12 @@ import androidx.databinding.ObservableList
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.phenixrts.suite.groups.databinding.GroupCallChatMessageRecordBinding
-import com.phenixrts.suite.groups.models.ChatMessage
+import com.phenixrts.suite.groups.models.Message
 import com.phenixrts.suite.groups.utils.ListObservableRecyclerViewAdapter
 
 open class ChatListAdapter(
-    private val data: ObservableList<ChatMessage>
-) : ListObservableRecyclerViewAdapter<ChatMessage, ChatListAdapter.ViewHolder>(data) {
+    private val data: ObservableList<Message>
+) : ListObservableRecyclerViewAdapter<Message, ChatListAdapter.ViewHolder>(data) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(GroupCallChatMessageRecordBinding.inflate(LayoutInflater.from(parent.context)).apply {

@@ -11,17 +11,19 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.phenixrts.suite.groups.R
-import com.phenixrts.suite.groups.viewmodels.RoomViewModel
+import com.phenixrts.suite.groups.viewmodels.ParticipantsViewModel
+import com.phenixrts.suite.groups.viewmodels.PreviewViewModel
 import kotlinx.android.synthetic.main.group_call_participants_fragment.*
 
 class ParticipantsListFragment : Fragment() {
 
-    private val roomViewModel: RoomViewModel by viewModels({ activity!! })
+    private val participantsViewModel: ParticipantsViewModel by viewModels({ activity!! })
+    private val previewViewModel: PreviewViewModel by viewModels({ activity!! })
 
     private val listAdapter by lazy {
         ParticipantsListAdapter(
-            roomViewModel.roomParticipants,
-            roomViewModel.activeParticipant
+            participantsViewModel.roomParticipants,
+            previewViewModel.activeParticipant
         )
     }
 

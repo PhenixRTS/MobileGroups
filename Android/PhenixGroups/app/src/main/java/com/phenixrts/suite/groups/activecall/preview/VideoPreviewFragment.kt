@@ -12,13 +12,13 @@ import androidx.databinding.ObservableBoolean
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.phenixrts.suite.groups.databinding.GroupCallPreviewBinding
-import com.phenixrts.suite.groups.viewmodels.RoomViewModel
+import com.phenixrts.suite.groups.viewmodels.PreviewViewModel
 import java.util.*
 import kotlin.concurrent.schedule
 
 class VideoPreviewFragment : Fragment() {
 
-    private val roomViewModel: RoomViewModel by viewModels({ activity!! })
+    private val previewViewModel: PreviewViewModel by viewModels({ activity!! })
     private lateinit var binding: GroupCallPreviewBinding
 
     private val areControlsShown = ObservableBoolean(false)
@@ -39,7 +39,7 @@ class VideoPreviewFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.participant = roomViewModel.activeParticipant
+        binding.participant = previewViewModel.activeParticipant
         binding.showControls = areControlsShown
 
         binding.eventHandler = object : EventHandler {

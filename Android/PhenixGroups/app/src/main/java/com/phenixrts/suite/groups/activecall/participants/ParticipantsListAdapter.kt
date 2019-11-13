@@ -33,7 +33,9 @@ open class ParticipantsListAdapter(
 
         holder.bind.apply {
             this.participant = participant
-            isActive = Transformations.map(selected) { it == selected.value }
+            isActive = Transformations.map(selected) {
+                participant == selected.value
+            }
         }
     }
 

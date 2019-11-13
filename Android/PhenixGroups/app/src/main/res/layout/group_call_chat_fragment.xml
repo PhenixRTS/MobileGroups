@@ -1,4 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?><!--
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
   ~ Copyright 2019 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
   -->
 
@@ -12,8 +14,12 @@
             type="String" />
 
         <variable
-            name="chatViewModel"
+            name="chat"
             type="com.phenixrts.suite.groups.viewmodels.ChatViewModel" />
+
+        <variable
+            name="sendMessageCallback"
+            type="com.phenixrts.suite.groups.viewmodels.ChatViewModel.OnSendMessageCallback" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -63,7 +69,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:contentDescription="@string/group_call_chat_send_button_content_descrition"
-                android:onClick="@{() -> chatViewModel.sendChatMessage(newMessage ?? ``)}"
+                android:onClick="@{() -> chat.sendChatMessage(newMessage, sendMessageCallback)}"
                 android:src="@drawable/ic_send_black_24dp" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

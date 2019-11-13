@@ -4,38 +4,31 @@
 
 package com.phenixrts.suite.groups.viewmodels
 
-import androidx.databinding.ObservableArrayList
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.phenixrts.suite.groups.models.Participant
-import com.phenixrts.suite.groups.models.UserSettings
+import com.phenixrts.suite.groups.models.RoomModel
 
-class RoomViewModel : ViewModel() {
-
+class RoomViewModel : ViewModel(), RoomModel.OnConnectionEventsListener {
     private val TAG = RoomViewModel::class.java.simpleName
 
-    val activeParticipant: MutableLiveData<Participant> = MutableLiveData()
-    val roomParticipants = ObservableArrayList<Participant>()
+    val errorState = MutableLiveData<Exception>()
 
-    fun startCall(userSettings: UserSettings) {
+    private lateinit var roomModel: RoomModel
 
-        val localParticipant = userSettings.toParticipant()
-        roomParticipants.add(localParticipant)
-        activeParticipant.value = localParticipant
-
-        // subscribe to room and observe members
-        // - update roomParticipants
-
-        // publish local user media
-
+    fun initialize(roomModel: RoomModel) {
+        this.roomModel = roomModel
+        roomModel.addOnConnectionEventsListener(this)
     }
 
-    fun endCall() {
-        activeParticipant.value = null
-        roomParticipants.clear()
+    override fun onSubscribed() {
+        errorState.value = null
     }
 
-    private fun UserSettings.toParticipant(): Participant {
-        return Participant(nickname, isVideoEnabled, isMicrophoneEnabled, isLocal = true)
+    override fun onError(error: Exception) {
+        errorState.value = error
+        Log.e(TAG, "Connection error", error)
     }
+
+
 }

@@ -7,7 +7,7 @@ package com.phenixrts.suite.groups.phenix
 enum class PhenixBackend(val backendUrl: String, val pcastUrl: String = "") {
     PRODUCTION("https://demo.phenixrts.com/pcast"),
     STAGING(
-        "http://demo-stg.phenixrts.com/pcast",
+        "https://demo-stg.phenixrts.com/pcast",
         "https://pcast-stg.phenixrts.com/"
     )
 }

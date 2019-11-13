@@ -11,16 +11,26 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.phenixrts.suite.groups.R
-import com.phenixrts.suite.groups.models.UserSettings
+import com.phenixrts.suite.groups.models.RoomModel
+import com.phenixrts.suite.groups.phenix.PhenixComponent
+import com.phenixrts.suite.groups.phenix.PhenixRoomAdapter
+import com.phenixrts.suite.groups.viewmodels.CallSettingsViewModel
 import com.phenixrts.suite.groups.viewmodels.ChatViewModel
+import com.phenixrts.suite.groups.viewmodels.ParticipantsViewModel
 import com.phenixrts.suite.groups.viewmodels.RoomViewModel
 import kotlinx.android.synthetic.main.group_call_fragment.*
 
 class GroupCallScreen : Fragment() {
 
     private val roomViewModel: RoomViewModel by viewModels({ activity!! })
+    private val participantsViewModel: ParticipantsViewModel by viewModels({ activity!! })
     private val chatViewModel: ChatViewModel by viewModels({ activity!! })
-    private val userSettings: UserSettings by viewModels({ activity!! })
+    private val callSettings: CallSettingsViewModel by viewModels({ activity!! })
+
+    private val roomModel: RoomModel by lazy {
+        PhenixRoomAdapter(PhenixComponent.roomExpress, callSettings)
+    }
+
 
     init {
         retainInstance = true
@@ -28,7 +38,11 @@ class GroupCallScreen : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        roomViewModel.startCall(userSettings)
+        roomViewModel.initialize(roomModel)
+        participantsViewModel.initialize(roomModel)
+        chatViewModel.init(roomModel)
+
+        roomModel.subscribe()
     }
 
     override fun onCreateView(
@@ -45,7 +59,8 @@ class GroupCallScreen : Fragment() {
     }
 
     override fun onDestroy() {
-        roomViewModel.endCall()
+        roomModel.unsubscribe()
+        activity?.viewModelStore?.clear()
         super.onDestroy()
     }
 }

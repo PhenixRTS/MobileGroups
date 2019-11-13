@@ -12,8 +12,8 @@
     <data>
 
         <variable
-            name="userSettings"
-            type="com.phenixrts.suite.groups.models.UserSettings" />
+            name="callSettings"
+            type="com.phenixrts.suite.groups.viewmodels.CallSettingsViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="32dp"
             android:layout_marginBottom="24dp"
-            android:checked="@={userSettings.isMicrophoneEnabled()}"
+            android:checked="@={callSettings.isMicrophoneEnabled()}"
             android:src="@drawable/checkable_microphone"
             app:layout_constraintBottom_toTopOf="@+id/cardView"
             app:layout_constraintEnd_toStartOf="@+id/cameraButton"
@@ -52,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
-            android:checked="@={userSettings.isVideoEnabled()}"
+            android:checked="@={callSettings.isVideoEnabled()}"
             android:src="@drawable/checkable_camera"
             app:layout_constraintBottom_toTopOf="@+id/cardView"
             app:layout_constraintEnd_toEndOf="parent"

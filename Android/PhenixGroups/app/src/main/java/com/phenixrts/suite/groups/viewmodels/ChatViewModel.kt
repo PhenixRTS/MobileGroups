@@ -6,12 +6,33 @@ package com.phenixrts.suite.groups.viewmodels
 
 import androidx.databinding.ObservableArrayList
 import androidx.lifecycle.ViewModel
-import com.phenixrts.suite.groups.models.ChatMessage
+import com.phenixrts.suite.groups.models.Message
+import com.phenixrts.suite.groups.models.RoomModel
 
-class ChatViewModel : ViewModel() {
-    val roomChat = ObservableArrayList<ChatMessage>()
+class ChatViewModel : ViewModel(), RoomModel.OnChatEventsListener {
+    val chatHistory = ObservableArrayList<Message>()
+    private lateinit var roomModel: RoomModel
 
-    fun sendChatMessage(message: String) {
-        TODO("Send message")
+    fun init(roomModel: RoomModel) {
+        this.roomModel = roomModel
+        roomModel.addOnChatEventsListener(this)
+    }
+
+    override fun onNewChatMessage(message: Message) {
+        chatHistory.add(message)
+    }
+
+    fun sendChatMessage(message: String?, callback: OnSendMessageCallback) {
+        message?.run {
+            roomModel.sendChatMessage(
+                message,
+                { callback.onSuccess() },
+                { callback.onError(it) })
+        }
+    }
+
+    interface OnSendMessageCallback {
+        fun onSuccess()
+        fun onError(error: Exception)
     }
 }
