@@ -15,13 +15,10 @@ import androidx.databinding.InverseBindingMethods
         attribute = "android:checked"
     )
 )
-class CheckableFloatingActionButtonBindingAdapter {
-
-    companion object {
-        @BindingAdapter("android:checkedAttrChanged")
-        @JvmStatic
-        fun CheckableFloatingActionButton.setCheckedAdapter(inverseListener: InverseBindingListener) {
-            onInverseBindingListener = inverseListener
-        }
+object CheckableFloatingActionButtonBindingAdapter {
+    @BindingAdapter("android:checkedAttrChanged")
+    @JvmStatic
+    fun CheckableFloatingActionButton.setCheckedAdapter(inverseListener: InverseBindingListener) {
+        onInverseBindingListener = inverseListener
     }
 }

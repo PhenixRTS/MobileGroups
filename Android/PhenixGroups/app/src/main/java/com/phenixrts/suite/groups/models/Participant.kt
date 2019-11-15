@@ -5,10 +5,13 @@
 package com.phenixrts.suite.groups.models
 
 import androidx.lifecycle.LiveData
+import com.phenixrts.pcast.Renderer
 
-class Participant(
+abstract class Participant(
     val nickname: LiveData<String>,
     val isVideoEnabled: LiveData<Boolean>,
     val isMicrophoneEnabled: LiveData<Boolean>,
-    val isLocal: Boolean = false
-)
+    val isLocal: Boolean
+) {
+    abstract val renderer: LiveData<Renderer>
+}

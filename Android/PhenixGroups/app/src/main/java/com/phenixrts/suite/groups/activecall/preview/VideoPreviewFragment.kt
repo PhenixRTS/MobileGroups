@@ -39,7 +39,7 @@ class VideoPreviewFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.participant = previewViewModel.activeParticipant
+        binding.participant = previewViewModel.participantInVideoPreview
         binding.showControls = areControlsShown
 
         binding.eventHandler = object : EventHandler {

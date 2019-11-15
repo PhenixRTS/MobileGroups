@@ -23,7 +23,7 @@ class ParticipantsListFragment : Fragment() {
     private val listAdapter by lazy {
         ParticipantsListAdapter(
             participantsViewModel.roomParticipants,
-            previewViewModel.activeParticipant
+            previewViewModel.participantInVideoPreview
         )
     }
 

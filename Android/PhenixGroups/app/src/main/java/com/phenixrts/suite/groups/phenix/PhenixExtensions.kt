@@ -22,11 +22,10 @@ fun <T> Observable<T>.fixedSubscribe(callback: Observable.OnChangedHandler<T>): 
 fun <T> Observable<T>.toMutableLiveData(): MutableLiveData<T> {
     return MutableLiveData<T>().apply {
         fixedSubscribe(Observable.OnChangedHandler {
-            mainThreadHandler.post {
-                if (value != it) {
-                    value = it
-                }
+            if (value != it) {
+                postValue(it)
             }
+
         })
 
         mainThreadHandler.post {

@@ -7,7 +7,7 @@ package com.phenixrts.suite.groups.models
 import androidx.lifecycle.MutableLiveData
 import java.util.*
 
-open class Message(
+data class Message(
     val senderName: MutableLiveData<String> = MutableLiveData(),
     val message: String,
     val date: Date,

@@ -14,10 +14,7 @@ import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.models.RoomModel
 import com.phenixrts.suite.groups.phenix.PhenixComponent
 import com.phenixrts.suite.groups.phenix.PhenixRoomAdapter
-import com.phenixrts.suite.groups.viewmodels.CallSettingsViewModel
-import com.phenixrts.suite.groups.viewmodels.ChatViewModel
-import com.phenixrts.suite.groups.viewmodels.ParticipantsViewModel
-import com.phenixrts.suite.groups.viewmodels.RoomViewModel
+import com.phenixrts.suite.groups.viewmodels.*
 import kotlinx.android.synthetic.main.group_call_fragment.*
 
 class GroupCallScreen : Fragment() {
@@ -25,11 +22,10 @@ class GroupCallScreen : Fragment() {
     private val roomViewModel: RoomViewModel by viewModels({ activity!! })
     private val participantsViewModel: ParticipantsViewModel by viewModels({ activity!! })
     private val chatViewModel: ChatViewModel by viewModels({ activity!! })
+    private val previewViewModel: PreviewViewModel by viewModels({ activity!! })
     private val callSettings: CallSettingsViewModel by viewModels({ activity!! })
 
-    private val roomModel: RoomModel by lazy {
-        PhenixRoomAdapter(PhenixComponent.roomExpress, callSettings)
-    }
+    private val roomModel: RoomModel by lazy { PhenixRoomAdapter(PhenixComponent.roomExpress, callSettings) }
 
 
     init {
@@ -41,6 +37,7 @@ class GroupCallScreen : Fragment() {
         roomViewModel.initialize(roomModel)
         participantsViewModel.initialize(roomModel)
         chatViewModel.init(roomModel)
+        previewViewModel.initialize(roomModel)
 
         roomModel.subscribe()
     }

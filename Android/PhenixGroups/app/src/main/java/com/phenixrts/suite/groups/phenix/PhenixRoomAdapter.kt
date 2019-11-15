@@ -8,7 +8,6 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import com.phenixrts.chat.ChatMessage
 import com.phenixrts.chat.RoomChatService
 import com.phenixrts.chat.RoomChatServiceFactory
@@ -19,11 +18,13 @@ import com.phenixrts.express.RoomExpress
 import com.phenixrts.express.RoomExpressFactory
 import com.phenixrts.room.Member
 import com.phenixrts.room.RoomService
-import com.phenixrts.room.TrackState
 import com.phenixrts.suite.groups.models.Message
 import com.phenixrts.suite.groups.models.Participant
 import com.phenixrts.suite.groups.models.RoomModel
 import com.phenixrts.suite.groups.models.RoomModel.*
+import com.phenixrts.suite.groups.models.Session
+import com.phenixrts.suite.groups.phenix.members.LocalMemberPublisher
+import com.phenixrts.suite.groups.phenix.members.RemoteMemberSubscriber
 import com.phenixrts.suite.groups.viewmodels.CallSettingsViewModel
 
 
@@ -47,13 +48,13 @@ class PhenixRoomAdapter(
     private var onChatEventsListener = arrayListOf<OnChatEventsListener>()
     private var onMembersEventListener = arrayListOf<OnMembersEventListener>()
 
+    private val localMember by lazy { LocalMemberPublisher(roomExpress, callSettings) }
     // Keeps disposable as a workaround to keep active observables
     private val strongRefDisposable = mutableListOf<Disposable?>()
 
     override fun subscribe() {
         val joinRoomOptions = RoomExpressFactory.createJoinRoomOptionsBuilder()
             .withRoomAlias(callSettings.roomName.value)
-            .withScreenName(callSettings.nickname.value)
             .buildJoinRoomOptions()
 
         roomExpress.joinRoom(joinRoomOptions) { status: RequestStatus, roomService ->
@@ -94,12 +95,16 @@ class PhenixRoomAdapter(
                 mainThreadHandler.post {
                     onMembersEventListener.forEach { it.onNewMember(newMember) }
                 }
+                // subscribe to member
+                (newMember as? Session)?.takeIf { it != localMember }?.connect()
             }
             Log.d(TAG, "Left members count: ${leftMembers.size}")
             leftMembers.forEach { leftMember ->
                 mainThreadHandler.post {
                     onMembersEventListener.forEach { it.onMemberLeft(leftMember) }
                 }
+                // unsubscribe from member
+                (leftMember as? Session)?.disconnect()
             }
 
             // update cache
@@ -172,6 +177,7 @@ class PhenixRoomAdapter(
         strongRefDisposable.forEach { it?.dispose() }
         strongRefDisposable.clear()
 
+        membersCache.forEach { (it as? Session)?.disconnect() }
         membersCache.clear()
 
         chatService?.dispose()
@@ -193,11 +199,9 @@ class PhenixRoomAdapter(
     )
 
     private fun Member.toParticipant(): Participant {
-        return Participant(
-            observableScreenName.toMutableLiveData(),
-            Transformations.map(observableStreams.value.first().observableVideoState.toMutableLiveData()) { it == TrackState.ENABLED },
-            Transformations.map(observableStreams.value.first().observableAudioState.toMutableLiveData()) { it == TrackState.ENABLED },
-            this == roomService?.self
-        )
+        return if (this == roomService?.self)
+            localMember // already connected
+        else
+            RemoteMemberSubscriber(this)
     }
 }
