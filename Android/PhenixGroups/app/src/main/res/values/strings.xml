@@ -1,15 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright 2019 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+  ~ Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
   -->
-
 <resources>
     <!--  General  -->
     <string name="app_name">Phenix Groups</string>
 
     <!--  Call Settings screen  -->
-    <string name="join_meeting_button_label">Join Meeting</string>
-    <string name="new_meeting_button_label">New Meeting</string>
+    <string name="show_join_room_button_label">Meeting Code</string>
+    <string name="new_room_button_label">New Meeting</string>
+    <string name="rejoin_room_button_label">Rejoin</string>
     <string name="preview_icon_content_description">Preview Icon</string>
+    <string name="room_left_label">Left at %1$s</string>
 
     <!--  Room call screen  -->
     <string name="participants_page_title">Participants</string>
@@ -22,4 +24,16 @@
     <!--  Chat  -->
     <string name="group_call_chat_message_hint">Message</string>
     <string name="group_call_chat_send_button_content_descrition">Send Button</string>
+
+    <!-- Errors -->
+    <string name="err_chat_message_failed">Failed to send chat message: %1$s</string>
+    <string name="err_create_room_failed">Failed to create new meeting</string>
+    <string name="err_join_room_failed">Failed to join meeting</string>
+
+    <!-- Join Meeting -->
+    <string name="join_room_button_label">Join meeting</string>
+    <string name="err_enter_valid_room_code">Please enter a valid room code</string>
+    <string name="hint_room_code">Meeting code</string>
+    <string name="hint_enter_a_meeting_code">Enter a meeting code</string>
+
 </resources>

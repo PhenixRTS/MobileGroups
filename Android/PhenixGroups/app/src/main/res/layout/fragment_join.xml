@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+  -->
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/fragment_background"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/join_room_dismiss_button"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:rotation="45"
+        android:layout_margin="16dp"
+        android:contentDescription="@string/group_call_chat_send_button_content_descrition"
+        android:src="@drawable/ic_add_black_24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <RelativeLayout
+        android:id="@+id/join_room_code_holder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:hint="@string/hint_enter_a_meeting_code"
+        app:hintEnabled="true"
+        app:hintAnimationEnabled="false"
+        app:layout_constraintTop_toBottomOf="@id/join_room_dismiss_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <EditText
+            android:id="@+id/join_room_code_input"
+            android:background="@drawable/bg_input_box"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/hint_room_code"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:padding="16dp"
+            android:layout_marginTop="8dp"
+            android:textColor="@color/text_color_dark" />
+
+        <TextView
+            android:text="@string/hint_enter_a_meeting_code"
+            android:background="@color/input_box_label_background"
+            android:layout_marginStart="16dp"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:textColor="@color/text_color_dark"
+            android:textSize="12sp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+
+    <Button
+        android:id="@+id/join_room_button"
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:layout_weight="1"
+        android:text="@string/join_room_button_label"
+        app:layout_constraintTop_toBottomOf="@id/join_room_code_holder"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

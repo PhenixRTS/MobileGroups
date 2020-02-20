@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.phenix.members
@@ -11,15 +11,15 @@ import com.phenixrts.pcast.Renderer
 import com.phenixrts.suite.groups.models.Participant
 import com.phenixrts.suite.groups.models.Session
 import com.phenixrts.suite.groups.phenix.PhenixException
-import com.phenixrts.suite.groups.viewmodels.CallSettingsViewModel
+import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
 
 class LocalMemberPublisher(
     private val roomExpress: RoomExpress,
-    private val callSettings: CallSettingsViewModel
+    private val groups: GroupsViewModel
 ) : Participant(
-    callSettings.nickname,
-    callSettings.isVideoEnabled,
-    callSettings.isMicrophoneEnabled,
+    groups.screenName,
+    groups.isVideoEnabled,
+    groups.isMicrophoneEnabled,
     true
 ), Session {
     private val internalRenderer = MutableLiveData<Renderer>()

@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+  -->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="participant"
+            type="androidx.lifecycle.LiveData&lt;com.phenixrts.suite.groups.models.Participant>" />
+
+        <variable
+            name="showControls"
+            type="androidx.databinding.ObservableBoolean" />
+
+        <variable
+            name="eventHandler"
+            type="com.phenixrts.suite.groups.ui.screens.fragments.VideoPreviewFragment.EventHandler" />
+
+        <import type="android.view.View" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:background="@android:color/black"
+        android:onClick="@{() -> eventHandler.onPreviewClick()}"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toTopOf="@+id/controls"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="UseCompoundDrawables">
+
+            <ImageView
+                android:id="@+id/userIcon"
+                android:layout_width="128dp"
+                android:layout_height="128dp"
+                android:contentDescription="@string/preview_icon_content_description"
+                android:src="@drawable/ic_account_box_black_24dp"
+                android:tint="@android:color/white" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@{participant.screenName}"
+                android:textColor="@android:color/white"
+                android:textSize="24sp"
+                tools:text="Nickname" />
+
+        </LinearLayout>
+
+        <SurfaceView
+            android:id="@+id/videoRenderer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="@{participant.isVideoEnabled() ? View.VISIBLE : View.GONE }"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:renderer="@{participant.renderer}"
+            tools:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/userMicOff"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="@string/preview_icon_content_description"
+            android:tint="@android:color/holo_red_light"
+            android:visibility="@{participant.isMicrophoneEnabled ? View.GONE : View.VISIBLE }"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:srcCompat="@drawable/ic_mic_off_black_24dp"
+            tools:visibility="visible" />
+
+        <LinearLayout
+            android:id="@+id/controls"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:visibility="@{showControls ? View.VISIBLE : View.GONE}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/videoRenderer">
+
+            <com.phenixrts.suite.groups.customViews.CheckableFloatingActionButton
+                android:id="@+id/microphoneButton"
+                style="@style/Widget.MaterialComponents.FloatingActionButton.Checkable"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="@{participant.isMicrophoneEnabled()}"
+                android:src="@drawable/checkable_microphone"
+                android:visibility="gone" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/endCallButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="24dp"
+                android:layout_marginBottom="24dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:onClick="@{() -> eventHandler.onEndCallButtonClick()}"
+                android:src="@drawable/ic_call_end_black_24dp"
+                android:tint="@color/secondaryTextColor" />
+
+            <com.phenixrts.suite.groups.customViews.CheckableFloatingActionButton
+                android:id="@+id/cameraButton"
+                style="@style/Widget.MaterialComponents.FloatingActionButton.Checkable"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="@{participant.isVideoEnabled()}"
+                android:src="@drawable/checkable_camera"
+                android:visibility="gone" />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

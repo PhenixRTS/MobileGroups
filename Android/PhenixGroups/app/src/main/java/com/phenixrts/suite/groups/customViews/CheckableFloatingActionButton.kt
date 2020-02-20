@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.customViews
@@ -10,9 +10,7 @@ import android.widget.Checkable
 import androidx.databinding.InverseBindingListener
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-
 private typealias OnCheckedChangeListener = (isChecked: Boolean) -> Unit
-
 
 class CheckableFloatingActionButton @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0

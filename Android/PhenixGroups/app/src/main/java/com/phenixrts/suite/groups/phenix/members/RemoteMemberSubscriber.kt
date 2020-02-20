@@ -1,28 +1,30 @@
 /*
- * Copyright 2019 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.phenix.members
 
-import android.util.Log
+import timber.log.Timber
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.express.ExpressSubscriber
+import com.phenixrts.express.RoomExpress
 import com.phenixrts.express.RoomExpressFactory
 import com.phenixrts.pcast.Renderer
 import com.phenixrts.room.Member
 import com.phenixrts.room.TrackState
 import com.phenixrts.suite.groups.models.Participant
 import com.phenixrts.suite.groups.models.Session
-import com.phenixrts.suite.groups.phenix.PhenixComponent
 import com.phenixrts.suite.groups.phenix.PhenixException
-import com.phenixrts.suite.groups.phenix.toMutableLiveData
-import com.phenixrts.suite.groups.utils.TAG
+import com.phenixrts.suite.groups.common.extensions.toMutableLiveData
 
-class RemoteMemberSubscriber(val member: Member) : Participant(
-    member.observableScreenName.toMutableLiveData(),
+class RemoteMemberSubscriber(
+    private val member: Member,
+    private val roomExpress: RoomExpress
+) : Participant(
+    member.observableScreenName.value,
     Transformations.map(member.observableStreams.value.first().observableVideoState.toMutableLiveData()) { it == TrackState.ENABLED },
     Transformations.map(member.observableStreams.value.first().observableAudioState.toMutableLiveData()) { it == TrackState.ENABLED },
     false
@@ -55,10 +57,7 @@ class RemoteMemberSubscriber(val member: Member) : Participant(
         val options = RoomExpressFactory.createSubscribeToMemberStreamOptionsBuilder()
             .buildSubscribeToMemberStreamOptions()
 
-        PhenixComponent.roomExpress.subscribeToMemberStream(
-            stream,
-            options
-        ) { status, subscriber, _ ->
+        roomExpress.subscribeToMemberStream(stream, options) { status, subscriber, _ ->
             when (status) {
                 RequestStatus.OK -> {
                     this.subscriber = subscriber
@@ -68,7 +67,7 @@ class RemoteMemberSubscriber(val member: Member) : Participant(
                     internalError.postValue(null)
                 }
                 else -> {
-                    Log.e(TAG, "Cannot subscribe to [${member.observableScreenName.value}]")
+                    Timber.e("Cannot subscribe to [${member.observableScreenName.value}]")
                     internalRenderer.value?.stop()
                     internalRenderer.value?.dispose()
                     internalRenderer.postValue(null)

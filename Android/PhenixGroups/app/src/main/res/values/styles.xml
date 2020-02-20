@@ -1,7 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright 2019 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+  ~ Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
   -->
-
 <resources>
 
     <!-- Base application theme. -->
@@ -14,11 +14,12 @@
         <item name="windowActionBarOverlay">true</item>
     </style>
 
-    <style name="Widget.MaterialComponents.FloatingActionButton.Checkable">
+    <style name="Widget.MaterialComponents.FloatingActionButton.Checkable" parent="Theme.MaterialComponents">
         <item name="borderWidth">0dp</item>
         <item name="backgroundTint">@color/checkable_fab_background</item>
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
         <item name="android:tint">@color/checkable_fab_drawable_tint</item>
     </style>
+
 </resources>

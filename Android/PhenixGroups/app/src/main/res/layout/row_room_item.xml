@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+  -->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <import
+            alias="stringUtils"
+            type="com.phenixrts.suite.groups.common.StringUtilsKt" />
+
+        <variable
+            name="room"
+            type="com.phenixrts.suite.groups.cache.entities.RoomInfoItem" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <TextView
+            android:id="@+id/room_alias"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="@{room.alias}"
+            tools:text="abc-efgh-ijk"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/room_rejoin_button"
+            app:layout_constraintBottom_toTopOf="@id/room_exit_date" />
+
+        <TextView
+            android:id="@+id/room_exit_date"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@{@string/room_left_label(stringUtils.getFormattedDate(room.dateLeft))}"
+            android:textSize="12sp"
+            tools:text="Left at 14:02"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/room_alias"
+            app:layout_constraintEnd_toStartOf="@id/room_rejoin_button"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <Button
+            android:id="@+id/room_rejoin_button"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_centerVertical="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/rejoin_room_button_label"
+            android:layout_alignParentEnd="true"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

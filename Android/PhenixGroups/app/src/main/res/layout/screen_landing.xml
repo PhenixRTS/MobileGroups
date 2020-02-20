@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+  -->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable
+            name="model"
+            type="com.phenixrts.suite.groups.viewmodels.GroupsViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/black"
+        tools:context=".ui.screens.LandingScreen">
+
+        <ImageView
+            android:id="@+id/userIcon"
+            android:layout_width="128dp"
+            android:layout_height="128dp"
+            android:layout_gravity="center"
+            android:contentDescription="@string/preview_icon_content_description"
+            android:src="@drawable/ic_account_box_black_24dp"
+            android:tint="@android:color/white"
+            app:layout_constraintBottom_toTopOf="@id/landing_bottom_sheet"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.phenixrts.suite.groups.customViews.CheckableFloatingActionButton
+            android:id="@+id/microphoneButton"
+            style="@style/Widget.MaterialComponents.FloatingActionButton.Checkable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="24dp"
+            android:checked="@={model.isMicrophoneEnabled()}"
+            android:src="@drawable/checkable_microphone"
+            app:layout_constraintBottom_toTopOf="@+id/landing_bottom_sheet"
+            app:layout_constraintEnd_toStartOf="@+id/cameraButton"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <com.phenixrts.suite.groups.customViews.CheckableFloatingActionButton
+            android:id="@+id/cameraButton"
+            style="@style/Widget.MaterialComponents.FloatingActionButton.Checkable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:checked="@={model.isVideoEnabled()}"
+            android:src="@drawable/checkable_camera"
+            app:layout_constraintBottom_toTopOf="@+id/landing_bottom_sheet"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintStart_toEndOf="@+id/microphoneButton" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/landing_bottom_sheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:id="@+id/landing_button_holder"
+                    style="?android:attr/buttonBarStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/new_room_button"
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="8dp"
+                        android:layout_weight="1"
+                        android:drawableStart="@drawable/ic_add_black_24dp"
+                        android:text="@string/new_room_button_label" />
+
+                    <Button
+                        android:id="@+id/join_room_button"
+                        style="?android:attr/buttonBarButtonStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="8dp"
+                        android:layout_weight="1"
+                        android:text="@string/show_join_room_button_label" />
+                </LinearLayout>
+
+                <com.phenixrts.suite.groups.customViews.MaxHeightRecyclerView
+                    android:id="@+id/room_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:maxHeight="200dp"
+                    tools:itemCount="1"
+                    tools:listitem="@layout/row_room_item"/>
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

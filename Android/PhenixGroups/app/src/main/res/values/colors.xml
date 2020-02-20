@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <!--
-  ~ Copyright 2019 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+  ~ Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
   -->
-
 <resources>
     <color name="primaryColor">#212121</color>
     <color name="primaryLightColor">#484848</color>
@@ -14,5 +12,11 @@
     <color name="primaryTextColor">#ffffff</color>
     <color name="secondaryTextColor">#ffffff</color>
 
+    <color name="fragment_background">#fff</color>
     <color name="active_participant_selection">#80000000</color>
+    <color name="loading_background">#80000000</color>
+    <color name="input_box_border">#333</color>
+    <color name="input_box_label_background">#fff</color>
+    <color name="text_color_dark">#333</color>
+
 </resources>
