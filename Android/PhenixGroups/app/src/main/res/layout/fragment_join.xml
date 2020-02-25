@@ -5,7 +5,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/fragment_background"
+    android:background="@color/primaryBackgroundColor"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -25,9 +25,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:hint="@string/hint_enter_a_meeting_code"
-        app:hintEnabled="true"
-        app:hintAnimationEnabled="false"
         app:layout_constraintTop_toBottomOf="@id/join_room_dismiss_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -42,15 +39,16 @@
             android:inputType="text"
             android:padding="16dp"
             android:layout_marginTop="8dp"
-            android:textColor="@color/text_color_dark" />
+            android:imeOptions="actionDone"
+            android:textColor="@color/primaryTextDarkColor" />
 
         <TextView
             android:text="@string/hint_enter_a_meeting_code"
-            android:background="@color/input_box_label_background"
+            android:background="@color/primaryBackgroundColor"
             android:layout_marginStart="16dp"
             android:paddingStart="4dp"
             android:paddingEnd="4dp"
-            android:textColor="@color/text_color_dark"
+            android:textColor="@color/primaryTextDarkColor"
             android:textSize="12sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />

@@ -26,17 +26,18 @@ class LandingScreen : EasyPermissionFragment(), RoomListAdapter.OnRoomJoin {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = ScreenLandingBinding.inflate(inflater)
-        binding.model = viewModel
+        binding.viewModel = viewModel
         binding.lifecycleOwner = this
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.roomList.setHasFixedSize(true)
-        binding.cameraButton.setOnCheckedChangeListener(::setCameraPreviewEnabled)
-        binding.microphoneButton.setOnCheckedChangeListener(::setMicrophoneEnabled)
+        cameraButton.setOnCheckedChangeListener(::setCameraPreviewEnabled)
+        microphoneButton.setOnCheckedChangeListener(::setMicrophoneEnabled)
 
+        binding.roomList.setHasFixedSize(true)
+        binding.roomList.adapter = roomAdapter
         binding.newRoomButton.setOnClickListener {
             createRoom()
         }
@@ -44,22 +45,45 @@ class LandingScreen : EasyPermissionFragment(), RoomListAdapter.OnRoomJoin {
             launchFragment(JoinScreen())
         }
 
+        mainBinding.lifecycleOwner = this
+        viewModel.isControlsEnabled.value = true
+        viewModel.isInRoom.value = false
         viewModel.roomList.observe(this, Observer {
             Timber.d("Room list data changed $it")
             roomAdapter.data = it
-            if (binding.roomList.adapter == null) {
-                binding.roomList.adapter = roomAdapter
+        })
+        viewModel.onRoomCreated.observe(this, Observer { response ->
+            if (response.status == RequestStatus.OK) {
+                joinRoomById(response.message)
+            } else {
+                showToast(getString(R.string.err_create_room_failed))
+                hideLoadingScreen()
             }
         })
+
+        setCameraPreviewEnabled(true)
+        setMicrophoneEnabled(true)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        roomExpressRepository.launch {
+            roomExpressRepository.stopMediaStream()
+        }
+    }
+
+    override fun onRoomJoinClicked(roomId: String) {
+        Timber.d("Join clicked for: $roomId")
+        joinRoomById(roomId)
     }
 
     private fun setCameraPreviewEnabled(enabled: Boolean) {
-        if (enabled) {
-            askForPermission(Manifest.permission.CAMERA) { granted ->
-                // TODO (YM): add camera preview switch logic
-                if (!granted) {
-                    binding.cameraButton.isChecked = false
-                }
+        askForPermission(Manifest.permission.CAMERA) { granted ->
+            if (!granted) {
+                cameraButton.isChecked = false
+                viewModel.isVideoEnabled.value = false
+            } else {
+                previewUserVideo(enabled)
             }
         }
     }
@@ -67,9 +91,11 @@ class LandingScreen : EasyPermissionFragment(), RoomListAdapter.OnRoomJoin {
     private fun setMicrophoneEnabled(enabled: Boolean) {
         if (enabled) {
             askForPermission(Manifest.permission.RECORD_AUDIO) { granted ->
-                // TODO (YM): show settings dialog if denied
                 if (!granted) {
-                    binding.microphoneButton.isChecked = false
+                    microphoneButton.isChecked = false
+                    viewModel.isMicrophoneEnabled.value = false
+                } else {
+                    viewModel.isMicrophoneEnabled.value = enabled
                 }
             }
         }
@@ -80,19 +106,25 @@ class LandingScreen : EasyPermissionFragment(), RoomListAdapter.OnRoomJoin {
      */
     private fun createRoom() {
         showLoadingScreen()
-        roomExpressRepository.launch {
-            val response = roomExpressRepository.createRoom()
-            if (response.status == RequestStatus.OK) {
-                joinRoomById(response.message)
-            } else {
-                showToast(getString(R.string.err_create_room_failed))
-                hideLoadingScreen()
-            }
-        }
+        viewModel.createRoom()
     }
 
-    override fun onRoomJoinClicked(roomId: String) {
-        Timber.d("Join clicked for: $roomId")
-        joinRoomById(roomId)
+    private fun previewUserVideo(start: Boolean) {
+        Timber.d("Preview user media: $start")
+        viewModel.isVideoEnabled.value = start
+        if (start) {
+            roomExpressRepository.launch {
+                val response = roomExpressRepository.startUserVideoPreview(surfaceView.holder)
+                launch {
+                    if (response.status == RequestStatus.OK) {
+                        surfaceView.visibility = View.VISIBLE
+                    } else {
+                        showToast(response.message)
+                    }
+                }
+            }
+        } else {
+            surfaceView.visibility = View.GONE
+        }
     }
 }

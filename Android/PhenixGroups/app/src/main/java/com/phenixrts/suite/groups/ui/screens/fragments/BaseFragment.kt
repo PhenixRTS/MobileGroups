@@ -5,17 +5,22 @@
 package com.phenixrts.suite.groups.ui.screens.fragments
 
 import android.os.Bundle
+import android.view.SurfaceView
+import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.cache.CacheProvider
+import com.phenixrts.suite.groups.cache.PreferenceProvider
 import com.phenixrts.suite.groups.common.extensions.*
-import com.phenixrts.suite.groups.phenix.RoomExpressRepository
+import com.phenixrts.suite.groups.customViews.CheckableFloatingActionButton
+import com.phenixrts.suite.groups.repository.RoomExpressRepository
+import com.phenixrts.suite.groups.ui.MainActivity
 import com.phenixrts.suite.groups.ui.screens.JoinScreen
 import com.phenixrts.suite.groups.ui.screens.LoadingScreen
 import com.phenixrts.suite.groups.ui.screens.RoomScreen
+import com.phenixrts.suite.groups.ui.screens.SplashScreen
 import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -23,25 +28,38 @@ import javax.inject.Inject
 
 abstract class BaseFragment : Fragment() {
 
-    private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
-
-    /**
-     * The shared view model containing all necessary view data
-     */
-    val viewModel: GroupsViewModel by lazyViewModel { GroupsViewModel(cacheProvider) }
-
     @Inject
     lateinit var roomExpressRepository: RoomExpressRepository
     @Inject
     lateinit var cacheProvider: CacheProvider
+    @Inject
+    lateinit var preferenceProvider: PreferenceProvider
+
+    private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+
+    val viewModel: GroupsViewModel by lazyViewModel {
+        GroupsViewModel(cacheProvider, preferenceProvider, roomExpressRepository, this)
+    }
+
+    val mainBinding by lazy { (requireActivity() as MainActivity).binding }
+
+    val surfaceView: SurfaceView by lazy { requireActivity().findViewById<SurfaceView>(R.id.video_surface) }
+    val microphoneButton: CheckableFloatingActionButton
+            by lazy { requireActivity().findViewById<CheckableFloatingActionButton>(R.id.microphone_button) }
+    val cameraButton: CheckableFloatingActionButton
+            by lazy { requireActivity().findViewById<CheckableFloatingActionButton>(R.id.camera_button) }
+    val endCallButton: View by lazy { requireActivity().findViewById<View>(R.id.end_call_button) }
+    val previewContainer: View by lazy { requireActivity().findViewById<View>(R.id.preview_container) }
 
     open fun onBackPressed() {}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Timber.d("Fragment created $savedInstanceState")
         injectDependencies()
 
         handleExceptions()
+        observeOnRoomJoined()
     }
 
     /**
@@ -51,6 +69,18 @@ abstract class BaseFragment : Fragment() {
         roomExpressRepository.roomStatus.observe(this, Observer {
             if (it.status != RequestStatus.OK) {
                 closeApp(it.message)
+            }
+        })
+    }
+
+    private fun observeOnRoomJoined() {
+        viewModel.onRoomJoined.observe(this, Observer { status ->
+            Timber.d("Room joined with status: $status")
+            hideLoadingScreen()
+            if (status == RequestStatus.OK) {
+                launchFragment(RoomScreen())
+            } else {
+                showToast(getString(R.string.err_join_room_failed))
             }
         })
     }
@@ -68,15 +98,7 @@ abstract class BaseFragment : Fragment() {
      */
     fun joinRoomById(roomId: String) {
         showLoadingScreen()
-        roomExpressRepository.launch {
-            val status = roomExpressRepository.joinRoomById(roomId, viewModel.screenName)
-            hideLoadingScreen()
-            if (status == RequestStatus.OK) {
-                launchFragment(RoomScreen())
-            } else {
-                showToast(getString(R.string.err_join_room_failed))
-            }
-        }
+        viewModel.joinRoomById(roomId, preferenceProvider.getDisplayName())
     }
 
     /**
@@ -84,15 +106,7 @@ abstract class BaseFragment : Fragment() {
      */
     fun joinRoomByAlias(roomAlias: String) {
         showLoadingScreen()
-        roomExpressRepository.launch {
-            val status = roomExpressRepository.joinRoomByAlias(roomAlias, viewModel.screenName)
-            hideLoadingScreen()
-            if (status == RequestStatus.OK) {
-                launchFragment(RoomScreen())
-            } else {
-                showToast(getString(R.string.err_join_room_failed))
-            }
-        }
+        viewModel.joinRoomByAlias(roomAlias, preferenceProvider.getDisplayName())
     }
 
     /**
@@ -101,11 +115,13 @@ abstract class BaseFragment : Fragment() {
     fun launchFragment(fragment: Fragment, addToBackStack: Boolean = true) {
         launch {
             parentFragmentManager.run {
-                if (fragments.lastOrNull() is JoinScreen) {
+                val fullscreen = fragment is JoinScreen
+                val container = if (fullscreen) R.id.fullscreen_fragment_container else R.id.fragment_container
+                if (fragments.lastOrNull() is JoinScreen || fragments.lastOrNull() is SplashScreen) {
                     popBackStackImmediate()
                 }
                 val transaction = beginTransaction()
-                    .replace(R.id.fragment, fragment, fragment.javaClass.name)
+                    .replace(container, fragment, fragment.javaClass.name)
                 if (addToBackStack) {
                     transaction.addToBackStack(fragment.javaClass.name)
                 }
@@ -123,7 +139,7 @@ abstract class BaseFragment : Fragment() {
             parentFragmentManager.run {
                 if (findFragmentByTag(LoadingScreen::class.java.name) == null) {
                     beginTransaction()
-                        .add(R.id.fragment, LoadingScreen(), LoadingScreen::class.java.name)
+                        .add(R.id.fullscreen_fragment_container, LoadingScreen(), LoadingScreen::class.java.name)
                         .commitNow()
                 }
             }

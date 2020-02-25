@@ -17,7 +17,7 @@ class GroupsApplication: Application() {
         super.onCreate()
 
         if (BuildConfig.DEBUG) {
-            Timber.plant(LineNumberDebugTree("Phenix"))
+            Timber.plant(LineNumberDebugTree("PhenixApp"))
         }
 
         component = DaggerInjectionComponent.builder().injectionModule(InjectionModule(this)).build()

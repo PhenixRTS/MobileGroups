@@ -13,8 +13,9 @@ import com.phenixrts.express.RoomExpressFactory
 import com.phenixrts.suite.groups.BuildConfig
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.cache.CacheProvider
+import com.phenixrts.suite.groups.cache.PreferenceProvider
 import com.phenixrts.suite.groups.models.RoomStatus
-import com.phenixrts.suite.groups.phenix.RoomExpressRepository
+import com.phenixrts.suite.groups.repository.RoomExpressRepository
 import dagger.Module
 import dagger.Provides
 import timber.log.Timber
@@ -51,11 +52,10 @@ class InjectionModule(private val context: GroupsApplication) {
 
     @Provides
     @Singleton
-    fun provideCacheProvider(): CacheProvider {
-        return Room.databaseBuilder(
-            context,
-            CacheProvider::class.java,
-            "phenix_database"
-        ).build()
-    }
+    fun provideCacheProvider(): CacheProvider = Room.databaseBuilder(context,
+        CacheProvider::class.java, "phenix_database").build()
+
+    @Provides
+    @Singleton
+    fun providePreferencesProvider(): PreferenceProvider = PreferenceProvider(context)
 }

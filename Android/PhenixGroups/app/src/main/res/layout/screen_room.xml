@@ -6,29 +6,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:orientation="vertical">
-
-    <fragment
-        android:id="@+id/active_user_preview"
-        android:name="com.phenixrts.suite.groups.ui.screens.fragments.VideoPreviewFragment"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintDimensionRatio="w,3:4"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:layout="@layout/fragment_video_preview" />
+    android:layout_height="wrap_content"
+    tools:background="@color/primaryBackgroundDarkColor" >
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/service_pager"
         android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_height="300dp"
+        android:background="@color/primaryBackgroundColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/active_user_preview">
+        app:layout_constraintStart_toStartOf="parent" >
 
         <com.google.android.material.tabs.TabLayout
             android:layout_width="match_parent"

@@ -2,14 +2,161 @@
 <!--
   ~ Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
   -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <FrameLayout
-        android:id="@+id/fragment"
+    <data>
+        <import type="android.view.View" />
+
+        <variable
+            name="model"
+            type="com.phenixrts.suite.groups.viewmodels.GroupsViewModel" />
+    </data>
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
 
-</LinearLayout>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:background="@color/primaryBackgroundDarkColor"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/preview_container"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:animateLayoutChanges="true"
+                android:clickable="true"
+                android:focusable="true"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/fragment_container">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toTopOf="@+id/media_controls"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.5"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:ignore="UseCompoundDrawables">
+
+                    <ImageView
+                        android:id="@+id/preview_user_icon"
+                        android:layout_width="128dp"
+                        android:layout_height="128dp"
+                        android:contentDescription="@string/preview_icon_content_description"
+                        android:src="@drawable/ic_account_box_black_24dp"
+                        android:tint="@color/primaryTextColor" />
+
+                    <TextView
+                        android:id="@+id/preview_user_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/primaryTextColor"
+                        android:textSize="24sp"
+                        android:text="@{model.displayName}"
+                        tools:text="Nickname" />
+
+                </LinearLayout>
+
+                <SurfaceView
+                    android:id="@+id/video_surface"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="gone"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent" />
+
+                <ImageView
+                    android:id="@+id/indicator_mic"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:contentDescription="@string/preview_icon_content_description"
+                    android:tint="@color/accentColor"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:srcCompat="@drawable/ic_mic_off_black_24dp" />
+
+                <LinearLayout
+                    android:id="@+id/media_controls"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:padding="12dp"
+                    android:visibility="@{!model.isInRoom() || model.isControlsEnabled() ? View.VISIBLE : View.GONE}"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent">
+
+                    <com.phenixrts.suite.groups.customViews.CheckableFloatingActionButton
+                        android:id="@+id/microphone_button"
+                        style="@style/Widget.MaterialComponents.FloatingActionButton.Checkable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="12dp"
+                        android:elevation="5dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:checked="@={model.isMicrophoneEnabled()}"
+                        android:src="@drawable/checkable_microphone" />
+
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/end_call_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="12dp"
+                        android:elevation="5dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:visibility="@{model.isInRoom ? View.VISIBLE : View.GONE}"
+                        android:src="@drawable/ic_call_end_black_24dp"
+                        android:tint="@color/secondaryTextColor" />
+
+                    <com.phenixrts.suite.groups.customViews.CheckableFloatingActionButton
+                        android:id="@+id/camera_button"
+                        style="@style/Widget.MaterialComponents.FloatingActionButton.Checkable"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="12dp"
+                        android:elevation="5dp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:checked="@={model.isVideoEnabled()}"
+                        android:src="@drawable/checkable_camera" />
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/fragment_container"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <androidx.fragment.app.FragmentContainerView
+                android:id="@+id/fullscreen_fragment_container"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+</layout>

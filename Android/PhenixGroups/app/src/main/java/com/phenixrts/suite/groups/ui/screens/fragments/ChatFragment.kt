@@ -20,7 +20,7 @@ class ChatFragment : BaseFragment() {
 
     private lateinit var binding: FragmentChatBinding
 
-    private val adapter = ChatListAdapter()
+    private val adapter by lazy { ChatListAdapter(viewModel) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentChatBinding.inflate(inflater)
@@ -30,8 +30,7 @@ class ChatFragment : BaseFragment() {
             sendMessage()
         }
 
-        viewModel.currentRoomId = roomExpressRepository.getCurrentRoomId()
-        viewModel.chatList.observe(this, Observer {
+        roomExpressRepository.getObservableChatMessages().observe(this, Observer {
             adapter.data = it
             if (it.isNotEmpty()) {
                 binding.chatHistory.scrollToPosition(it.size - 1)

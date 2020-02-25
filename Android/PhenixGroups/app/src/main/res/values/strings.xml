@@ -12,6 +12,8 @@
     <string name="rejoin_room_button_label">Rejoin</string>
     <string name="preview_icon_content_description">Preview Icon</string>
     <string name="room_left_label">Left at %1$s</string>
+    <string name="hint_enter_display_name">Enter display name</string>
+    <string name="hint_display_name">Display name</string>
 
     <!--  Room call screen  -->
     <string name="participants_page_title">Participants</string>

@@ -9,11 +9,10 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.phenixrts.suite.groups.cache.converters.DateConverter
 import com.phenixrts.suite.groups.cache.dao.CacheDao
-import com.phenixrts.suite.groups.cache.entities.ChatMessageItem
 import com.phenixrts.suite.groups.cache.entities.RoomInfoItem
 
 @Database(
-    entities = [RoomInfoItem::class, ChatMessageItem::class],
+    entities = [RoomInfoItem::class],
     version = 1,
     exportSchema = false
 )

@@ -16,6 +16,10 @@ inline fun <reified T : ViewModel> FragmentActivity.getViewModel(noinline creato
         ViewModelProvider(this, BaseViewModelFactory(creator)).get(T::class.java)
 }
 
+inline fun <reified T : ViewModel> FragmentActivity.lazyViewModel(noinline creator: (() -> T)? = null) = lazy {
+    getViewModel(creator)
+}
+
 inline fun <reified T : ViewModel> Fragment.lazyViewModel(noinline creator: (() -> T)? = null) = lazy {
     requireActivity().getViewModel(creator)
 }

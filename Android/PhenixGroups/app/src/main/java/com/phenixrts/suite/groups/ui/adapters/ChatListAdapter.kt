@@ -9,13 +9,14 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.phenixrts.chat.ChatMessage
 import com.phenixrts.suite.groups.databinding.RowChatMessageItemBinding
-import com.phenixrts.suite.groups.cache.entities.ChatMessageItem
+import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
 import kotlin.properties.Delegates
 
-class ChatListAdapter : RecyclerView.Adapter<ChatListAdapter.ViewHolder>() {
+class ChatListAdapter(private val viewModel: GroupsViewModel) : RecyclerView.Adapter<ChatListAdapter.ViewHolder>() {
 
-    var data: List<ChatMessageItem> by Delegates.observable(emptyList()) { _, old, new ->
+    var data: List<ChatMessage> by Delegates.observable(emptyList()) { _, old, new ->
         DiffUtil.calculateDiff(ChatMessageDiff(old, new)).dispatchUpdatesTo(this)
     }
 
@@ -29,12 +30,13 @@ class ChatListAdapter : RecyclerView.Adapter<ChatListAdapter.ViewHolder>() {
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.binding.chatMessage = data[position]
+        holder.binding.isLocal = viewModel.displayName.value == data[position].observableFrom.value.observableScreenName.value
     }
 
     inner class ViewHolder(val binding: RowChatMessageItemBinding) : RecyclerView.ViewHolder(binding.root)
 
-    inner class ChatMessageDiff(private val oldItems: List<ChatMessageItem>,
-                                private val newItems: List<ChatMessageItem>
+    inner class ChatMessageDiff(private val oldItems: List<ChatMessage>,
+                                private val newItems: List<ChatMessage>
     ) : DiffUtil.Callback() {
 
         override fun getOldListSize() = oldItems.size

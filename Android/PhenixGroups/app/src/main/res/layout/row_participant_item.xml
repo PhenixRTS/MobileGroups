@@ -38,7 +38,7 @@
                 android:background="@android:color/white">
 
                 <ImageView
-                    android:id="@+id/userIcon"
+                    android:id="@+id/preview_user_icon"
                     android:layout_width="64dp"
                     android:layout_height="64dp"
                     android:layout_centerInParent="true"
@@ -50,7 +50,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/active_participant_selection"
+                    android:background="@color/primaryTranslucentColor"
                     android:visibility="@{isActive ? View.VISIBLE : View.GONE}" />
 
                 <ImageView

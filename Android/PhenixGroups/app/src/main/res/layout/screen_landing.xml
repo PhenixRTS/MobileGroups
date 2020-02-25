@@ -8,62 +8,22 @@
 
     <data>
         <variable
-            name="model"
+            name="viewModel"
             type="com.phenixrts.suite.groups.viewmodels.GroupsViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@android:color/black"
+        android:layout_height="wrap_content"
+        tools:background="@color/primaryBackgroundDarkColor"
         tools:context=".ui.screens.LandingScreen">
-
-        <ImageView
-            android:id="@+id/userIcon"
-            android:layout_width="128dp"
-            android:layout_height="128dp"
-            android:layout_gravity="center"
-            android:contentDescription="@string/preview_icon_content_description"
-            android:src="@drawable/ic_account_box_black_24dp"
-            android:tint="@android:color/white"
-            app:layout_constraintBottom_toTopOf="@id/landing_bottom_sheet"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <com.phenixrts.suite.groups.customViews.CheckableFloatingActionButton
-            android:id="@+id/microphoneButton"
-            style="@style/Widget.MaterialComponents.FloatingActionButton.Checkable"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="32dp"
-            android:layout_marginBottom="24dp"
-            android:checked="@={model.isMicrophoneEnabled()}"
-            android:src="@drawable/checkable_microphone"
-            app:layout_constraintBottom_toTopOf="@+id/landing_bottom_sheet"
-            app:layout_constraintEnd_toStartOf="@+id/cameraButton"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <com.phenixrts.suite.groups.customViews.CheckableFloatingActionButton
-            android:id="@+id/cameraButton"
-            style="@style/Widget.MaterialComponents.FloatingActionButton.Checkable"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:checked="@={model.isVideoEnabled()}"
-            android:src="@drawable/checkable_camera"
-            app:layout_constraintBottom_toTopOf="@+id/landing_bottom_sheet"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_chainStyle="packed"
-            app:layout_constraintStart_toEndOf="@+id/microphoneButton" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/landing_bottom_sheet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:elevation="5dp"
+            app:layout_constraintBottom_toTopOf="@id/room_list"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
@@ -71,6 +31,37 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="16dp">
+
+                    <EditText
+                        android:id="@+id/screen_display_name"
+                        android:background="@drawable/bg_input_box"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/hint_display_name"
+                        android:importantForAutofill="no"
+                        android:inputType="text"
+                        android:padding="16dp"
+                        android:text="@={viewModel.displayName}"
+                        android:layout_marginTop="8dp"
+                        android:imeOptions="actionDone"
+                        android:textColor="@color/primaryTextDarkColor" />
+
+                    <TextView
+                        android:text="@string/hint_enter_display_name"
+                        android:background="@color/primaryBackgroundColor"
+                        android:layout_marginStart="16dp"
+                        android:paddingStart="4dp"
+                        android:paddingEnd="4dp"
+                        android:textColor="@color/primaryTextDarkColor"
+                        android:textSize="12sp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </RelativeLayout>
 
                 <LinearLayout
                     android:id="@+id/landing_button_holder"
@@ -100,18 +91,22 @@
                         android:text="@string/show_join_room_button_label" />
                 </LinearLayout>
 
-                <com.phenixrts.suite.groups.customViews.MaxHeightRecyclerView
-                    android:id="@+id/room_list"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                    app:maxHeight="200dp"
-                    tools:itemCount="1"
-                    tools:listitem="@layout/row_room_item"/>
-
             </LinearLayout>
 
         </androidx.cardview.widget.CardView>
+
+        <com.phenixrts.suite.groups.customViews.MaxHeightRecyclerView
+            android:id="@+id/room_list"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@color/primaryBackgroundColor"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:maxHeight="200dp"
+            tools:itemCount="1"
+            tools:listitem="@layout/row_room_item"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -4,6 +4,7 @@
 
 package com.phenixrts.suite.groups.injection
 
+import com.phenixrts.suite.groups.ui.MainActivity
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
 import dagger.Component
 import javax.inject.Singleton
@@ -12,4 +13,5 @@ import javax.inject.Singleton
 @Component(modules = [InjectionModule::class])
 interface InjectionComponent {
     fun inject(target: BaseFragment)
+    fun inject(target: MainActivity)
 }
