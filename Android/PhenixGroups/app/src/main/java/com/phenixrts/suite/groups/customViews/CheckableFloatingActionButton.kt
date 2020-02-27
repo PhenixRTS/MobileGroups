@@ -16,7 +16,7 @@ class CheckableFloatingActionButton @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : Checkable, FloatingActionButton(context, attrs, defStyleAttr) {
 
-    private var checked = true
+    private var checked = false
     private var onCheckedChangeListener: OnCheckedChangeListener? = null
     internal var onInverseBindingListener: InverseBindingListener? = null
 

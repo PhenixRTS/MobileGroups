@@ -14,21 +14,20 @@ import com.phenixrts.suite.groups.common.extensions.addUnique
 import com.phenixrts.suite.groups.models.RoomStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
 
-class JoinedRoomRepository(private val roomService: RoomService) {
+class JoinedRoomRepository(private val roomService: RoomService) : Repository() {
 
     private val chatService = RoomChatServiceFactory.createRoomChatService(roomService)
     private val disposables: MutableList<Disposable?> = mutableListOf()
+    private val chatHistory = MutableLiveData<List<ChatMessage>>()
 
     fun getObservableChatMessages(): MutableLiveData<List<ChatMessage>> {
-        val chatHistory = MutableLiveData<List<ChatMessage>>()
         chatService.observableChatMessages.subscribe { messages ->
             Timber.d("Message list updated ${messages.size}")
-            runBlocking {
+            launch {
                 launch(Dispatchers.Main) {
                     Timber.d("Message list updated")
                     val history = chatHistory.value?.toMutableList() ?: mutableListOf()
@@ -56,7 +55,7 @@ class JoinedRoomRepository(private val roomService: RoomService) {
     fun leaveRoom(): String {
         val roomId = roomService.observableActiveRoom.value.roomId
         roomService.leaveRoom { _, status ->
-            Timber.d("Room left")
+            Timber.d("Room left: $status")
         }
         clear()
         return roomId
@@ -71,10 +70,16 @@ class JoinedRoomRepository(private val roomService: RoomService) {
     }
 
     private fun clear() {
+        launch {
+            launch(Dispatchers.Main) {
+                chatHistory.value = mutableListOf()
+            }
+        }
         disposables.forEach { it?.dispose() }
         disposables.clear()
 
         roomService.dispose()
         chatService.dispose()
     }
+
 }

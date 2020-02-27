@@ -8,10 +8,17 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.phenixrts.suite.groups.R
+import com.phenixrts.suite.groups.databinding.FragmentInfoBinding
 
-class CallInfoFragment : Fragment() {
+const val EXTRA_ROOM_ALIAS = "extraRoomAlias"
+
+class InfoFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
-        inflater.inflate(R.layout.fragment_call_info, container, false)!!
+        FragmentInfoBinding.inflate(inflater).apply {
+            roomAlias = arguments?.getString(EXTRA_ROOM_ALIAS, "") ?: ""
+            lifecycleOwner = this@InfoFragment
+        }.root
+
 }
+

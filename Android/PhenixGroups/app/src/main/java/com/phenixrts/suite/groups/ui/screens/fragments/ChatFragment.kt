@@ -30,7 +30,7 @@ class ChatFragment : BaseFragment() {
             sendMessage()
         }
 
-        roomExpressRepository.getObservableChatMessages().observe(this, Observer {
+        viewModel.getChatMessages().observe(viewLifecycleOwner, Observer {
             adapter.data = it
             if (it.isNotEmpty()) {
                 binding.chatHistory.scrollToPosition(it.size - 1)
@@ -42,17 +42,14 @@ class ChatFragment : BaseFragment() {
     /**
      * Sends a chat message and handles response
      */
-    private fun sendMessage() {
-        roomExpressRepository.launch {
-            val status = roomExpressRepository.sendChatMessage(binding.newMessageEditText.text.toString())
-            launch {
-                if (status.status == RequestStatus.OK) {
-                    binding.newMessageEditText.text.clear()
-                } else {
-                    Timber.e("Cannot send message ${status.message}")
-                    showToast(getString(R.string.err_chat_message_failed, status.message))
-                }
-            }
+    private fun sendMessage() = launch {
+        val status = viewModel.sendChatMessage(binding.newMessageEditText.text.toString())
+        if (status.status == RequestStatus.OK) {
+            binding.newMessageEditText.text.clear()
+        } else {
+            Timber.e("Cannot send message ${status.message}")
+            showToast(getString(R.string.err_chat_message_failed, status.message))
         }
     }
+
 }

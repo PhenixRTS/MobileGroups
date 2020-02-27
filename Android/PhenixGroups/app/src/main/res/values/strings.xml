@@ -37,5 +37,6 @@
     <string name="err_enter_valid_room_code">Please enter a valid room code</string>
     <string name="hint_room_code">Meeting code</string>
     <string name="hint_enter_a_meeting_code">Enter a meeting code</string>
+    <string name="meeting_code">Meeting code</string>
 
 </resources>

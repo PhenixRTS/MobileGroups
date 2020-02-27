@@ -14,4 +14,5 @@ class LoadingScreen : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         inflater.inflate(R.layout.screen_loading, container, false)!!
+
 }

@@ -16,6 +16,7 @@ import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
 import com.phenixrts.suite.groups.models.RoomStatus
 import com.phenixrts.suite.groups.repository.RoomExpressRepository
+import com.phenixrts.suite.groups.repository.UserMediaRepository
 import dagger.Module
 import dagger.Provides
 import timber.log.Timber
@@ -47,15 +48,24 @@ class InjectionModule(private val context: GroupsApplication) {
         val roomExpressOptions = RoomExpressFactory.createRoomExpressOptionsBuilder()
             .withPCastExpressOptions(pcastExpressOptions)
             .buildRoomExpressOptions()
-        return RoomExpressRepository(cacheProvider, RoomExpressFactory.createRoomExpress(roomExpressOptions), roomStatus)
+        return RoomExpressRepository(
+            cacheProvider,
+            RoomExpressFactory.createRoomExpress(roomExpressOptions),
+            roomStatus)
     }
 
     @Provides
     @Singleton
-    fun provideCacheProvider(): CacheProvider = Room.databaseBuilder(context,
-        CacheProvider::class.java, "phenix_database").build()
+    fun provideUserMediaRepository(roomExpressRepository: RoomExpressRepository): UserMediaRepository
+            = UserMediaRepository(roomExpressRepository.roomExpress)
+
+    @Provides
+    @Singleton
+    fun provideCacheProvider(): CacheProvider
+            = Room.databaseBuilder(context, CacheProvider::class.java, "phenix_database").build()
 
     @Provides
     @Singleton
     fun providePreferencesProvider(): PreferenceProvider = PreferenceProvider(context)
+
 }

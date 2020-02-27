@@ -4,25 +4,28 @@
 
 package com.phenixrts.suite.groups.common
 
+import android.annotation.SuppressLint
 import android.content.pm.PackageManager.PERMISSION_GRANTED
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
+import androidx.fragment.app.FragmentActivity
 import java.util.*
 
 /**
  * Simplifies permission request to single Callback method call
  */
-open class EasyPermissionFragment : BaseFragment() {
+@SuppressLint("Registered")
+open class EasyPermissionActivity : FragmentActivity() {
 
     private val permissionRequestHistory = hashMapOf<Int, (a: Boolean) -> Unit>()
 
     fun askForPermission(permission: String, callback: (granted: Boolean) -> Unit) {
-        context?.run {
+        run {
             if (ContextCompat.checkSelfPermission(this, permission) != PERMISSION_GRANTED) {
                 // RequestCode supports only low 16 bits of int
                 val requestCode = Date().time.toInt().low16bits()
                 permissionRequestHistory[requestCode] = callback
-                requestPermissions(arrayOf(permission), requestCode)
+                ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
             } else {
                 callback(true)
             }
@@ -38,4 +41,5 @@ open class EasyPermissionFragment : BaseFragment() {
     }
 
     private fun Int.low16bits() = this and 0xFFFF
+
 }

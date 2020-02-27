@@ -4,14 +4,13 @@
 
 package com.phenixrts.suite.groups.ui.screens
 
-import android.Manifest
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.phenixrts.suite.groups.R
-import com.phenixrts.suite.groups.common.EasyPermissionFragment
+import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
 
-class SplashScreen : EasyPermissionFragment() {
+class SplashScreen : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         inflater.inflate(R.layout.screen_splash, container, false)!!
@@ -21,12 +20,9 @@ class SplashScreen : EasyPermissionFragment() {
         showLandingScreen()
     }
 
-    private fun showLandingScreen() {
-        askForPermission(Manifest.permission.CAMERA) { _ ->
-            roomExpressRepository.launch {
-                roomExpressRepository.waitForPCast()
-                launchFragment(LandingScreen(), false)
-            }
-        }
+    private fun showLandingScreen() = launch {
+        viewModel.waitForPCast()
+        launchFragment(LandingScreen(), false)
     }
+
 }

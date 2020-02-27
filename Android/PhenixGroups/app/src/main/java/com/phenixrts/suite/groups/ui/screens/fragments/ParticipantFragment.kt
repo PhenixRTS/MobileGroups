@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import com.phenixrts.suite.groups.R
 
 // TODO: Needs to be refactored and reimplemented
-class ParticipantsListFragment : BaseFragment() {
+class ParticipantFragment : BaseFragment() {
 
     private val listAdapter by lazy {
         /*ParticipantsListAdapter(

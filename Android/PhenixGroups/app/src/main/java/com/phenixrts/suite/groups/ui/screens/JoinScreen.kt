@@ -8,11 +8,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.phenixrts.common.RequestStatus
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.common.extensions.hideKeyboard
 import com.phenixrts.suite.groups.common.extensions.showToast
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
 import kotlinx.android.synthetic.main.fragment_join.view.*
+import timber.log.Timber
 
 class JoinScreen : BaseFragment() {
 
@@ -26,9 +28,22 @@ class JoinScreen : BaseFragment() {
         }
         view.join_room_button.setOnClickListener {
             view.join_room_code_input.text.toString().takeIf { it.isNotBlank() }?.let {
-                hideKeyboard()
-                joinRoomByAlias(it)
+                joinRoom(it)
             } ?: showToast(getString(R.string.err_enter_valid_room_code))
         }
     }
+
+    private fun joinRoom(roomAlias: String) = launch {
+        hideKeyboard()
+        showLoadingScreen()
+        val joinedRoomStatus = viewModel.joinRoomByAlias(roomAlias, preferenceProvider.getDisplayName())
+        Timber.d("Room joined with status: $joinedRoomStatus")
+        hideLoadingScreen()
+        if (joinedRoomStatus.status == RequestStatus.OK) {
+            launchFragment(RoomScreen())
+        } else {
+            showToast(getString(R.string.err_join_room_failed))
+        }
+    }
+
 }

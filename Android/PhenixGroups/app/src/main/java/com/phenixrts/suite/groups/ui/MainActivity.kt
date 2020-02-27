@@ -4,41 +4,77 @@
 
 package com.phenixrts.suite.groups.ui
 
+import android.Manifest
 import android.os.Bundle
+import android.view.View
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.FragmentActivity
+import com.phenixrts.common.RequestStatus
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
+import com.phenixrts.suite.groups.common.EasyPermissionActivity
+import com.phenixrts.suite.groups.common.extensions.hideKeyboard
 import com.phenixrts.suite.groups.common.extensions.lazyViewModel
+import com.phenixrts.suite.groups.common.extensions.showToast
 import com.phenixrts.suite.groups.databinding.ActivityMainBinding
 import com.phenixrts.suite.groups.repository.RoomExpressRepository
+import com.phenixrts.suite.groups.repository.UserMediaRepository
 import com.phenixrts.suite.groups.ui.screens.SplashScreen
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
 import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.*
+import timber.log.Timber
+import java.util.*
 import javax.inject.Inject
+import kotlin.concurrent.schedule
 
-class MainActivity : FragmentActivity() {
+class MainActivity : EasyPermissionActivity() {
 
-    @Inject
-    lateinit var roomExpressRepository: RoomExpressRepository
-    @Inject
-    lateinit var cacheProvider: CacheProvider
-    @Inject
-    lateinit var preferenceProvider: PreferenceProvider
+    @Inject lateinit var roomExpressRepository: RoomExpressRepository
+    @Inject lateinit var userMediaRepository: UserMediaRepository
+    @Inject lateinit var cacheProvider: CacheProvider
+    @Inject lateinit var preferenceProvider: PreferenceProvider
+
+    private var hideControlsTask: TimerTask? = null
 
     private val viewModel: GroupsViewModel by lazyViewModel {
-        GroupsViewModel(cacheProvider, preferenceProvider, roomExpressRepository, this)
+        GroupsViewModel(cacheProvider, preferenceProvider, roomExpressRepository, userMediaRepository, this)
     }
 
-    lateinit var binding: ActivityMainBinding
+    private val activityScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         GroupsApplication.component.inject(this)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        binding.model = viewModel
+
+        DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main).apply {
+            model = viewModel
+            lifecycleOwner = this@MainActivity
+        }
+
+        camera_button.setOnCheckedChangeListener(::setCameraPreviewEnabled)
+        microphone_button.setOnCheckedChangeListener(::setMicrophoneEnabled)
+        preview_container.setOnClickListener {
+            launch {
+                viewModel.isControlsEnabled.value = true
+                hideControlsTask?.cancel()
+                hideControlsTask = Timer("hide buttons").schedule(HIDE_CONTROLS_DELAY) {
+                    launch {
+                        viewModel.isControlsEnabled.value = false
+                    }
+                }
+            }
+        }
+        end_call_button.setOnClickListener {
+            hideKeyboard()
+            onBackPressed()
+        }
+
+        Timber.d("Set camera preview call: ${viewModel.isVideoEnabled.value} ${viewModel.isVideoEnabled.value ?: true}")
+        setCameraPreviewEnabled(viewModel.isVideoEnabled.value ?: true)
+        setMicrophoneEnabled(viewModel.isMicrophoneEnabled.value ?: true)
 
         // Show splash screen if wasn't started already
         if (savedInstanceState == null) {
@@ -60,4 +96,61 @@ class MainActivity : FragmentActivity() {
         }
         super.onBackPressed()
     }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Timber.d("App destroyed, disposing renderer")
+        viewModel.disposeMediaRenderer()
+    }
+
+    private fun launch(block: suspend CoroutineScope.() -> Unit) = activityScope.launch(
+        context = CoroutineExceptionHandler { _, e -> Timber.e("Coroutine failed: ${e.localizedMessage}") },
+        block = block
+    )
+
+    private fun setCameraPreviewEnabled(enabled: Boolean) {
+        Timber.d("Camera preview clicked: $enabled")
+        askForPermission(Manifest.permission.CAMERA) { granted ->
+            Timber.d("Camera permission granted: $enabled $granted")
+            if (!granted) {
+                camera_button.isChecked = false
+                viewModel.isVideoEnabled.value = false
+            } else {
+                previewUserVideo(enabled)
+            }
+        }
+    }
+
+    private fun setMicrophoneEnabled(enabled: Boolean) {
+        if (enabled) {
+            askForPermission(Manifest.permission.RECORD_AUDIO) { granted ->
+                if (!granted) {
+                    microphone_button.isChecked = false
+                    viewModel.isMicrophoneEnabled.value = false
+                } else {
+                    viewModel.isMicrophoneEnabled.value = enabled
+                }
+            }
+        }
+    }
+
+    private fun previewUserVideo(start: Boolean) = launch {
+        Timber.d("Preview user video: $start")
+        viewModel.isVideoEnabled.value = start
+        if (start) {
+            val response = viewModel.startMediaPreview(video_surface.holder)
+            if (response.status == RequestStatus.OK) {
+                video_surface.visibility = View.VISIBLE
+            } else {
+                showToast(response.message)
+            }
+        } else {
+            video_surface.visibility = View.INVISIBLE
+        }
+    }
+
+    companion object {
+        private const val HIDE_CONTROLS_DELAY = 5000L
+    }
+
 }

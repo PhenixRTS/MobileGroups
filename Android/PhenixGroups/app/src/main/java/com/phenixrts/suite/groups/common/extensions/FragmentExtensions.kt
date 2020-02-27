@@ -8,6 +8,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
 import kotlinx.coroutines.Dispatchers
@@ -19,9 +20,13 @@ import kotlinx.coroutines.launch
  */
 fun Fragment.showToast(message: String) {
     if (isAdded) {
-        GlobalScope.launch(Dispatchers.Main) {
-            Toast.makeText(activity, message, Toast.LENGTH_SHORT).show()
-        }
+        requireActivity().showToast(message)
+    }
+}
+
+fun FragmentActivity.showToast(message: String) {
+    GlobalScope.launch(Dispatchers.Main) {
+        Toast.makeText(this@showToast, message, Toast.LENGTH_SHORT).show()
     }
 }
 
@@ -43,9 +48,15 @@ fun BaseFragment.closeApp(message: String) {
 /**
  * Hides current active keyboard and clears focus
  */
-fun BaseFragment.hideKeyboard() {
-    val view = requireActivity().currentFocus ?: requireActivity().window.decorView
+fun Fragment.hideKeyboard() {
+    if (isAdded) {
+        requireActivity().hideKeyboard()
+    }
+}
+
+fun FragmentActivity.hideKeyboard() {
+    val view = currentFocus ?: window.decorView
     val token = view.windowToken
     view.clearFocus()
-    getSystemService(requireContext(), InputMethodManager::class.java)?.hideSoftInputFromWindow(token, 0)
+    getSystemService(this, InputMethodManager::class.java)?.hideSoftInputFromWindow(token, 0)
 }

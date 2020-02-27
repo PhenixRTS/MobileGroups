@@ -4,10 +4,7 @@
 
 package com.phenixrts.suite.groups.cache.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.phenixrts.suite.groups.cache.entities.RoomInfoItem
 import kotlinx.coroutines.flow.Flow
 import java.util.*
@@ -23,5 +20,8 @@ interface CacheDao {
 
     @Query("UPDATE room_item SET dateLeft = :dateLeft WHERE roomId = :roomId")
     fun updateRoomLeftDate(roomId: String, dateLeft: Date)
+
+    @Query("DELETE FROM room_item WHERE dateLeft < :expirationDate")
+    fun expireOldRooms(expirationDate: Date)
 
 }
