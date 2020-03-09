@@ -13,7 +13,6 @@ import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
-import com.phenixrts.suite.groups.common.EasyPermissionActivity
 import com.phenixrts.suite.groups.common.extensions.hideKeyboard
 import com.phenixrts.suite.groups.common.extensions.lazyViewModel
 import com.phenixrts.suite.groups.common.extensions.showToast
@@ -29,6 +28,8 @@ import timber.log.Timber
 import java.util.*
 import javax.inject.Inject
 import kotlin.concurrent.schedule
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class MainActivity : EasyPermissionActivity() {
 
@@ -54,7 +55,11 @@ class MainActivity : EasyPermissionActivity() {
             lifecycleOwner = this@MainActivity
         }
 
-        camera_button.setOnCheckedChangeListener(::setCameraPreviewEnabled)
+        camera_button.setOnCheckedChangeListener { enabled ->
+            launch {
+                setCameraPreviewEnabled(enabled)
+            }
+        }
         microphone_button.setOnCheckedChangeListener(::setMicrophoneEnabled)
         preview_container.setOnClickListener {
             launch {
@@ -72,9 +77,10 @@ class MainActivity : EasyPermissionActivity() {
             onBackPressed()
         }
 
-        Timber.d("Set camera preview call: ${viewModel.isVideoEnabled.value} ${viewModel.isVideoEnabled.value ?: true}")
-        setCameraPreviewEnabled(viewModel.isVideoEnabled.value ?: true)
-        setMicrophoneEnabled(viewModel.isMicrophoneEnabled.value ?: true)
+        launch {
+            setMicrophoneEnabled(viewModel.isMicrophoneEnabled.value ?: true)
+            setCameraPreviewEnabled(viewModel.isVideoEnabled.value ?: true)
+        }
 
         // Show splash screen if wasn't started already
         if (savedInstanceState == null) {
@@ -98,9 +104,11 @@ class MainActivity : EasyPermissionActivity() {
     }
 
     override fun onDestroy() {
+        launch {
+            Timber.d("App destroyed, stopping renderer")
+            viewModel.stopMediaRenderer()
+        }
         super.onDestroy()
-        Timber.d("App destroyed, disposing renderer")
-        viewModel.disposeMediaRenderer()
     }
 
     private fun launch(block: suspend CoroutineScope.() -> Unit) = activityScope.launch(
@@ -108,15 +116,18 @@ class MainActivity : EasyPermissionActivity() {
         block = block
     )
 
-    private fun setCameraPreviewEnabled(enabled: Boolean) {
-        Timber.d("Camera preview clicked: $enabled")
+    private suspend fun setCameraPreviewEnabled(enabled: Boolean): Unit = suspendCoroutine { continuation ->
+        Timber.d("Camera preview enabled: $enabled")
         askForPermission(Manifest.permission.CAMERA) { granted ->
-            Timber.d("Camera permission granted: $enabled $granted")
-            if (!granted) {
-                camera_button.isChecked = false
-                viewModel.isVideoEnabled.value = false
-            } else {
-                previewUserVideo(enabled)
+            launch {
+                if (!granted) {
+                    camera_button.isChecked = false
+                    viewModel.isVideoEnabled.value = false
+                } else {
+                    previewUserVideo(enabled)
+                }
+                Timber.d("Camera permission granted: $enabled $granted")
+                continuation.resume(Unit)
             }
         }
     }
@@ -134,17 +145,19 @@ class MainActivity : EasyPermissionActivity() {
         }
     }
 
-    private fun previewUserVideo(start: Boolean) = launch {
+    private suspend fun previewUserVideo(start: Boolean) {
         Timber.d("Preview user video: $start")
         viewModel.isVideoEnabled.value = start
         if (start) {
             val response = viewModel.startMediaPreview(video_surface.holder)
+            Timber.d("Preview started: ${response.status}")
             if (response.status == RequestStatus.OK) {
                 video_surface.visibility = View.VISIBLE
             } else {
                 showToast(response.message)
             }
         } else {
+            viewModel.stopMediaRenderer()
             video_surface.visibility = View.INVISIBLE
         }
     }

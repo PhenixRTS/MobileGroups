@@ -25,8 +25,10 @@ fun Fragment.showToast(message: String) {
 }
 
 fun FragmentActivity.showToast(message: String) {
-    GlobalScope.launch(Dispatchers.Main) {
-        Toast.makeText(this@showToast, message, Toast.LENGTH_SHORT).show()
+    if (message.isNotBlank()) {
+        GlobalScope.launch(Dispatchers.Main) {
+            Toast.makeText(this@showToast, message, Toast.LENGTH_SHORT).show()
+        }
     }
 }
 

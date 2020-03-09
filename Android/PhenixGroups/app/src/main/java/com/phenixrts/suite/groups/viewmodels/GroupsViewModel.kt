@@ -9,9 +9,12 @@ import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import com.phenixrts.chat.ChatMessage
 import com.phenixrts.common.RequestStatus
+import com.phenixrts.express.SubscribeToMemberStreamOptions
 import com.phenixrts.pcast.Renderer
 import com.phenixrts.pcast.RendererStartStatus
 import com.phenixrts.pcast.android.AndroidVideoRenderSurface
+import com.phenixrts.room.Member
+import com.phenixrts.room.Stream
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
 import com.phenixrts.suite.groups.cache.entities.RoomInfoItem
@@ -24,6 +27,7 @@ import com.phenixrts.suite.groups.repository.UserMediaRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
 import java.util.*
 import kotlin.coroutines.resume
@@ -54,11 +58,13 @@ class GroupsViewModel(
         displayName.observe(lifecycleOwner, Observer {
             preferenceProvider.saveDisplayName(it)
         })
-        isMicrophoneEnabled.observe(lifecycleOwner, Observer {enabled ->
+        isMicrophoneEnabled.observe(lifecycleOwner, Observer { enabled ->
             userMediaRepository.switchAudioStreams(enabled)
+            joinedRoomRepository?.switchAudioStreams(enabled)
         })
-        isVideoEnabled.observe(lifecycleOwner, Observer {enabled ->
+        isVideoEnabled.observe(lifecycleOwner, Observer { enabled ->
             userMediaRepository.switchVideoStreams(enabled)
+            joinedRoomRepository?.switchVideoStreams(enabled)
         })
         expireOldRooms()
         getRoomListItems()
@@ -76,36 +82,60 @@ class GroupsViewModel(
 
     private fun handleJoinedRoom(joinedRoomStatus: JoinedRoomStatus) {
         if (joinedRoomStatus.status == RequestStatus.OK) {
-            joinedRoomStatus.roomService?.let {
-                viewModelScope.launch {
-                    currentRoomAlias.value = it.observableActiveRoom.value.observableAlias.value
-                    joinedRoomRepository = JoinedRoomRepository(it)
+            joinedRoomStatus.roomService?.let { roomService ->
+                joinedRoomStatus.publisher?.let { publisher ->
+                    viewModelScope.launch {
+                        Timber.d("Joined room repository created")
+                        currentRoomAlias.value = roomService.observableActiveRoom.value.observableAlias.value
+                        joinedRoomRepository = JoinedRoomRepository(roomService, publisher)
+                    }
                 }
             }
         }
     }
 
-    fun getChatMessages(): MutableLiveData<List<ChatMessage>> =
-        joinedRoomRepository?.getObservableChatMessages() ?: MutableLiveData()
+    private suspend fun disposeMediaRenderer(): Unit = suspendCancellableCoroutine { continuation ->
+        Timber.d("Disposing media renderer")
+        try {
+            userMediaRenderer?.stop()
+            userMediaRenderer?.dispose()
+            userMediaRenderer = null
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Timber.d("Failed to dispose Renderer")
+        } finally {
+            Timber.d("Media renderer disposed")
+            if (continuation.isActive) {
+                continuation.resume(Unit)
+            }
+        }
+    }
+
+    suspend fun waitForPCast(): Unit = suspendCoroutine {
+        viewModelScope.launch {
+            roomExpressRepository.waitForPCast()
+            it.resume(Unit)
+        }
+    }
 
     suspend fun joinRoomById(roomId: String, userScreenName: String): JoinedRoomStatus = suspendCoroutine { continuation ->
         viewModelScope.launch {
-            userMediaRepository.userMediaStream.value?.let {
-                Timber.d("Joining room by id: $roomId")
-                val joinedRoomStatus = roomExpressRepository.joinRoomById(roomId, userScreenName, it)
-                handleJoinedRoom(joinedRoomStatus)
-                continuation.resume(joinedRoomStatus)
+            userMediaRepository.getUserMediaStream().userMediaStream?.let {
+                    Timber.d("Joining room by id: $roomId")
+                    val joinedRoomStatus = roomExpressRepository.joinRoomById(roomId, userScreenName, it)
+                    handleJoinedRoom(joinedRoomStatus)
+                    continuation.resume(joinedRoomStatus)
             } ?: continuation.resume(JoinedRoomStatus(RequestStatus.FAILED))
         }
     }
 
     suspend fun joinRoomByAlias(roomAlias: String, userScreenName: String): JoinedRoomStatus = suspendCoroutine { continuation ->
         viewModelScope.launch {
-            userMediaRepository.userMediaStream.value?.let {
-                Timber.d("Joining room by alias: $roomAlias")
-                val joinedRoomStatus = roomExpressRepository.joinRoomByAlias(roomAlias, userScreenName, it)
-                handleJoinedRoom(joinedRoomStatus)
-                continuation.resume(joinedRoomStatus)
+            userMediaRepository.getUserMediaStream().userMediaStream?.let {
+                    Timber.d("Joining room by alias: $roomAlias")
+                    val joinedRoomStatus = roomExpressRepository.joinRoomByAlias(roomAlias, userScreenName, it)
+                    handleJoinedRoom(joinedRoomStatus)
+                    continuation.resume(joinedRoomStatus)
             } ?: continuation.resume(JoinedRoomStatus(RequestStatus.FAILED))
         }
     }
@@ -116,15 +146,6 @@ class GroupsViewModel(
         }
     }
 
-    fun leaveRoom() = viewModelScope.launch {
-        roomExpressRepository.launch {
-            joinedRoomRepository?.leaveRoom()?.let { roomId ->
-                cacheProvider.cacheDao().updateRoomLeftDate(roomId, Date())
-            }
-        }
-        joinedRoomRepository = null
-    }
-
     suspend fun sendChatMessage(message: String): RoomStatus = suspendCoroutine { continuation ->
         viewModelScope.launch {
             joinedRoomRepository?.sendChatMessage(message, continuation)
@@ -132,38 +153,58 @@ class GroupsViewModel(
         }
     }
 
-    suspend fun startMediaPreview(holder: SurfaceHolder): RoomStatus = suspendCoroutine {
-        viewModelScope.launch {
-            var status = RequestStatus.OK
-            if (userMediaRenderer == null) {
-                userMediaRenderer = userMediaRepository.userMediaStream.value?.mediaStream?.createRenderer()
-                val renderStatus = userMediaRenderer?.start(AndroidVideoRenderSurface(holder))
-                if (renderStatus != RendererStartStatus.OK) {
-                    status = RequestStatus.FAILED
-                }
-                Timber.d("Video render restarted: $renderStatus")
-            }
-            it.resume(RoomStatus(status))
-        }
-    }
-
-    fun restartMediaPreview(holder: SurfaceHolder) = viewModelScope.launch {
+    suspend fun startMediaPreview(holder: SurfaceHolder): RoomStatus = suspendCoroutine { continuation ->
         if(isVideoEnabled.value == true) {
-            disposeMediaRenderer()
-            startMediaPreview(holder)
+            viewModelScope.launch {
+                var status = RequestStatus.OK
+                if (userMediaRenderer == null) {
+                    userMediaRepository.getUserMediaStream().let { userMedia ->
+                        status = userMedia.status
+                        if (status == RequestStatus.OK) {
+                            userMediaRenderer = userMedia.userMediaStream?.mediaStream?.createRenderer()
+                            val renderStatus = userMediaRenderer?.start(AndroidVideoRenderSurface(holder))
+                            if (renderStatus != RendererStartStatus.OK) {
+                                status = RequestStatus.FAILED
+                                disposeMediaRenderer()
+                            }
+                            Timber.d("Video render created and started: $renderStatus")
+                        }
+                    }
+                } else {
+                    val renderStatus = userMediaRenderer?.start(AndroidVideoRenderSurface(holder))
+                    if (renderStatus != RendererStartStatus.OK) {
+                        status = RequestStatus.FAILED
+                        disposeMediaRenderer()
+                    }
+                    Timber.d("Video render re-started: $renderStatus")
+                }
+                continuation.resume(RoomStatus(status))
+            }
         }
     }
 
-    fun disposeMediaRenderer() = viewModelScope.launch {
-        Timber.d("Disposing media renderer")
-        userMediaRenderer = null
-    }
-
-    suspend fun waitForPCast(): Unit = suspendCoroutine {
+    suspend fun subscribeToMemberStream(stream: Stream, options: SubscribeToMemberStreamOptions): RoomStatus = suspendCoroutine { continuation ->
         viewModelScope.launch {
-            roomExpressRepository.waitForPCast()
-            it.resume(Unit)
+            continuation.resume(userMediaRepository.subscribeToMemberMedia(stream, options))
         }
+    }
+
+    fun leaveRoom() = viewModelScope.launch {
+        Timber.d("Leaving room")
+        joinedRoomRepository?.leaveRoom(cacheProvider)
+        joinedRoomRepository = null
+    }
+
+    fun getChatMessages(): MutableLiveData<List<ChatMessage>> =
+        joinedRoomRepository?.getObservableChatMessages() ?: MutableLiveData()
+
+    fun getRoomMembers(): MutableLiveData<List<Member>>
+            = joinedRoomRepository?.getObservableRoomMembers() ?: MutableLiveData()
+
+    fun stopMediaRenderer() = viewModelScope.launch {
+        Timber.d("Stopping media renderer")
+        // TODO: Stopping and re-starting the renderer in quick manner causes crash or BSOD (Black Screen Of Death)
+        userMediaRenderer?.stop()
     }
 
 }

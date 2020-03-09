@@ -48,7 +48,7 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
             Timber.d("Room list data changed $it")
             roomAdapter.data = it
         })
-        viewModel.restartMediaPreview(getSurfaceHolder())
+        restartVideoPreview()
     }
 
     override fun onRoomJoinClicked(roomId: String) {
@@ -76,6 +76,7 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
         Timber.d("Room joined with status: $joinedRoomStatus")
         hideLoadingScreen()
         if (joinedRoomStatus.status == RequestStatus.OK) {
+            viewModel.stopMediaRenderer()
             launchFragment(RoomScreen())
         } else {
             showToast(getString(R.string.err_join_room_failed))

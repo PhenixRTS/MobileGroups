@@ -25,10 +25,11 @@ class RoomScreen : BaseFragment() {
 
         viewModel.isControlsEnabled.value = false
         viewModel.isInRoom.value = true
-        viewModel.restartMediaPreview(getSurfaceHolder())
+        restartVideoPreview()
     }
 
     override fun onBackPressed() {
+        viewModel.stopMediaRenderer()
         viewModel.leaveRoom()
     }
 

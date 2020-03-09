@@ -5,9 +5,11 @@
 package com.phenixrts.suite.groups.models
 
 import com.phenixrts.common.RequestStatus
+import com.phenixrts.express.ExpressPublisher
 import com.phenixrts.room.RoomService
 
 data class JoinedRoomStatus(
     val status: RequestStatus,
-    val roomService: RoomService? = null
+    val roomService: RoomService? = null,
+    val publisher: ExpressPublisher? = null
 )

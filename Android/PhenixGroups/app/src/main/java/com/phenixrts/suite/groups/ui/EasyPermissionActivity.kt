@@ -2,7 +2,7 @@
  * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
-package com.phenixrts.suite.groups.common
+package com.phenixrts.suite.groups.ui
 
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager.PERMISSION_GRANTED

@@ -11,7 +11,7 @@ abstract class Repository {
 
     private val repositoryScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    fun launch(block: suspend CoroutineScope.() -> Unit) = repositoryScope.launch(
+    protected fun launch(block: suspend CoroutineScope.() -> Unit) = repositoryScope.launch(
         context = CoroutineExceptionHandler { _, e ->
             Timber.w("Coroutine failed: ${e.localizedMessage}")
             e.printStackTrace()

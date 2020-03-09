@@ -4,21 +4,22 @@
 
 package com.phenixrts.suite.groups.repository
 
-import androidx.lifecycle.MutableLiveData
-import com.phenixrts.express.RoomExpress
+import com.phenixrts.common.RequestStatus
+import com.phenixrts.express.*
 import com.phenixrts.pcast.*
+import com.phenixrts.room.Stream
 import com.phenixrts.suite.groups.common.extensions.getUserMedia
+import com.phenixrts.suite.groups.models.RoomStatus
 import com.phenixrts.suite.groups.models.UserMediaStatus
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 import timber.log.Timber
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class UserMediaRepository(private val roomExpress: RoomExpress) : Repository() {
 
-    val userMediaStream = MutableLiveData<UserMediaStream>()
+    private val subscribers: MutableList<ExpressSubscriber> = mutableListOf()
+    private var userMediaStream: UserMediaStream? = null
+    private var collectingUserMedia = false
 
     private val userMediaOptions = UserMediaOptions().apply {
         videoOptions.capabilityConstraints[DeviceCapability.FACING_MODE] = listOf(DeviceConstraint(FacingMode.USER))
@@ -28,30 +29,48 @@ class UserMediaRepository(private val roomExpress: RoomExpress) : Repository() {
             listOf(DeviceConstraint(AudioEchoCancelationMode.ON))
     }
 
-    init {
+    suspend fun getUserMediaStream(): UserMediaStatus = suspendCoroutine { continuation ->
         launch {
-            getUserMediaStream().collect {
-                launch(Dispatchers.Main) {
-                    Timber.d("Received user media: $it")
-                    userMediaStream.value = it.userMediaStream
+            if (!collectingUserMedia) {
+                collectingUserMedia = true
+                if (userMediaStream != null) {
+                    Timber.d("Returning already collected stream")
+                    collectingUserMedia = false
+                    continuation.resume(UserMediaStatus(userMediaStream = userMediaStream))
+                } else {
+                    Timber.d("Media stream not collected yet - getting from pCast")
+                    val status = roomExpress.pCastExpress.getUserMedia(userMediaOptions)
+                    userMediaStream = status.userMediaStream
+                    collectingUserMedia = false
+                    continuation.resume(status)
                 }
+            } else {
+                continuation.resume(UserMediaStatus(status = RequestStatus.FAILED))
             }
         }
     }
 
-    private fun getUserMediaStream(): Flow<UserMediaStatus> = flow {
-        emit(userMediaStream.value?.let { UserMediaStatus(userMediaStream = it) }
-            ?: roomExpress.pCastExpress.getUserMedia(userMediaOptions))
+    suspend fun subscribeToMemberMedia(stream: Stream, options: SubscribeToMemberStreamOptions): RoomStatus = suspendCoroutine { continuation ->
+        roomExpress.subscribeToMemberStream(stream, options) {status, subscriber, renderer ->
+            var message = ""
+            if (status == RequestStatus.OK && renderer != null) {
+                renderer.start()
+            } else {
+                message = "Failed to subscribe to member media"
+            }
+            subscribers.add(subscriber)
+            continuation.resume(RoomStatus(status, message))
+        }
     }
 
     fun switchVideoStreams(enabled: Boolean) = launch {
         Timber.d("Switching video streams: $enabled")
-        userMediaStream.value?.mediaStream?.videoTracks?.forEach { it.isEnabled = enabled }
+        userMediaStream?.mediaStream?.videoTracks?.forEach { it.isEnabled = enabled }
     }
 
     fun switchAudioStreams(enabled: Boolean) = launch {
         Timber.d("Switching audio streams: $enabled")
-        userMediaStream.value?.mediaStream?.audioTracks?.forEach { it.isEnabled = enabled }
+        userMediaStream?.mediaStream?.audioTracks?.forEach { it.isEnabled = enabled }
     }
 
 }

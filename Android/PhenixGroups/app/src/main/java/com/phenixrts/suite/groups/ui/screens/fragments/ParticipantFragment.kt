@@ -8,23 +8,52 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.phenixrts.suite.groups.R
+import androidx.lifecycle.Observer
+import com.phenixrts.common.RequestStatus
+import com.phenixrts.room.Stream
+import com.phenixrts.suite.groups.common.extensions.showToast
+import com.phenixrts.suite.groups.common.getSubscribeOptions
+import com.phenixrts.suite.groups.databinding.FragmentParticipantsBinding
+import com.phenixrts.suite.groups.ui.adapters.ParticipantListAdapter
+import timber.log.Timber
 
-// TODO: Needs to be refactored and reimplemented
-class ParticipantFragment : BaseFragment() {
+class ParticipantFragment : BaseFragment(), ParticipantListAdapter.OnParticipant {
 
-    private val listAdapter by lazy {
-        /*ParticipantsListAdapter(
-            participantsViewModel.roomParticipants,
-            previewViewModel.participantInVideoPreview
-        )*/
+    private lateinit var binding: FragmentParticipantsBinding
+
+    private val adapter by lazy { ParticipantListAdapter(viewModel, this) }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = FragmentParticipantsBinding.inflate(inflater)
+        binding.lifecycleOwner = this
+        binding.participantList.adapter = adapter
+
+        viewModel.getRoomMembers().observe(viewLifecycleOwner, Observer {
+            Timber.d("Member adapter updated")
+            adapter.data = it
+        })
+        return binding.root
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
-        inflater.inflate(R.layout.fragment_participants, container, false)!!
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        //participantsList.adapter = listAdapter
+    override fun onParticipantClicked(stream: Stream?, isSelf: Boolean) {
+        launch {
+            viewModel.stopMediaRenderer()
+            if (isSelf) {
+                Timber.d("Self clicked")
+                viewModel.startMediaPreview(getSurfaceHolder())
+            }
+            else if (stream != null) {
+                val options = getSubscribeOptions(getSurfaceHolder())
+                val status = viewModel.subscribeToMemberStream(stream, options)
+                Timber.d("Subscribed to member media: $status")
+                if (status.status != RequestStatus.OK) {
+                    showToast(status.message)
+                }
+            } else {
+                showToast("Failed to load member stream")
+                viewModel.startMediaPreview(getSurfaceHolder())
+            }
+        }
     }
+
 }

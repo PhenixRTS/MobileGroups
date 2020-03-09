@@ -24,6 +24,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 abstract class BaseFragment : Fragment() {
 
@@ -122,6 +124,16 @@ abstract class BaseFragment : Fragment() {
         requireActivity().onBackPressed()
     }
 
-    fun getSurfaceHolder(): SurfaceHolder = (requireActivity() as MainActivity).video_surface.holder
+    fun restartVideoPreview() = launch {
+        Timber.d("Restarting video preview")
+        viewModel.startMediaPreview(getSurfaceHolder())
+    }
+
+    suspend fun getSurfaceHolder(): SurfaceHolder = suspendCoroutine { continuation ->
+        val surface = (requireActivity() as MainActivity).video_surface
+        surface.post {
+            continuation.resume(surface.holder)
+        }
+    }
 
 }
