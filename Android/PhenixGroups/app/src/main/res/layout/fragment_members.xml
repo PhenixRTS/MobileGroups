@@ -14,7 +14,7 @@
         android:layout_height="match_parent" >
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/participant_list"
+            android:id="@+id/member_list"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
@@ -22,7 +22,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            tools:listitem="@layout/row_participant_item"
+            tools:listitem="@layout/row_member_item"
             tools:itemCount="3" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

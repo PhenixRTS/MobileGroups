@@ -5,27 +5,23 @@
 package com.phenixrts.suite.groups.ui.screens.fragments
 
 import android.os.Bundle
-import android.view.SurfaceHolder
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
+import com.phenixrts.suite.groups.common.SurfaceIndex
 import com.phenixrts.suite.groups.common.extensions.*
 import com.phenixrts.suite.groups.repository.RoomExpressRepository
 import com.phenixrts.suite.groups.repository.UserMediaRepository
-import com.phenixrts.suite.groups.ui.MainActivity
 import com.phenixrts.suite.groups.ui.screens.JoinScreen
 import com.phenixrts.suite.groups.ui.screens.LoadingScreen
 import com.phenixrts.suite.groups.ui.screens.SplashScreen
 import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import timber.log.Timber
 import javax.inject.Inject
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 abstract class BaseFragment : Fragment() {
 
@@ -37,7 +33,7 @@ abstract class BaseFragment : Fragment() {
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     val viewModel: GroupsViewModel by lazyViewModel {
-        GroupsViewModel(cacheProvider, preferenceProvider, roomExpressRepository, userMediaRepository,this)
+        GroupsViewModel(cacheProvider, preferenceProvider, roomExpressRepository, userMediaRepository, this)
     }
 
     open fun onBackPressed() {}
@@ -126,13 +122,8 @@ abstract class BaseFragment : Fragment() {
 
     fun restartVideoPreview() = launch {
         Timber.d("Restarting video preview")
-        viewModel.startMediaPreview(getSurfaceHolder())
-    }
-
-    suspend fun getSurfaceHolder(): SurfaceHolder = suspendCoroutine { continuation ->
-        val surface = (requireActivity() as MainActivity).video_surface
-        surface.post {
-            continuation.resume(surface.holder)
+        getSurfaceView(SurfaceIndex.SURFACE_1)?.let { surfaceView ->
+            viewModel.startUserMediaPreview(surfaceView.holder)
         }
     }
 

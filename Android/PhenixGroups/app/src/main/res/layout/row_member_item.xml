@@ -10,7 +10,7 @@
 
     <data>
         <variable
-            name="participant"
+            name="member"
             type="com.phenixrts.room.Member" />
 
         <variable
@@ -25,7 +25,7 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/participant_item"
+        android:id="@+id/member_item"
         android:layout_width="match_parent"
         android:layout_height="72dp"
         android:clickable="true"
@@ -41,7 +41,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/participant_name">
+            app:layout_constraintEnd_toStartOf="@id/member_name">
 
             <ImageView
                 android:id="@+id/preview_user_icon"
@@ -80,15 +80,15 @@
         </RelativeLayout>
 
         <TextView
-            android:id="@+id/participant_name"
+            android:id="@+id/member_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="16dp"
-            android:text="@{participant.observableScreenName.value}"
+            android:text="@{member.observableScreenName.value}"
             android:textSize="16sp"
             tools:ignore="RtlHardcoded"
-            tools:text="Participant Name"
+            tools:text="Member Name"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"

@@ -14,7 +14,7 @@ import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.ui.screens.fragments.ChatFragment
 import com.phenixrts.suite.groups.ui.screens.fragments.EXTRA_ROOM_ALIAS
 import com.phenixrts.suite.groups.ui.screens.fragments.InfoFragment
-import com.phenixrts.suite.groups.ui.screens.fragments.ParticipantFragment
+import com.phenixrts.suite.groups.ui.screens.fragments.MemberFragment
 
 class RoomScreenPageAdapter(
     private val resources: Resources,
@@ -25,7 +25,7 @@ class RoomScreenPageAdapter(
     private data class Page(@StringRes val title: Int, val fragment: Fragment)
 
     private val pages = arrayOf(
-        Page(R.string.participants_page_title, ParticipantFragment()),
+        Page(R.string.members_page_title, MemberFragment()),
         Page(R.string.chat_page_title, ChatFragment()),
         Page(R.string.call_info_page_title, getInfoFragment())
     )

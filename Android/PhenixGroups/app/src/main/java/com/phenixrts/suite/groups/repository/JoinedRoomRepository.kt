@@ -10,7 +10,6 @@ import com.phenixrts.chat.RoomChatServiceFactory
 import com.phenixrts.common.Disposable
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.express.ExpressPublisher
-import com.phenixrts.room.Member
 import com.phenixrts.room.RoomService
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.common.extensions.addUnique
@@ -30,12 +29,10 @@ class JoinedRoomRepository(
     private val chatService = RoomChatServiceFactory.createRoomChatService(roomService)
     private val disposables: MutableList<Disposable?> = mutableListOf()
     private val chatHistory = MutableLiveData<List<ChatMessage>>()
-    private val roomMembers = MutableLiveData<List<Member>>()
 
     private fun dispose() = launch {
         launch(Dispatchers.Main) {
             chatHistory.value = mutableListOf()
-            roomMembers.value = mutableListOf()
         }
 
         disposables.forEach { it?.dispose() }
@@ -91,18 +88,6 @@ class JoinedRoomRepository(
         } else {
             publisher.disableAudio()
         }
-    }
-
-    fun getObservableRoomMembers(): MutableLiveData<List<Member>> {
-        roomService.observableActiveRoom.value.observableMembers.subscribe { members ->
-            launch {
-                launch(Dispatchers.Main) {
-                    Timber.d("Room members updated: $members")
-                    roomMembers.value = members.toList()
-                }
-            }
-        }
-        return roomMembers
     }
 
     fun leaveRoom(cacheProvider: CacheProvider) = launch {

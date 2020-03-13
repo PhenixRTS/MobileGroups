@@ -6,16 +6,14 @@ package com.phenixrts.suite.groups.ui
 
 import android.Manifest
 import android.os.Bundle
-import android.view.View
 import androidx.databinding.DataBindingUtil
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
-import com.phenixrts.suite.groups.common.extensions.hideKeyboard
-import com.phenixrts.suite.groups.common.extensions.lazyViewModel
-import com.phenixrts.suite.groups.common.extensions.showToast
+import com.phenixrts.suite.groups.common.SurfaceIndex
+import com.phenixrts.suite.groups.common.extensions.*
 import com.phenixrts.suite.groups.databinding.ActivityMainBinding
 import com.phenixrts.suite.groups.repository.RoomExpressRepository
 import com.phenixrts.suite.groups.repository.UserMediaRepository
@@ -106,7 +104,7 @@ class MainActivity : EasyPermissionActivity() {
     override fun onDestroy() {
         launch {
             Timber.d("App destroyed, stopping renderer")
-            viewModel.stopMediaRenderer()
+            viewModel.disposeMediaRenderer()
         }
         super.onDestroy()
     }
@@ -149,16 +147,17 @@ class MainActivity : EasyPermissionActivity() {
         Timber.d("Preview user video: $start")
         viewModel.isVideoEnabled.value = start
         if (start) {
-            val response = viewModel.startMediaPreview(video_surface.holder)
+            val response = viewModel.startUserMediaPreview(surface_view_1.holder)
             Timber.d("Preview started: ${response.status}")
             if (response.status == RequestStatus.OK) {
-                video_surface.visibility = View.VISIBLE
+                showGivenSurfaceView(SurfaceIndex.SURFACE_1)
             } else {
                 showToast(response.message)
             }
         } else {
-            viewModel.stopMediaRenderer()
-            video_surface.visibility = View.INVISIBLE
+            // TODO: Probably should behave differently while in a room
+            hideUnusedSurfaces()
+            viewModel.stopUserMediaPreview()
         }
     }
 

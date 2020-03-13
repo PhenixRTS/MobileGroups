@@ -11,6 +11,8 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.suite.groups.R
+import com.phenixrts.suite.groups.common.SurfaceIndex
+import com.phenixrts.suite.groups.common.extensions.showGivenSurfaceView
 import com.phenixrts.suite.groups.common.extensions.showToast
 import com.phenixrts.suite.groups.databinding.ScreenLandingBinding
 import com.phenixrts.suite.groups.ui.adapters.RoomListAdapter
@@ -48,6 +50,7 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
             Timber.d("Room list data changed $it")
             roomAdapter.data = it
         })
+        showGivenSurfaceView(SurfaceIndex.SURFACE_1)
         restartVideoPreview()
     }
 
@@ -76,7 +79,6 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
         Timber.d("Room joined with status: $joinedRoomStatus")
         hideLoadingScreen()
         if (joinedRoomStatus.status == RequestStatus.OK) {
-            viewModel.stopMediaRenderer()
             launchFragment(RoomScreen())
         } else {
             showToast(getString(R.string.err_join_room_failed))

@@ -6,7 +6,7 @@ package com.phenixrts.suite.groups.common
 
 import android.view.SurfaceHolder
 import com.phenixrts.express.*
-import com.phenixrts.pcast.UserMediaStream
+import com.phenixrts.pcast.*
 import com.phenixrts.pcast.android.AndroidVideoRenderSurface
 import com.phenixrts.room.RoomOptions
 import com.phenixrts.room.RoomServiceFactory
@@ -14,7 +14,7 @@ import com.phenixrts.room.RoomType
 
 fun getPublishOptions(userMediaStream: UserMediaStream): PublishOptions = PCastExpressFactory.createPublishOptionsBuilder()
     .withUserMedia(userMediaStream)
-    .withCapabilities(arrayOf("sd", "multi-bitrate"))
+    .withCapabilities(arrayOf("sd", "multi-bitrate", "prefer-h264"))
     .buildPublishOptions()
 
 fun getRoomOptions(roomAlias: String): RoomOptions = RoomServiceFactory.createRoomOptionsBuilder()
@@ -37,7 +37,21 @@ fun getPublishToRoomOptions(userScreenName: String, roomOptions: RoomOptions, pu
         .withScreenName(userScreenName)
         .buildPublishToRoomOptions()
 
-fun getSubscribeOptions(surfaceHolder: SurfaceHolder): SubscribeToMemberStreamOptions =
+fun getSubscribeVideoOptions(surfaceHolder: SurfaceHolder): SubscribeToMemberStreamOptions =
     RoomExpressFactory.createSubscribeToMemberStreamOptionsBuilder()
         .withRenderer(AndroidVideoRenderSurface(surfaceHolder))
         .buildSubscribeToMemberStreamOptions()
+
+fun getSubscribeAudioOptions(): SubscribeToMemberStreamOptions =
+    RoomExpressFactory.createSubscribeToMemberStreamOptionsBuilder()
+        .withCapabilities(arrayOf("audio-only"))
+        .withAudioOnlyRenderer()
+        .buildSubscribeToMemberStreamOptions()
+
+fun getUserMediaOptions(): UserMediaOptions = UserMediaOptions().apply {
+    videoOptions.capabilityConstraints[DeviceCapability.FACING_MODE] = listOf(DeviceConstraint(FacingMode.USER))
+    videoOptions.capabilityConstraints[DeviceCapability.HEIGHT] = listOf(DeviceConstraint(480.0))
+    videoOptions.capabilityConstraints[DeviceCapability.FRAME_RATE] = listOf(DeviceConstraint(15.0))
+    audioOptions.capabilityConstraints[DeviceCapability.AUDIO_ECHO_CANCELATION_MODE] =
+        listOf(DeviceConstraint(AudioEchoCancelationMode.ON))
+}

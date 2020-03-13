@@ -5,7 +5,9 @@
 package com.phenixrts.suite.groups.common.extensions
 
 import com.phenixrts.chat.ChatMessage
+import com.phenixrts.room.Member
 import com.phenixrts.suite.groups.BuildConfig
+import com.phenixrts.suite.groups.models.RoomMember
 import java.util.*
 
 fun MutableList<ChatMessage>.addUnique(messages: Array<ChatMessage>) {
@@ -15,6 +17,27 @@ fun MutableList<ChatMessage>.addUnique(messages: Array<ChatMessage>) {
         }
     }
     this.sortBy { it.observableTimeStamp.value }
+}
+
+fun Member.getFromList(members: List<RoomMember>): RoomMember? {
+    var roomMember: RoomMember? = null
+    members.forEach {
+        if (it.member.sessionId == this.sessionId) {
+            roomMember = it
+        }
+    }
+    return roomMember
+}
+
+fun List<RoomMember>.isListUpdated(oldMembers: List<RoomMember>?): Boolean {
+    var updated = size != oldMembers?.size
+    forEach { member ->
+        val oldMember = oldMembers?.firstOrNull { it.member.sessionId == member.member.sessionId }
+        if (oldMember == null || oldMember.surface != member.surface) {
+            updated = true
+        }
+    }
+    return updated
 }
 
 fun Calendar.expirationDate(): Date {

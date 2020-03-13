@@ -66,15 +66,60 @@
 
                 </LinearLayout>
 
-                <SurfaceView
-                    android:id="@+id/video_surface"
+                <!-- Surface views -->
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    android:visibility="gone"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintBottom_toBottomOf="parent" />
+                    app:layout_constraintBottom_toBottomOf="parent">
+
+                    <SurfaceView
+                        android:id="@+id/surface_view_1"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:visibility="gone"
+                        android:background="@drawable/bg_surface_border"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/surface_view_2"
+                        app:layout_constraintBottom_toTopOf="@id/surface_view_3" />
+
+                    <SurfaceView
+                        android:id="@+id/surface_view_2"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:visibility="gone"
+                        android:background="@drawable/bg_surface_border"
+                        app:layout_constraintStart_toEndOf="@id/surface_view_1"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="@id/surface_view_1"/>
+
+                    <SurfaceView
+                        android:id="@+id/surface_view_3"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:visibility="gone"
+                        android:background="@drawable/bg_surface_border"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/surface_view_1"
+                        app:layout_constraintEnd_toStartOf="@id/surface_view_4"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+
+                    <SurfaceView
+                        android:id="@+id/surface_view_4"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:visibility="gone"
+                        android:background="@drawable/bg_surface_border"
+                        app:layout_constraintStart_toEndOf="@id/surface_view_3"
+                        app:layout_constraintTop_toBottomOf="@id/surface_view_1"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <ImageView
                     android:id="@+id/indicator_mic"

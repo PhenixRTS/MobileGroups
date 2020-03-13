@@ -16,11 +16,11 @@
     <string name="hint_display_name">Display name</string>
 
     <!--  Room call screen  -->
-    <string name="participants_page_title">Participants</string>
+    <string name="members_page_title">Participants</string>
     <string name="chat_page_title">Chat</string>
     <string name="call_info_page_title">Info</string>
 
-    <!--  Participants list  -->
+    <!-- Members list  -->
     <string name="preview_mic_off_icon_content_description">Microphone is off</string>
 
     <!--  Chat  -->
@@ -38,5 +38,6 @@
     <string name="hint_room_code">Meeting code</string>
     <string name="hint_enter_a_meeting_code">Enter a meeting code</string>
     <string name="meeting_code">Meeting code</string>
+    <string name="err_failed_to_load_stream">Failed to load member stream</string>
 
 </resources>

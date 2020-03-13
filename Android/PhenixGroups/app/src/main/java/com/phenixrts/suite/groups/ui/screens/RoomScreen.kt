@@ -29,7 +29,6 @@ class RoomScreen : BaseFragment() {
     }
 
     override fun onBackPressed() {
-        viewModel.stopMediaRenderer()
         viewModel.leaveRoom()
     }
 
