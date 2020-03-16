@@ -12,6 +12,7 @@ import androidx.lifecycle.Observer
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.common.SurfaceIndex
+import com.phenixrts.suite.groups.common.extensions.hideUnusedSurfaces
 import com.phenixrts.suite.groups.common.extensions.showGivenSurfaceView
 import com.phenixrts.suite.groups.common.extensions.showToast
 import com.phenixrts.suite.groups.databinding.ScreenLandingBinding
@@ -50,7 +51,11 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
             Timber.d("Room list data changed $it")
             roomAdapter.data = it
         })
-        showGivenSurfaceView(SurfaceIndex.SURFACE_1)
+        if (viewModel.isVideoEnabled.value == true) {
+            showGivenSurfaceView(SurfaceIndex.SURFACE_1)
+        } else {
+            hideUnusedSurfaces()
+        }
         restartVideoPreview()
     }
 

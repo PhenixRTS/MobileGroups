@@ -19,14 +19,16 @@ fun MutableList<ChatMessage>.addUnique(messages: Array<ChatMessage>) {
     this.sortBy { it.observableTimeStamp.value }
 }
 
-fun Member.getFromList(members: List<RoomMember>): RoomMember? {
+fun Member.getRoomMember(members: List<RoomMember>): RoomMember {
     var roomMember: RoomMember? = null
-    members.forEach {
-        if (it.member.sessionId == this.sessionId) {
-            roomMember = it
+    members.takeIf { it.isNotEmpty() }?.let { memberList ->
+        memberList.forEach {
+            if (it.member.sessionId == this.sessionId) {
+                roomMember = it
+            }
         }
     }
-    return roomMember
+    return roomMember ?: RoomMember(this)
 }
 
 fun List<RoomMember>.isListUpdated(oldMembers: List<RoomMember>?): Boolean {

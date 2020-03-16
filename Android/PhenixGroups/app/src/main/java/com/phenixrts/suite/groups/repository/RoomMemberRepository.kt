@@ -12,7 +12,7 @@ import com.phenixrts.express.SubscribeToMemberStreamOptions
 import com.phenixrts.room.Member
 import com.phenixrts.room.RoomService
 import com.phenixrts.suite.groups.common.SurfaceIndex
-import com.phenixrts.suite.groups.common.extensions.getFromList
+import com.phenixrts.suite.groups.common.extensions.getRoomMember
 import com.phenixrts.suite.groups.models.RoomStatus
 import com.phenixrts.suite.groups.models.RoomMember
 import kotlinx.coroutines.Dispatchers
@@ -42,10 +42,11 @@ class RoomMemberRepository(
             val memberList = ArrayList<RoomMember>()
             takenSurfaces.clear()
             members.forEach { member ->
-                val roomMember = member.getFromList(roomMembers.value ?: listOf()) ?: RoomMember(member)
+                val roomMember = member.getRoomMember(roomMembers.value ?: listOf())
                 roomMember.surface = getAvailableSurfaceIndex()
                 memberList.add(roomMember)
             }
+            Timber.d("Updating members list: $memberList")
             roomMembers.value = memberList
         }
     }
@@ -91,10 +92,14 @@ class RoomMemberRepository(
                         }
                     }
                 } else {
-                    Timber.d("Member stream has ended")
-                    takenSurfaces.remove(member.surface)
-                    member.surface = SurfaceIndex.SURFACE_NONE
-                    roomMembers.value = members
+                    launch {
+                        launch(Dispatchers.Main) {
+                            Timber.d("Member stream has ended")
+                            takenSurfaces.remove(member.surface)
+                            member.surface = SurfaceIndex.SURFACE_NONE
+                            roomMembers.value = members
+                        }
+                    }
                 }
             }.run { disposables.add(this) }
         }

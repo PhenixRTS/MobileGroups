@@ -96,7 +96,7 @@ class MemberFragment : BaseFragment(), MemberListAdapter.OnMemberListener {
             }
         } else {
             getSurfaceView(SurfaceIndex.SURFACE_1)?.let { surfaceView ->
-                Timber.d("Showing self preview when all members are gone")
+                Timber.d("Showing self preview when alone")
                 showGivenSurfaceView(SurfaceIndex.SURFACE_1)
                 viewModel.startUserMediaPreview(surfaceView.holder)
             }

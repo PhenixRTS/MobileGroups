@@ -56,7 +56,10 @@ abstract class BaseFragment : Fragment() {
      * Launch a suspendable function on main tread
      */
     fun launch(block: suspend CoroutineScope.() -> Unit) = mainScope.launch(
-        context = CoroutineExceptionHandler { _, e -> Timber.e("Coroutine failed: ${e.localizedMessage}") },
+        context = CoroutineExceptionHandler { _, e ->
+            Timber.e("Coroutine failed: ${e.localizedMessage}")
+            e.printStackTrace()
+        },
         block = block
     )
 
