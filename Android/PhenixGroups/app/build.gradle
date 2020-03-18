@@ -21,6 +21,7 @@ android {
         buildConfigField "String", "PCAST_URL", "\"\""
         buildConfigField "String", "PCAST_URL_STAGING", "\"https://pcast-stg.phenixrts.com/\""
         buildConfigField "int", "EXPIRATION_DAYS", "10"
+        buildConfigField "int", "MAX_RENDERERS", "4"
     }
     buildTypes {
         release {

@@ -25,7 +25,6 @@ class RoomScreen : BaseFragment() {
 
         viewModel.isControlsEnabled.value = false
         viewModel.isInRoom.value = true
-        restartVideoPreview()
     }
 
     override fun onBackPressed() {

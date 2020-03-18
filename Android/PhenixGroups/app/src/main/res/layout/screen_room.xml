@@ -14,6 +14,7 @@
         android:id="@+id/service_pager"
         android:layout_width="0dp"
         android:layout_height="300dp"
+        android:clipChildren="true"
         android:background="@color/primaryBackgroundColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

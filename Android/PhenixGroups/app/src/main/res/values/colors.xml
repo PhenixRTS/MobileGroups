@@ -17,6 +17,7 @@
 
     <color name="primaryBackgroundColor">#fff</color>
     <color name="primaryBackgroundDarkColor">#333</color>
+    <color name="primaryBackgroundLightColor">#808080</color>
 
     <color name="primaryTranslucentColor">#80000000</color>
 

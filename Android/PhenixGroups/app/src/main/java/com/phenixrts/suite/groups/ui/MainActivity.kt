@@ -6,13 +6,13 @@ package com.phenixrts.suite.groups.ui
 
 import android.Manifest
 import android.os.Bundle
+import android.view.View
 import androidx.databinding.DataBindingUtil
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
-import com.phenixrts.suite.groups.common.SurfaceIndex
 import com.phenixrts.suite.groups.common.extensions.*
 import com.phenixrts.suite.groups.databinding.ActivityMainBinding
 import com.phenixrts.suite.groups.repository.RoomExpressRepository
@@ -76,8 +76,8 @@ class MainActivity : EasyPermissionActivity() {
         }
 
         launch {
-            setMicrophoneEnabled(viewModel.isMicrophoneEnabled.value ?: true)
-            setCameraPreviewEnabled(viewModel.isVideoEnabled.value ?: true)
+            setMicrophoneEnabled(viewModel.isMicrophoneEnabled.isTrue(true))
+            setCameraPreviewEnabled(viewModel.isVideoEnabled.isTrue(true))
         }
 
         // Show splash screen if wasn't started already
@@ -147,16 +147,16 @@ class MainActivity : EasyPermissionActivity() {
         Timber.d("Preview user video: $start")
         viewModel.isVideoEnabled.value = start
         if (start) {
-            val response = viewModel.startUserMediaPreview(surface_view_1.holder)
+            val response = viewModel.startUserMediaPreview(surface_view.holder)
             Timber.d("Preview started: ${response.status}")
             if (response.status == RequestStatus.OK) {
-                showGivenSurfaceView(SurfaceIndex.SURFACE_1)
+                surface_view.visibility = View.VISIBLE
             } else {
                 showToast(response.message)
             }
         } else {
             // TODO: Probably should behave differently while in a room
-            hideUnusedSurfaces()
+            surface_view.visibility = View.GONE
             viewModel.stopUserMediaPreview()
         }
     }

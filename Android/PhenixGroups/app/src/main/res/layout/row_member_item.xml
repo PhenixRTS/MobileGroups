@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <!--
   ~ Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
   -->
@@ -11,15 +10,7 @@
     <data>
         <variable
             name="member"
-            type="com.phenixrts.room.Member" />
-
-        <variable
-            name="isActive"
-            type="androidx.lifecycle.LiveData&lt;Boolean>" />
-
-        <variable
-            name="isMicOn"
-            type="androidx.lifecycle.LiveData&lt;Boolean>" />
+            type="com.phenixrts.suite.groups.models.RoomMember" />
 
         <import type="android.view.View" />
     </data>
@@ -36,31 +27,47 @@
         <RelativeLayout
             android:id="@+id/userIconAndStateContainer"
             android:layout_width="128dp"
-            android:layout_height="match_parent"
-            android:background="@android:color/white"
+            android:layout_height="72dp"
+            android:background="@color/primaryBackgroundLightColor"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/member_name">
 
+            <SurfaceView
+                android:id="@+id/member_surface"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:visibility="@{member.canRenderThumbnail() ? View.VISIBLE : View.GONE}" />
+
             <ImageView
-                android:id="@+id/preview_user_icon"
-                android:layout_width="64dp"
-                android:layout_height="64dp"
+                android:id="@+id/member_preview_icon"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:layout_centerInParent="true"
                 android:layout_gravity="center"
+                android:padding="8dp"
                 android:contentDescription="@string/preview_icon_content_description"
+                android:visibility="@{member.canRenderThumbnail() ? View.GONE : View.VISIBLE}"
+                android:background="@color/primaryBackgroundLightColor"
                 android:src="@drawable/ic_account_box_black_24dp"
                 android:tint="@android:color/black" />
 
-            <View
+            <ImageView
+                android:id="@+id/member_pinned_icon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="@color/primaryTranslucentColor"
-                android:visibility="@{isActive ? View.VISIBLE : View.GONE}" />
+                android:layout_gravity="center"
+                android:padding="16dp"
+                android:contentDescription="@string/preview_icon_content_description"
+                android:visibility="@{member.pinned ? View.VISIBLE : View.GONE}"
+                android:background="@color/primaryBackgroundLightColor"
+                android:src="@drawable/ic_pin"
+                android:tint="@android:color/black"
+                tools:visibility="gone"/>
 
             <ImageView
-                android:id="@+id/userMicOff"
+                android:id="@+id/member_mic_icon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_alignParentRight="true"
@@ -71,11 +78,10 @@
                 android:contentDescription="@string/preview_mic_off_icon_content_description"
                 android:src="@drawable/ic_mic_off_black_24dp"
                 android:tint="@android:color/white"
-                android:visibility="@{isMicOn ? View.GONE : View.VISIBLE }"
+                android:visibility="@{member.muted ? View.VISIBLE : View.GONE }"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                tools:ignore="RtlHardcoded"
-                tools:visibility="visible" />
+                tools:ignore="RtlHardcoded" />
 
         </RelativeLayout>
 
@@ -85,7 +91,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="16dp"
-            android:text="@{member.observableScreenName.value}"
+            android:text="@{member.member.observableScreenName.value}"
             android:textSize="16sp"
             tools:ignore="RtlHardcoded"
             tools:text="Member Name"
@@ -94,6 +100,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@id/userIconAndStateContainer" />
 
+        <!-- Empty view required to ensure the row item matches device screen width -->
         <View
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

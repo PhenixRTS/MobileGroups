@@ -11,7 +11,8 @@ import com.phenixrts.express.RoomExpress
 import com.phenixrts.express.SubscribeToMemberStreamOptions
 import com.phenixrts.room.Member
 import com.phenixrts.room.RoomService
-import com.phenixrts.suite.groups.common.SurfaceIndex
+import com.phenixrts.suite.groups.BuildConfig
+import com.phenixrts.suite.groups.common.extensions.call
 import com.phenixrts.suite.groups.common.extensions.getRoomMember
 import com.phenixrts.suite.groups.models.RoomStatus
 import com.phenixrts.suite.groups.models.RoomMember
@@ -27,7 +28,6 @@ class RoomMemberRepository(
 ) : Repository() {
 
     private val disposables: MutableList<Disposable?> = mutableListOf()
-    private val takenSurfaces = arrayListOf<SurfaceIndex>()
     private val roomMembers = MutableLiveData<List<RoomMember>>()
 
     fun getObservableRoomMembers(): MutableLiveData<List<RoomMember>> {
@@ -40,28 +40,91 @@ class RoomMemberRepository(
     private fun updateMemberList(members: Array<Member>) = launch {
         launch(Dispatchers.Main) {
             val memberList = ArrayList<RoomMember>()
-            takenSurfaces.clear()
+            var showingVideoCount = 0
+            var isSomeonePinned = false
+            // Map received members with existing ones and count rendering streams
             members.forEach { member ->
                 val roomMember = member.getRoomMember(roomMembers.value ?: listOf())
-                roomMember.surface = getAvailableSurfaceIndex()
                 memberList.add(roomMember)
+                if (roomMember.canRenderVideo) {
+                    showingVideoCount++
+                }
+                if (roomMember.isPinned) {
+                    isSomeonePinned = true
+                }
             }
+            // Enable video previews for limited member count
+            if (showingVideoCount <= BuildConfig.MAX_RENDERERS) {
+                memberList.forEach {
+                    if (showingVideoCount <= BuildConfig.MAX_RENDERERS && !it.canRenderVideo) {
+                        it.canRenderVideo = true
+                        showingVideoCount++
+                    }
+                }
+            }
+            // Update active renderer if no member is pinned
+            if (!isSomeonePinned) {
+                memberList.firstOrNull { it.isActiveRenderer }?.run {
+                    if (isActiveRenderer) {
+                        isActiveRenderer = false
+                        onUpdate.call()
+                    }
+                }
+                // Pick anyone who can render video but self if available
+                memberList.lastOrNull { it.canRenderVideo && it.member.sessionId != roomService.self.sessionId }?.run {
+                    if (!isActiveRenderer) {
+                        isActiveRenderer = true
+                        onUpdate.call()
+                    }
+                } ?: memberList.lastOrNull { it.canRenderVideo }?.run {
+                    if (!isActiveRenderer) {
+                        isActiveRenderer = true
+                        onUpdate.call()
+                    }
+                }
+            }
+            // Move self member to top
+            memberList.sortByDescending { it.member.sessionId == roomService.self.sessionId }
             Timber.d("Updating members list: $memberList")
             roomMembers.value = memberList
         }
     }
 
-    private fun getAvailableSurfaceIndex(): SurfaceIndex {
-        var surfaceIndex = SurfaceIndex.SURFACE_NONE
-        var found = false
-        SurfaceIndex.values().forEach {
-            if (!found && it != SurfaceIndex.SURFACE_NONE && !takenSurfaces.contains(it)) {
-                takenSurfaces.add(it)
-                surfaceIndex = it
-                found = true
-            }
+    fun pinActiveMember(roomMember: RoomMember) {
+        val wasPinned = roomMember.isPinned
+        val members = roomMembers.value ?: mutableListOf()
+        var restartRenderer = false
+
+        // Unpin current member
+        members.firstOrNull { it.isActiveRenderer }?.run {
+            isPinned = false
+            isActiveRenderer = false
+            restartRenderer = member.sessionId != roomMember.member.sessionId
+            onUpdate.call(member.sessionId != roomMember.member.sessionId)
         }
-        return surfaceIndex
+        // Pin new member
+        members.firstOrNull { it.member.sessionId == roomMember.member.sessionId }?.run {
+            isActiveRenderer = true
+            isPinned = !wasPinned
+            onUpdate.call(restartRenderer)
+        }
+        Timber.d("Changed member pin state: $roomMember restartRenderer: $restartRenderer")
+    }
+
+    fun switchAudioStreamState(enabled: Boolean) {
+        roomMembers.value?.firstOrNull { it.member.sessionId == roomService.self.sessionId }?.run {
+            Timber.d("Self audio state changed: $enabled $this")
+            isMuted = !enabled
+            onUpdate.call(false)
+        }
+    }
+
+    fun switchVideoStreamState(enabled: Boolean) {
+        roomMembers.value?.firstOrNull { it.member.sessionId == roomService.self.sessionId }?.run {
+            Timber.d("Self video state changed: $enabled $this")
+            canRenderVideo = enabled
+            onUpdate.call()
+        }
     }
 
     suspend fun subscribeToMemberMedia(roomMember: RoomMember, options: SubscribeToMemberStreamOptions): RoomStatus
@@ -73,31 +136,19 @@ class RoomMemberRepository(
                 if (stream != null && !member.isSubscribed()) {
                     roomExpress.subscribeToMemberStream(stream, options) { status, subscriber, renderer ->
                         var message = ""
-                        if (status == RequestStatus.OK) {
-                            launch {
-                                launch(Dispatchers.Main) {
+                        launch {
+                            launch(Dispatchers.Main) {
+                                if (status == RequestStatus.OK) {
                                     member.renderer = renderer
                                     member.subscriber = subscriber
-                                    if (member.surface == SurfaceIndex.SURFACE_NONE) {
-                                        member.surface = getAvailableSurfaceIndex()
-                                    }
-                                    roomMembers.value = members
                                     Timber.d("Subscribed to member media: $status $member")
+                                    continuation.resume(RoomStatus(status, message))
+                                } else {
+                                    message = "Failed to subscribe to member media"
+                                    member.canRenderVideo = false
                                     continuation.resume(RoomStatus(status, message))
                                 }
                             }
-                        } else {
-                            message = "Failed to subscribe to member media"
-                            continuation.resume(RoomStatus(status, message))
-                        }
-                    }
-                } else {
-                    launch {
-                        launch(Dispatchers.Main) {
-                            Timber.d("Member stream has ended")
-                            takenSurfaces.remove(member.surface)
-                            member.surface = SurfaceIndex.SURFACE_NONE
-                            roomMembers.value = members
                         }
                     }
                 }
@@ -110,18 +161,7 @@ class RoomMemberRepository(
         disposables.clear()
 
         launch(Dispatchers.Main) {
-            takenSurfaces.clear()
-            roomMembers.value?.forEach {
-                try {
-                    it.renderer?.stop()
-                    it.renderer?.dispose()
-                    it.renderer = null
-                    it.subscriber?.dispose()
-                    it.subscriber = null
-                } catch (e: Exception) {
-                    Timber.d("Failed to dispose room member: $it")
-                }
-            }
+            roomMembers.value?.forEach { it.dispose() }
             roomMembers.value = null
         }
     }

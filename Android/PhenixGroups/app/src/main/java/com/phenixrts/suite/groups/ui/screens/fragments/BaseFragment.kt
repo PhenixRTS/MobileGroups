@@ -11,7 +11,6 @@ import com.phenixrts.common.RequestStatus
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
-import com.phenixrts.suite.groups.common.SurfaceIndex
 import com.phenixrts.suite.groups.common.extensions.*
 import com.phenixrts.suite.groups.repository.RoomExpressRepository
 import com.phenixrts.suite.groups.repository.UserMediaRepository
@@ -125,9 +124,7 @@ abstract class BaseFragment : Fragment() {
 
     fun restartVideoPreview() = launch {
         Timber.d("Restarting video preview")
-        getSurfaceView(SurfaceIndex.SURFACE_1)?.let { surfaceView ->
-            viewModel.startUserMediaPreview(surfaceView.holder)
-        }
+        viewModel.startUserMediaPreview(getSurfaceView().holder)
     }
 
 }

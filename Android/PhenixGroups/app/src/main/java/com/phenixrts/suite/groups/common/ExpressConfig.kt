@@ -14,7 +14,7 @@ import com.phenixrts.room.RoomType
 
 fun getPublishOptions(userMediaStream: UserMediaStream): PublishOptions = PCastExpressFactory.createPublishOptionsBuilder()
     .withUserMedia(userMediaStream)
-    .withCapabilities(arrayOf("sd", "multi-bitrate", "prefer-h264"))
+    .withCapabilities(arrayOf("ld", "multi-bitrate", "prefer-h264"))
     .buildPublishOptions()
 
 fun getRoomOptions(roomAlias: String): RoomOptions = RoomServiceFactory.createRoomOptionsBuilder()
@@ -50,7 +50,7 @@ fun getSubscribeAudioOptions(): SubscribeToMemberStreamOptions =
 
 fun getUserMediaOptions(): UserMediaOptions = UserMediaOptions().apply {
     videoOptions.capabilityConstraints[DeviceCapability.FACING_MODE] = listOf(DeviceConstraint(FacingMode.USER))
-    videoOptions.capabilityConstraints[DeviceCapability.HEIGHT] = listOf(DeviceConstraint(480.0))
+    videoOptions.capabilityConstraints[DeviceCapability.HEIGHT] = listOf(DeviceConstraint(360.0))
     videoOptions.capabilityConstraints[DeviceCapability.FRAME_RATE] = listOf(DeviceConstraint(15.0))
     audioOptions.capabilityConstraints[DeviceCapability.AUDIO_ECHO_CANCELATION_MODE] =
         listOf(DeviceConstraint(AudioEchoCancelationMode.ON))

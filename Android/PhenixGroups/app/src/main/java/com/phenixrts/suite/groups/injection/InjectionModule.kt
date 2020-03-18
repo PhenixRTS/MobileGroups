@@ -4,6 +4,7 @@
 
 package com.phenixrts.suite.groups.injection
 
+import android.system.Os
 import androidx.lifecycle.MutableLiveData
 import androidx.room.Room
 import com.phenixrts.common.RequestStatus
@@ -32,15 +33,12 @@ class InjectionModule(private val context: GroupsApplication) {
         val roomStatus = MutableLiveData<RoomStatus>()
         roomStatus.value = RoomStatus(RequestStatus.OK, "")
         AndroidContext.setContext(context)
+        Os.setenv("PHENIX_LOGGING_CONSOLE_LOG_LEVEL", "Info", true)
         val pcastExpressOptions = PCastExpressFactory.createPCastExpressOptionsBuilder()
             .withBackendUri(BuildConfig.BACKEND_URL)
             .withPCastUri(BuildConfig.PCAST_URL)
             .withUnrecoverableErrorCallback { status: RequestStatus, description: String ->
-                Timber.e(
-                    "Unrecoverable error in PhenixSDK. " +
-                            "Error status: [$status]. " +
-                            "Description: [$description]"
-                )
+                Timber.e("Unrecoverable error in PhenixSDK. Error status: [$status]. Description: [$description]")
                 roomStatus.value = RoomStatus(status, description)
             }
             .buildPCastExpressOptions()

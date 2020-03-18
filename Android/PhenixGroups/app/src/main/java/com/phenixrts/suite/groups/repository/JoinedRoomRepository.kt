@@ -72,7 +72,7 @@ class JoinedRoomRepository(
         } ?: continuation.resume(RoomStatus(RequestStatus.NOT_INITIALIZED, "Chat Service is not initialized"))
     }
 
-    fun switchVideoStreams(enabled: Boolean) = launch {
+    fun switchVideoStreamState(enabled: Boolean) = launch {
         Timber.d("Switching publisher video streams: $enabled")
         if (enabled) {
             publisher.enableVideo()
@@ -81,7 +81,7 @@ class JoinedRoomRepository(
         }
     }
 
-    fun switchAudioStreams(enabled: Boolean) = launch {
+    fun switchAudioStreamState(enabled: Boolean) = launch {
         Timber.d("Switching publisher audio streams: $enabled")
         if (enabled) {
             publisher.enableAudio()

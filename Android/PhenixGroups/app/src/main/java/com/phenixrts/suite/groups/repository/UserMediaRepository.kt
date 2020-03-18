@@ -39,12 +39,12 @@ class UserMediaRepository(private val roomExpress: RoomExpress) : Repository() {
         }
     }
 
-    fun switchVideoStreams(enabled: Boolean) = launch {
+    fun switchVideoStreamState(enabled: Boolean) = launch {
         Timber.d("Switching video streams: $enabled")
         userMediaStream?.mediaStream?.videoTracks?.forEach { it.isEnabled = enabled }
     }
 
-    fun switchAudioStreams(enabled: Boolean) = launch {
+    fun switchAudioStreamState(enabled: Boolean) = launch {
         Timber.d("Switching audio streams: $enabled")
         userMediaStream?.mediaStream?.audioTracks?.forEach { it.isEnabled = enabled }
     }
