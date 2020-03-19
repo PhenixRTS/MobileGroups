@@ -9,14 +9,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.Observer
-import com.phenixrts.common.RequestStatus
-import com.phenixrts.pcast.RendererStartStatus
 import com.phenixrts.suite.groups.common.extensions.*
 import com.phenixrts.suite.groups.databinding.FragmentMembersBinding
 import com.phenixrts.suite.groups.models.RoomMember
 import com.phenixrts.suite.groups.ui.adapters.MemberListAdapter
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class MemberFragment : BaseFragment(), MemberListAdapter.OnMemberListener {
@@ -32,7 +28,7 @@ class MemberFragment : BaseFragment(), MemberListAdapter.OnMemberListener {
 
         viewModel.getRoomMembers().observe(viewLifecycleOwner, Observer { members ->
             Timber.d("Member adapter updated ${members.size} $members")
-            adapter.data = members
+            adapter.members = members
         })
         return binding.root
     }

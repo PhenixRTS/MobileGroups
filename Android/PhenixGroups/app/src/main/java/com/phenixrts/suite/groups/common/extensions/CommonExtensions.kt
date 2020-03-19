@@ -22,6 +22,8 @@ fun MutableList<ChatMessage>.addUnique(messages: Array<ChatMessage>) {
 
 fun MutableLiveData<Boolean>.isTrue(default: Boolean = false) = value ?: default
 
+fun MutableLiveData<Boolean>.isFalse(default: Boolean = true) = value?.not() ?: default
+
 fun MutableLiveData<Boolean>.call(restartRenderer: Boolean = true) {
     value = restartRenderer
 }

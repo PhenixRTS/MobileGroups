@@ -17,6 +17,7 @@ import com.phenixrts.suite.groups.common.extensions.getRoomMember
 import com.phenixrts.suite.groups.models.RoomStatus
 import com.phenixrts.suite.groups.models.RoomMember
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import kotlin.coroutines.resume
@@ -29,6 +30,7 @@ class RoomMemberRepository(
 
     private val disposables: MutableList<Disposable?> = mutableListOf()
     private val roomMembers = MutableLiveData<List<RoomMember>>()
+    private var dispatchDelay = 0L
 
     fun getObservableRoomMembers(): MutableLiveData<List<RoomMember>> {
         roomService.observableActiveRoom.value.observableMembers.subscribe { members ->
@@ -38,6 +40,9 @@ class RoomMemberRepository(
     }
 
     private fun updateMemberList(members: Array<Member>) = launch {
+        dispatchDelay += dispatchDelay + 400
+        delay(dispatchDelay)
+        dispatchDelay = 0L
         launch(Dispatchers.Main) {
             val memberList = ArrayList<RoomMember>()
             var showingVideoCount = 0
@@ -54,10 +59,11 @@ class RoomMemberRepository(
                 }
             }
             // Enable video previews for limited member count
-            if (showingVideoCount <= BuildConfig.MAX_RENDERERS) {
+            if (showingVideoCount < BuildConfig.MAX_RENDERERS) {
                 memberList.forEach {
-                    if (showingVideoCount <= BuildConfig.MAX_RENDERERS && !it.canRenderVideo) {
+                    if (showingVideoCount < BuildConfig.MAX_RENDERERS && !it.canRenderVideo) {
                         it.canRenderVideo = true
+                        it.canShowPreview = true
                         showingVideoCount++
                     }
                 }
@@ -113,17 +119,21 @@ class RoomMemberRepository(
 
     fun switchAudioStreamState(enabled: Boolean) {
         roomMembers.value?.firstOrNull { it.member.sessionId == roomService.self.sessionId }?.run {
-            Timber.d("Self audio state changed: $enabled $this")
-            isMuted = !enabled
-            onUpdate.call(false)
+            if (isMuted == enabled) {
+                Timber.d("Self audio state changed: $enabled $this")
+                isMuted = !enabled
+                onUpdate.call(false)
+            }
         }
     }
 
     fun switchVideoStreamState(enabled: Boolean) {
         roomMembers.value?.firstOrNull { it.member.sessionId == roomService.self.sessionId }?.run {
-            Timber.d("Self video state changed: $enabled $this")
-            canRenderVideo = enabled
-            onUpdate.call()
+            if (canRenderVideo && canShowPreview != enabled) {
+                Timber.d("Self video state changed: $enabled $this")
+                canShowPreview = enabled
+                onUpdate.call()
+            }
         }
     }
 
@@ -145,7 +155,7 @@ class RoomMemberRepository(
                                     continuation.resume(RoomStatus(status, message))
                                 } else {
                                     message = "Failed to subscribe to member media"
-                                    member.canRenderVideo = false
+                                    member.canShowPreview = false
                                     continuation.resume(RoomStatus(status, message))
                                 }
                             }

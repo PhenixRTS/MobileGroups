@@ -60,9 +60,6 @@ class GroupsViewModel(
     init {
         Timber.d("View model created")
         displayName.value = preferenceProvider.getDisplayName()
-        displayName.observe(lifecycleOwner, Observer {
-            preferenceProvider.saveDisplayName(it)
-        })
         isMicrophoneEnabled.observe(lifecycleOwner, Observer { enabled ->
             userMediaRepository.switchAudioStreamState(enabled)
             joinedRoomRepository?.switchAudioStreamState(enabled)
@@ -247,10 +244,12 @@ class GroupsViewModel(
                         rendererStartStatus = RendererStartStatus.FAILED
                     } finally {
                         restartingRenderers.remove(mediaRenderer)
+                        Timber.d("Resuming renderer restart")
                         continuation.resume(rendererStartStatus)
                     }
                 }
             } else {
+                Timber.d("Resuming renderer restart")
                 continuation.resume(rendererStartStatus)
             }
         }

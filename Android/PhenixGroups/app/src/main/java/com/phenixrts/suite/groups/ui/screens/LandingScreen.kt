@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.suite.groups.R
@@ -43,7 +44,11 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
         binding.joinRoomButton.setOnClickListener {
             launchFragment(JoinScreen())
         }
+        binding.screenDisplayName.addTextChangedListener(afterTextChanged = {
+            preferenceProvider.saveDisplayName(it?.toString() ?: "")
+        })
 
+        viewModel.displayName.value = preferenceProvider.getDisplayName()
         viewModel.isControlsEnabled.value = true
         viewModel.isInRoom.value = false
         viewModel.roomList.observe(viewLifecycleOwner, Observer {

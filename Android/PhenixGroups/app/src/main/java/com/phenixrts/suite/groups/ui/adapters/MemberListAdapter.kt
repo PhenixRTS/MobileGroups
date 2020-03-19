@@ -9,7 +9,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.RecyclerView
-import com.phenixrts.common.Disposable
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.pcast.RendererStartStatus
 import com.phenixrts.room.MemberState
@@ -21,7 +20,6 @@ import com.phenixrts.suite.groups.databinding.RowMemberItemBinding
 import com.phenixrts.suite.groups.models.RoomMember
 import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import kotlin.properties.Delegates
@@ -32,22 +30,14 @@ class MemberListAdapter(
     private val callback: OnMemberListener
 ) : RecyclerView.Adapter<MemberListAdapter.ViewHolder>() {
 
-    private val disposables: MutableList<Disposable> = mutableListOf()
     private val subscriptionsInProgress = arrayListOf<String>()
 
-    var data: List<RoomMember> by Delegates.observable(emptyList(), { _, old, _ ->
-        old.forEach { it.dispose() }
-        dispose()
-        viewModel.viewModelScope.launch(Dispatchers.Main) {
-            delay(200)
-            Timber.d("Member list updated: $data")
-            notifyDataSetChanged()
-        }
+    var members: List<RoomMember> by Delegates.observable(emptyList(), { _, _, _ ->
+        notifyDataSetChanged()
     })
 
     fun dispose() {
-        disposables.forEach { it.dispose() }
-        disposables.clear()
+        members.forEach { it.dispose() }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -56,10 +46,10 @@ class MemberListAdapter(
         })
     }
 
-    override fun getItemCount() = data.size
+    override fun getItemCount() = members.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val roomMember = data[position]
+        val roomMember = members[position]
         holder.binding.member = roomMember
         holder.binding.memberItem.tag = roomMember
         holder.binding.memberItem.setOnClickListener {
@@ -72,7 +62,7 @@ class MemberListAdapter(
     }
 
     private fun subscribeToMember(binding: RowMemberItemBinding, position: Int) {
-        data.getOrNull(position)?.let { roomMember ->
+        members.getOrNull(position)?.let { roomMember ->
             binding.lifecycleOwner?.let {
                 if (!roomMember.onUpdate.hasActiveObservers()) {
                     roomMember.onUpdate.removeObservers(it)
@@ -80,7 +70,7 @@ class MemberListAdapter(
                 Timber.d("Observing member: $roomMember")
                 val memberStream = roomMember.member.observableStreams?.value?.get(0)
                 roomMember.onUpdate.observe(it, Observer { restartRenderer ->
-                    data.getOrNull(position)?.let { member ->
+                    members.getOrNull(position)?.let { member ->
                         Timber.d("Member updated: $member $restartRenderer")
                         binding.member = member
                         if (restartRenderer) {
@@ -91,36 +81,31 @@ class MemberListAdapter(
 
                 roomMember.member.observableState?.subscribe {
                     viewModel.viewModelScope.launch {
-                        data.getOrNull(position)?.let { member ->
-                            if (member.canRenderVideo != (it == MemberState.ACTIVE)) {
+                        members.getOrNull(position)?.let { member ->
+                            if (member.canRenderVideo && member.canShowPreview != (it == MemberState.ACTIVE)) {
                                 Timber.d("Active state changed: $member state: $it")
-                                member.canRenderVideo = it == MemberState.ACTIVE
+                                member.canShowPreview = it == MemberState.ACTIVE
                                 member.onUpdate.call()
                             }
                         }
                     }
-                }?.run {
-                    disposables.add(this)
-                    Timber.d("Updating active disposable: ${disposables.size}")
-                }
+                }?.run { roomMember.addDisposable(this) }
 
                 memberStream?.observableVideoState?.subscribe {
                     viewModel.viewModelScope.launch {
-                        data.getOrNull(position)?.let { member ->
-                            Timber.d("Video state changed: $member state: $it")
-                            // TODO: This is called when audio stream is disabled which is wrong
-                            // member.canRenderVideo = it == TrackState.ENABLED
-                            // member.onUpdate.call()
+                        members.getOrNull(position)?.let { member ->
+                            if (member.canRenderVideo && member.canShowPreview != (it == TrackState.ENABLED)) {
+                                Timber.d("Video state changed: $member state: $it")
+                                member.canShowPreview = it == TrackState.ENABLED
+                                member.onUpdate.call()
+                            }
                         }
                     }
-                }?.run {
-                    disposables.add(this)
-                    Timber.d("Updating video disposable: ${disposables.size}")
-                }
+                }?.run { roomMember.addDisposable(this) }
 
                 memberStream?.observableAudioState?.subscribe {
                     viewModel.viewModelScope.launch {
-                        data.getOrNull(position)?.let { member ->
+                        members.getOrNull(position)?.let { member ->
                             if (member.isMuted != (it == TrackState.DISABLED)) {
                                 Timber.d("Audio state changed: $member state: $it")
                                 member.isMuted = it == TrackState.DISABLED
@@ -128,22 +113,23 @@ class MemberListAdapter(
                             }
                         }
                     }
-                }?.run {
-                    disposables.add(this)
-                    Timber.d("Updating audio disposable: ${disposables.size}")
-                }
+                }?.run { roomMember.addDisposable(this) }
             }
         }
     }
 
-    private fun updateMemberStream(roomMember: RoomMember, surfaceView: SurfaceView) = viewModel.viewModelScope.launch(Dispatchers.Main) {
+    private fun updateMemberStream(roomMember: RoomMember, surfaceView: SurfaceView)
+            = viewModel.viewModelScope.launch(Dispatchers.Main) {
         if (subscriptionsInProgress.contains(roomMember.member.sessionId)) {
             return@launch
         }
-        Timber.d("Updating member stream: $roomMember $surfaceView ${surfaceView.holder} $subscriptionsInProgress")
+
+        Timber.d("Updating member stream: $roomMember")
         subscriptionsInProgress.add(roomMember.member.sessionId)
         val isSelf = roomMember.member.sessionId == viewModel.currentSessionsId.value
-        var status = if (roomMember.canRenderVideo) RequestStatus.OK else RequestStatus.FAILED
+        var status = if (roomMember.canShowPreview) RequestStatus.OK else RequestStatus.FAILED
+
+        // Subscribe to member media if not self member and not subscribed yet
         if (!roomMember.isSubscribed() && !isSelf) {
             val options = if (roomMember.canRenderVideo) {
                 getSubscribeVideoOptions(surfaceView.holder)
@@ -151,47 +137,45 @@ class MemberListAdapter(
                 getSubscribeAudioOptions()
             }
             status = viewModel.subscribeToMemberStream(roomMember, options).status
+            Timber.d("Subscribed to member media: $status")
         }
-        Timber.d("Subscribed to member stream: $status")
-        if (status != RequestStatus.OK && roomMember.canRenderVideo) {
-            Timber.d("Member video stream ended: $roomMember")
-            roomMember.canRenderVideo = false
-            roomMember.onUpdate.call()
-        } else if (status == RequestStatus.OK) {
+
+        // Restart member media renderer if all is good
+        if (status == RequestStatus.OK) {
             val holder = if (roomMember.isActiveRenderer) mainSurface.holder else surfaceView.holder
             if (isSelf) {
                 status = viewModel.startUserMediaPreview(holder).status
             } else {
-                viewModel.restartMediaRenderer(roomMember.renderer, holder).let {
-                    if (it != RendererStartStatus.OK) {
-                        status = RequestStatus.FAILED
-                    }
-                }
-            }
-
-            Timber.d("Restarted member renderer: $status $roomMember isSelf: $isSelf")
-            launch(Dispatchers.Main) {
-                if (status == RequestStatus.OK) {
-                    Timber.d("Showing surface: $roomMember")
-                    if (!roomMember.canRenderVideo) {
-                        roomMember.canRenderVideo = true
-                        roomMember.onUpdate.call()
-                    }
-                    if (roomMember.isActiveRenderer) {
-                        mainSurface.visibility = View.VISIBLE
-                    }
-                } else {
-                    Timber.d("Hiding surface: $roomMember")
-                    if (roomMember.canRenderVideo) {
-                        roomMember.canRenderVideo = false
-                        roomMember.onUpdate.call()
-                    }
-                    if (roomMember.isActiveRenderer) {
-                        mainSurface.visibility = View.GONE
-                    }
+                viewModel.restartMediaRenderer(roomMember.renderer, holder).takeIf { it != RendererStartStatus.OK }?.let {
+                    status = RequestStatus.FAILED
                 }
             }
         }
+        // Handle renderer status
+        if (status == RequestStatus.OK) {
+            Timber.d("Showing surface: $roomMember")
+            if (!roomMember.canShowPreview) {
+                roomMember.canShowPreview = true
+                roomMember.onUpdate.call()
+            }
+            if (roomMember.isActiveRenderer) {
+                mainSurface.visibility = View.VISIBLE
+            }
+        } else {
+            Timber.d("Hiding surface: $roomMember")
+            if (roomMember.canShowPreview) {
+                roomMember.canShowPreview = false
+                roomMember.onUpdate.call()
+            }
+            if (roomMember.isActiveRenderer) {
+                mainSurface.visibility = View.GONE
+            }
+        }
+        // Update display name
+        if (roomMember.isActiveRenderer) {
+            viewModel.displayName.value = roomMember.member.observableScreenName.value
+        }
+        Timber.d("Updated member renderer: $status $roomMember isSelf: $isSelf")
         subscriptionsInProgress.remove(roomMember.member.sessionId)
     }
 

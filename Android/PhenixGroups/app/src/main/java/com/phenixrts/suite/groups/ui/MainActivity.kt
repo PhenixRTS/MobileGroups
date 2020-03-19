@@ -146,18 +146,19 @@ class MainActivity : EasyPermissionActivity() {
     private suspend fun previewUserVideo(start: Boolean) {
         Timber.d("Preview user video: $start")
         viewModel.isVideoEnabled.value = start
-        if (start) {
-            val response = viewModel.startUserMediaPreview(surface_view.holder)
-            Timber.d("Preview started: ${response.status}")
-            if (response.status == RequestStatus.OK) {
-                surface_view.visibility = View.VISIBLE
+        if (viewModel.isInRoom.isFalse()) {
+            if (start) {
+                val response = viewModel.startUserMediaPreview(surface_view.holder)
+                Timber.d("Preview started: ${response.status}")
+                if (response.status == RequestStatus.OK) {
+                    surface_view.visibility = View.VISIBLE
+                } else {
+                    showToast(response.message)
+                }
             } else {
-                showToast(response.message)
+                surface_view.visibility = View.GONE
+                viewModel.stopUserMediaPreview()
             }
-        } else {
-            // TODO: Probably should behave differently while in a room
-            surface_view.visibility = View.GONE
-            viewModel.stopUserMediaPreview()
         }
     }
 
