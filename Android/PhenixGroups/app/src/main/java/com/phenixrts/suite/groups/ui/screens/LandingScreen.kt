@@ -12,6 +12,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.suite.groups.R
+import com.phenixrts.suite.groups.common.extensions.getMicIcon
 import com.phenixrts.suite.groups.common.extensions.getSurfaceView
 import com.phenixrts.suite.groups.common.extensions.isTrue
 import com.phenixrts.suite.groups.common.extensions.showToast
@@ -59,6 +60,11 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
             getSurfaceView().visibility = View.VISIBLE
         } else {
             getSurfaceView().visibility = View.GONE
+        }
+        if (viewModel.isMicrophoneEnabled.isTrue()) {
+            getMicIcon().visibility = View.GONE
+        } else {
+            getMicIcon().visibility = View.VISIBLE
         }
         restartVideoPreview()
     }

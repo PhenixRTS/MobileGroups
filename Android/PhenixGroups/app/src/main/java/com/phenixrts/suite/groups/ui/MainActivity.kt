@@ -6,6 +6,7 @@ package com.phenixrts.suite.groups.ui
 
 import android.Manifest
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import androidx.databinding.DataBindingUtil
 import com.phenixrts.common.RequestStatus
@@ -23,9 +24,7 @@ import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import timber.log.Timber
-import java.util.*
 import javax.inject.Inject
-import kotlin.concurrent.schedule
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -36,10 +35,19 @@ class MainActivity : EasyPermissionActivity() {
     @Inject lateinit var cacheProvider: CacheProvider
     @Inject lateinit var preferenceProvider: PreferenceProvider
 
-    private var hideControlsTask: TimerTask? = null
+    private val timerHandler = Handler()
+    private val timerRunnable = Runnable {
+        launch {
+            if (viewModel.isInRoom.isTrue()) {
+                Timber.d("Hiding controls")
+                viewModel.isControlsEnabled.value = false
+            }
+        }
+    }
 
     private val viewModel: GroupsViewModel by lazyViewModel {
-        GroupsViewModel(cacheProvider, preferenceProvider, roomExpressRepository, userMediaRepository, this)
+        GroupsViewModel(cacheProvider, preferenceProvider, roomExpressRepository, userMediaRepository,
+            getSurfaceView().holder, this)
     }
 
     private val activityScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -61,12 +69,12 @@ class MainActivity : EasyPermissionActivity() {
         microphone_button.setOnCheckedChangeListener(::setMicrophoneEnabled)
         preview_container.setOnClickListener {
             launch {
-                viewModel.isControlsEnabled.value = true
-                hideControlsTask?.cancel()
-                hideControlsTask = Timer("hide buttons").schedule(HIDE_CONTROLS_DELAY) {
-                    launch {
-                        viewModel.isControlsEnabled.value = false
-                    }
+                if (viewModel.isInRoom.isTrue()) {
+                    timerHandler.removeCallbacks(timerRunnable)
+                    timerHandler.postDelayed(timerRunnable, HIDE_CONTROLS_DELAY)
+                    val enabled = viewModel.isControlsEnabled.value?.not() ?: true
+                    Timber.d("Switching controls: $enabled")
+                    viewModel.isControlsEnabled.value = enabled
                 }
             }
         }
@@ -88,6 +96,7 @@ class MainActivity : EasyPermissionActivity() {
                 .addToBackStack(SplashScreen::class.java.name)
                 .commit()
         }
+        viewModel.initObservers(this)
     }
 
     override fun onBackPressed() {
@@ -99,14 +108,6 @@ class MainActivity : EasyPermissionActivity() {
             }
         }
         super.onBackPressed()
-    }
-
-    override fun onDestroy() {
-        launch {
-            Timber.d("App destroyed, stopping renderer")
-            viewModel.disposeMediaRenderer()
-        }
-        super.onDestroy()
     }
 
     private fun launch(block: suspend CoroutineScope.() -> Unit) = activityScope.launch(
@@ -131,14 +132,17 @@ class MainActivity : EasyPermissionActivity() {
     }
 
     private fun setMicrophoneEnabled(enabled: Boolean) {
-        if (enabled) {
-            askForPermission(Manifest.permission.RECORD_AUDIO) { granted ->
-                if (!granted) {
-                    microphone_button.isChecked = false
-                    viewModel.isMicrophoneEnabled.value = false
-                } else {
-                    viewModel.isMicrophoneEnabled.value = enabled
+        askForPermission(Manifest.permission.RECORD_AUDIO) { granted ->
+            Timber.d("Mute clicked: $enabled ${viewModel.isInRoom.isFalse()}")
+            if (!granted) {
+                microphone_button.isChecked = false
+                viewModel.isMicrophoneEnabled.value = false
+                if (viewModel.isInRoom.isFalse()) {
+                    active_member_mic.visibility = View.VISIBLE
                 }
+            } else if (viewModel.isInRoom.isFalse()) {
+                viewModel.isMicrophoneEnabled.value = enabled
+                active_member_mic.visibility = if (enabled) View.GONE else View.VISIBLE
             }
         }
     }
@@ -157,7 +161,6 @@ class MainActivity : EasyPermissionActivity() {
                 }
             } else {
                 surface_view.visibility = View.GONE
-                viewModel.stopUserMediaPreview()
             }
         }
     }

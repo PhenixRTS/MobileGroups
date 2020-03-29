@@ -4,28 +4,64 @@
 
 package com.phenixrts.suite.groups.models
 
+import android.view.SurfaceHolder
 import androidx.lifecycle.MutableLiveData
 import com.phenixrts.common.Disposable
 import com.phenixrts.express.ExpressSubscriber
 import com.phenixrts.pcast.Renderer
+import com.phenixrts.pcast.RendererStartStatus
+import com.phenixrts.pcast.android.AndroidVideoRenderSurface
 import com.phenixrts.room.Member
 import timber.log.Timber
 
 data class RoomMember(val member: Member) {
 
     private val disposables: MutableList<Disposable> = mutableListOf()
+    private val videoRenderSurface = AndroidVideoRenderSurface()
+    private var subscriber: ExpressSubscriber? = null
+    private var renderer: Renderer? = null
+
     val onUpdate: MutableLiveData<Boolean> = MutableLiveData<Boolean>()
+    var mainSurface: SurfaceHolder? = null
+    var previewSurface: SurfaceHolder? = null
+
     var canRenderVideo = false
     var canShowPreview = false
+    var isRendererStarted = false
     var isActiveRenderer = false
     var isPinned = false
     var isMuted = false
-    var subscriber: ExpressSubscriber? = null
-    var renderer: Renderer? = null
 
     fun isSubscribed() = subscriber != null && renderer != null
 
     fun canRenderThumbnail() = canRenderVideo && canShowPreview && !isActiveRenderer
+
+    fun onSubscribed(subscriber: ExpressSubscriber, renderer: Renderer?) {
+        this.subscriber = subscriber
+        this.renderer = renderer
+    }
+
+    fun setSurfaces(mainSurface: SurfaceHolder, previewSurface: SurfaceHolder) {
+        this.mainSurface = mainSurface
+        this.previewSurface = previewSurface
+        Timber.d("Added member surfaces: ${toString()}")
+    }
+
+    fun startMemberRenderer(): RendererStartStatus {
+        if (renderer == null) {
+            renderer = subscriber?.createRenderer()
+        }
+
+        var status = RendererStartStatus.OK
+        Timber.d("Updating renderer surface: $mainSurface $previewSurface")
+        videoRenderSurface.setSurfaceHolder(if (isActiveRenderer) mainSurface else previewSurface)
+        if (!isRendererStarted) {
+            status = renderer?.start(videoRenderSurface) ?: RendererStartStatus.FAILED
+            isRendererStarted = status == RendererStartStatus.OK
+            Timber.d("Started video renderer: $status : ${toString()}")
+        }
+        return status
+    }
 
     fun addDisposable(disposable: Disposable) {
         disposables.add(disposable)

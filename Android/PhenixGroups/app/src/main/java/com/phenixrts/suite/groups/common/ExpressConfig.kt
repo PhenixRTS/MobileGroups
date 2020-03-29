@@ -37,9 +37,8 @@ fun getPublishToRoomOptions(userScreenName: String, roomOptions: RoomOptions, pu
         .withScreenName(userScreenName)
         .buildPublishToRoomOptions()
 
-fun getSubscribeVideoOptions(surfaceHolder: SurfaceHolder): SubscribeToMemberStreamOptions =
+fun getSubscribeToMemberOptions(): SubscribeToMemberStreamOptions =
     RoomExpressFactory.createSubscribeToMemberStreamOptionsBuilder()
-        .withRenderer(AndroidVideoRenderSurface(surfaceHolder))
         .buildSubscribeToMemberStreamOptions()
 
 fun getSubscribeAudioOptions(): SubscribeToMemberStreamOptions =

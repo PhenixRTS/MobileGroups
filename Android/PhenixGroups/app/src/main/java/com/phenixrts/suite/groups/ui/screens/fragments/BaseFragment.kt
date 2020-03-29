@@ -32,7 +32,8 @@ abstract class BaseFragment : Fragment() {
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     val viewModel: GroupsViewModel by lazyViewModel {
-        GroupsViewModel(cacheProvider, preferenceProvider, roomExpressRepository, userMediaRepository, this)
+        GroupsViewModel(cacheProvider, preferenceProvider, roomExpressRepository, userMediaRepository,
+            getSurfaceView().holder, this)
     }
 
     open fun onBackPressed() {}
@@ -41,6 +42,7 @@ abstract class BaseFragment : Fragment() {
         super.onCreate(savedInstanceState)
         injectDependencies()
         handleExceptions()
+        viewModel.initObservers(this)
     }
 
     private fun handleExceptions() {

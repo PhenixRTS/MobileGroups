@@ -74,16 +74,18 @@
                 app:layout_constraintBottom_toBottomOf="parent" />
 
             <ImageView
-                android:id="@+id/indicator_mic"
+                android:id="@+id/active_member_mic"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_marginEnd="16dp"
                 android:layout_marginBottom="16dp"
                 android:contentDescription="@string/preview_icon_content_description"
                 android:tint="@color/accentColor"
+                android:src="@drawable/ic_mic_off_black_24dp"
+                android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:srcCompat="@drawable/ic_mic_off_black_24dp" />
+                tools:visibility="visible"/>
 
             <LinearLayout
                 android:id="@+id/media_controls"

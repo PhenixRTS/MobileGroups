@@ -26,10 +26,8 @@ import com.phenixrts.suite.groups.repository.RoomExpressRepository
 import com.phenixrts.suite.groups.repository.RoomMemberRepository
 import com.phenixrts.suite.groups.repository.UserMediaRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
 import java.util.*
 import kotlin.coroutines.resume
@@ -40,13 +38,14 @@ class GroupsViewModel(
     private val preferenceProvider: PreferenceProvider,
     private val roomExpressRepository: RoomExpressRepository,
     private val userMediaRepository: UserMediaRepository,
+    private val mainSurfaceHolder: SurfaceHolder,
     lifecycleOwner: LifecycleOwner
 ) : ViewModel() {
 
+    private val mainRendererSurface = AndroidVideoRenderSurface()
     private var roomMemberRepository: RoomMemberRepository? = null
     private var joinedRoomRepository: JoinedRoomRepository? = null
-    private var restartingRenderers = arrayListOf<Renderer?>()
-    var userMediaRenderer: Renderer? = null
+    private var userMediaRenderer: Renderer? = null
 
     val displayName = MutableLiveData<String>()
     val isVideoEnabled = MutableLiveData<Boolean>()
@@ -59,17 +58,7 @@ class GroupsViewModel(
 
     init {
         Timber.d("View model created")
-        displayName.value = preferenceProvider.getDisplayName()
-        isMicrophoneEnabled.observe(lifecycleOwner, Observer { enabled ->
-            userMediaRepository.switchAudioStreamState(enabled)
-            joinedRoomRepository?.switchAudioStreamState(enabled)
-            roomMemberRepository?.switchAudioStreamState(enabled)
-        })
-        isVideoEnabled.observe(lifecycleOwner, Observer { enabled ->
-            userMediaRepository.switchVideoStreamState(enabled)
-            joinedRoomRepository?.switchVideoStreamState(enabled)
-            roomMemberRepository?.switchVideoStreamState(enabled)
-        })
+        initObservers(lifecycleOwner)
         expireOldRooms()
         getRoomListItems()
     }
@@ -94,26 +83,28 @@ class GroupsViewModel(
                         currentSessionsId.value = roomService.self.sessionId
                         joinedRoomRepository = JoinedRoomRepository(roomService, publisher)
                         roomMemberRepository = RoomMemberRepository(roomExpressRepository.roomExpress, roomService)
+                        // Update audio / video state
+                        joinedRoomRepository?.switchAudioStreamState(isMicrophoneEnabled.isTrue())
+                        joinedRoomRepository?.switchVideoStreamState(isVideoEnabled.isTrue())
                     }
                 }
             }
         }
     }
 
-    suspend fun disposeMediaRenderer(): Unit = suspendCancellableCoroutine { continuation ->
-        Timber.d("Disposing media renderer")
-        try {
-            userMediaRenderer?.stop()
-            userMediaRenderer?.dispose()
-            userMediaRenderer = null
-        } catch (e: Exception) {
-            e.printStackTrace()
-            Timber.d("Failed to dispose Renderer")
-        } finally {
-            Timber.d("Media renderer disposed")
-            if (continuation.isActive) {
-                continuation.resume(Unit)
-            }
+    fun initObservers(lifecycleOwner: LifecycleOwner) {
+        viewModelScope.launch(Dispatchers.Main) {
+            displayName.value = preferenceProvider.getDisplayName()
+            isMicrophoneEnabled.observe(lifecycleOwner, Observer { enabled ->
+                userMediaRepository.switchAudioStreamState(enabled)
+                joinedRoomRepository?.switchAudioStreamState(enabled)
+                roomMemberRepository?.switchAudioStreamState(enabled)
+            })
+            isVideoEnabled.observe(lifecycleOwner, Observer { enabled ->
+                userMediaRepository.switchVideoStreamState(enabled)
+                joinedRoomRepository?.switchVideoStreamState(enabled)
+                roomMemberRepository?.switchVideoStreamState(enabled)
+            })
         }
     }
 
@@ -159,34 +150,26 @@ class GroupsViewModel(
         }
     }
 
-    suspend fun startUserMediaPreview(holder: SurfaceHolder): RoomStatus = suspendCoroutine { continuation ->
+    suspend fun startUserMediaPreview(holder: SurfaceHolder?): RoomStatus = suspendCoroutine { continuation ->
         if (isVideoEnabled.isTrue()) {
             viewModelScope.launch {
-                Timber.d("Start user media: ${isVideoEnabled.isTrue()}")
+                Timber.d("Start user media: ${isVideoEnabled.isTrue()} holder: $holder")
                 var status = RequestStatus.OK
+                mainRendererSurface.setSurfaceHolder(holder ?: mainSurfaceHolder)
                 if (userMediaRenderer == null) {
                     userMediaRepository.getUserMediaStream().let { userMedia ->
                         status = userMedia.status
                         if (status == RequestStatus.OK) {
                             userMediaRenderer = userMedia.userMediaStream?.mediaStream?.createRenderer()
-                            val renderStatus = userMediaRenderer?.start(AndroidVideoRenderSurface(holder))
+                            val renderStatus = userMediaRenderer?.start(mainRendererSurface)
                             if (renderStatus != RendererStartStatus.OK) {
                                 status = RequestStatus.FAILED
                             }
                             Timber.d("Video render created and started: $renderStatus")
                         }
                     }
-                    continuation.resume(RoomStatus(status))
-                } else {
-                    launch {
-                        val renderStatus = restartMediaRenderer(userMediaRenderer, holder)
-                        if (renderStatus != RendererStartStatus.OK) {
-                            status = RequestStatus.FAILED
-                        }
-                        Timber.d("Video render re-started: $renderStatus")
-                        continuation.resume(RoomStatus(status))
-                    }
                 }
+                continuation.resume(RoomStatus(status))
             }
         }
     }
@@ -217,46 +200,5 @@ class GroupsViewModel(
 
     fun getRoomMembers(): MutableLiveData<List<RoomMember>>
             = roomMemberRepository?.getObservableRoomMembers() ?: MutableLiveData()
-
-    fun stopUserMediaPreview() = viewModelScope.launch {
-        Timber.d("Stopping media renderer")
-        userMediaRenderer?.stop()
-    }
-
-    suspend fun restartMediaRenderer(renderer: Renderer?, surfaceHolder: SurfaceHolder): RendererStartStatus
-            = suspendCoroutine { continuation ->
-        renderer?.let { mediaRenderer ->
-            var rendererStartStatus = RendererStartStatus.OK
-            if (!restartingRenderers.contains(mediaRenderer)) {
-                restartingRenderers.add(mediaRenderer)
-                viewModelScope.launch {
-                    try {
-                        mediaRenderer.stop()
-                        // TODO: Remove delay once SDK is updated to not throw conflict error when called quickly
-                        delay(RENDERER_RESTART_DELAY)
-                        Timber.d("Restarting media renderer: $mediaRenderer ${restartingRenderers.size} $surfaceHolder")
-                        rendererStartStatus = mediaRenderer.start(AndroidVideoRenderSurface(surfaceHolder))?.let { rendererStatus ->
-                            Timber.d("Renderer restarted: $rendererStatus")
-                            rendererStatus
-                        } ?: RendererStartStatus.FAILED
-                    } catch (e: Exception) {
-                        Timber.d("Failed to restart renderer")
-                        rendererStartStatus = RendererStartStatus.FAILED
-                    } finally {
-                        restartingRenderers.remove(mediaRenderer)
-                        Timber.d("Resuming renderer restart")
-                        continuation.resume(rendererStartStatus)
-                    }
-                }
-            } else {
-                Timber.d("Resuming renderer restart")
-                continuation.resume(rendererStartStatus)
-            }
-        }
-    }
-
-    companion object {
-        const val RENDERER_RESTART_DELAY = 400L
-    }
 
 }

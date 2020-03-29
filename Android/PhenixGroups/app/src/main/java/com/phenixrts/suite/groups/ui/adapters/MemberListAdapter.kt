@@ -5,6 +5,7 @@
 package com.phenixrts.suite.groups.ui.adapters
 
 import android.view.*
+import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
@@ -15,7 +16,7 @@ import com.phenixrts.room.MemberState
 import com.phenixrts.room.TrackState
 import com.phenixrts.suite.groups.common.extensions.call
 import com.phenixrts.suite.groups.common.getSubscribeAudioOptions
-import com.phenixrts.suite.groups.common.getSubscribeVideoOptions
+import com.phenixrts.suite.groups.common.getSubscribeToMemberOptions
 import com.phenixrts.suite.groups.databinding.RowMemberItemBinding
 import com.phenixrts.suite.groups.models.RoomMember
 import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
@@ -27,6 +28,7 @@ import kotlin.properties.Delegates
 class MemberListAdapter(
     private val viewModel: GroupsViewModel,
     private val mainSurface: SurfaceView,
+    private val micIcon: ImageView,
     private val callback: OnMemberListener
 ) : RecyclerView.Adapter<MemberListAdapter.ViewHolder>() {
 
@@ -57,15 +59,18 @@ class MemberListAdapter(
             Timber.d("Member clicked: $selectedMember")
             callback.onMemberClicked(selectedMember)
         }
+        roomMember.setSurfaces(mainSurface.holder, holder.binding.memberSurface.holder)
         subscribeToMember(holder.binding, position)
-        updateMemberStream(roomMember, holder.binding.memberSurface)
+        updateMemberStream(roomMember)
     }
 
     private fun subscribeToMember(binding: RowMemberItemBinding, position: Int) {
         members.getOrNull(position)?.let { roomMember ->
             binding.lifecycleOwner?.let {
-                if (!roomMember.onUpdate.hasActiveObservers()) {
+                if (roomMember.onUpdate.hasActiveObservers()) {
+                    Timber.d("Removing active observers for: $roomMember")
                     roomMember.onUpdate.removeObservers(it)
+                    roomMember.dispose()
                 }
                 Timber.d("Observing member: $roomMember")
                 val memberStream = roomMember.member.observableStreams?.value?.get(0)
@@ -73,8 +78,15 @@ class MemberListAdapter(
                     members.getOrNull(position)?.let { member ->
                         Timber.d("Member updated: $member $restartRenderer")
                         binding.member = member
-                        if (restartRenderer) {
-                            updateMemberStream(member, binding.memberSurface)
+                        updateMemberStream(member)
+
+                        // Update mic icon
+                        if (roomMember.isActiveRenderer) {
+                            if (roomMember.isMuted) {
+                                micIcon.visibility = View.VISIBLE
+                            } else {
+                                micIcon.visibility = View.GONE
+                            }
                         }
                     }
                 })
@@ -118,7 +130,7 @@ class MemberListAdapter(
         }
     }
 
-    private fun updateMemberStream(roomMember: RoomMember, surfaceView: SurfaceView)
+    private fun updateMemberStream(roomMember: RoomMember)
             = viewModel.viewModelScope.launch(Dispatchers.Main) {
         if (subscriptionsInProgress.contains(roomMember.member.sessionId)) {
             return@launch
@@ -132,7 +144,7 @@ class MemberListAdapter(
         // Subscribe to member media if not self member and not subscribed yet
         if (!roomMember.isSubscribed() && !isSelf) {
             val options = if (roomMember.canRenderVideo) {
-                getSubscribeVideoOptions(surfaceView.holder)
+                getSubscribeToMemberOptions()
             } else {
                 getSubscribeAudioOptions()
             }
@@ -140,41 +152,37 @@ class MemberListAdapter(
             Timber.d("Subscribed to member media: $status")
         }
 
-        // Restart member media renderer if all is good
-        if (status == RequestStatus.OK) {
-            val holder = if (roomMember.isActiveRenderer) mainSurface.holder else surfaceView.holder
+        // Update member media renderer if all is good
+        if (status == RequestStatus.OK && roomMember.canShowPreview) {
             if (isSelf) {
-                status = viewModel.startUserMediaPreview(holder).status
+                status = viewModel.startUserMediaPreview(if (roomMember.isActiveRenderer)
+                    roomMember.mainSurface else roomMember.previewSurface).status
             } else {
-                viewModel.restartMediaRenderer(roomMember.renderer, holder).takeIf { it != RendererStartStatus.OK }?.let {
+                roomMember.startMemberRenderer().takeIf { it != RendererStartStatus.OK }?.let {
                     status = RequestStatus.FAILED
                 }
             }
         }
-        // Handle renderer status
-        if (status == RequestStatus.OK) {
-            Timber.d("Showing surface: $roomMember")
-            if (!roomMember.canShowPreview) {
-                roomMember.canShowPreview = true
-                roomMember.onUpdate.call()
-            }
-            if (roomMember.isActiveRenderer) {
+
+        // Update active renderer
+        if (roomMember.isActiveRenderer) {
+            if (status == RequestStatus.OK) {
+                Timber.d("Showing surface: $roomMember")
                 mainSurface.visibility = View.VISIBLE
-            }
-        } else {
-            Timber.d("Hiding surface: $roomMember")
-            if (roomMember.canShowPreview) {
-                roomMember.canShowPreview = false
-                roomMember.onUpdate.call()
-            }
-            if (roomMember.isActiveRenderer) {
+            } else {
+                Timber.d("Hiding surface: $roomMember")
                 mainSurface.visibility = View.GONE
             }
-        }
-        // Update display name
-        if (roomMember.isActiveRenderer) {
+            // Update display name
             viewModel.displayName.value = roomMember.member.observableScreenName.value
+            // Update mic icon
+            if (roomMember.isMuted) {
+                micIcon.visibility = View.VISIBLE
+            } else {
+                micIcon.visibility = View.GONE
+            }
         }
+
         Timber.d("Updated member renderer: $status $roomMember isSelf: $isSelf")
         subscriptionsInProgress.remove(roomMember.member.sessionId)
     }

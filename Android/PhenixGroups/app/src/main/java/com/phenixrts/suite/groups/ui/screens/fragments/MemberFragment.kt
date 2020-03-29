@@ -19,18 +19,21 @@ class MemberFragment : BaseFragment(), MemberListAdapter.OnMemberListener {
 
     private lateinit var binding: FragmentMembersBinding
 
-    private val adapter by lazy { MemberListAdapter(viewModel, getSurfaceView(), this) }
+    private val adapter by lazy { MemberListAdapter(viewModel, getSurfaceView(), getMicIcon(), this) }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentMembersBinding.inflate(inflater)
         binding.lifecycleOwner = this
         binding.memberList.adapter = adapter
+        return binding.root
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         viewModel.getRoomMembers().observe(viewLifecycleOwner, Observer { members ->
             Timber.d("Member adapter updated ${members.size} $members")
             adapter.members = members
         })
-        return binding.root
     }
 
     override fun onDestroy() {

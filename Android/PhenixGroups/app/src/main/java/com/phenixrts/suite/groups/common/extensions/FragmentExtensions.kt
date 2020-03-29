@@ -6,6 +6,7 @@ package com.phenixrts.suite.groups.common.extensions
 
 import android.view.SurfaceView
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
@@ -68,3 +69,7 @@ fun FragmentActivity.hideKeyboard() {
 fun FragmentActivity.getSurfaceView(): SurfaceView = surface_view
 
 fun Fragment.getSurfaceView(): SurfaceView = requireActivity().getSurfaceView()
+
+fun FragmentActivity.getMicIcon(): ImageView = active_member_mic
+
+fun Fragment.getMicIcon(): ImageView = requireActivity().getMicIcon()
