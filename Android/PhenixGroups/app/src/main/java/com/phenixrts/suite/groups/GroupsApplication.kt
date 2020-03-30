@@ -5,6 +5,7 @@
 package com.phenixrts.suite.groups
 
 import android.app.Application
+import android.content.res.Resources
 import com.phenixrts.suite.groups.common.LineNumberDebugTree
 import com.phenixrts.suite.groups.injection.DaggerInjectionComponent
 import com.phenixrts.suite.groups.injection.InjectionComponent
@@ -21,10 +22,15 @@ class GroupsApplication: Application() {
         }
 
         component = DaggerInjectionComponent.builder().injectionModule(InjectionModule(this)).build()
+        resourceContext = resources
     }
 
     companion object {
         lateinit var component: InjectionComponent
             private set
+
+        private lateinit var resourceContext: Resources
+
+        fun getString(id: Int, arguments: String = ""): String = resourceContext.getString(id, arguments)
     }
 }

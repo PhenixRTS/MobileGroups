@@ -4,10 +4,8 @@
 
 package com.phenixrts.suite.groups.common
 
-import android.view.SurfaceHolder
 import com.phenixrts.express.*
 import com.phenixrts.pcast.*
-import com.phenixrts.pcast.android.AndroidVideoRenderSurface
 import com.phenixrts.room.RoomOptions
 import com.phenixrts.room.RoomServiceFactory
 import com.phenixrts.room.RoomType
@@ -37,7 +35,7 @@ fun getPublishToRoomOptions(userScreenName: String, roomOptions: RoomOptions, pu
         .withScreenName(userScreenName)
         .buildPublishToRoomOptions()
 
-fun getSubscribeToMemberOptions(): SubscribeToMemberStreamOptions =
+fun getSubscribeVideoOptions(): SubscribeToMemberStreamOptions =
     RoomExpressFactory.createSubscribeToMemberStreamOptionsBuilder()
         .buildSubscribeToMemberStreamOptions()
 

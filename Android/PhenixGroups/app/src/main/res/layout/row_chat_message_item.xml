@@ -6,54 +6,49 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import
-            alias="stringUtils"
-            type="com.phenixrts.suite.groups.common.StringUtilsKt" />
-
-        <variable
-            name="isLocal"
-            type="Boolean" />
-
         <variable
             name="chatMessage"
-            type="com.phenixrts.chat.ChatMessage" />
+            type="com.phenixrts.suite.groups.models.RoomMessage" />
     </data>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:padding="16dp"
+        tools:background="@color/primaryBackgroundColor">
 
         <TextView
-            android:id="@+id/senderNameLabel"
+            android:id="@+id/message_sender_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:lines="1"
             android:ellipsize="end"
-            android:text="@{chatMessage.observableFrom.value.observableScreenName.value}"
-            android:textColor="@{isLocal ? @android:color/holo_blue_dark : @android:color/black}"
+            android:text="@{chatMessage.observableSenderName}"
+            android:textColor="@{chatMessage.isSelf ? @color/primaryTextAccentColor : @color/secondaryTextColor}"
             android:textSize="14sp"
-            android:layout_toStartOf="@id/messageTimeLabel"
+            android:layout_toStartOf="@id/message_time_label"
             tools:text="Russel Crow" />
 
         <TextView
-            android:id="@+id/messageTimeLabel"
+            android:id="@+id/message_time_label"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="12sp"
             android:lines="1"
             android:ellipsize="end"
             android:layout_alignParentEnd="true"
-            android:text="@{stringUtils.getFormattedDate(chatMessage.observableTimeStamp.value)}"
+            android:text="@{chatMessage.observableMessageTime}"
+            android:textColor="@color/secondaryTextColor"
             tools:text="3 min"/>
 
         <TextView
-            android:id="@+id/messageLabel"
+            android:id="@+id/message_body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@{chatMessage.observableMessage.value}"
+            android:text="@{chatMessage.observableMessageBody}"
             android:textSize="18sp"
-            android:layout_below="@id/senderNameLabel"
+            android:textColor="@color/primaryTextDarkColor"
+            android:layout_below="@id/message_sender_name"
             tools:text="Some message text" />
 
     </RelativeLayout>

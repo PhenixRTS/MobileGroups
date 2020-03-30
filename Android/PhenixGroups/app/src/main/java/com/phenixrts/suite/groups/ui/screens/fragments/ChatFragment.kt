@@ -20,7 +20,7 @@ class ChatFragment : BaseFragment() {
 
     private lateinit var binding: FragmentChatBinding
 
-    private val adapter by lazy { ChatListAdapter(viewModel) }
+    private val adapter by lazy { ChatListAdapter() }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentChatBinding.inflate(inflater)
@@ -29,19 +29,19 @@ class ChatFragment : BaseFragment() {
         binding.sendButton.setOnClickListener {
             sendMessage()
         }
+        return binding.root
+    }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         viewModel.getChatMessages().observe(viewLifecycleOwner, Observer {
             adapter.data = it
             if (it.isNotEmpty()) {
                 binding.chatHistory.scrollToPosition(it.size - 1)
             }
         })
-        return binding.root
     }
 
-    /**
-     * Sends a chat message and handles response
-     */
     private fun sendMessage() = launch {
         val status = viewModel.sendChatMessage(binding.newMessageEditText.text.toString())
         if (status.status == RequestStatus.OK) {

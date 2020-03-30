@@ -7,7 +7,6 @@ package com.phenixrts.suite.groups.viewmodels
 import android.view.SurfaceHolder
 import androidx.lifecycle.*
 import androidx.lifecycle.Observer
-import com.phenixrts.chat.ChatMessage
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.express.SubscribeToMemberStreamOptions
 import com.phenixrts.pcast.Renderer
@@ -18,6 +17,7 @@ import com.phenixrts.suite.groups.cache.PreferenceProvider
 import com.phenixrts.suite.groups.cache.entities.RoomInfoItem
 import com.phenixrts.suite.groups.common.extensions.expirationDate
 import com.phenixrts.suite.groups.common.extensions.isTrue
+import com.phenixrts.suite.groups.models.RoomMessage
 import com.phenixrts.suite.groups.models.JoinedRoomStatus
 import com.phenixrts.suite.groups.models.RoomMember
 import com.phenixrts.suite.groups.models.RoomStatus
@@ -171,6 +171,8 @@ class GroupsViewModel(
                 }
                 continuation.resume(RoomStatus(status))
             }
+        } else {
+            continuation.resume(RoomStatus(RequestStatus.FAILED))
         }
     }
 
@@ -195,7 +197,7 @@ class GroupsViewModel(
         roomMemberRepository = null
     }
 
-    fun getChatMessages(): MutableLiveData<List<ChatMessage>> =
+    fun getChatMessages(): MutableLiveData<List<RoomMessage>> =
         joinedRoomRepository?.getObservableChatMessages() ?: MutableLiveData()
 
     fun getRoomMembers(): MutableLiveData<List<RoomMember>>

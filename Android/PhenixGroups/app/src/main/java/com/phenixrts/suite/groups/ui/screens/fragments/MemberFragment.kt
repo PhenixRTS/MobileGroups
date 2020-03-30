@@ -42,7 +42,6 @@ class MemberFragment : BaseFragment(), MemberListAdapter.OnMemberListener {
     }
 
     override fun onMemberClicked(roomMember: RoomMember) {
-        Timber.d("Member clicked: $roomMember")
         viewModel.pinActiveMember(roomMember)
     }
 

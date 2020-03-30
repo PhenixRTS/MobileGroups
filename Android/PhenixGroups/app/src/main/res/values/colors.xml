@@ -13,7 +13,8 @@
 
     <color name="primaryTextColor">#ffffff</color>
     <color name="primaryTextDarkColor">#333</color>
-    <color name="secondaryTextColor">#ffffff</color>
+    <color name="secondaryTextColor">#777</color>
+    <color name="primaryTextAccentColor">#FF0099CC</color>
 
     <color name="primaryBackgroundColor">#fff</color>
     <color name="primaryBackgroundDarkColor">#333</color>

@@ -9,14 +9,13 @@ import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.phenixrts.chat.ChatMessage
 import com.phenixrts.suite.groups.databinding.RowChatMessageItemBinding
-import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
+import com.phenixrts.suite.groups.models.RoomMessage
 import kotlin.properties.Delegates
 
-class ChatListAdapter(private val viewModel: GroupsViewModel) : RecyclerView.Adapter<ChatListAdapter.ViewHolder>() {
+class ChatListAdapter : RecyclerView.Adapter<ChatListAdapter.ViewHolder>() {
 
-    var data: List<ChatMessage> by Delegates.observable(emptyList()) { _, old, new ->
+    var data: List<RoomMessage> by Delegates.observable(emptyList()) { _, old, new ->
         DiffUtil.calculateDiff(ChatMessageDiff(old, new)).dispatchUpdatesTo(this)
     }
 
@@ -30,13 +29,12 @@ class ChatListAdapter(private val viewModel: GroupsViewModel) : RecyclerView.Ada
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.binding.chatMessage = data[position]
-        holder.binding.isLocal = viewModel.displayName.value == data[position].observableFrom.value.observableScreenName.value
     }
 
     inner class ViewHolder(val binding: RowChatMessageItemBinding) : RecyclerView.ViewHolder(binding.root)
 
-    inner class ChatMessageDiff(private val oldItems: List<ChatMessage>,
-                                private val newItems: List<ChatMessage>
+    inner class ChatMessageDiff(private val oldItems: List<RoomMessage>,
+                                private val newItems: List<RoomMessage>
     ) : DiffUtil.Callback() {
 
         override fun getOldListSize() = oldItems.size
@@ -44,7 +42,7 @@ class ChatListAdapter(private val viewModel: GroupsViewModel) : RecyclerView.Ada
         override fun getNewListSize() = newItems.size
 
         override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldItems[oldItemPosition].messageId == newItems[newItemPosition].messageId
+            return oldItems[oldItemPosition].message.messageId == newItems[newItemPosition].message.messageId
         }
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {

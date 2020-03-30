@@ -5,7 +5,6 @@
 package com.phenixrts.suite.groups.repository
 
 import androidx.lifecycle.MutableLiveData
-import com.phenixrts.chat.ChatMessage
 import com.phenixrts.chat.RoomChatServiceFactory
 import com.phenixrts.common.Disposable
 import com.phenixrts.common.RequestStatus
@@ -13,6 +12,7 @@ import com.phenixrts.express.ExpressPublisher
 import com.phenixrts.room.RoomService
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.common.extensions.addUnique
+import com.phenixrts.suite.groups.models.RoomMessage
 import com.phenixrts.suite.groups.models.RoomStatus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,7 +28,7 @@ class JoinedRoomRepository(
 
     private val chatService = RoomChatServiceFactory.createRoomChatService(roomService)
     private val disposables: MutableList<Disposable?> = mutableListOf()
-    private val chatHistory = MutableLiveData<List<ChatMessage>>()
+    private val chatHistory = MutableLiveData<List<RoomMessage>>()
 
     private fun dispose() = launch {
         launch(Dispatchers.Main) {
@@ -44,14 +44,14 @@ class JoinedRoomRepository(
         Timber.d("Joined room disposed")
     }
 
-    fun getObservableChatMessages(): MutableLiveData<List<ChatMessage>> {
+    fun getObservableChatMessages(): MutableLiveData<List<RoomMessage>> {
         chatService.observableChatMessages.subscribe { messages ->
             Timber.d("Message list updated ${messages.size}")
             launch {
                 launch(Dispatchers.Main) {
                     Timber.d("Message list updated")
                     val history = chatHistory.value?.toMutableList() ?: mutableListOf()
-                    history.addUnique(messages)
+                    history.addUnique(messages, roomService.self.observableScreenName.value)
                     chatHistory.value = history
                 }
             }

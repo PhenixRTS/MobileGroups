@@ -26,6 +26,10 @@
     <!--  Chat  -->
     <string name="group_call_chat_message_hint">Message</string>
     <string name="group_call_chat_send_button_content_descrition">Send Button</string>
+    <string name="group_call_chat_self">You</string>
+    <string name="chat_time_now">Now</string>
+    <string name="chat_time_min">%1$s min</string>
+    <string name="chat_time_mins">%1$s mins</string>
 
     <!-- Errors -->
     <string name="err_chat_message_failed">Failed to send chat message: %1$s</string>
