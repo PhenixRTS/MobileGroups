@@ -185,6 +185,12 @@ class GroupsViewModel(
         }
     }
 
+    suspend fun switchCameraFacing(): RequestStatus = suspendCoroutine { continuation ->
+        viewModelScope.launch {
+            continuation.resume(userMediaRepository.switchCameraFacing())
+        }
+    }
+
     fun pinActiveMember(roomMember: RoomMember) = viewModelScope.launch {
         roomMemberRepository?.pinActiveMember(roomMember)
     }

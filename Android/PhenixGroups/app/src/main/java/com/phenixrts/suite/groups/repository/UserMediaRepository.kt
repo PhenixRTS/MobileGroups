@@ -18,6 +18,7 @@ class UserMediaRepository(private val roomExpress: RoomExpress) : Repository() {
 
     private var userMediaStream: UserMediaStream? = null
     private var collectingUserMedia = false
+    private var currentFacingMode = FacingMode.USER
 
     suspend fun getUserMediaStream(): UserMediaStatus = suspendCoroutine { continuation ->
         launch {
@@ -36,6 +37,20 @@ class UserMediaRepository(private val roomExpress: RoomExpress) : Repository() {
             } else {
                 continuation.resume(UserMediaStatus(status = RequestStatus.FAILED))
             }
+        }
+    }
+
+    suspend fun switchCameraFacing(): RequestStatus = suspendCoroutine { continuation ->
+        launch {
+            val facingMode = if (currentFacingMode == FacingMode.USER) FacingMode.ENVIRONMENT else FacingMode.USER
+            var requestStatus = RequestStatus.FAILED
+            userMediaStream?.applyOptions(getUserMediaOptions(facingMode))?.let { status ->
+                requestStatus = status
+                if (status == RequestStatus.OK) {
+                    currentFacingMode = facingMode
+                }
+            }
+            continuation.resume(requestStatus)
         }
     }
 

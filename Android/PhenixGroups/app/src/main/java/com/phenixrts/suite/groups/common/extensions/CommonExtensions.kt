@@ -10,13 +10,16 @@ import com.phenixrts.room.Member
 import com.phenixrts.suite.groups.BuildConfig
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.R
-import com.phenixrts.suite.groups.common.getFormattedDate
 import com.phenixrts.suite.groups.databinding.RowMemberItemBinding
 import com.phenixrts.suite.groups.models.RoomMember
 import com.phenixrts.suite.groups.models.RoomMessage
 import java.util.*
 
-private const val MAX_MESSAGE_INTERVAL = 30 // Minutes
+private const val MINUTE_MILLIS = 1000 * 60L
+private const val HOUR_MILLIS = MINUTE_MILLIS * 60L
+private const val DAY_MILLIS = HOUR_MILLIS * 24L
+private const val MONTH_MILLIS = DAY_MILLIS * 30L
+private const val YEAR_MILLIS = MONTH_MILLIS * 12L
 
 fun MutableList<RoomMessage>.addUnique(messages: Array<ChatMessage>, selfName: String) {
     messages.forEach {message ->
@@ -55,16 +58,60 @@ fun Date.elapsedTime(): String {
     val calendar = Calendar.getInstance()
     calendar.time = this
 
-    val minute = calendar.time.time / (1000 * 60)
-    val currentMinute = currentCalendar.time.time / (1000 * 60)
-    val interval = currentMinute - minute
+    val minutes = calendar.time.time / MINUTE_MILLIS
+    val hours = calendar.time.time / HOUR_MILLIS
+    val days = calendar.time.time / DAY_MILLIS
+    val months = calendar.time.time / MONTH_MILLIS
+    val years = calendar.time.time / YEAR_MILLIS
+    val currentMinutes = currentCalendar.time.time / MINUTE_MILLIS
+    val currentHours = currentCalendar.time.time / HOUR_MILLIS
+    val currentDays = currentCalendar.time.time / DAY_MILLIS
+    val currentMonths = currentCalendar.time.time / MONTH_MILLIS
+    val currentYears = currentCalendar.time.time / YEAR_MILLIS
 
-    return if (interval < MAX_MESSAGE_INTERVAL) GroupsApplication.getString(
-        // TODO: Update this to reflect message time greater than 24h
-        when (interval) {
-            in 0 until 1 -> R.string.chat_time_now
-            1L -> R.string.chat_time_min
-            in 2 until MAX_MESSAGE_INTERVAL -> R.string.chat_time_mins
-            else -> R.string.chat_time_now
-        }, interval.toString()) else getFormattedDate(this)
+    val minutesElapsed = currentMinutes - minutes
+    val hoursElapsed = if (minutesElapsed > 59) currentHours - hours else 0
+    val daysElapsed = if (hoursElapsed > 23) currentDays - days else 0
+    val monthsElapsed = if (daysElapsed > 29) currentMonths - months else 0
+    val yearsElapsed = if (monthsElapsed > 11) currentYears - years else 0
+
+    return when {
+        yearsElapsed > 0 -> {
+            GroupsApplication.getString(
+                if (yearsElapsed == 1L) R.string.chat_time_year
+                else R.string.chat_time_years,
+                yearsElapsed.toString()
+            )
+        }
+        monthsElapsed > 0 -> {
+            GroupsApplication.getString(
+                if (monthsElapsed == 1L) R.string.chat_time_month
+                else R.string.chat_time_months,
+                monthsElapsed.toString()
+            )
+        }
+        daysElapsed > 0 -> {
+            GroupsApplication.getString(
+                if (daysElapsed == 1L) R.string.chat_time_day
+                else R.string.chat_time_days,
+                daysElapsed.toString()
+            )
+        }
+        hoursElapsed > 0 -> {
+            GroupsApplication.getString(
+                if (hoursElapsed == 1L) R.string.chat_time_hour
+                else R.string.chat_time_hours,
+                hoursElapsed.toString()
+            )
+        }
+        minutesElapsed > 0 -> {
+            GroupsApplication.getString(
+                if (minutesElapsed == 1L) R.string.chat_time_min
+                else R.string.chat_time_mins,
+                minutesElapsed.toString()
+            )
+        }
+        else -> GroupsApplication.getString(R.string.chat_time_now)
+    }
+
 }

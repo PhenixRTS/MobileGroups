@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.view.View
 import androidx.databinding.DataBindingUtil
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.R
@@ -22,6 +23,7 @@ import com.phenixrts.suite.groups.ui.screens.SplashScreen
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
 import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.view_bottom_menu.*
 import kotlinx.coroutines.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -34,6 +36,21 @@ class MainActivity : EasyPermissionActivity() {
     @Inject lateinit var userMediaRepository: UserMediaRepository
     @Inject lateinit var cacheProvider: CacheProvider
     @Inject lateinit var preferenceProvider: PreferenceProvider
+
+    private val bottomMenu by lazy { BottomSheetBehavior.from(bottom_menu) }
+    private val sheetListener = object : BottomSheetBehavior.BottomSheetCallback() {
+        override fun onSlide(bottomSheet: View, slideOffset: Float) {
+            menu_background.visibility = View.VISIBLE
+            menu_background.alpha = slideOffset
+        }
+
+        override fun onStateChanged(bottomSheet: View, newState: Int) {
+            if (newState == BottomSheetBehavior.STATE_HIDDEN || newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                menu_background.visibility = View.GONE
+                menu_background.alpha = 0f
+            }
+        }
+    }
 
     private val timerHandler = Handler()
     private val timerRunnable = Runnable {
@@ -83,6 +100,29 @@ class MainActivity : EasyPermissionActivity() {
             onBackPressed()
         }
 
+        bottomMenu.addBottomSheetCallback(sheetListener)
+        menu_button.setOnClickListener {
+            switchMenu()
+        }
+
+        menu_background.setOnClickListener {
+            hideBottomMenu()
+        }
+
+        menu_close.setOnClickListener {
+            hideBottomMenu()
+        }
+
+        menu_switch_camera.setOnClickListener {
+            launch {
+                hideBottomMenu()
+                delay(200)
+                launch(Dispatchers.IO) {
+                    viewModel.switchCameraFacing()
+                }
+            }
+        }
+
         launch {
             setMicrophoneEnabled(viewModel.isMicrophoneEnabled.isTrue(true))
             setCameraPreviewEnabled(viewModel.isVideoEnabled.isTrue(true))
@@ -99,6 +139,11 @@ class MainActivity : EasyPermissionActivity() {
         viewModel.initObservers(this)
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        bottomMenu.removeBottomSheetCallback(sheetListener)
+    }
+
     override fun onBackPressed() {
         supportFragmentManager.run {
             fragments.forEach {
@@ -107,13 +152,35 @@ class MainActivity : EasyPermissionActivity() {
                 }
             }
         }
-        super.onBackPressed()
+        if (bottomMenu.state == BottomSheetBehavior.STATE_EXPANDED) {
+            hideBottomMenu()
+        } else {
+            super.onBackPressed()
+        }
     }
 
     private fun launch(block: suspend CoroutineScope.() -> Unit) = activityScope.launch(
         context = CoroutineExceptionHandler { _, e -> Timber.e("Coroutine failed: ${e.localizedMessage}") },
         block = block
     )
+
+    private fun switchMenu() {
+        if (bottomMenu.state != BottomSheetBehavior.STATE_EXPANDED) {
+            showBottomMenu()
+        } else {
+            hideBottomMenu()
+        }
+    }
+
+    private fun showBottomMenu() {
+        Timber.d("Showing bottom menu")
+        bottomMenu.state = BottomSheetBehavior.STATE_EXPANDED
+    }
+
+    private fun hideBottomMenu() {
+        Timber.d("Hiding bottom menu")
+        bottomMenu.state = BottomSheetBehavior.STATE_HIDDEN
+    }
 
     private suspend fun setCameraPreviewEnabled(enabled: Boolean): Unit = suspendCoroutine { continuation ->
         Timber.d("Camera preview enabled: $enabled")

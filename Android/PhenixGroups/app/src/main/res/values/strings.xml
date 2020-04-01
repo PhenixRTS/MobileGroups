@@ -28,8 +28,16 @@
     <string name="group_call_chat_send_button_content_descrition">Send Button</string>
     <string name="group_call_chat_self">You</string>
     <string name="chat_time_now">Now</string>
-    <string name="chat_time_min">%1$s min</string>
+    <string name="chat_time_min">1 min</string>
     <string name="chat_time_mins">%1$s mins</string>
+    <string name="chat_time_hour">1 hour</string>
+    <string name="chat_time_hours">%1$s hours</string>
+    <string name="chat_time_day">1 day</string>
+    <string name="chat_time_days">%1$s days</string>
+    <string name="chat_time_month">1 month</string>
+    <string name="chat_time_months">%1$s months</string>
+    <string name="chat_time_year">1 year</string>
+    <string name="chat_time_years">%1$s years</string>
 
     <!-- Errors -->
     <string name="err_chat_message_failed">Failed to send chat message: %1$s</string>

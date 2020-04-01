@@ -45,8 +45,8 @@ fun getSubscribeAudioOptions(): SubscribeToMemberStreamOptions =
         .withAudioOnlyRenderer()
         .buildSubscribeToMemberStreamOptions()
 
-fun getUserMediaOptions(): UserMediaOptions = UserMediaOptions().apply {
-    videoOptions.capabilityConstraints[DeviceCapability.FACING_MODE] = listOf(DeviceConstraint(FacingMode.USER))
+fun getUserMediaOptions(facingMode: FacingMode = FacingMode.USER): UserMediaOptions = UserMediaOptions().apply {
+    videoOptions.capabilityConstraints[DeviceCapability.FACING_MODE] = listOf(DeviceConstraint(facingMode))
     videoOptions.capabilityConstraints[DeviceCapability.HEIGHT] = listOf(DeviceConstraint(360.0))
     videoOptions.capabilityConstraints[DeviceCapability.FRAME_RATE] = listOf(DeviceConstraint(15.0))
     audioOptions.capabilityConstraints[DeviceCapability.AUDIO_ECHO_CANCELATION_MODE] =
