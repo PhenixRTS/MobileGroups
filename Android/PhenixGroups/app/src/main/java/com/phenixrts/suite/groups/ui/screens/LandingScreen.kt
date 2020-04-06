@@ -12,10 +12,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.Observer
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.suite.groups.R
-import com.phenixrts.suite.groups.common.extensions.getMicIcon
-import com.phenixrts.suite.groups.common.extensions.getSurfaceView
-import com.phenixrts.suite.groups.common.extensions.isTrue
-import com.phenixrts.suite.groups.common.extensions.showToast
+import com.phenixrts.suite.groups.common.extensions.*
 import com.phenixrts.suite.groups.databinding.ScreenLandingBinding
 import com.phenixrts.suite.groups.ui.adapters.RoomListAdapter
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
@@ -66,6 +63,7 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
         } else {
             getMicIcon().visibility = View.VISIBLE
         }
+        getMenuMargin().visibility = View.VISIBLE
         restartVideoPreview()
     }
 

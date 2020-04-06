@@ -17,8 +17,8 @@
         android:layout_height="32dp"
         android:rotation="45"
         android:layout_margin="16dp"
-        android:contentDescription="@string/group_call_chat_send_button_content_descrition"
-        android:src="@drawable/ic_add_black_24dp"
+        android:contentDescription="@string/group_call_chat_send_button_content_description"
+        android:src="@drawable/ic_plus"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
 

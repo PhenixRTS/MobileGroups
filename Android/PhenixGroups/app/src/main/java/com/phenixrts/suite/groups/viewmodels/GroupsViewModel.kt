@@ -37,9 +37,7 @@ class GroupsViewModel(
     private val cacheProvider: CacheProvider,
     private val preferenceProvider: PreferenceProvider,
     private val roomExpressRepository: RoomExpressRepository,
-    private val userMediaRepository: UserMediaRepository,
-    private val mainSurfaceHolder: SurfaceHolder,
-    lifecycleOwner: LifecycleOwner
+    private val userMediaRepository: UserMediaRepository
 ) : ViewModel() {
 
     private val mainRendererSurface = AndroidVideoRenderSurface()
@@ -47,18 +45,17 @@ class GroupsViewModel(
     private var joinedRoomRepository: JoinedRoomRepository? = null
     private var userMediaRenderer: Renderer? = null
 
+    val memberCount = MutableLiveData<Int>().apply { value = 0 }
     val displayName = MutableLiveData<String>()
-    val isVideoEnabled = MutableLiveData<Boolean>()
-    val isMicrophoneEnabled = MutableLiveData<Boolean>()
-    val isInRoom = MutableLiveData<Boolean>()
+    val isVideoEnabled = MutableLiveData<Boolean>().apply { value = true }
+    val isMicrophoneEnabled = MutableLiveData<Boolean>().apply { value = true }
+    val isInRoom = MutableLiveData<Boolean>().apply { value = false }
     val isControlsEnabled = MutableLiveData<Boolean>()
     val roomList = MutableLiveData<List<RoomInfoItem>>()
     val currentRoomAlias = MutableLiveData<String>()
-    val currentSessionsId = MutableLiveData<String>()
 
     init {
         Timber.d("View model created")
-        initObservers(lifecycleOwner)
         expireOldRooms()
         getRoomListItems()
     }
@@ -80,7 +77,6 @@ class GroupsViewModel(
                     viewModelScope.launch {
                         Timber.d("Joined room repository created")
                         currentRoomAlias.value = roomService.observableActiveRoom.value.observableAlias.value
-                        currentSessionsId.value = roomService.self.sessionId
                         joinedRoomRepository = JoinedRoomRepository(roomService, publisher)
                         roomMemberRepository = RoomMemberRepository(roomExpressRepository.roomExpress, roomService)
                         // Update audio / video state
@@ -93,6 +89,7 @@ class GroupsViewModel(
     }
 
     fun initObservers(lifecycleOwner: LifecycleOwner) {
+        Timber.d("Observing live data")
         viewModelScope.launch(Dispatchers.Main) {
             displayName.value = preferenceProvider.getDisplayName()
             isMicrophoneEnabled.observe(lifecycleOwner, Observer { enabled ->
@@ -150,12 +147,12 @@ class GroupsViewModel(
         }
     }
 
-    suspend fun startUserMediaPreview(holder: SurfaceHolder?): RoomStatus = suspendCoroutine { continuation ->
+    suspend fun startUserMediaPreview(holder: SurfaceHolder): RoomStatus = suspendCoroutine { continuation ->
+        mainRendererSurface.setSurfaceHolder(holder)
         if (isVideoEnabled.isTrue()) {
             viewModelScope.launch {
-                Timber.d("Start user media: ${isVideoEnabled.isTrue()} holder: $holder")
+                Timber.d("Start user media: ${isVideoEnabled.isTrue()}")
                 var status = RequestStatus.OK
-                mainRendererSurface.setSurfaceHolder(holder ?: mainSurfaceHolder)
                 if (userMediaRenderer == null) {
                     userMediaRepository.getUserMediaStream().let { userMedia ->
                         status = userMedia.status
@@ -197,6 +194,7 @@ class GroupsViewModel(
 
     fun leaveRoom() = viewModelScope.launch {
         Timber.d("Leaving room")
+        isInRoom.value = false
         joinedRoomRepository?.leaveRoom(cacheProvider)
         joinedRoomRepository = null
         roomMemberRepository?.dispose()
@@ -206,7 +204,7 @@ class GroupsViewModel(
     fun getChatMessages(): MutableLiveData<List<RoomMessage>> =
         joinedRoomRepository?.getObservableChatMessages() ?: MutableLiveData()
 
-    fun getRoomMembers(): MutableLiveData<List<RoomMember>>
-            = roomMemberRepository?.getObservableRoomMembers() ?: MutableLiveData()
+    fun getRoomMembers(): MutableLiveData<List<RoomMember>> =
+        roomMemberRepository?.getObservableRoomMembers() ?: MutableLiveData()
 
 }

@@ -4,7 +4,9 @@
 
 package com.phenixrts.suite.groups.common.extensions
 
+import android.os.Handler
 import android.view.SurfaceView
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.Toast
@@ -17,6 +19,9 @@ import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlin.system.exitProcess
+
+private const val QUIT_DELAY = 1000L
 
 /**
  * Used to show simple toast with given message
@@ -45,9 +50,12 @@ fun BaseFragment.injectDependencies() {
 /**
  * Terminates the app with a message in case SDK failed to initializes
  */
-fun BaseFragment.closeApp(message: String) {
+fun FragmentActivity.closeApp(message: String) {
     showToast(message)
-    requireActivity().finish()
+    Handler().postDelayed({
+        finishAndRemoveTask()
+        exitProcess(0)
+    }, QUIT_DELAY)
 }
 
 /**
@@ -73,3 +81,7 @@ fun Fragment.getSurfaceView(): SurfaceView = requireActivity().getSurfaceView()
 fun FragmentActivity.getMicIcon(): ImageView = active_member_mic
 
 fun Fragment.getMicIcon(): ImageView = requireActivity().getMicIcon()
+
+fun FragmentActivity.getMenuMargin(): View = menu_margin
+
+fun Fragment.getMenuMargin(): View = requireActivity().getMenuMargin()

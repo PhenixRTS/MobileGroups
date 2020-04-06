@@ -32,8 +32,8 @@
                 android:focusable="true"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toTopOf="@id/fragment_container">
+                app:layout_constraintEnd_toStartOf="@id/fragment_container"
+                app:layout_constraintBottom_toBottomOf="parent">
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -139,17 +139,16 @@
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/fragment_container"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>
 
             <View
                 android:id="@+id/menu_margin"
                 android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:visibility="gone"
+                android:layout_height="12dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
@@ -158,11 +157,9 @@
                 android:id="@+id/menu_button"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
-                android:layout_margin="8dp"
-                android:padding="10dp"
+                android:padding="12dp"
                 android:background="@drawable/bg_round_item_selector"
                 android:src="@drawable/ic_menu"
-                android:tint="@color/primaryBackgroundColor"
                 app:layout_constraintTop_toBottomOf="@id/menu_margin"
                 app:layout_constraintEnd_toEndOf="parent"
                 tools:ignore="ContentDescription" />

@@ -15,12 +15,8 @@
         <item name="android:windowBackground">@drawable/bg_splash</item>
     </style>
 
-    <style name="Widget.MaterialComponents.FloatingActionButton.Checkable" parent="Theme.MaterialComponents">
-        <item name="borderWidth">0dp</item>
-        <item name="backgroundTint">@color/checkable_fab_background</item>
-        <item name="android:clickable">true</item>
-        <item name="android:focusable">true</item>
-        <item name="android:tint">@color/checkable_fab_drawable_tint</item>
+    <style name="TabTextStyle" parent="TextAppearance.Design.Tab">
+        <item name="textAllCaps">false</item>
     </style>
 
 </resources>

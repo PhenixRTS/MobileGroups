@@ -4,6 +4,7 @@
 
 package com.phenixrts.suite.groups.ui
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import androidx.core.app.ActivityCompat
@@ -18,6 +19,12 @@ import java.util.*
 open class EasyPermissionActivity : FragmentActivity() {
 
     private val permissionRequestHistory = hashMapOf<Int, (a: Boolean) -> Unit>()
+
+    fun hasCameraPermission(): Boolean =
+        ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PERMISSION_GRANTED
+
+    fun hasRecordAudioPermission(): Boolean =
+        ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PERMISSION_GRANTED
 
     fun askForPermission(permission: String, callback: (granted: Boolean) -> Unit) {
         run {

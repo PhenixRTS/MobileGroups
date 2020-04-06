@@ -5,6 +5,7 @@
 package com.phenixrts.suite.groups.models
 
 import android.view.SurfaceHolder
+import android.view.SurfaceView
 import androidx.lifecycle.MutableLiveData
 import com.phenixrts.common.Disposable
 import com.phenixrts.express.ExpressSubscriber
@@ -17,7 +18,10 @@ import com.phenixrts.room.TrackState
 import com.phenixrts.suite.groups.common.extensions.call
 import timber.log.Timber
 
-data class RoomMember(val member: Member) : ModelScope() {
+data class RoomMember(
+    var member: Member,
+    var isSelf: Boolean
+) : ModelScope() {
 
     private val disposables: MutableList<Disposable> = mutableListOf()
     private val videoRenderSurface = AndroidVideoRenderSurface()
@@ -26,15 +30,17 @@ data class RoomMember(val member: Member) : ModelScope() {
     private var isObserved = false
     private var isRendererStarted = false
 
-    val onUpdate: MutableLiveData<Unit> = MutableLiveData<Unit>()
+    val onUpdate: MutableLiveData<RoomMember> = MutableLiveData<RoomMember>()
     var mainSurface: SurfaceHolder? = null
     var previewSurface: SurfaceHolder? = null
+    var previewSurfaceView: SurfaceView? = null
 
     var canRenderVideo = false
     var canShowPreview = false
     var isActiveRenderer = false
     var isPinned = false
     var isMuted = false
+    var isOffscreen = false
 
     @Suppress("RemoveToStringInStringTemplate")
     private fun observeMember(){
@@ -48,7 +54,7 @@ data class RoomMember(val member: Member) : ModelScope() {
                         if (canRenderVideo && canShowPreview != (it == MemberState.ACTIVE)) {
                             Timber.d("Active state changed: ${this@RoomMember.toString()} state: $it")
                             canShowPreview = it == MemberState.ACTIVE
-                            onUpdate.call()
+                            onUpdate.call(this@RoomMember)
                         }
                     }
                 }?.run { disposables.add(this) }
@@ -58,7 +64,7 @@ data class RoomMember(val member: Member) : ModelScope() {
                         if (canRenderVideo && canShowPreview != (it == TrackState.ENABLED)) {
                             Timber.d("Video state changed: ${this@RoomMember.toString()} state: $it")
                             canShowPreview = it == TrackState.ENABLED
-                            onUpdate.call()
+                            onUpdate.call(this@RoomMember)
                         }
                     }
                 }?.run { disposables.add(this) }
@@ -68,16 +74,21 @@ data class RoomMember(val member: Member) : ModelScope() {
                         if (isMuted != (it == TrackState.DISABLED)) {
                             Timber.d("Audio state changed: ${this@RoomMember.toString()} state: $it")
                             isMuted = it == TrackState.DISABLED
-                            onUpdate.call()
+                            onUpdate.call(this@RoomMember)
                         }
                     }
                 }?.run { disposables.add(this) }
             }
         } catch (e: Exception) {
-            Timber.d("Failed to subscribe to member: ${e.message}")
+            e.printStackTrace()
+            Timber.d("Failed to subscribe to member: ${toString()}")
             isObserved = false
         }
     }
+
+    fun isThisMember(sessionId: String?) = member.sessionId == sessionId
+
+    fun getScreenName(): String = member.observableScreenName.value
 
     fun isSubscribed() = subscriber != null
 
@@ -88,10 +99,13 @@ data class RoomMember(val member: Member) : ModelScope() {
         this.renderer = renderer
     }
 
-    fun setSurfaces(mainSurface: SurfaceHolder, previewSurface: SurfaceHolder) {
+    fun setSurfaces(mainSurface: SurfaceHolder, previewSurface: SurfaceView) {
         this.mainSurface = mainSurface
-        this.previewSurface = previewSurface
-        observeMember()
+        this.previewSurface = previewSurface.holder
+        this.previewSurfaceView = previewSurface
+        if (!isSelf) {
+            observeMember()
+        }
     }
 
     fun startMemberRenderer(): RendererStartStatus {
@@ -100,7 +114,7 @@ data class RoomMember(val member: Member) : ModelScope() {
         }
 
         var status = if (canShowPreview) RendererStartStatus.OK else RendererStartStatus.FAILED
-        Timber.d("Updating renderer surface: $mainSurface $previewSurface")
+        Timber.d("Set surface holder called: ${toString()}")
         videoRenderSurface.setSurfaceHolder(if (isActiveRenderer) mainSurface else previewSurface)
         if (!isRendererStarted) {
             val rendererStartStatus = renderer?.start(videoRenderSurface) ?: RendererStartStatus.FAILED
@@ -115,12 +129,6 @@ data class RoomMember(val member: Member) : ModelScope() {
         isObserved = false
         disposables.forEach { it.dispose() }
         disposables.clear()
-        renderer?.stop()
-        renderer?.dispose()
-        renderer = null
-        subscriber?.stop()
-        subscriber?.dispose()
-        subscriber = null
         mainSurface = null
         previewSurface = null
         videoRenderSurface.setSurfaceHolder(null)
@@ -130,12 +138,13 @@ data class RoomMember(val member: Member) : ModelScope() {
     }
 
     override fun toString(): String {
-        return "{\"name\":\"${member.observableScreenName.value}\"," +
+        return "{\"name\":\"${getScreenName()}\"," +
                 "\"canRenderVideo\":\"$canRenderVideo\"," +
                 "\"canShowPreview\":\"$canShowPreview\"," +
                 "\"isActiveRenderer\":\"$isActiveRenderer\"," +
                 "\"isPinned\":\"$isPinned\"," +
                 "\"isMuted\":\"$isMuted\"," +
+                "\"isSelf\":\"$isSelf\"," +
                 "\"isSubscribed\":\"${isSubscribed()}\"}"
     }
 

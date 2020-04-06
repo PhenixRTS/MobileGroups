@@ -8,8 +8,9 @@ import android.view.*
 import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.phenixrts.suite.groups.common.extensions.isFalse
+import com.phenixrts.suite.groups.common.extensions.isTrue
 import com.phenixrts.suite.groups.common.extensions.refresh
 import com.phenixrts.suite.groups.common.getSubscribeAudioOptions
 import com.phenixrts.suite.groups.common.getSubscribeVideoOptions
@@ -28,12 +29,8 @@ class MemberListAdapter(
 
     private val subscriptionsInProgress = arrayListOf<String>()
 
-    var members: List<RoomMember> by Delegates.observable(emptyList()) { _, old, new ->
-        DiffUtil.calculateDiff(RoomMemberDiff(old, new)).dispatchUpdatesTo(this)
-    }
-
-    fun dispose() {
-        members.forEach { it.dispose() }
+    var members: List<RoomMember> by Delegates.observable(emptyList()) { _, _, _ ->
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -53,27 +50,26 @@ class MemberListAdapter(
             Timber.d("Member clicked: $selectedMember")
             callback.onMemberClicked(selectedMember)
         }
+        roomMember.setSurfaces(mainSurface.holder, holder.binding.memberSurface)
         holder.binding.lifecycleOwner?.let { owner ->
-            holder.binding.member?.onUpdate?.observe(owner, Observer {
-                Timber.d("Member updated: $roomMember :: ${holder.binding.member}")
+            holder.binding.member?.onUpdate?.observe(owner, Observer { member ->
+                Timber.d("Member updated: $member")
                 holder.binding.refresh()
-                updateMemberStream(roomMember)
+                updateMemberStream(member)
             })
         }
         updateMemberStream(roomMember)
-        roomMember.setSurfaces(mainSurface.holder, holder.binding.memberSurface.holder)
     }
 
     private fun updateMemberStream(roomMember: RoomMember) {
         roomMember.launch {
-            if (subscriptionsInProgress.contains(roomMember.member.sessionId)) {
+            if (subscriptionsInProgress.contains(roomMember.member.sessionId) || viewModel.isInRoom.isFalse()) {
                 return@launch
             }
             subscriptionsInProgress.add(roomMember.member.sessionId)
-            val isSelf = roomMember.member.sessionId == viewModel.currentSessionsId.value
 
             // Subscribe to member media if not self member and not subscribed yet
-            if (!roomMember.isSubscribed() && !isSelf) {
+            if (!roomMember.isSubscribed() && !roomMember.isSelf) {
                 val options = if (roomMember.canRenderVideo) {
                     getSubscribeVideoOptions()
                 } else {
@@ -83,56 +79,51 @@ class MemberListAdapter(
                 Timber.d("Subscribed to member media")
             }
 
-            if (isSelf) {
-                val surface = if (roomMember.isActiveRenderer) roomMember.mainSurface else roomMember.previewSurface
-                viewModel.startUserMediaPreview(surface)
+            if (roomMember.isSelf) {
+                Timber.d("Starting self preview: $roomMember")
+                (if (roomMember.isActiveRenderer) roomMember.mainSurface else roomMember.previewSurface)?.let { surface ->
+                    viewModel.startUserMediaPreview(surface)
+                }
             } else {
+                Timber.d("Starting member preview: $roomMember")
                 roomMember.startMemberRenderer()
             }
 
-            // Update active renderer
-            if (roomMember.isActiveRenderer) {
-                // Update main surface visibility
-                if (roomMember.canShowPreview) {
-                    Timber.d("Showing main surface: $roomMember")
-                    mainSurface.visibility = View.VISIBLE
+            // Update member surfaces
+            if (viewModel.isInRoom.isTrue()) {
+                if (roomMember.isActiveRenderer) {
+                    // Update main surface visibility
+                    if (roomMember.canShowPreview) {
+                        Timber.d("Showing main surface: $roomMember")
+                        mainSurface.visibility = View.VISIBLE
+                    } else {
+                        Timber.d("Hiding main surface: $roomMember")
+                        mainSurface.visibility = View.GONE
+                    }
+                    // Update display name
+                    viewModel.displayName.value = roomMember.member.observableScreenName.value
+                    // Update mic icon
+                    if (roomMember.isMuted) {
+                        micIcon.visibility = View.VISIBLE
+                    } else {
+                        micIcon.visibility = View.GONE
+                    }
                 } else {
-                    Timber.d("Hiding main surface: $roomMember")
-                    mainSurface.visibility = View.GONE
-                }
-                // Update display name
-                viewModel.displayName.value = roomMember.member.observableScreenName.value
-                // Update mic icon
-                if (roomMember.isMuted) {
-                    micIcon.visibility = View.VISIBLE
-                } else {
-                    micIcon.visibility = View.GONE
+                    roomMember.previewSurfaceView?.visibility = if (roomMember.isOffscreen) View.GONE else View.VISIBLE
                 }
             }
-
-            Timber.d("Updated member renderer $roomMember isSelf: $isSelf")
+            Timber.d("Updated member renderer $roomMember")
             subscriptionsInProgress.remove(roomMember.member.sessionId)
         }
     }
 
-    inner class ViewHolder(val binding: RowMemberItemBinding) : RecyclerView.ViewHolder(binding.root)
-
-    inner class RoomMemberDiff(private val oldItems: List<RoomMember>,
-                               private val newItems: List<RoomMember>
-    ) : DiffUtil.Callback() {
-
-        override fun getOldListSize() = oldItems.size
-
-        override fun getNewListSize() = newItems.size
-
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldItems[oldItemPosition].member.sessionId == newItems[newItemPosition].member.sessionId
-        }
-
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldItems[oldItemPosition] == newItems[newItemPosition]
-        }
+    fun hidePreviews(hide: Boolean) {
+        Timber.d("Hiding surfaces: $hide")
+        members.forEach { it.isOffscreen = hide }
+        notifyDataSetChanged()
     }
+
+    inner class ViewHolder(val binding: RowMemberItemBinding) : RecyclerView.ViewHolder(binding.root)
 
     interface OnMemberListener {
         fun onMemberClicked(roomMember: RoomMember)

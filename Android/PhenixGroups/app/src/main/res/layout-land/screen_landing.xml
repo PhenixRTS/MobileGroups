@@ -13,22 +13,23 @@
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         tools:background="@color/primaryBackgroundDarkColor"
         tools:context=".ui.screens.LandingScreen">
 
         <androidx.cardview.widget.CardView
             android:id="@+id/landing_bottom_sheet"
-            android:layout_width="match_parent"
+            android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:elevation="5dp"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toTopOf="@id/room_list"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
@@ -37,8 +38,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="48dp"
+                    android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp">
 
                     <EditText
@@ -65,13 +66,6 @@
                         android:textSize="12sp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content" />
-
-                    <ImageView
-                        android:id="@+id/landscape_menu_button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:visibility="gone"
-                        tools:ignore="ContentDescription" />
                 </RelativeLayout>
 
                 <LinearLayout
@@ -109,12 +103,12 @@
         <com.phenixrts.suite.groups.customViews.MaxHeightRecyclerView
             android:id="@+id/room_list"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:background="@color/primaryBackgroundColor"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:maxHeight="192dp"
             tools:itemCount="1"
             tools:listitem="@layout/row_room_item"
+            app:layout_constraintTop_toBottomOf="@id/landing_bottom_sheet"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>

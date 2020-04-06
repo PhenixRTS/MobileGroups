@@ -4,6 +4,7 @@
 
 package com.phenixrts.suite.groups.repository
 
+import android.os.Handler
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.express.*
 import com.phenixrts.pcast.*
@@ -19,6 +20,35 @@ class UserMediaRepository(private val roomExpress: RoomExpress) : Repository() {
     private var userMediaStream: UserMediaStream? = null
     private var collectingUserMedia = false
     private var currentFacingMode = FacingMode.USER
+    private var mediaStateCallback: OnMediaStateChange? = null
+
+    private val audioFailureHandler = Handler()
+    private val videoFailureHandler = Handler()
+    private val audioFailureRunnable = Runnable {
+        Timber.d("Audio recording has stopped")
+        mediaStateCallback?.onMicrophoneLost()
+    }
+    private val videoFailureRunnable = Runnable {
+        Timber.d("Video recording is stopped")
+        mediaStateCallback?.onCameraLost()
+    }
+
+    private fun observeMediaStreams() {
+        userMediaStream?.apply {
+            mediaStream.videoTracks.getOrNull(0)?.let { videoTrack ->
+                setFrameReadyCallback(videoTrack) {
+                    videoFailureHandler.removeCallbacks(videoFailureRunnable)
+                    videoFailureHandler.postDelayed(videoFailureRunnable, FAILURE_TIMEOUT)
+                }
+            }
+            mediaStream.audioTracks.getOrNull(0)?.let { audioTrack ->
+                setFrameReadyCallback(audioTrack) {
+                    audioFailureHandler.removeCallbacks(audioFailureRunnable)
+                    audioFailureHandler.postDelayed(audioFailureRunnable, FAILURE_TIMEOUT)
+                }
+            }
+        }
+    }
 
     suspend fun getUserMediaStream(): UserMediaStatus = suspendCoroutine { continuation ->
         launch {
@@ -31,6 +61,7 @@ class UserMediaRepository(private val roomExpress: RoomExpress) : Repository() {
                     Timber.d("Media stream not collected yet - getting from pCast")
                     val status = roomExpress.pCastExpress.getUserMedia(getUserMediaOptions())
                     userMediaStream = status.userMediaStream
+                    observeMediaStreams()
                     continuation.resume(status)
                 }
                 collectingUserMedia = false
@@ -62,6 +93,20 @@ class UserMediaRepository(private val roomExpress: RoomExpress) : Repository() {
     fun switchAudioStreamState(enabled: Boolean) = launch {
         Timber.d("Switching audio streams: $enabled")
         userMediaStream?.mediaStream?.audioTracks?.forEach { it.isEnabled = enabled }
+    }
+
+    fun observeMediaState(callback: OnMediaStateChange) {
+        mediaStateCallback = callback
+    }
+
+    interface OnMediaStateChange {
+        fun onMicrophoneLost()
+        fun onCameraLost()
+    }
+
+    private companion object {
+        // The timeout after we can assume that the video or audio pipeline is terminated
+        private const val FAILURE_TIMEOUT = 1000 * 3L
     }
 
 }

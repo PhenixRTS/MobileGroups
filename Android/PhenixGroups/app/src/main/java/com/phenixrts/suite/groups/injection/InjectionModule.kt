@@ -15,6 +15,7 @@ import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
 import com.phenixrts.suite.groups.models.RoomStatus
+import com.phenixrts.suite.groups.receivers.CellularStateReceiver
 import com.phenixrts.suite.groups.repository.RoomExpressRepository
 import com.phenixrts.suite.groups.repository.UserMediaRepository
 import dagger.Module
@@ -64,5 +65,9 @@ class InjectionModule(private val context: GroupsApplication) {
     @Provides
     @Singleton
     fun providePreferencesProvider(): PreferenceProvider = PreferenceProvider(context)
+
+    @Provides
+    @Singleton
+    fun provideCellularStateReceiver(): CellularStateReceiver = CellularStateReceiver(context)
 
 }

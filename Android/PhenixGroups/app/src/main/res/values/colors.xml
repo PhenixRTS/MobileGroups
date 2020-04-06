@@ -4,12 +4,10 @@
   -->
 <resources>
     <color name="primaryColor">#212121</color>
-    <color name="primaryLightColor">#484848</color>
     <color name="primaryDarkColor">#000000</color>
 
     <color name="accentColor">#ff1744</color>
-    <color name="accentLightColor">#ff616f</color>
-    <color name="accentDarkColor">#c4001d</color>
+    <color name="accentGrayColor">#FFAAAAAA</color>
 
     <color name="primaryTextColor">#ffffff</color>
     <color name="primaryTextDarkColor">#333</color>

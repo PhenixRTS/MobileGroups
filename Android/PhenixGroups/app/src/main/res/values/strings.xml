@@ -16,16 +16,16 @@
     <string name="hint_display_name">Display name</string>
 
     <!--  Room call screen  -->
-    <string name="members_page_title">Participants</string>
-    <string name="chat_page_title">Chat</string>
-    <string name="call_info_page_title">Info</string>
+    <string name="tab_members_count"> (%1$d)</string>
+    <string name="menu_switch_camera">Switch camera</string>
+    <string name="menu_cancel">Cancel</string>
 
     <!-- Members list  -->
     <string name="preview_mic_off_icon_content_description">Microphone is off</string>
 
     <!--  Chat  -->
     <string name="group_call_chat_message_hint">Message</string>
-    <string name="group_call_chat_send_button_content_descrition">Send Button</string>
+    <string name="group_call_chat_send_button_content_description">Send Button</string>
     <string name="group_call_chat_self">You</string>
     <string name="chat_time_now">Now</string>
     <string name="chat_time_min">1 min</string>
@@ -43,6 +43,8 @@
     <string name="err_chat_message_failed">Failed to send chat message: %1$s</string>
     <string name="err_create_room_failed">Failed to create new meeting</string>
     <string name="err_join_room_failed">Failed to join meeting</string>
+    <string name="err_camera_lost">Phenix Groups has lost access to camera</string>
+    <string name="err_microphone_lost">Phenix Groups has lost access to microphone</string>
 
     <!-- Join Meeting -->
     <string name="join_room_button_label">Join meeting</string>
@@ -50,6 +52,5 @@
     <string name="hint_room_code">Meeting code</string>
     <string name="hint_enter_a_meeting_code">Enter a meeting code</string>
     <string name="meeting_code">Meeting code</string>
-    <string name="err_failed_to_load_stream">Failed to load member stream</string>
 
 </resources>

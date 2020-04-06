@@ -6,8 +6,6 @@ package com.phenixrts.suite.groups.ui.screens.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import com.phenixrts.common.RequestStatus
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
@@ -32,8 +30,7 @@ abstract class BaseFragment : Fragment() {
     private val mainScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     val viewModel: GroupsViewModel by lazyViewModel {
-        GroupsViewModel(cacheProvider, preferenceProvider, roomExpressRepository, userMediaRepository,
-            getSurfaceView().holder, this)
+        GroupsViewModel(cacheProvider, preferenceProvider, roomExpressRepository, userMediaRepository)
     }
 
     open fun onBackPressed() {}
@@ -41,16 +38,6 @@ abstract class BaseFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         injectDependencies()
-        handleExceptions()
-        viewModel.initObservers(this)
-    }
-
-    private fun handleExceptions() {
-        roomExpressRepository.roomStatus.observe(this, Observer {
-            if (it.status != RequestStatus.OK) {
-                closeApp(it.message)
-            }
-        })
     }
 
     /**

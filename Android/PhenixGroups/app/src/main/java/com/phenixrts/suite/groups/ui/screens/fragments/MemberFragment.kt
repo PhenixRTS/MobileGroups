@@ -32,17 +32,17 @@ class MemberFragment : BaseFragment(), MemberListAdapter.OnMemberListener {
         super.onViewCreated(view, savedInstanceState)
         viewModel.getRoomMembers().observe(viewLifecycleOwner, Observer { members ->
             Timber.d("Member adapter updated ${members.size} $members")
+            viewModel.memberCount.value = members.size
             adapter.members = members
         })
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        adapter.dispose()
-    }
-
     override fun onMemberClicked(roomMember: RoomMember) {
         viewModel.pinActiveMember(roomMember)
+    }
+
+    fun hidePreviews(hide: Boolean) = launch {
+        (binding.memberList.adapter as MemberListAdapter).hidePreviews(hide)
     }
 
 }

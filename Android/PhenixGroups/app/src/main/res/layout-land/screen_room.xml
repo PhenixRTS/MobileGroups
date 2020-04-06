@@ -6,25 +6,27 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent"
     android:keepScreenOn="true"
     tools:background="@color/primaryBackgroundDarkColor" >
 
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/fragment_pager"
-        android:layout_width="0dp"
-        android:layout_height="300dp"
+        android:layout_width="300dp"
+        android:layout_height="0dp"
         android:clipChildren="true"
         android:background="@color/primaryBackgroundColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" >
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/fragment_tab_layout"
-            android:layout_width="match_parent"
+            android:layout_width="252dp"
             android:layout_height="wrap_content"
+            app:tabGravity="fill"
+            app:tabMode="fixed"
             app:tabInlineLabel="true"
             app:tabTextAppearance="@style/TabTextStyle"
             app:tabIconTint="@color/bg_tab_selector"

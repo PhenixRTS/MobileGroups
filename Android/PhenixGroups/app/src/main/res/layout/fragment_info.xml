@@ -30,7 +30,7 @@
             android:textSize="32sp"
             android:textColor="@color/primaryTextDarkColor"
             android:text="@{roomAlias}"
-            tools:text="abc-efgh-ijk"
+            tools:text="abc-defg-hij"
             android:layout_marginTop="4dp" />
 
     </LinearLayout>

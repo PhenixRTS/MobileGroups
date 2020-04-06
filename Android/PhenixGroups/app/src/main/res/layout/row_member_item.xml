@@ -50,7 +50,7 @@
                 android:contentDescription="@string/preview_icon_content_description"
                 android:visibility="@{member.canRenderThumbnail() ? View.GONE : View.VISIBLE}"
                 android:background="@color/primaryBackgroundLightColor"
-                android:src="@drawable/ic_account_box_black_24dp"
+                android:src="@drawable/ic_member"
                 android:tint="@android:color/black" />
 
             <ImageView
@@ -74,9 +74,9 @@
                 android:layout_alignParentBottom="true"
                 android:layout_marginEnd="4dp"
                 android:layout_marginBottom="4dp"
-                android:background="@drawable/circle_24dp"
+                android:background="@drawable/bg_circle"
                 android:contentDescription="@string/preview_mic_off_icon_content_description"
-                android:src="@drawable/ic_mic_off_black_24dp"
+                android:src="@drawable/ic_mic_off"
                 android:tint="@android:color/white"
                 android:visibility="@{member.muted ? View.VISIBLE : View.GONE }"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -91,7 +91,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="16dp"
-            android:text="@{member.member.observableScreenName.value}"
+            android:text="@{member.getScreenName()}"
             android:textSize="16sp"
             tools:ignore="RtlHardcoded"
             tools:text="Member Name"

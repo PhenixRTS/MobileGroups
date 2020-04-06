@@ -30,23 +30,23 @@ fun MutableList<RoomMessage>.addUnique(messages: Array<ChatMessage>, selfName: S
     this.sortBy { it.message.observableTimeStamp.value }
 }
 
-fun MutableLiveData<Boolean>.isTrue(default: Boolean = false) = value ?: default
+fun MutableLiveData<Boolean>.isTrue(default: Boolean = false) = if (value != null) value == true else default
 
-fun MutableLiveData<Boolean>.isFalse(default: Boolean = true) = value?.not() ?: default
+fun MutableLiveData<Boolean>.isFalse(default: Boolean = true) = if (value != null) value == false else default
 
-fun MutableLiveData<Unit>.call() {
-    value = Unit
+fun MutableLiveData<RoomMember>.call(roomMember: RoomMember) {
+    value = roomMember
 }
 
 fun RowMemberItemBinding.refresh() {
     this.member = this.member
 }
 
-fun Member.getRoomMember(members: List<RoomMember>): RoomMember {
-    val roomMember = members.takeIf { it.isNotEmpty() }
-        ?.firstOrNull { it.member.sessionId == this.sessionId }
-    return roomMember ?: RoomMember(this)
-}
+fun Member.mapRoomMember(members: List<RoomMember>?, selfSessionId: String) =
+    members?.find { it.isThisMember(this@mapRoomMember.sessionId) }?.apply {
+        member = this@mapRoomMember
+        isSelf = this@mapRoomMember.sessionId == selfSessionId
+    } ?: RoomMember(this, this@mapRoomMember.sessionId == selfSessionId)
 
 fun Calendar.expirationDate(): Date {
     add(Calendar.DAY_OF_MONTH, - BuildConfig.EXPIRATION_DAYS)

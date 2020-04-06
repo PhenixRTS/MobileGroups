@@ -9,12 +9,11 @@ import com.phenixrts.common.Disposable
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.express.RoomExpress
 import com.phenixrts.express.SubscribeToMemberStreamOptions
-import com.phenixrts.room.Member
 import com.phenixrts.room.RoomService
 import com.phenixrts.room.TrackState
 import com.phenixrts.suite.groups.BuildConfig
 import com.phenixrts.suite.groups.common.extensions.call
-import com.phenixrts.suite.groups.common.extensions.getRoomMember
+import com.phenixrts.suite.groups.common.extensions.mapRoomMember
 import com.phenixrts.suite.groups.models.RoomStatus
 import com.phenixrts.suite.groups.models.RoomMember
 import kotlinx.coroutines.Dispatchers
@@ -34,114 +33,111 @@ class RoomMemberRepository(
     fun getObservableRoomMembers(): MutableLiveData<List<RoomMember>> {
         roomService.observableActiveRoom.value.observableMembers.subscribe { members ->
             Timber.d("Received RAW members count: ${members.size}")
-            updateMemberList(members)
+            // Map received Members to existing RoomMembers or create new ones in transformation
+            val selfId = roomService.self.sessionId
+            val memberList = mutableListOf(roomService.self.mapRoomMember(roomMembers.value, selfId))
+            val mappedMembers = members.filterNot { it.sessionId == selfId }.mapTo(memberList) {
+                it.mapRoomMember(roomMembers.value, selfId)
+            }
+            updateMemberList(mappedMembers)
         }.run { disposables.add(this) }
         return roomMembers
     }
 
-    private fun updateMemberList(members: Array<Member>) = launch {
+    private fun updateMemberList(members: List<RoomMember>) = launch {
         launch(Dispatchers.Main) {
-            val memberList = ArrayList<RoomMember>()
-            var showingVideoCount = 0
-            var isSomeonePinned = false
-            // Map received members with existing ones and count rendering streams
-            members.forEach { member ->
-                val roomMember = member.getRoomMember(roomMembers.value ?: listOf())
-                memberList.add(roomMember)
-                if (roomMember.canRenderVideo) {
-                    showingVideoCount++
+            disposeGoneMembers(members)
+            enableMemberRenderers(members)
+            pickActiveRenderer(members)
+            Timber.d("Updated members list: $members")
+            roomMembers.value = members
+        }
+    }
+
+    private fun disposeGoneMembers(members: List<RoomMember>) {
+        roomMembers.value?.forEach { member ->
+            member.takeIf { !member.isSelf && members.find { it.isThisMember(member.member.sessionId) } == null }?.let {
+                Timber.d("Disposing gone member: $it")
+                it.dispose()
+            }
+        }
+    }
+
+    private fun enableMemberRenderers(members: List<RoomMember>) {
+        var showingVideoCount = members.count { it.canRenderVideo }
+        members.forEach { member ->
+            val memberStream = member.member.observableStreams.value?.get(0)
+            val videoEnabled = memberStream?.observableVideoState?.value == TrackState.ENABLED
+            val audioMuted = memberStream?.observableAudioState?.value != TrackState.ENABLED
+            member.canShowPreview = videoEnabled
+            member.isMuted = audioMuted
+
+            // Allow video render if limit not reached
+            if (showingVideoCount < BuildConfig.MAX_RENDERERS && !member.canRenderVideo) {
+                member.canRenderVideo = true
+                showingVideoCount++
+            }
+        }
+    }
+
+    private fun pickActiveRenderer(members: List<RoomMember>) {
+        if (members.find { it.isPinned } == null) {
+            // Deselect current active renderer
+            members.find { it.isActiveRenderer }?.run {
+                isActiveRenderer = false
+                onUpdate.call(this)
+            }
+
+            // Pick anyone who can render video but self if available
+            members.findLast { it.canRenderVideo && !it.isSelf }?.run {
+                if (!isActiveRenderer) {
+                    isActiveRenderer = true
+                    Timber.d("Picked active renderer: ${toString()}")
+                    onUpdate.call(this)
                 }
-                if (roomMember.isPinned) {
-                    isSomeonePinned = true
+            } ?: members.findLast { it.canRenderVideo }?.run {
+                if (!isActiveRenderer) {
+                    isActiveRenderer = true
+                    Timber.d("Picked active renderer: ${toString()}")
+                    onUpdate.call(this)
                 }
             }
-            // Update member video and audio states
-            memberList.forEach {
-                val memberStream = it.member.observableStreams.value?.get(0)
-                val videoEnabled = memberStream?.observableVideoState?.value == TrackState.ENABLED
-                val audioMuted = memberStream?.observableAudioState?.value != TrackState.ENABLED
-                if (showingVideoCount < BuildConfig.MAX_RENDERERS && !it.canRenderVideo) {
-                    it.canRenderVideo = true
-                    showingVideoCount++
-                }
-                it.canShowPreview = videoEnabled
-                it.isMuted = audioMuted
-            }
-            // Update active renderer if no member is pinned
-            if (!isSomeonePinned) {
-                memberList.firstOrNull { it.isActiveRenderer }?.run {
-                    if (isActiveRenderer) {
-                        isActiveRenderer = false
-                        onUpdate.call()
-                    }
-                }
-                // Pick anyone who can render video but self if available
-                memberList.lastOrNull { it.canRenderVideo && it.member.sessionId != roomService.self.sessionId }?.run {
-                    if (!isActiveRenderer) {
-                        isActiveRenderer = true
-                        onUpdate.call()
-                    }
-                } ?: memberList.lastOrNull { it.canRenderVideo }?.run {
-                    if (!isActiveRenderer) {
-                        isActiveRenderer = true
-                        onUpdate.call()
-                    }
-                }
-            }
-            // Move self member to top
-            memberList.sortByDescending { it.member.sessionId == roomService.self.sessionId }
-            // Dispose gone members
-            roomMembers.value?.forEach { oldMember ->
-                var isGone = true
-                memberList.forEach { newMember ->
-                    if (newMember.member.sessionId == oldMember.member.sessionId) {
-                        isGone = false
-                    }
-                }
-                if (isGone) {
-                    oldMember.dispose()
-                }
-            }
-            Timber.d("Updating members list: $memberList")
-            roomMembers.value = memberList
         }
     }
 
     fun pinActiveMember(roomMember: RoomMember) {
         val wasPinned = roomMember.isPinned
-        val members = roomMembers.value ?: mutableListOf()
-
         // Unpin current member
-        members.firstOrNull { it.isActiveRenderer }?.run {
+        roomMembers.value?.find { it.isActiveRenderer }?.run {
             isPinned = false
             isActiveRenderer = false
-            onUpdate.call()
+            onUpdate.call(this)
         }
         // Pin new member
-        members.firstOrNull { it.member.sessionId == roomMember.member.sessionId }?.run {
+        roomMembers.value?.find { it.isThisMember(roomMember.member.sessionId) }?.run {
             isActiveRenderer = true
             isPinned = !wasPinned
-            onUpdate.call()
+            onUpdate.call(this)
         }
         Timber.d("Changed member pin state: $roomMember")
     }
 
     fun switchAudioStreamState(enabled: Boolean) {
-        roomMembers.value?.firstOrNull { it.member.sessionId == roomService.self.sessionId }?.run {
+        roomMembers.value?.find { it.isSelf }?.run {
             if (isMuted == enabled) {
-                Timber.d("Self audio state changed: $enabled $this")
                 isMuted = !enabled
-                onUpdate.call()
+                Timber.d("Self audio state changed: $enabled $this")
+                onUpdate.call(this)
             }
         }
     }
 
     fun switchVideoStreamState(enabled: Boolean) {
-        roomMembers.value?.firstOrNull { it.member.sessionId == roomService.self.sessionId }?.run {
+        roomMembers.value?.find { it.isSelf }?.run {
             if (canRenderVideo && canShowPreview != enabled) {
-                Timber.d("Self video state changed: $enabled $this")
                 canShowPreview = enabled
-                onUpdate.call()
+                Timber.d("Self video state changed: $enabled $this")
+                onUpdate.call(this)
             }
         }
     }
@@ -149,7 +145,7 @@ class RoomMemberRepository(
     suspend fun subscribeToMemberMedia(roomMember: RoomMember, options: SubscribeToMemberStreamOptions): RoomStatus
             = suspendCoroutine { continuation ->
         val members = roomMembers.value ?: mutableListOf()
-        members.firstOrNull { it.member.sessionId == roomMember.member.sessionId }?.let { member ->
+        members.find { it.isThisMember(roomMember.member.sessionId) }?.let { member ->
             member.member.observableStreams.subscribe { streams ->
                 val stream = streams.getOrNull(0)
                 if (stream != null && !member.isSubscribed()) {

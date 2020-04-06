@@ -20,7 +20,8 @@
         android:layout_width="match_parent"
         android:layout_height="64dp"
         android:paddingStart="16dp"
-        android:paddingEnd="16dp">
+        android:paddingEnd="16dp"
+        tools:background="@color/primaryBackgroundColor">
 
         <TextView
             android:id="@+id/room_alias"
@@ -28,7 +29,7 @@
             android:layout_height="wrap_content"
             android:textSize="16sp"
             android:text="@{room.alias}"
-            tools:text="abc-efgh-ijk"
+            tools:text="abc-defg-hij"
             app:layout_constraintVertical_chainStyle="packed"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
