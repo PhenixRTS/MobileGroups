@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+  -->
+<resources>
+    <item name="tab_members" type="id"/>
+    <item name="tab_chat" type="id"/>
+    <item name="tab_info" type="id"/>
+</resources>

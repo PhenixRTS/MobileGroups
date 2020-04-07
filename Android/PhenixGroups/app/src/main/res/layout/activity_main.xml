@@ -68,7 +68,7 @@
 
                 <!-- Surface view -->
                 <SurfaceView
-                    android:id="@+id/surface_view"
+                    android:id="@+id/main_surface_view"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:visibility="gone"
@@ -137,6 +137,48 @@
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <ImageView
+                android:id="@+id/main_landscape_members"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_people"
+                android:tint="@color/primaryBackgroundColor"
+                android:background="@drawable/bg_round_item_selector"
+                android:layout_margin="8dp"
+                android:padding="8dp"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/menu_margin"
+                app:layout_constraintEnd_toStartOf="@id/main_landscape_chat"
+                android:contentDescription="@string/accessibility_members_tab"/>
+
+            <ImageView
+                android:id="@+id/main_landscape_chat"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_chat"
+                android:tint="@color/primaryBackgroundColor"
+                android:background="@drawable/bg_round_item_selector"
+                android:layout_margin="8dp"
+                android:padding="8dp"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@id/menu_margin"
+                app:layout_constraintEnd_toStartOf="@id/main_landscape_info"
+                android:contentDescription="@string/accessibility_chat_tab"/>
+
+            <ImageView
+                android:id="@+id/main_landscape_info"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_info"
+                android:tint="@color/primaryBackgroundColor"
+                android:background="@drawable/bg_round_item_selector"
+                android:layout_margin="8dp"
+                android:padding="8dp"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@+id/menu_margin"
+                app:layout_constraintEnd_toStartOf="@+id/menu_button"
+                android:contentDescription="@string/accessibility_info_tab"/>
+
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/fragment_container"
                 android:layout_width="0dp"
@@ -163,9 +205,9 @@
                 android:background="@drawable/bg_round_item_selector"
                 android:src="@drawable/ic_menu"
                 android:tint="@color/primaryBackgroundColor"
+                android:contentDescription="@string/accessibility_menu_button"
                 app:layout_constraintTop_toBottomOf="@id/menu_margin"
-                app:layout_constraintEnd_toEndOf="parent"
-                tools:ignore="ContentDescription" />
+                app:layout_constraintEnd_toEndOf="parent" />
 
             <androidx.fragment.app.FragmentContainerView
                 android:id="@+id/fullscreen_fragment_container"

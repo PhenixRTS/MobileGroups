@@ -54,9 +54,9 @@ class ChatFragment : BaseFragment() {
     }
 
     private fun sendMessage() = launch {
-        val status = viewModel.sendChatMessage(binding.newMessageEditText.text.toString())
+        val status = viewModel.sendChatMessage(binding.messageInputField.text.toString())
         if (status.status == RequestStatus.OK) {
-            binding.newMessageEditText.text.clear()
+            binding.messageInputField.text.clear()
         } else {
             Timber.e("Cannot send message ${status.message}")
             showToast(getString(R.string.err_chat_message_failed, status.message))

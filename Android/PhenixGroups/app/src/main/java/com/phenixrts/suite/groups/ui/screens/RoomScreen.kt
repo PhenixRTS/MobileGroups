@@ -8,6 +8,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.OvershootInterpolator
+import android.view.animation.Transformation
+import android.widget.FrameLayout
 import androidx.lifecycle.Observer
 import androidx.viewpager.widget.ViewPager
 import com.phenixrts.suite.groups.R
@@ -83,6 +87,53 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
         fragment_tab_layout.getTabAt(0)?.setIcon(R.drawable.ic_people)
         fragment_tab_layout.getTabAt(1)?.setIcon(R.drawable.ic_chat)
         fragment_tab_layout.getTabAt(2)?.setIcon(R.drawable.ic_info)
+        fragment_tab_layout.getTabAt(0)?.view?.id = R.id.tab_members
+        fragment_tab_layout.getTabAt(1)?.view?.id = R.id.tab_chat
+        fragment_tab_layout.getTabAt(2)?.view?.id = R.id.tab_info
     }
 
+    fun selectTab(index: Int) {
+        Timber.d("Selecting tab: $index")
+        fragment_pager.setCurrentItem(index, false)
+    }
+
+    fun fadeIn() {
+        val params: FrameLayout.LayoutParams = fragment_room_root.layoutParams as FrameLayout.LayoutParams
+        val currentOffset = params.rightMargin
+        val offset = resources.getDimension(R.dimen.room_pager_offset_gone).toInt()
+        if (currentOffset < 0) {
+            Timber.d("Fading in")
+            val animation: Animation = object : Animation() {
+                override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
+                    params.rightMargin = offset - (offset * interpolatedTime).toInt()
+                    fragment_room_root.layoutParams = params
+                }
+            }
+            animation.duration = SCREEN_FADE_DELAY
+            animation.interpolator = OvershootInterpolator()
+            fragment_room_root.startAnimation(animation)
+        }
+    }
+
+    fun fadeOut() {
+        val params: FrameLayout.LayoutParams = fragment_room_root.layoutParams as FrameLayout.LayoutParams
+        val currentOffset = params.rightMargin
+        val offset = resources.getDimension(R.dimen.room_pager_offset_gone)
+        if (currentOffset == 0) {
+            Timber.d("Fading out")
+            val animation: Animation = object : Animation() {
+                override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
+                    params.rightMargin = (offset * interpolatedTime).toInt()
+                    fragment_room_root.layoutParams = params
+                }
+            }
+            animation.duration = SCREEN_FADE_DELAY
+            animation.interpolator = OvershootInterpolator()
+            fragment_room_root.startAnimation(animation)
+        }
+    }
+
+    private companion object {
+        private const val SCREEN_FADE_DELAY = 300L
+    }
 }

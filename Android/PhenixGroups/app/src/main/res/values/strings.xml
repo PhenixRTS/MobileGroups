@@ -53,4 +53,10 @@
     <string name="hint_enter_a_meeting_code">Enter a meeting code</string>
     <string name="meeting_code">Meeting code</string>
 
+    <!-- Accessibility descriptions -->
+    <string name="accessibility_members_tab">Members Tab</string>
+    <string name="accessibility_chat_tab">Chat Tab</string>
+    <string name="accessibility_info_tab">Info Tab</string>
+    <string name="accessibility_menu_button">Menu Button</string>
+
 </resources>

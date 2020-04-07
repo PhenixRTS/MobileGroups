@@ -14,11 +14,11 @@
         android:layout_height="match_parent" >
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/chatHistory"
+            android:id="@+id/chat_history"
             android:layout_width="0dp"
             android:layout_height="0dp"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+            app:layout_constraintBottom_toTopOf="@+id/message_input_holder"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -27,7 +27,7 @@
             tools:listitem="@layout/row_chat_message_item"/>
 
         <LinearLayout
-            android:id="@+id/linearLayout"
+            android:id="@+id/message_input_holder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -37,10 +37,10 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/chatHistory">
+            app:layout_constraintTop_toBottomOf="@+id/chat_history">
 
             <EditText
-                android:id="@+id/newMessageEditText"
+                android:id="@+id/message_input_field"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -51,7 +51,7 @@
                 android:textColor="@android:color/black" />
 
             <ImageButton
-                android:id="@+id/sendButton"
+                android:id="@+id/send_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/group_call_chat_send_button_content_description"

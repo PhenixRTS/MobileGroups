@@ -74,7 +74,7 @@ fun FragmentActivity.hideKeyboard() {
     getSystemService(this, InputMethodManager::class.java)?.hideSoftInputFromWindow(token, 0)
 }
 
-fun FragmentActivity.getSurfaceView(): SurfaceView = surface_view
+fun FragmentActivity.getSurfaceView(): SurfaceView = main_surface_view
 
 fun Fragment.getSurfaceView(): SurfaceView = requireActivity().getSurfaceView()
 

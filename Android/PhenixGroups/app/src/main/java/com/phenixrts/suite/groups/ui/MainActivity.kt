@@ -6,6 +6,7 @@ package com.phenixrts.suite.groups.ui
 
 import android.Manifest
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.view.View
@@ -23,6 +24,7 @@ import com.phenixrts.suite.groups.databinding.ActivityMainBinding
 import com.phenixrts.suite.groups.receivers.CellularStateReceiver
 import com.phenixrts.suite.groups.repository.RoomExpressRepository
 import com.phenixrts.suite.groups.repository.UserMediaRepository
+import com.phenixrts.suite.groups.ui.screens.RoomScreen
 import com.phenixrts.suite.groups.ui.screens.SplashScreen
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
 import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
@@ -82,83 +84,7 @@ class MainActivity : EasyPermissionActivity() {
         }
         handleExceptions()
         observeCellularState()
-
-        camera_button.setOnClickListener {
-            launch {
-                restartTimer()
-                if (!cellularStateReceiver.isInCall()) {
-                    val enabled = !viewModel.isVideoEnabled.isTrue(true)
-                    setCameraPreviewEnabled(enabled)
-                }
-            }
-        }
-        microphone_button.setOnClickListener {
-            launch {
-                restartTimer()
-                if (!cellularStateReceiver.isInCall()) {
-                    val enabled = !viewModel.isMicrophoneEnabled.isTrue(true)
-                    setMicrophoneEnabled(enabled)
-                }
-            }
-        }
-        preview_container.setOnClickListener {
-            launch {
-                if (viewModel.isInRoom.isTrue()) {
-                    restartTimer()
-                    val enabled = viewModel.isControlsEnabled.value?.not() ?: true
-                    Timber.d("Switching controls: $enabled")
-                    viewModel.isControlsEnabled.value = enabled
-                }
-            }
-        }
-        end_call_button.setOnClickListener {
-            hideKeyboard()
-            onBackPressed()
-        }
-
-        bottomMenu.addBottomSheetCallback(sheetListener)
-        menu_button.setOnClickListener { switchMenu() }
-        menu_background.setOnClickListener { hideBottomMenu() }
-        menu_close.setOnClickListener { hideBottomMenu() }
-        menu_switch_camera.setOnClickListener {
-            launch {
-                hideBottomMenu()
-                delay(200)
-                launch(Dispatchers.IO) {
-                    viewModel.switchCameraFacing()
-                }
-            }
-        }
-
-        // Show splash screen if wasn't started already
-        if (savedInstanceState == null) {
-            supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.fullscreen_fragment_container, SplashScreen(), SplashScreen::class.java.name)
-                .addToBackStack(SplashScreen::class.java.name)
-                .commit()
-        }
-        viewModel.initObservers(this)
-        viewModel.isMicrophoneEnabled.observe(this, Observer { enabled ->
-            val color = ContextCompat.getColor(this, if (enabled) R.color.accentGrayColor else R.color.accentColor)
-            microphone_button.setImageResource(if (enabled) R.drawable.ic_mic_on else R.drawable.ic_mic_off)
-            microphone_button.backgroundTintList = ColorStateList.valueOf(color)
-            if (viewModel.isInRoom.isFalse()) {
-                active_member_mic.visibility = if (enabled) View.GONE else View.VISIBLE
-            }
-        })
-        viewModel.isVideoEnabled.observe(this, Observer { enabled ->
-            val color = ContextCompat.getColor(this, if (enabled) R.color.accentGrayColor else R.color.accentColor)
-            camera_button.setImageResource(if (enabled) R.drawable.ic_camera_on else R.drawable.ic_camera_off)
-            camera_button.backgroundTintList = ColorStateList.valueOf(color)
-            showUserVideoPreview(enabled)
-        })
-
-        launch {
-            Timber.d("Init user media: ${viewModel.isVideoEnabled.value} ${viewModel.isMicrophoneEnabled.value}")
-            setMicrophoneEnabled(viewModel.isMicrophoneEnabled.isTrue(true))
-            setCameraPreviewEnabled(viewModel.isVideoEnabled.isTrue(true))
-        }
+        initViews(savedInstanceState == null)
     }
 
     override fun onDestroy() {
@@ -189,6 +115,98 @@ class MainActivity : EasyPermissionActivity() {
         },
         block = block
     )
+
+    private fun initViews(firstLaunch: Boolean) {
+        camera_button.setOnClickListener {
+            launch {
+                restartTimer()
+                if (!cellularStateReceiver.isInCall()) {
+                    val enabled = !viewModel.isVideoEnabled.isTrue(true)
+                    setCameraPreviewEnabled(enabled)
+                }
+            }
+        }
+        microphone_button.setOnClickListener {
+            launch {
+                restartTimer()
+                if (!cellularStateReceiver.isInCall()) {
+                    val enabled = !viewModel.isMicrophoneEnabled.isTrue(true)
+                    setMicrophoneEnabled(enabled)
+                }
+            }
+        }
+        preview_container.setOnClickListener {
+            launch {
+                if (viewModel.isInRoom.isTrue()) {
+                    restartTimer()
+                    val enabled = viewModel.isControlsEnabled.value?.not() ?: true
+                    Timber.d("Switching controls: $enabled")
+                    viewModel.isControlsEnabled.value = enabled
+                    hideRoomScreen()
+                }
+            }
+        }
+        end_call_button.setOnClickListener {
+            hideKeyboard()
+            onBackPressed()
+        }
+
+        bottomMenu.addBottomSheetCallback(sheetListener)
+        menu_button.setOnClickListener { switchMenu() }
+        menu_background.setOnClickListener { hideBottomMenu() }
+        menu_close.setOnClickListener { hideBottomMenu() }
+        menu_switch_camera.setOnClickListener {
+            launch {
+                hideBottomMenu()
+                delay(200)
+                launch(Dispatchers.IO) {
+                    viewModel.switchCameraFacing()
+                }
+            }
+        }
+
+        main_landscape_members.setOnClickListener {
+            showRoomScreen(0)
+        }
+
+        main_landscape_chat.setOnClickListener {
+            showRoomScreen(1)
+        }
+
+        main_landscape_info.setOnClickListener {
+            showRoomScreen(2)
+        }
+
+        // Show splash screen if wasn't started already
+        if (firstLaunch) {
+            supportFragmentManager
+                .beginTransaction()
+                .replace(R.id.fullscreen_fragment_container, SplashScreen(), SplashScreen::class.java.name)
+                .addToBackStack(SplashScreen::class.java.name)
+                .commit()
+        }
+        viewModel.initObservers(this)
+        viewModel.isMicrophoneEnabled.observe(this, Observer { enabled ->
+            val color = ContextCompat.getColor(this, if (enabled) R.color.accentGrayColor else R.color.accentColor)
+            microphone_button.setImageResource(if (enabled) R.drawable.ic_mic_on else R.drawable.ic_mic_off)
+            microphone_button.backgroundTintList = ColorStateList.valueOf(color)
+            if (viewModel.isInRoom.isFalse()) {
+                active_member_mic.visibility = if (enabled) View.GONE else View.VISIBLE
+            }
+        })
+        viewModel.isVideoEnabled.observe(this, Observer { enabled ->
+            val color = ContextCompat.getColor(this, if (enabled) R.color.accentGrayColor else R.color.accentColor)
+            camera_button.setImageResource(if (enabled) R.drawable.ic_camera_on else R.drawable.ic_camera_off)
+            camera_button.backgroundTintList = ColorStateList.valueOf(color)
+            showUserVideoPreview(enabled)
+        })
+
+        launch {
+            Timber.d("Init user media: ${viewModel.isVideoEnabled.value} ${viewModel.isMicrophoneEnabled.value}")
+            setMicrophoneEnabled(viewModel.isMicrophoneEnabled.isTrue(true))
+            setCameraPreviewEnabled(viewModel.isVideoEnabled.isTrue(true))
+        }
+    }
 
     private fun observeCellularState() {
         cellularStateReceiver.observeCellularState(object: CellularStateReceiver.OnCallStateChanged {
@@ -253,13 +271,26 @@ class MainActivity : EasyPermissionActivity() {
         bottomMenu.state = BottomSheetBehavior.STATE_HIDDEN
     }
 
+    private fun showRoomScreen(selectedTab: Int) {
+        (supportFragmentManager.findFragmentByTag(RoomScreen::class.java.name) as? RoomScreen)?.let { roomScreen ->
+            roomScreen.selectTab(selectedTab)
+            roomScreen.fadeIn()
+        }
+    }
+
+    private fun hideRoomScreen() {
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            (supportFragmentManager.findFragmentByTag(RoomScreen::class.java.name) as? RoomScreen)?.fadeOut()
+        }
+    }
+
     private fun showUserVideoPreview(enabled: Boolean) = launch {
         if (viewModel.isInRoom.isFalse()) {
             if (enabled) {
-                val response = viewModel.startUserMediaPreview(surface_view.holder)
+                val response = viewModel.startUserMediaPreview(main_surface_view.holder)
                 Timber.d("Preview started: ${response.status}")
                 if (response.status == RequestStatus.OK) {
-                    surface_view.visibility = View.VISIBLE
+                    main_surface_view.visibility = View.VISIBLE
                     if (viewModel.isVideoEnabled.isFalse()) {
                         viewModel.isVideoEnabled.value = true
                     }
@@ -270,7 +301,7 @@ class MainActivity : EasyPermissionActivity() {
                     }
                 }
             } else {
-                surface_view.visibility = View.GONE
+                main_surface_view.visibility = View.GONE
             }
         }
     }
