@@ -22,6 +22,7 @@
 
     <!-- Members list  -->
     <string name="preview_mic_off_icon_content_description">Microphone is off</string>
+    <string name="preview_volume_icon_content_description">Audio volume</string>
 
     <!--  Chat  -->
     <string name="group_call_chat_message_hint">Message</string>

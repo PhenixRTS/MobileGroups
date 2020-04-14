@@ -61,7 +61,7 @@ class MainActivity : EasyPermissionActivity() {
 
     private val timerHandler = Handler()
     private val timerRunnable = Runnable {
-        launch {
+        launchMain {
             if (viewModel.isInRoom.isTrue()) {
                 Timber.d("Hiding controls")
                 viewModel.isControlsEnabled.value = false
@@ -72,8 +72,6 @@ class MainActivity : EasyPermissionActivity() {
     private val viewModel: GroupsViewModel by lazyViewModel {
         GroupsViewModel(cacheProvider, preferenceProvider, roomExpressRepository, userMediaRepository)
     }
-
-    private val activityScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,17 +106,9 @@ class MainActivity : EasyPermissionActivity() {
         }
     }
 
-    private fun launch(block: suspend CoroutineScope.() -> Unit) = activityScope.launch(
-        context = CoroutineExceptionHandler { _, e ->
-            Timber.e("Coroutine failed: ${e.localizedMessage}")
-            e.printStackTrace()
-        },
-        block = block
-    )
-
     private fun initViews(firstLaunch: Boolean) {
         camera_button.setOnClickListener {
-            launch {
+            launchMain {
                 restartTimer()
                 if (!cellularStateReceiver.isInCall()) {
                     val enabled = !viewModel.isVideoEnabled.isTrue(true)
@@ -127,7 +117,7 @@ class MainActivity : EasyPermissionActivity() {
             }
         }
         microphone_button.setOnClickListener {
-            launch {
+            launchMain {
                 restartTimer()
                 if (!cellularStateReceiver.isInCall()) {
                     val enabled = !viewModel.isMicrophoneEnabled.isTrue(true)
@@ -136,13 +126,16 @@ class MainActivity : EasyPermissionActivity() {
             }
         }
         preview_container.setOnClickListener {
-            launch {
+            launchMain {
                 if (viewModel.isInRoom.isTrue()) {
                     restartTimer()
-                    val enabled = viewModel.isControlsEnabled.value?.not() ?: true
-                    Timber.d("Switching controls: $enabled")
-                    viewModel.isControlsEnabled.value = enabled
-                    hideRoomScreen()
+                    if (tryHideRoomScreen()) {
+                        viewModel.isControlsEnabled.value = true
+                    } else {
+                        val enabled = viewModel.isControlsEnabled.value?.not() ?: true
+                        Timber.d("Switching controls: $enabled")
+                        viewModel.isControlsEnabled.value = enabled
+                    }
                 }
             }
         }
@@ -156,24 +149,27 @@ class MainActivity : EasyPermissionActivity() {
         menu_background.setOnClickListener { hideBottomMenu() }
         menu_close.setOnClickListener { hideBottomMenu() }
         menu_switch_camera.setOnClickListener {
-            launch {
+            launchMain {
                 hideBottomMenu()
-                delay(200)
-                launch(Dispatchers.IO) {
+                delay(BOTTOM_MENU_DELAY)
+                launchIO {
                     viewModel.switchCameraFacing()
                 }
             }
         }
 
-        main_landscape_members.setOnClickListener {
+        main_landscape_members_holder.setOnClickListener {
+            restartTimer()
             showRoomScreen(0)
         }
 
         main_landscape_chat.setOnClickListener {
+            restartTimer()
             showRoomScreen(1)
         }
 
         main_landscape_info.setOnClickListener {
+            restartTimer()
             showRoomScreen(2)
         }
 
@@ -200,8 +196,20 @@ class MainActivity : EasyPermissionActivity() {
             camera_button.backgroundTintList = ColorStateList.valueOf(color)
             showUserVideoPreview(enabled)
         })
+        viewModel.memberCount.observe(this, Observer { memberCount ->
+            val label =  if (memberCount > 0) getString(R.string.tab_members_count, memberCount) else " "
+            main_landscape_member_count.visibility = if (memberCount > 0) View.VISIBLE else View.GONE
+            main_landscape_member_count.text = label
+        })
+        viewModel.isControlsEnabled.observe(this, Observer { enabled ->
+            if (enabled) {
+                showTopMenu()
+            } else {
+                hideTopMenu()
+            }
+        })
 
-        launch {
+        launchMain {
             Timber.d("Init user media: ${viewModel.isVideoEnabled.value} ${viewModel.isMicrophoneEnabled.value}")
             setMicrophoneEnabled(viewModel.isMicrophoneEnabled.isTrue(true))
             setCameraPreviewEnabled(viewModel.isVideoEnabled.isTrue(true))
@@ -261,7 +269,35 @@ class MainActivity : EasyPermissionActivity() {
         }
     }
 
-    private fun showBottomMenu() {
+    private fun showTopMenu() {
+        if (main_menu_holder.alpha == MENU_INVISIBLE) {
+            Timber.d("Showing top menu")
+            main_menu_holder.visibility = View.VISIBLE
+            main_menu_holder.animate()
+                .setStartDelay(MENU_FADE_DURATION)
+                .setDuration(MENU_FADE_DURATION)
+                .alpha(MENU_VISIBLE)
+                .withEndAction {
+                    main_menu_holder.alpha = MENU_VISIBLE
+                }.start()
+        }
+    }
+
+    private fun hideTopMenu() {
+        if (main_menu_holder.alpha == MENU_VISIBLE) {
+            Timber.d("Hiding top menu")
+            main_menu_holder.animate()
+                .setStartDelay(0)
+                .setDuration(MENU_FADE_DURATION)
+                .alpha(MENU_INVISIBLE)
+                .withEndAction {
+                    main_menu_holder.alpha = MENU_INVISIBLE
+                    main_menu_holder.visibility = View.GONE
+                }.start()
+        }
+    }
+
+    fun showBottomMenu() {
         Timber.d("Showing bottom menu")
         bottomMenu.state = BottomSheetBehavior.STATE_EXPANDED
     }
@@ -272,19 +308,25 @@ class MainActivity : EasyPermissionActivity() {
     }
 
     private fun showRoomScreen(selectedTab: Int) {
-        (supportFragmentManager.findFragmentByTag(RoomScreen::class.java.name) as? RoomScreen)?.let { roomScreen ->
-            roomScreen.selectTab(selectedTab)
-            roomScreen.fadeIn()
-        }
-    }
-
-    private fun hideRoomScreen() {
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            (supportFragmentManager.findFragmentByTag(RoomScreen::class.java.name) as? RoomScreen)?.fadeOut()
+            hideTopMenu()
+            (supportFragmentManager.findFragmentByTag(RoomScreen::class.java.name) as? RoomScreen)?.let { roomScreen ->
+                roomScreen.selectTab(selectedTab)
+                roomScreen.fadeIn()
+            }
         }
     }
 
-    private fun showUserVideoPreview(enabled: Boolean) = launch {
+    private fun tryHideRoomScreen(): Boolean {
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            (supportFragmentManager.findFragmentByTag(RoomScreen::class.java.name) as? RoomScreen)?.tryFadeOut()?.let { fadedOut ->
+                return fadedOut
+            }
+        }
+        return false
+    }
+
+    private fun showUserVideoPreview(enabled: Boolean) = launchMain {
         if (viewModel.isInRoom.isFalse()) {
             if (enabled) {
                 val response = viewModel.startUserMediaPreview(main_surface_view.holder)
@@ -309,7 +351,7 @@ class MainActivity : EasyPermissionActivity() {
     private suspend fun setCameraPreviewEnabled(enabled: Boolean): Unit = suspendCoroutine { continuation ->
         Timber.d("Camera preview enabled: $enabled")
         askForPermission(Manifest.permission.CAMERA) { granted ->
-            launch {
+            launchMain {
                 viewModel.isVideoEnabled.value = granted && enabled
                 Timber.d("Camera state changed: $enabled $granted")
                 continuation.resume(Unit)
@@ -320,7 +362,7 @@ class MainActivity : EasyPermissionActivity() {
     private suspend fun setMicrophoneEnabled(enabled: Boolean): Unit = suspendCoroutine { continuation ->
         Timber.d("Microphone enabled: $enabled")
         askForPermission(Manifest.permission.RECORD_AUDIO) { granted ->
-            launch {
+            launchMain {
                 viewModel.isMicrophoneEnabled.value = granted && enabled
                 Timber.d("Microphone state changed: $enabled $granted")
                 continuation.resume(Unit)
@@ -330,6 +372,10 @@ class MainActivity : EasyPermissionActivity() {
 
     private companion object {
         private const val HIDE_CONTROLS_DELAY = 5000L
+        private const val BOTTOM_MENU_DELAY = 200L
+        private const val MENU_FADE_DURATION = 300L
+        private const val MENU_VISIBLE = 1f
+        private const val MENU_INVISIBLE = 0f
     }
 
 }

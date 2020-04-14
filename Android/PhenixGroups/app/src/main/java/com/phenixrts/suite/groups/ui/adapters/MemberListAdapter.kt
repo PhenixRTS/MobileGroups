@@ -11,6 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.phenixrts.suite.groups.common.extensions.isFalse
 import com.phenixrts.suite.groups.common.extensions.isTrue
+import com.phenixrts.suite.groups.common.extensions.launchMain
 import com.phenixrts.suite.groups.common.extensions.refresh
 import com.phenixrts.suite.groups.common.getSubscribeAudioOptions
 import com.phenixrts.suite.groups.common.getSubscribeVideoOptions
@@ -58,36 +59,35 @@ class MemberListAdapter(
                 updateMemberStream(member)
             })
         }
+        holder.binding.lifecycleOwner?.let { owner ->
+            holder.binding.member?.audioLevel?.observe(owner, Observer { volume ->
+                holder.binding.memberVolumeIndicator.setImageResource(volume.icon)
+                holder.binding.refresh()
+            })
+        }
         updateMemberStream(roomMember)
     }
 
     private fun updateMemberStream(roomMember: RoomMember) {
-        roomMember.launch {
+        launchMain {
             if (subscriptionsInProgress.contains(roomMember.member.sessionId) || viewModel.isInRoom.isFalse()) {
-                return@launch
+                return@launchMain
             }
             subscriptionsInProgress.add(roomMember.member.sessionId)
 
-            // Subscribe to member media if not self member and not subscribed yet
-            if (!roomMember.isSubscribed() && !roomMember.isSelf) {
+            // Subscribe to member media if not subscribed yet
+            if (!roomMember.isSubscribed()) {
                 val options = if (roomMember.canRenderVideo) {
                     getSubscribeVideoOptions()
                 } else {
                     getSubscribeAudioOptions()
                 }
-                viewModel.subscribeToMemberStream(roomMember, options).status
-                Timber.d("Subscribed to member media")
+                val status = viewModel.subscribeToMemberStream(roomMember, options)
+                Timber.d("Subscribed to member media: $status")
             }
 
-            if (roomMember.isSelf) {
-                Timber.d("Starting self preview: $roomMember")
-                (if (roomMember.isActiveRenderer) roomMember.mainSurface else roomMember.previewSurface)?.let { surface ->
-                    viewModel.startUserMediaPreview(surface)
-                }
-            } else {
-                Timber.d("Starting member preview: $roomMember")
-                roomMember.startMemberRenderer()
-            }
+            Timber.d("Starting member preview: $roomMember")
+            roomMember.startMemberRenderer()
 
             // Update member surfaces
             if (viewModel.isInRoom.isTrue()) {

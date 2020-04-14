@@ -10,11 +10,12 @@ import com.phenixrts.chat.ChatMessage
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.common.extensions.elapsedTime
+import com.phenixrts.suite.groups.common.extensions.launchMain
 
 data class RoomMessage(
     val message: ChatMessage,
     val isSelf: Boolean
-) : ModelScope() {
+) {
 
     val observableMessageTime = MutableLiveData<String>()
     val observableSenderName = MutableLiveData<String>()
@@ -25,7 +26,7 @@ data class RoomMessage(
     }
 
     private fun refreshMessage() {
-        launch {
+        launchMain {
             observableMessageTime.value = message.observableTimeStamp.value.elapsedTime()
             observableSenderName.value = if (isSelf) {
                 GroupsApplication.getString(R.string.group_call_chat_self)

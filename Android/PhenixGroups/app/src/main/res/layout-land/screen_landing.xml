@@ -38,7 +38,6 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
-                    android:layout_marginEnd="48dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp">
 
@@ -54,7 +53,8 @@
                         android:text="@={viewModel.displayName}"
                         android:layout_marginTop="8dp"
                         android:imeOptions="actionDone"
-                        android:textColor="@color/primaryTextDarkColor" />
+                        android:textColor="@color/primaryTextDarkColor"
+                        android:layout_toStartOf="@id/landing_menu_button"/>
 
                     <TextView
                         android:text="@string/hint_enter_display_name"
@@ -65,7 +65,18 @@
                         android:textColor="@color/primaryTextDarkColor"
                         android:textSize="12sp"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        tools:ignore="RelativeOverlap" />
+
+                    <ImageView
+                        android:id="@+id/landing_menu_button"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:padding="12dp"
+                        android:background="@drawable/bg_round_item_selector"
+                        android:src="@drawable/ic_menu"
+                        android:contentDescription="@string/accessibility_menu_button"
+                        android:layout_alignParentEnd="true"/>
                 </RelativeLayout>
 
                 <LinearLayout

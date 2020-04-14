@@ -12,6 +12,7 @@ import com.phenixrts.room.RoomService
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.common.getRoomCode
 import com.phenixrts.suite.groups.cache.entities.RoomInfoItem
+import com.phenixrts.suite.groups.common.extensions.launchIO
 import com.phenixrts.suite.groups.common.getPublishOptions
 import com.phenixrts.suite.groups.common.getPublishToRoomOptions
 import com.phenixrts.suite.groups.common.getRoomOptions
@@ -27,13 +28,13 @@ class RoomExpressRepository(
     private val cacheProvider: CacheProvider,
     val roomExpress: RoomExpress,
     val roomStatus: MutableLiveData<RoomStatus>
-) : Repository() {
+) {
 
     /**
      * Try to join a room with given room options and block until executed
      */
     private fun joinRoom(publishToRoomOptions: PublishToRoomOptions,
-                         continuation: CancellableContinuation<JoinedRoomStatus>) = launch {
+                         continuation: CancellableContinuation<JoinedRoomStatus>) = launchIO {
         roomExpress.publishToRoom(publishToRoomOptions) { status: RequestStatus, roomService: RoomService?,
                                                           publisher: ExpressPublisher? ->
             Timber.d("Room join completed with status: $status")
@@ -68,7 +69,7 @@ class RoomExpressRepository(
         val code = getRoomCode()
         val options = getRoomOptions(code)
         roomExpress.createRoom(options) { status, room ->
-            launch {
+            launchIO {
                 Timber.d("Room create completed with status: $status")
                 it.resume(RoomStatus(status, room.roomId))
             }

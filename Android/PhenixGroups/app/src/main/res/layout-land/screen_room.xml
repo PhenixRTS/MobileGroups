@@ -8,8 +8,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment_room_root"
     android:layout_width="300dp"
-    android:layout_gravity="end"
     android:layout_marginEnd="@dimen/room_pager_offset_gone"
+    android:layout_gravity="end"
     android:layout_height="match_parent"
     android:keepScreenOn="true"
     tools:background="@color/primaryBackgroundDarkColor" >
@@ -37,5 +37,16 @@
             app:tabSelectedTextColor="@color/primaryTextDarkColor"/>
 
     </androidx.viewpager.widget.ViewPager>
+
+    <ImageView
+        android:id="@+id/room_menu_button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:padding="12dp"
+        android:background="@drawable/bg_round_item_selector"
+        android:src="@drawable/ic_menu"
+        android:contentDescription="@string/accessibility_menu_button"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

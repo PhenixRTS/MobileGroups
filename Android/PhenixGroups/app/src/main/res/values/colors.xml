@@ -9,6 +9,9 @@
     <color name="accentColor">#ff1744</color>
     <color name="accentGrayColor">#FFAAAAAA</color>
 
+    <color name="indicatorColor">#FF99CC00</color>
+    <color name="indicatorColorInactive">#91C100</color>
+
     <color name="primaryTextColor">#ffffff</color>
     <color name="primaryTextDarkColor">#333</color>
     <color name="secondaryTextColor">#777</color>
@@ -19,5 +22,6 @@
     <color name="primaryBackgroundLightColor">#808080</color>
 
     <color name="primaryTranslucentColor">#80000000</color>
+    <color name="transparent">#00000000</color>
 
 </resources>

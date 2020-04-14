@@ -41,7 +41,7 @@ class MemberFragment : BaseFragment(), MemberListAdapter.OnMemberListener {
         viewModel.pinActiveMember(roomMember)
     }
 
-    fun hidePreviews(hide: Boolean) = launch {
+    fun hidePreviews(hide: Boolean) = launchMain {
         (binding.memberList.adapter as MemberListAdapter).hidePreviews(hide)
     }
 

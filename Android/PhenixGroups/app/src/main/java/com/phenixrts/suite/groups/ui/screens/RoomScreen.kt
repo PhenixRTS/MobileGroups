@@ -15,7 +15,6 @@ import android.widget.FrameLayout
 import androidx.lifecycle.Observer
 import androidx.viewpager.widget.ViewPager
 import com.phenixrts.suite.groups.R
-import com.phenixrts.suite.groups.common.extensions.getMenuMargin
 import com.phenixrts.suite.groups.common.extensions.hideKeyboard
 import com.phenixrts.suite.groups.ui.adapters.RoomScreenPageAdapter
 import com.phenixrts.suite.groups.ui.screens.fragments.*
@@ -44,8 +43,10 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
         fragment_pager.offscreenPageLimit = 2
         fragment_pager?.adapter = adapter
         fragment_tab_layout.setupWithViewPager(fragment_pager)
+        room_menu_button.setOnClickListener {
+            showBottomMenu()
+        }
         refreshTabs(0)
-        getMenuMargin().visibility = View.GONE
 
         viewModel.isControlsEnabled.value = false
         viewModel.isInRoom.value = true
@@ -115,7 +116,7 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
         }
     }
 
-    fun fadeOut() {
+    fun tryFadeOut(): Boolean {
         val params: FrameLayout.LayoutParams = fragment_room_root.layoutParams as FrameLayout.LayoutParams
         val currentOffset = params.rightMargin
         val offset = resources.getDimension(R.dimen.room_pager_offset_gone)
@@ -130,7 +131,9 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
             animation.duration = SCREEN_FADE_DELAY
             animation.interpolator = OvershootInterpolator()
             fragment_room_root.startAnimation(animation)
+            return true
         }
+        return false
     }
 
     private companion object {

@@ -34,4 +34,16 @@
 
     </androidx.viewpager.widget.ViewPager>
 
+    <ImageView
+        android:id="@+id/room_menu_button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:visibility="gone"
+        android:padding="12dp"
+        android:background="@drawable/bg_round_item_selector"
+        android:src="@drawable/ic_menu"
+        android:contentDescription="@string/accessibility_menu_button"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

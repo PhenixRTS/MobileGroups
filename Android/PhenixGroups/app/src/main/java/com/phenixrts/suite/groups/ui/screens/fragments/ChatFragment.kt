@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.suite.groups.R
+import com.phenixrts.suite.groups.common.extensions.launchMain
 import com.phenixrts.suite.groups.common.extensions.showToast
 import com.phenixrts.suite.groups.databinding.FragmentChatBinding
 import com.phenixrts.suite.groups.ui.adapters.ChatListAdapter
@@ -41,7 +42,7 @@ class ChatFragment : BaseFragment() {
         observeMessages()
     }
 
-    private fun observeMessages() = launch {
+    private fun observeMessages() = launchMain {
         delay(CHAT_SUBSCRIPTION_DELAY)
         if (isAdded) {
             viewModel.getChatMessages().observe(viewLifecycleOwner, Observer {
@@ -53,7 +54,7 @@ class ChatFragment : BaseFragment() {
         }
     }
 
-    private fun sendMessage() = launch {
+    private fun sendMessage() = launchMain {
         val status = viewModel.sendChatMessage(binding.messageInputField.text.toString())
         if (status.status == RequestStatus.OK) {
             binding.messageInputField.text.clear()

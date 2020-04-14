@@ -9,13 +9,14 @@ import com.phenixrts.common.RequestStatus
 import com.phenixrts.express.*
 import com.phenixrts.pcast.*
 import com.phenixrts.suite.groups.common.extensions.getUserMedia
+import com.phenixrts.suite.groups.common.extensions.launchIO
 import com.phenixrts.suite.groups.common.getUserMediaOptions
 import com.phenixrts.suite.groups.models.UserMediaStatus
 import timber.log.Timber
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class UserMediaRepository(private val roomExpress: RoomExpress) : Repository() {
+class UserMediaRepository(private val roomExpress: RoomExpress) {
 
     private var userMediaStream: UserMediaStream? = null
     private var collectingUserMedia = false
@@ -51,7 +52,7 @@ class UserMediaRepository(private val roomExpress: RoomExpress) : Repository() {
     }
 
     suspend fun getUserMediaStream(): UserMediaStatus = suspendCoroutine { continuation ->
-        launch {
+        launchIO {
             if (!collectingUserMedia) {
                 collectingUserMedia = true
                 if (userMediaStream != null) {
@@ -72,7 +73,7 @@ class UserMediaRepository(private val roomExpress: RoomExpress) : Repository() {
     }
 
     suspend fun switchCameraFacing(): RequestStatus = suspendCoroutine { continuation ->
-        launch {
+        launchIO {
             val facingMode = if (currentFacingMode == FacingMode.USER) FacingMode.ENVIRONMENT else FacingMode.USER
             var requestStatus = RequestStatus.FAILED
             userMediaStream?.applyOptions(getUserMediaOptions(facingMode))?.let { status ->
@@ -85,12 +86,12 @@ class UserMediaRepository(private val roomExpress: RoomExpress) : Repository() {
         }
     }
 
-    fun switchVideoStreamState(enabled: Boolean) = launch {
+    fun switchVideoStreamState(enabled: Boolean) = launchIO {
         Timber.d("Switching video streams: $enabled")
         userMediaStream?.mediaStream?.videoTracks?.forEach { it.isEnabled = enabled }
     }
 
-    fun switchAudioStreamState(enabled: Boolean) = launch {
+    fun switchAudioStreamState(enabled: Boolean) = launchIO {
         Timber.d("Switching audio streams: $enabled")
         userMediaStream?.mediaStream?.audioTracks?.forEach { it.isEnabled = enabled }
     }

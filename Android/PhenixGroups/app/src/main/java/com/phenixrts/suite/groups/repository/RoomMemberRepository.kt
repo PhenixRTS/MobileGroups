@@ -4,6 +4,7 @@
 
 package com.phenixrts.suite.groups.repository
 
+import android.os.Handler
 import androidx.lifecycle.MutableLiveData
 import com.phenixrts.common.Disposable
 import com.phenixrts.common.RequestStatus
@@ -12,23 +13,37 @@ import com.phenixrts.express.SubscribeToMemberStreamOptions
 import com.phenixrts.room.RoomService
 import com.phenixrts.room.TrackState
 import com.phenixrts.suite.groups.BuildConfig
+import com.phenixrts.suite.groups.common.enums.AudioLevel
 import com.phenixrts.suite.groups.common.extensions.call
+import com.phenixrts.suite.groups.common.extensions.launchIO
+import com.phenixrts.suite.groups.common.extensions.launchMain
 import com.phenixrts.suite.groups.common.extensions.mapRoomMember
 import com.phenixrts.suite.groups.models.RoomStatus
 import com.phenixrts.suite.groups.models.RoomMember
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class RoomMemberRepository(
     private val roomExpress: RoomExpress,
-    private val roomService: RoomService
-) : Repository() {
+    private val roomService: RoomService,
+    private val selfMember: RoomMember
+) {
 
     private val disposables: MutableList<Disposable?> = mutableListOf()
     private val roomMembers = MutableLiveData<List<RoomMember>>()
+
+
+    private val memberPickerHandler = Handler()
+    private val memberPickerRunnable = Runnable {
+        pickLoudestMember()
+    }
+
+    init {
+        launchMain {
+            roomMembers.value = listOf(selfMember)
+        }
+    }
 
     fun getObservableRoomMembers(): MutableLiveData<List<RoomMember>> {
         roomService.observableActiveRoom.value.observableMembers.subscribe { members ->
@@ -44,14 +59,13 @@ class RoomMemberRepository(
         return roomMembers
     }
 
-    private fun updateMemberList(members: List<RoomMember>) = launch {
-        launch(Dispatchers.Main) {
-            disposeGoneMembers(members)
-            enableMemberRenderers(members)
-            pickActiveRenderer(members)
-            Timber.d("Updated members list: $members")
-            roomMembers.value = members
-        }
+    private fun updateMemberList(members: List<RoomMember>) = launchMain {
+        disposeGoneMembers(members)
+        enableMemberRenderers(members)
+        pickActiveRenderer(members)
+        Timber.d("Updated members list: $members")
+        roomMembers.value = members
+        rePickMember(true)
     }
 
     private fun disposeGoneMembers(members: List<RoomMember>) {
@@ -105,6 +119,38 @@ class RoomMemberRepository(
         }
     }
 
+    private fun pickLoudestMember() {
+        var loudestPicked = false
+        roomMembers.value?.let { members ->
+            if (members.find { it.isPinned } == null) {
+                members
+                    .filter { !it.isSelf && it.canRenderVideo }
+                    .maxBy { it.audioLevel.value?.ordinal ?: AudioLevel.VOLUME_0.ordinal }
+                    ?.run {
+                        // Update if not active already
+                        if (!isActiveRenderer) {
+                            // Deselect active member
+                            members.find { it.isActiveRenderer }?.run {
+                                Timber.d("Deselected active renderer: ${toString()}")
+                                isActiveRenderer = false
+                                onUpdate.call(this)
+                            }
+                            isActiveRenderer = true
+                            onUpdate.call(this)
+                            Timber.d("Picked loudest renderer: ${toString()}")
+                            loudestPicked = true
+                        }
+                    }
+            }
+        }
+        rePickMember(loudestPicked)
+    }
+
+    private fun rePickMember(justPicked: Boolean) {
+        memberPickerHandler.removeCallbacks(memberPickerRunnable)
+        memberPickerHandler.postDelayed(memberPickerRunnable, if (justPicked) MEMBER_RE_PICK_DELAY else MEMBER_PICK_DELAY)
+    }
+
     fun pinActiveMember(roomMember: RoomMember) {
         val wasPinned = roomMember.isPinned
         // Unpin current member
@@ -119,6 +165,7 @@ class RoomMemberRepository(
             isPinned = !wasPinned
             onUpdate.call(this)
         }
+        rePickMember(false)
         Timber.d("Changed member pin state: $roomMember")
     }
 
@@ -150,18 +197,16 @@ class RoomMemberRepository(
                 val stream = streams.getOrNull(0)
                 if (stream != null && !member.isSubscribed()) {
                     roomExpress.subscribeToMemberStream(stream, options) { status, subscriber, renderer ->
-                        launch {
-                            launch(Dispatchers.Main) {
-                                var message = ""
-                                if (status == RequestStatus.OK) {
-                                    member.onSubscribed(subscriber, renderer)
-                                    Timber.d("Subscribed to member media: $status $member")
-                                    continuation.resume(RoomStatus(status, message))
-                                } else {
-                                    message = "Failed to subscribe to member media"
-                                    member.canShowPreview = false
-                                    continuation.resume(RoomStatus(status, message))
-                                }
+                        launchMain {
+                            var message = ""
+                            if (status == RequestStatus.OK) {
+                                member.onSubscribed(subscriber, renderer)
+                                Timber.d("Subscribed to member media: $status $member")
+                                continuation.resume(RoomStatus(status, message))
+                            } else {
+                                message = "Failed to subscribe to member media"
+                                member.canShowPreview = false
+                                continuation.resume(RoomStatus(status, message))
                             }
                         }
                     }
@@ -170,14 +215,19 @@ class RoomMemberRepository(
         }
     }
 
-    fun dispose() = launch {
+    fun dispose() = launchIO {
         disposables.forEach { it?.dispose() }
         disposables.clear()
 
-        launch(Dispatchers.Main) {
+        launchMain{
             roomMembers.value?.forEach { it.dispose() }
             roomMembers.value = null
         }
+    }
+
+    private companion object {
+        private const val MEMBER_PICK_DELAY = 1000 * 2L
+        private const val MEMBER_RE_PICK_DELAY = 1000 * 5L
     }
 
 }

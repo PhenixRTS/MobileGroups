@@ -37,6 +37,7 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
         binding.roomList.setHasFixedSize(true)
         binding.roomList.adapter = roomAdapter
         binding.newRoomButton.setOnClickListener {
+            Timber.d("Create Room clicked")
             createRoom()
         }
         binding.joinRoomButton.setOnClickListener {
@@ -45,6 +46,9 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
         binding.screenDisplayName.addTextChangedListener(afterTextChanged = {
             preferenceProvider.saveDisplayName(it?.toString() ?: "")
         })
+        binding.landingMenuButton.setOnClickListener {
+            showBottomMenu()
+        }
 
         viewModel.displayName.value = preferenceProvider.getDisplayName()
         viewModel.isControlsEnabled.value = true
@@ -63,7 +67,6 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
         } else {
             getMicIcon().visibility = View.VISIBLE
         }
-        getMenuMargin().visibility = View.VISIBLE
         restartVideoPreview()
     }
 
@@ -75,7 +78,7 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
     /**
      * Create a new meeting room
      */
-    private fun createRoom() = launch {
+    private fun createRoom() = launchMain {
         showLoadingScreen()
         val response = viewModel.createRoom()
         if (response.status == RequestStatus.OK) {
@@ -86,7 +89,7 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
         }
     }
 
-    private fun joinRoomById(roomId: String) = launch {
+    private fun joinRoomById(roomId: String) = launchMain {
         showLoadingScreen()
         val joinedRoomStatus = viewModel.joinRoomById(roomId, preferenceProvider.getDisplayName())
         Timber.d("Room joined with status: $joinedRoomStatus")

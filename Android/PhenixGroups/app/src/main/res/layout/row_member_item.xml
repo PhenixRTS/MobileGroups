@@ -83,6 +83,20 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 tools:ignore="RtlHardcoded" />
 
+            <ImageView
+                android:id="@+id/member_volume_indicator"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentBottom="true"
+                android:layout_marginEnd="4dp"
+                android:layout_marginBottom="4dp"
+                android:contentDescription="@string/preview_volume_icon_content_description"
+                android:visibility="@{member.muted ? View.GONE : View.VISIBLE }"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:ignore="RtlHardcoded" />
+
         </RelativeLayout>
 
         <TextView

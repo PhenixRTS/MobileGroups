@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.phenixrts.suite.groups.R
+import com.phenixrts.suite.groups.common.extensions.launchMain
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
 
 class SplashScreen : BaseFragment() {
@@ -20,7 +21,7 @@ class SplashScreen : BaseFragment() {
         showLandingScreen()
     }
 
-    private fun showLandingScreen() = launch {
+    private fun showLandingScreen() = launchMain {
         viewModel.waitForPCast()
         launchFragment(LandingScreen(), false)
     }

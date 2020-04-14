@@ -6,7 +6,6 @@ package com.phenixrts.suite.groups.common.extensions
 
 import android.os.Handler
 import android.view.SurfaceView
-import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.Toast
@@ -81,7 +80,3 @@ fun Fragment.getSurfaceView(): SurfaceView = requireActivity().getSurfaceView()
 fun FragmentActivity.getMicIcon(): ImageView = active_member_mic
 
 fun Fragment.getMicIcon(): ImageView = requireActivity().getMicIcon()
-
-fun FragmentActivity.getMenuMargin(): View = menu_margin
-
-fun Fragment.getMenuMargin(): View = requireActivity().getMenuMargin()

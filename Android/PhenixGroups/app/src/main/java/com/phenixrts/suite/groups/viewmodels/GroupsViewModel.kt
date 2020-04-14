@@ -9,6 +9,7 @@ import androidx.lifecycle.*
 import androidx.lifecycle.Observer
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.express.SubscribeToMemberStreamOptions
+import com.phenixrts.pcast.MediaStreamTrack
 import com.phenixrts.pcast.Renderer
 import com.phenixrts.pcast.RendererStartStatus
 import com.phenixrts.pcast.android.AndroidVideoRenderSurface
@@ -17,6 +18,8 @@ import com.phenixrts.suite.groups.cache.PreferenceProvider
 import com.phenixrts.suite.groups.cache.entities.RoomInfoItem
 import com.phenixrts.suite.groups.common.extensions.expirationDate
 import com.phenixrts.suite.groups.common.extensions.isTrue
+import com.phenixrts.suite.groups.common.extensions.launchIO
+import com.phenixrts.suite.groups.common.extensions.launchMain
 import com.phenixrts.suite.groups.models.RoomMessage
 import com.phenixrts.suite.groups.models.JoinedRoomStatus
 import com.phenixrts.suite.groups.models.RoomMember
@@ -25,9 +28,7 @@ import com.phenixrts.suite.groups.repository.JoinedRoomRepository
 import com.phenixrts.suite.groups.repository.RoomExpressRepository
 import com.phenixrts.suite.groups.repository.RoomMemberRepository
 import com.phenixrts.suite.groups.repository.UserMediaRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
 import kotlin.coroutines.resume
@@ -44,6 +45,7 @@ class GroupsViewModel(
     private var roomMemberRepository: RoomMemberRepository? = null
     private var joinedRoomRepository: JoinedRoomRepository? = null
     private var userMediaRenderer: Renderer? = null
+    private var userAudioTrack: MediaStreamTrack? = null
 
     val memberCount = MutableLiveData<Int>().apply { value = 0 }
     val displayName = MutableLiveData<String>()
@@ -60,11 +62,11 @@ class GroupsViewModel(
         getRoomListItems()
     }
 
-    private fun expireOldRooms() = viewModelScope.launch(Dispatchers.IO) {
+    private fun expireOldRooms() = launchIO {
         cacheProvider.cacheDao().expireOldRooms(Calendar.getInstance().expirationDate())
     }
 
-    private fun getRoomListItems() = viewModelScope.launch{
+    private fun getRoomListItems() = launchMain {
         cacheProvider.cacheDao().getVisitedRooms().collect {
             roomList.value = it
         }
@@ -74,11 +76,13 @@ class GroupsViewModel(
         if (joinedRoomStatus.status == RequestStatus.OK) {
             joinedRoomStatus.roomService?.let { roomService ->
                 joinedRoomStatus.publisher?.let { publisher ->
-                    viewModelScope.launch {
+                    launchMain {
                         Timber.d("Joined room repository created")
+                        val selfMember = RoomMember(roomService.self, true)
+                        selfMember.setSelfRenderer(userMediaRenderer, mainRendererSurface, userAudioTrack)
                         currentRoomAlias.value = roomService.observableActiveRoom.value.observableAlias.value
                         joinedRoomRepository = JoinedRoomRepository(roomService, publisher)
-                        roomMemberRepository = RoomMemberRepository(roomExpressRepository.roomExpress, roomService)
+                        roomMemberRepository = RoomMemberRepository(roomExpressRepository.roomExpress, roomService, selfMember)
                         // Update audio / video state
                         joinedRoomRepository?.switchAudioStreamState(isMicrophoneEnabled.isTrue())
                         joinedRoomRepository?.switchVideoStreamState(isVideoEnabled.isTrue())
@@ -88,32 +92,29 @@ class GroupsViewModel(
         }
     }
 
-    fun initObservers(lifecycleOwner: LifecycleOwner) {
-        Timber.d("Observing live data")
-        viewModelScope.launch(Dispatchers.Main) {
-            displayName.value = preferenceProvider.getDisplayName()
-            isMicrophoneEnabled.observe(lifecycleOwner, Observer { enabled ->
-                userMediaRepository.switchAudioStreamState(enabled)
-                joinedRoomRepository?.switchAudioStreamState(enabled)
-                roomMemberRepository?.switchAudioStreamState(enabled)
-            })
-            isVideoEnabled.observe(lifecycleOwner, Observer { enabled ->
-                userMediaRepository.switchVideoStreamState(enabled)
-                joinedRoomRepository?.switchVideoStreamState(enabled)
-                roomMemberRepository?.switchVideoStreamState(enabled)
-            })
-        }
+    fun initObservers(lifecycleOwner: LifecycleOwner) = launchMain {
+        displayName.value = preferenceProvider.getDisplayName()
+        isMicrophoneEnabled.observe(lifecycleOwner, Observer { enabled ->
+            userMediaRepository.switchAudioStreamState(enabled)
+            joinedRoomRepository?.switchAudioStreamState(enabled)
+            roomMemberRepository?.switchAudioStreamState(enabled)
+        })
+        isVideoEnabled.observe(lifecycleOwner, Observer { enabled ->
+            userMediaRepository.switchVideoStreamState(enabled)
+            joinedRoomRepository?.switchVideoStreamState(enabled)
+            roomMemberRepository?.switchVideoStreamState(enabled)
+        })
     }
 
     suspend fun waitForPCast(): Unit = suspendCoroutine {
-        viewModelScope.launch {
+        launchMain {
             roomExpressRepository.waitForPCast()
             it.resume(Unit)
         }
     }
 
     suspend fun joinRoomById(roomId: String, userScreenName: String): JoinedRoomStatus = suspendCoroutine { continuation ->
-        viewModelScope.launch {
+        launchMain {
             userMediaRepository.getUserMediaStream().userMediaStream?.let {
                     Timber.d("Joining room by id: $roomId")
                     val joinedRoomStatus = roomExpressRepository.joinRoomById(roomId, userScreenName, it)
@@ -124,7 +125,7 @@ class GroupsViewModel(
     }
 
     suspend fun joinRoomByAlias(roomAlias: String, userScreenName: String): JoinedRoomStatus = suspendCoroutine { continuation ->
-        viewModelScope.launch {
+        launchMain {
             userMediaRepository.getUserMediaStream().userMediaStream?.let {
                     Timber.d("Joining room by alias: $roomAlias")
                     val joinedRoomStatus = roomExpressRepository.joinRoomByAlias(roomAlias, userScreenName, it)
@@ -135,13 +136,13 @@ class GroupsViewModel(
     }
 
     suspend fun createRoom(): RoomStatus = suspendCoroutine { continuation ->
-        viewModelScope.launch {
+        launchMain {
             continuation.resume(roomExpressRepository.createRoom())
         }
     }
 
     suspend fun sendChatMessage(message: String): RoomStatus = suspendCoroutine { continuation ->
-        viewModelScope.launch {
+        launchMain {
             joinedRoomRepository?.sendChatMessage(message, continuation)
                 ?: continuation.resume(RoomStatus(RequestStatus.NOT_INITIALIZED, "Chat Service is not initialized"))
         }
@@ -150,7 +151,7 @@ class GroupsViewModel(
     suspend fun startUserMediaPreview(holder: SurfaceHolder): RoomStatus = suspendCoroutine { continuation ->
         mainRendererSurface.setSurfaceHolder(holder)
         if (isVideoEnabled.isTrue()) {
-            viewModelScope.launch {
+            launchMain {
                 Timber.d("Start user media: ${isVideoEnabled.isTrue()}")
                 var status = RequestStatus.OK
                 if (userMediaRenderer == null) {
@@ -158,6 +159,7 @@ class GroupsViewModel(
                         status = userMedia.status
                         if (status == RequestStatus.OK) {
                             userMediaRenderer = userMedia.userMediaStream?.mediaStream?.createRenderer()
+                            userAudioTrack = userMedia.userMediaStream?.mediaStream?.audioTracks?.getOrNull(0)
                             val renderStatus = userMediaRenderer?.start(mainRendererSurface)
                             if (renderStatus != RendererStartStatus.OK) {
                                 status = RequestStatus.FAILED
@@ -175,24 +177,29 @@ class GroupsViewModel(
 
     suspend fun subscribeToMemberStream(roomMember: RoomMember, options: SubscribeToMemberStreamOptions): RoomStatus
             = suspendCoroutine { continuation ->
-        viewModelScope.launch {
-            continuation.resume(roomMemberRepository?.subscribeToMemberMedia(roomMember, options)
-                ?: RoomStatus(RequestStatus.NOT_INITIALIZED, "Subscriber Repository is not initialized")
-            )
+        launchMain {
+            if (roomMember.isSelf) {
+                continuation.resume(RoomStatus(RequestStatus.OK))
+            } else {
+                continuation.resume(
+                    roomMemberRepository?.subscribeToMemberMedia(roomMember, options)
+                        ?: RoomStatus(RequestStatus.NOT_INITIALIZED, "Subscriber Repository is not initialized")
+                )
+            }
         }
     }
 
     suspend fun switchCameraFacing(): RequestStatus = suspendCoroutine { continuation ->
-        viewModelScope.launch {
+        launchMain {
             continuation.resume(userMediaRepository.switchCameraFacing())
         }
     }
 
-    fun pinActiveMember(roomMember: RoomMember) = viewModelScope.launch {
+    fun pinActiveMember(roomMember: RoomMember) = launchMain {
         roomMemberRepository?.pinActiveMember(roomMember)
     }
 
-    fun leaveRoom() = viewModelScope.launch {
+    fun leaveRoom() = launchMain {
         Timber.d("Leaving room")
         isInRoom.value = false
         joinedRoomRepository?.leaveRoom(cacheProvider)
