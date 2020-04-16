@@ -32,7 +32,10 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:host="phenixrts.com" android:scheme="groups" />
+                <data
+                    android:host="phenixrts.com"
+                    android:pathPrefix="/group/"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
 

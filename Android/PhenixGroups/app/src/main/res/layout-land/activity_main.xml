@@ -40,7 +40,8 @@
                     android:layout_height="0dp"
                     android:gravity="center"
                     android:orientation="vertical"
-                    app:layout_constraintBottom_toTopOf="@+id/media_controls"
+                    android:layout_marginBottom="100dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
@@ -93,10 +94,11 @@
 
                 <LinearLayout
                     android:id="@+id/media_controls"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:gravity="center_horizontal|bottom"
                     android:padding="12dp"
+                    android:background="@drawable/bg_controlls_fade_up"
                     android:visibility="@{!model.isInRoom() || model.isControlsEnabled() ? View.VISIBLE : View.GONE}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -139,11 +141,12 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/main_menu_holder"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:padding="8dp"
                 android:visibility="gone"
                 android:alpha="0"
-                android:layout_height="48dp"
-                android:layout_margin="8dp"
+                android:background="@drawable/bg_controlls_fade_down"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent">
 

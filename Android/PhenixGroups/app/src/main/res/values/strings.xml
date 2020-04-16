@@ -27,7 +27,7 @@
     <!-- Info fragment -->
     <string name="info_share">Share</string>
     <string name="info_meeting_subject">Meeting URL</string>
-    <string name="info_meeting_url">Meeting URL: groups://phenixrts.com/%1$s</string>
+    <string name="info_meeting_url">Meeting URL: https://phenixrts.com/group/#%1$s</string>
 
     <!--  Chat  -->
     <string name="group_call_chat_message_hint">Message</string>
@@ -51,7 +51,7 @@
     <string name="err_join_room_failed">Failed to join meeting</string>
     <string name="err_camera_lost">Phenix Groups has lost access to camera</string>
     <string name="err_microphone_lost">Phenix Groups has lost access to microphone</string>
-    <string name="err_network_problems">Experiencing problems connecting to pCast. Check your network status.</string>
+    <string name="err_network_problems">Experiencing problems connecting to Phenix. Check your network status.</string>
     <string name="err_enter_valid_room_code">Please enter a valid room code</string>
 
     <!-- Join Meeting -->

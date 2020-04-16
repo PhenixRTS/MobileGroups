@@ -55,6 +55,8 @@ fun Fragment.restartVideoPreview(viewModel: GroupsViewModel) = launchMain {
     }
 }
 
+fun Fragment.hideTopMenu() = (requireActivity() as? MainActivity)?.hideTopMenu()
+
 fun Fragment.showBottomMenu() = (requireActivity() as? MainActivity)?.showBottomMenu()
 
 fun Fragment.hasCameraPermission() = (requireActivity() as? MainActivity)?.hasCameraPermission() ?: false

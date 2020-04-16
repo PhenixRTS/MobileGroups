@@ -52,7 +52,7 @@ class SplashActivity : FragmentActivity() {
 
     private fun checkDeepLink(intent: Intent?) = launchMain {
         Timber.d("Checking deep link: ${intent?.data}")
-        val roomCode = intent?.data?.toString()?.substringAfterLast("/")
+        val roomCode = intent?.data?.toString()?.substringAfterLast("#")
         showLandingScreen(roomCode)
     }
 

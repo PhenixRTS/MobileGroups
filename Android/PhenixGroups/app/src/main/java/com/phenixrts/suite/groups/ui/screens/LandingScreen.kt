@@ -4,6 +4,7 @@
 
 package com.phenixrts.suite.groups.ui.screens
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -66,6 +67,10 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
             getMicIcon().visibility = View.GONE
         } else {
             getMicIcon().visibility = View.VISIBLE
+        }
+
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            hideTopMenu()
         }
         restartVideoPreview(viewModel)
     }

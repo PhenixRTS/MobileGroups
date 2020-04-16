@@ -47,6 +47,7 @@
             android:layout_height="wrap_content"
             android:text="@{chatMessage.observableMessageBody}"
             android:textSize="18sp"
+            android:autoLink="all"
             android:textColor="@color/primaryTextDarkColor"
             android:layout_below="@id/message_sender_name"
             tools:text="Some message text" />

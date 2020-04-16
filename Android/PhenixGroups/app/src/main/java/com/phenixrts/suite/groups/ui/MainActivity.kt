@@ -226,16 +226,17 @@ class MainActivity : EasyPermissionActivity() {
             main_landscape_member_count.text = label
         })
         viewModel.isControlsEnabled.observe(this, Observer { enabled ->
-            if (enabled) {
-                showTopMenu()
-            } else {
-                hideTopMenu()
+            if (viewModel.isInRoom.isTrue()) {
+                if (enabled) {
+                    showTopMenu()
+                } else {
+                    hideTopMenu()
+                }
             }
         })
         viewModel.onPermissionRequested.observe(this, Observer {
             initMediaButtons()
         })
-
         initMediaButtons()
     }
 
@@ -308,7 +309,7 @@ class MainActivity : EasyPermissionActivity() {
         }
     }
 
-    private fun hideTopMenu() {
+    fun hideTopMenu() {
         if (main_menu_holder.alpha == MENU_VISIBLE) {
             Timber.d("Hiding top menu")
             main_menu_holder.animate()
