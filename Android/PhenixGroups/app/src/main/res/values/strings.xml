@@ -24,6 +24,11 @@
     <string name="preview_mic_off_icon_content_description">Microphone is off</string>
     <string name="preview_volume_icon_content_description">Audio volume</string>
 
+    <!-- Info fragment -->
+    <string name="info_share">Share</string>
+    <string name="info_meeting_subject">Meeting URL</string>
+    <string name="info_meeting_url">Meeting URL: groups://phenixrts.com/%1$s</string>
+
     <!--  Chat  -->
     <string name="group_call_chat_message_hint">Message</string>
     <string name="group_call_chat_send_button_content_description">Send Button</string>
@@ -46,13 +51,14 @@
     <string name="err_join_room_failed">Failed to join meeting</string>
     <string name="err_camera_lost">Phenix Groups has lost access to camera</string>
     <string name="err_microphone_lost">Phenix Groups has lost access to microphone</string>
+    <string name="err_network_problems">Experiencing problems connecting to pCast. Check your network status.</string>
+    <string name="err_enter_valid_room_code">Please enter a valid room code</string>
 
     <!-- Join Meeting -->
     <string name="join_room_button_label">Join meeting</string>
-    <string name="err_enter_valid_room_code">Please enter a valid room code</string>
     <string name="hint_room_code">Meeting code</string>
     <string name="hint_enter_a_meeting_code">Enter a meeting code</string>
-    <string name="meeting_code">Meeting code</string>
+    <string name="meeting_code">Meeting code:</string>
 
     <!-- Accessibility descriptions -->
     <string name="accessibility_members_tab">Members Tab</string>

@@ -15,24 +15,40 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/primaryBackgroundColor"
-        android:orientation="vertical"
-        android:gravity="center">
+        android:padding="16dp"
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:text="@string/meeting_code" />
 
         <TextView
             android:id="@+id/fragment_info_code"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="32sp"
+            android:textSize="18sp"
             android:textColor="@color/primaryTextDarkColor"
+            android:fontFamily="sans-serif-medium"
             android:text="@{roomAlias}"
             tools:text="abc-defg-hij"
             android:layout_marginTop="4dp" />
+
+        <TextView
+            android:id="@+id/fragment_info_share"
+            android:drawablePadding="8dp"
+            android:drawableStart="@drawable/ic_share"
+            android:text="@string/info_share"
+            android:gravity="center_vertical"
+            android:textSize="14sp"
+            android:paddingEnd="16dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/bg_item_selector"
+            android:textColor="@color/accentColor"
+            android:fontFamily="sans-serif-medium"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp" />
 
     </LinearLayout>
 

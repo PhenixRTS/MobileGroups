@@ -16,6 +16,7 @@ import androidx.lifecycle.Observer
 import androidx.viewpager.widget.ViewPager
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.common.extensions.hideKeyboard
+import com.phenixrts.suite.groups.common.extensions.showBottomMenu
 import com.phenixrts.suite.groups.ui.adapters.RoomScreenPageAdapter
 import com.phenixrts.suite.groups.ui.screens.fragments.*
 import kotlinx.android.synthetic.main.screen_room.*

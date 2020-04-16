@@ -24,7 +24,7 @@ suspend fun PCastExpress.getUserMedia(options: UserMediaOptions): UserMediaStatu
 
 fun launchMain(block: suspend CoroutineScope.() -> Unit) = mainScope.launch(
     context = CoroutineExceptionHandler { _, e ->
-        Timber.e("Coroutine failed: ${e.localizedMessage}")
+        Timber.w(e, "Coroutine failed: ${e.localizedMessage}")
         e.printStackTrace()
     },
     block = block
@@ -32,7 +32,7 @@ fun launchMain(block: suspend CoroutineScope.() -> Unit) = mainScope.launch(
 
 fun launchIO(block: suspend CoroutineScope.() -> Unit) = ioScope.launch(
     context = CoroutineExceptionHandler { _, e ->
-        Timber.w("Coroutine failed: ${e.localizedMessage}")
+        Timber.w(e, "Coroutine failed: ${e.localizedMessage}")
         e.printStackTrace()
     },
     block = block

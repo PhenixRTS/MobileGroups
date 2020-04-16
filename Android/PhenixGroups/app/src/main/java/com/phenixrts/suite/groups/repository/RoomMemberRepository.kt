@@ -47,14 +47,16 @@ class RoomMemberRepository(
 
     fun getObservableRoomMembers(): MutableLiveData<List<RoomMember>> {
         roomService.observableActiveRoom.value.observableMembers.subscribe { members ->
-            Timber.d("Received RAW members count: ${members.size}")
-            // Map received Members to existing RoomMembers or create new ones in transformation
-            val selfId = roomService.self.sessionId
-            val memberList = mutableListOf(roomService.self.mapRoomMember(roomMembers.value, selfId))
-            val mappedMembers = members.filterNot { it.sessionId == selfId }.mapTo(memberList) {
-                it.mapRoomMember(roomMembers.value, selfId)
+            launchMain {
+                Timber.d("Received RAW members count: ${members.size}")
+                // Map received Members to existing RoomMembers or create new ones in transformation
+                val selfId = roomService.self.sessionId
+                val memberList = mutableListOf(roomService.self.mapRoomMember(roomMembers.value, selfId))
+                val mappedMembers = members.filterNot { it.sessionId == selfId }.mapTo(memberList) {
+                    it.mapRoomMember(roomMembers.value, selfId)
+                }
+                updateMemberList(mappedMembers)
             }
-            updateMemberList(mappedMembers)
         }.run { disposables.add(this) }
         return roomMembers
     }

@@ -20,6 +20,7 @@ import timber.log.Timber
 import java.util.*
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class JoinedRoomRepository(
     private val roomService: RoomService,
@@ -88,14 +89,17 @@ class JoinedRoomRepository(
         }
     }
 
-    fun leaveRoom(cacheProvider: CacheProvider) = launchIO {
-        val roomId = roomService.observableActiveRoom.value.roomId
-        cacheProvider.cacheDao().updateRoomLeftDate(roomId, Date())
-        publisher.stop()
-        roomService.leaveRoom { _, status ->
-            Timber.d("Room left: $status $roomId")
+    suspend fun leaveRoom(cacheProvider: CacheProvider) = suspendCoroutine<Unit> { continuation ->
+        launchIO {
+            val roomId = roomService.observableActiveRoom.value.roomId
+            cacheProvider.cacheDao().updateRoomLeftDate(roomId, Date())
+            publisher.stop()
+            roomService.leaveRoom { _, status ->
+                Timber.d("Room left: $status $roomId")
+                continuation.resume(Unit)
+            }
+            dispose()
         }
-        dispose()
     }
 
 }

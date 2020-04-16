@@ -53,6 +53,7 @@ class GroupsViewModel(
     val isMicrophoneEnabled = MutableLiveData<Boolean>().apply { value = true }
     val isInRoom = MutableLiveData<Boolean>().apply { value = false }
     val isControlsEnabled = MutableLiveData<Boolean>()
+    val onPermissionRequested = MutableLiveData<Unit>()
     val roomList = MutableLiveData<List<RoomInfoItem>>()
     val currentRoomAlias = MutableLiveData<String>()
 
@@ -113,26 +114,28 @@ class GroupsViewModel(
         }
     }
 
-    suspend fun joinRoomById(roomId: String, userScreenName: String): JoinedRoomStatus = suspendCoroutine { continuation ->
-        launchMain {
-            userMediaRepository.getUserMediaStream().userMediaStream?.let {
-                    Timber.d("Joining room by id: $roomId")
-                    val joinedRoomStatus = roomExpressRepository.joinRoomById(roomId, userScreenName, it)
-                    handleJoinedRoom(joinedRoomStatus)
-                    continuation.resume(joinedRoomStatus)
-            } ?: continuation.resume(JoinedRoomStatus(RequestStatus.FAILED))
-        }
+    suspend fun joinRoomById(owner: LifecycleOwner, roomId: String, userScreenName: String): JoinedRoomStatus = suspendCoroutine { continuation ->
+        userMediaRepository.userMediaStream.observe(owner, Observer {
+            launchMain {
+                Timber.d("Joining room by id: $roomId")
+                val joinedRoomStatus = roomExpressRepository.joinRoomById(roomId, userScreenName, it)
+                userMediaRepository.userMediaStream.removeObservers(owner)
+                handleJoinedRoom(joinedRoomStatus)
+                continuation.resume(joinedRoomStatus)
+            }
+        })
     }
 
-    suspend fun joinRoomByAlias(roomAlias: String, userScreenName: String): JoinedRoomStatus = suspendCoroutine { continuation ->
-        launchMain {
-            userMediaRepository.getUserMediaStream().userMediaStream?.let {
-                    Timber.d("Joining room by alias: $roomAlias")
-                    val joinedRoomStatus = roomExpressRepository.joinRoomByAlias(roomAlias, userScreenName, it)
-                    handleJoinedRoom(joinedRoomStatus)
-                    continuation.resume(joinedRoomStatus)
-            } ?: continuation.resume(JoinedRoomStatus(RequestStatus.FAILED))
-        }
+    suspend fun joinRoomByAlias(owner: LifecycleOwner, roomAlias: String, userScreenName: String): JoinedRoomStatus = suspendCoroutine { continuation ->
+        userMediaRepository.userMediaStream.observe(owner, Observer {
+            launchMain {
+                Timber.d("Joining room by alias: $roomAlias")
+                val joinedRoomStatus = roomExpressRepository.joinRoomByAlias(roomAlias, userScreenName, it)
+                userMediaRepository.userMediaStream.removeObservers(owner)
+                handleJoinedRoom(joinedRoomStatus)
+                continuation.resume(joinedRoomStatus)
+            }
+        })
     }
 
     suspend fun createRoom(): RoomStatus = suspendCoroutine { continuation ->

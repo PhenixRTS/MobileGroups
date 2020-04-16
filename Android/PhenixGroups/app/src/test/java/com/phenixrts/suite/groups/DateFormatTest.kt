@@ -3,6 +3,7 @@ package com.phenixrts.suite.groups
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import com.phenixrts.suite.groups.common.extensions.elapsedTime
+import com.phenixrts.suite.groups.common.extensions.isLongerThanDay
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertEquals
@@ -16,7 +17,7 @@ import java.util.*
 @ExperimentalCoroutinesApi
 @Config(manifest = Config.NONE, sdk = [21])
 @RunWith(RobolectricTestRunner::class)
-class ChatMessageTest {
+class DateFormatTest {
 
     private lateinit var context: Context
 
@@ -98,8 +99,22 @@ class ChatMessageTest {
     @Test
     fun `Should return '10 years' when elapsed time is 10 years`() = runBlockingTest {
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.YEAR, - 10)
+        calendar.add(Calendar.YEAR, - 9)
         assertEquals(context.getString(R.string.chat_time_years, 10), calendar.time.elapsedTime())
+    }
+
+    @Test
+    fun `Should return 'false' when elapsed time is less then 24 hours`() = runBlockingTest {
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.HOUR, - 23)
+        assertEquals(false, calendar.time.isLongerThanDay())
+    }
+
+    @Test
+    fun `Should return 'true' when elapsed time is more or equal then 24 hours`() = runBlockingTest {
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.HOUR, - 24)
+        assertEquals(true, calendar.time.isLongerThanDay())
     }
 
 }

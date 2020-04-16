@@ -67,7 +67,7 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
         } else {
             getMicIcon().visibility = View.VISIBLE
         }
-        restartVideoPreview()
+        restartVideoPreview(viewModel)
     }
 
     override fun onRoomJoinClicked(roomId: String) {
@@ -79,6 +79,10 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
      * Create a new meeting room
      */
     private fun createRoom() = launchMain {
+        if (!hasCameraPermission()) {
+            viewModel.onPermissionRequested.call()
+            return@launchMain
+        }
         showLoadingScreen()
         val response = viewModel.createRoom()
         if (response.status == RequestStatus.OK) {
@@ -90,8 +94,12 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
     }
 
     private fun joinRoomById(roomId: String) = launchMain {
+        if (!hasCameraPermission()) {
+            viewModel.onPermissionRequested.call()
+            return@launchMain
+        }
         showLoadingScreen()
-        val joinedRoomStatus = viewModel.joinRoomById(roomId, preferenceProvider.getDisplayName())
+        val joinedRoomStatus = viewModel.joinRoomById(this@LandingScreen, roomId, preferenceProvider.getDisplayName())
         Timber.d("Room joined with status: $joinedRoomStatus")
         hideLoadingScreen()
         if (joinedRoomStatus.status == RequestStatus.OK) {

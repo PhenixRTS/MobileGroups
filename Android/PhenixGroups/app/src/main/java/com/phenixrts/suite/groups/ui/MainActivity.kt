@@ -5,6 +5,7 @@
 package com.phenixrts.suite.groups.ui
 
 import android.Manifest
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Bundle
@@ -24,8 +25,8 @@ import com.phenixrts.suite.groups.databinding.ActivityMainBinding
 import com.phenixrts.suite.groups.receivers.CellularStateReceiver
 import com.phenixrts.suite.groups.repository.RoomExpressRepository
 import com.phenixrts.suite.groups.repository.UserMediaRepository
+import com.phenixrts.suite.groups.ui.screens.LandingScreen
 import com.phenixrts.suite.groups.ui.screens.RoomScreen
-import com.phenixrts.suite.groups.ui.screens.SplashScreen
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
 import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
 import kotlinx.android.synthetic.main.activity_main.*
@@ -35,6 +36,8 @@ import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+
+const val EXTRA_DEEP_LINK_CODE = "ExtraDeepLinkCode"
 
 class MainActivity : EasyPermissionActivity() {
 
@@ -83,6 +86,13 @@ class MainActivity : EasyPermissionActivity() {
         handleExceptions()
         observeCellularState()
         initViews(savedInstanceState == null)
+        checkDeepLink(intent)
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        Timber.d("On new intent $intent")
+        checkDeepLink(intent)
     }
 
     override fun onDestroy() {
@@ -103,6 +113,25 @@ class MainActivity : EasyPermissionActivity() {
             hideBottomMenu()
         } else {
             super.onBackPressed()
+        }
+    }
+
+    private fun checkDeepLink(intent: Intent?) = launchMain {
+        intent?.let { intent ->
+            if (intent.hasExtra(EXTRA_DEEP_LINK_CODE)) {
+                intent.getStringExtra(EXTRA_DEEP_LINK_CODE)?.let { roomCode ->
+                    Timber.d("Received deep link: $roomCode")
+                    if (viewModel.isInRoom.isTrue()) {
+                        Timber.d("Leaving current room")
+                        onBackPressed()
+                        showLoadingScreen()
+                        delay(LEAVE_ROOM_DELAY)
+                    }
+                    Timber.d("Joining deep link room: $roomCode")
+                    joinRoom(viewModel, roomCode, preferenceProvider.getDisplayName())
+                }
+                intent.removeExtra(EXTRA_DEEP_LINK_CODE)
+            }
         }
     }
 
@@ -173,13 +202,8 @@ class MainActivity : EasyPermissionActivity() {
             showRoomScreen(2)
         }
 
-        // Show splash screen if wasn't started already
         if (firstLaunch) {
-            supportFragmentManager
-                .beginTransaction()
-                .replace(R.id.fullscreen_fragment_container, SplashScreen(), SplashScreen::class.java.name)
-                .addToBackStack(SplashScreen::class.java.name)
-                .commit()
+            launchFragment(LandingScreen(), false)
         }
         viewModel.initObservers(this)
         viewModel.isMicrophoneEnabled.observe(this, Observer { enabled ->
@@ -208,12 +232,17 @@ class MainActivity : EasyPermissionActivity() {
                 hideTopMenu()
             }
         })
+        viewModel.onPermissionRequested.observe(this, Observer {
+            initMediaButtons()
+        })
 
-        launchMain {
-            Timber.d("Init user media: ${viewModel.isVideoEnabled.value} ${viewModel.isMicrophoneEnabled.value}")
-            setMicrophoneEnabled(viewModel.isMicrophoneEnabled.isTrue(true))
-            setCameraPreviewEnabled(viewModel.isVideoEnabled.isTrue(true))
-        }
+        initMediaButtons()
+    }
+
+    private fun initMediaButtons() = launchMain {
+        Timber.d("Init user media: ${viewModel.isVideoEnabled.value} ${viewModel.isMicrophoneEnabled.value}")
+        setMicrophoneEnabled(viewModel.isMicrophoneEnabled.isTrue(true))
+        setCameraPreviewEnabled(viewModel.isVideoEnabled.isTrue(true))
     }
 
     private fun observeCellularState() {
@@ -226,12 +255,8 @@ class MainActivity : EasyPermissionActivity() {
 
             override fun onHungUp() {
                 Timber.d("On Call Hung Up")
-                if (hasRecordAudioPermission()) {
-                    viewModel.isMicrophoneEnabled.value = true
-                }
-                if (hasCameraPermission()) {
-                    viewModel.isVideoEnabled.value = true
-                }
+                viewModel.isMicrophoneEnabled.value = hasRecordAudioPermission()
+                viewModel.isVideoEnabled.value = hasCameraPermission()
             }
         })
     }
@@ -327,14 +352,14 @@ class MainActivity : EasyPermissionActivity() {
     }
 
     private fun showUserVideoPreview(enabled: Boolean) = launchMain {
-        if (viewModel.isInRoom.isFalse()) {
+        if (viewModel.isInRoom.isFalse() && hasCameraPermission()) {
             if (enabled) {
                 val response = viewModel.startUserMediaPreview(main_surface_view.holder)
                 Timber.d("Preview started: ${response.status}")
                 if (response.status == RequestStatus.OK) {
                     main_surface_view.visibility = View.VISIBLE
                     if (viewModel.isVideoEnabled.isFalse()) {
-                        viewModel.isVideoEnabled.value = true
+                        viewModel.isVideoEnabled.value = hasCameraPermission()
                     }
                 } else {
                     showToast(response.message)
@@ -376,6 +401,7 @@ class MainActivity : EasyPermissionActivity() {
         private const val MENU_FADE_DURATION = 300L
         private const val MENU_VISIBLE = 1f
         private const val MENU_INVISIBLE = 0f
+        private const val LEAVE_ROOM_DELAY = 1000L
     }
 
 }

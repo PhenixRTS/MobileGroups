@@ -4,6 +4,7 @@
 
 package com.phenixrts.suite.groups.common
 
+import com.phenixrts.suite.groups.common.extensions.isLongerThanDay
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -15,6 +16,7 @@ fun getRoomCode(): String {
     }
 }
 
-fun getFormattedDate(date: Date?): String = date?.let {
-    SimpleDateFormat("HH:mm", Locale.getDefault()).format(date)
+fun getFormattedDate(date: Date?): String = date?.let { currentDate ->
+    val pattern = if (currentDate.isLongerThanDay()) "dd.MM HH:mm" else "HH:mm"
+    SimpleDateFormat(pattern, Locale.getDefault()).format(currentDate)
 } ?: ""

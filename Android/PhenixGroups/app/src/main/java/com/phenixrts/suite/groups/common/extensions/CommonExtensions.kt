@@ -34,6 +34,10 @@ fun MutableLiveData<Boolean>.isTrue(default: Boolean = false) = if (value != nul
 
 fun MutableLiveData<Boolean>.isFalse(default: Boolean = true) = if (value != null) value == false else default
 
+fun MutableLiveData<Unit>.call() {
+    value = Unit
+}
+
 fun MutableLiveData<RoomMember>.call(roomMember: RoomMember) {
     value = roomMember
 }
@@ -113,5 +117,6 @@ fun Date.elapsedTime(): String {
         }
         else -> GroupsApplication.getString(R.string.chat_time_now)
     }
-
 }
+
+fun Date.isLongerThanDay() = System.currentTimeMillis() - time >= DAY_MILLIS

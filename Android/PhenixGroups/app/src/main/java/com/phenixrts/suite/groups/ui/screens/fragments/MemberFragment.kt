@@ -30,10 +30,12 @@ class MemberFragment : BaseFragment(), MemberListAdapter.OnMemberListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.getRoomMembers().observe(viewLifecycleOwner, Observer { members ->
-            Timber.d("Member adapter updated ${members.size} $members")
-            viewModel.memberCount.value = members.size
-            adapter.members = members
+        viewModel.getRoomMembers().observe(viewLifecycleOwner, Observer { roomMembers ->
+            roomMembers?.let { members ->
+                Timber.d("Member adapter updated ${members.size} $members")
+                viewModel.memberCount.value = members.size
+                adapter.members = members
+            }
         })
     }
 
