@@ -66,4 +66,11 @@
     <string name="accessibility_info_tab">Info Tab</string>
     <string name="accessibility_menu_button">Menu Button</string>
 
+    <!-- Debug menu -->
+    <string name="debug_about">About</string>
+    <string name="debug_app_version">App version: %1$s build: %2$d</string>
+    <string name="debug_sdk_version">SDK version: %1$s build: %2$d</string>
+    <string name="debug_share_app_logs">Share App logs</string>
+    <string name="debug_close">Close</string>
+
 </resources>

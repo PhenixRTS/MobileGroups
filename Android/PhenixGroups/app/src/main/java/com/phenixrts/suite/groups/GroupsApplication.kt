@@ -6,6 +6,7 @@ package com.phenixrts.suite.groups
 
 import android.app.Application
 import android.content.res.Resources
+import com.phenixrts.suite.groups.common.FileWriterDebugTree
 import com.phenixrts.suite.groups.common.LineNumberDebugTree
 import com.phenixrts.suite.groups.injection.DaggerInjectionComponent
 import com.phenixrts.suite.groups.injection.InjectionComponent
@@ -19,6 +20,7 @@ class GroupsApplication: Application() {
 
         if (BuildConfig.DEBUG) {
             Timber.plant(LineNumberDebugTree("PhenixApp"))
+            Timber.plant(FileWriterDebugTree(this))
         }
 
         component = DaggerInjectionComponent.builder().injectionModule(InjectionModule(this)).build()

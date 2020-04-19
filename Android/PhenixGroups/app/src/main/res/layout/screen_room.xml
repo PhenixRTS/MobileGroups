@@ -26,6 +26,7 @@
             android:id="@+id/fragment_tab_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            style="@style/Widget.MaterialComponents.TabLayout"
             app:tabInlineLabel="true"
             app:tabTextAppearance="@style/TabTextStyle"
             app:tabIconTint="@color/bg_tab_selector"

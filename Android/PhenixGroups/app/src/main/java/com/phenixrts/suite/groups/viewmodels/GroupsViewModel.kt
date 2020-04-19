@@ -16,6 +16,7 @@ import com.phenixrts.pcast.android.AndroidVideoRenderSurface
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
 import com.phenixrts.suite.groups.cache.entities.RoomInfoItem
+import com.phenixrts.suite.groups.common.FileWriterDebugTree
 import com.phenixrts.suite.groups.common.extensions.expirationDate
 import com.phenixrts.suite.groups.common.extensions.isTrue
 import com.phenixrts.suite.groups.common.extensions.launchIO
@@ -48,6 +49,7 @@ class GroupsViewModel(
     private var userAudioTrack: MediaStreamTrack? = null
 
     val memberCount = MutableLiveData<Int>().apply { value = 0 }
+    val unreadMessageCount = MutableLiveData<Int>().apply { value = 0 }
     val displayName = MutableLiveData<String>()
     val isVideoEnabled = MutableLiveData<Boolean>().apply { value = true }
     val isMicrophoneEnabled = MutableLiveData<Boolean>().apply { value = true }
@@ -198,6 +200,17 @@ class GroupsViewModel(
         }
     }
 
+    suspend fun collectPhenixLogs(): Unit = suspendCoroutine { continuation ->
+        launchIO {
+            roomExpressRepository.roomExpress.pCastExpress.pCast.collectLogMessages { _, _, messages ->
+                launchIO {
+                    FileWriterDebugTree.writeSdkLogs(messages)
+                    continuation.resume(Unit)
+                }
+            }
+        }
+    }
+
     fun pinActiveMember(roomMember: RoomMember) = launchMain {
         roomMemberRepository?.pinActiveMember(roomMember)
     }
@@ -213,6 +226,10 @@ class GroupsViewModel(
 
     fun getChatMessages(): MutableLiveData<List<RoomMessage>> =
         joinedRoomRepository?.getObservableChatMessages() ?: MutableLiveData()
+
+    fun setViewingChat(isViewingChat: Boolean) {
+        joinedRoomRepository?.setViewingChat(isViewingChat)
+    }
 
     fun getRoomMembers(): MutableLiveData<List<RoomMember>> =
         roomMemberRepository?.getObservableRoomMembers() ?: MutableLiveData()

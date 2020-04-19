@@ -10,10 +10,7 @@ import androidx.lifecycle.MutableLiveData
 import com.phenixrts.common.Disposable
 import com.phenixrts.express.ExpressSubscriber
 import com.phenixrts.media.audio.android.AndroidAudioFrame
-import com.phenixrts.pcast.FrameNotification
-import com.phenixrts.pcast.MediaStreamTrack
-import com.phenixrts.pcast.Renderer
-import com.phenixrts.pcast.RendererStartStatus
+import com.phenixrts.pcast.*
 import com.phenixrts.pcast.android.AndroidReadAudioFrameCallback
 import com.phenixrts.pcast.android.AndroidVideoRenderSurface
 import com.phenixrts.room.Member
@@ -39,6 +36,7 @@ data class RoomMember(
     private var isObserved = false
     private var isAudioObserved = false
     private var isRendererStarted = false
+    private var isQualityObserved = false
     private var readDelay = System.currentTimeMillis()
     private var audioBuffer = arrayListOf<Double>()
     private var mainSurface: SurfaceHolder? = null
@@ -106,6 +104,21 @@ data class RoomMember(
         }
     }
 
+    private fun observeDataQuality() {
+        if (!isQualityObserved) {
+            isQualityObserved = true
+            renderer?.setDataQualityChangedCallback { _, status, _ ->
+                launchMain {
+                    if (canShowPreview && status != DataQualityStatus.ALL) {
+                        Timber.d("Render quality status changed: $status Can show video: $canShowPreview : ${this@RoomMember.toString()}")
+                        canShowPreview = false
+                        onUpdate.call(this@RoomMember)
+                    }
+                }
+            }
+        }
+    }
+
     private fun readFrame(frame: FrameNotification) = synchronized(audioBuffer) {
         frame.read(object: AndroidReadAudioFrameCallback() {
             override fun onAudioFrameEvent(audioFrame: AndroidAudioFrame?) {
@@ -164,6 +177,7 @@ data class RoomMember(
         if (audioTrack == null) {
             audioTrack = subscriber?.audioTracks?.getOrNull(0)
         }
+        observeDataQuality()
         audioTrack?.let { audioTrack ->
             observeAudioTrack(audioTrack)
         }

@@ -53,6 +53,7 @@ class MemberListAdapter(
         }
         roomMember.setSurfaces(mainSurface.holder, holder.binding.memberSurface)
         holder.binding.lifecycleOwner?.let { owner ->
+            holder.binding.member?.onUpdate?.removeObservers(owner)
             holder.binding.member?.onUpdate?.observe(owner, Observer { member ->
                 Timber.d("Member updated: $member")
                 holder.binding.refresh()
@@ -60,6 +61,7 @@ class MemberListAdapter(
             })
         }
         holder.binding.lifecycleOwner?.let { owner ->
+            holder.binding.member?.audioLevel?.removeObservers(owner)
             holder.binding.member?.audioLevel?.observe(owner, Observer { volume ->
                 holder.binding.memberVolumeIndicator.setImageResource(volume.icon)
                 holder.binding.refresh()

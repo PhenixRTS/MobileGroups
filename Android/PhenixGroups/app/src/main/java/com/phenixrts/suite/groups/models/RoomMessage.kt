@@ -14,7 +14,8 @@ import com.phenixrts.suite.groups.common.extensions.launchMain
 
 data class RoomMessage(
     val message: ChatMessage,
-    val isSelf: Boolean
+    val isSelf: Boolean,
+    var isRead: Boolean
 ) {
 
     val observableMessageTime = MutableLiveData<String>()

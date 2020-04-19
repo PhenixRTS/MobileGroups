@@ -45,10 +45,13 @@ class ChatFragment : BaseFragment() {
     private fun observeMessages() = launchMain {
         delay(CHAT_SUBSCRIPTION_DELAY)
         if (isAdded) {
-            viewModel.getChatMessages().observe(viewLifecycleOwner, Observer {
-                adapter.data = it
-                if (it.isNotEmpty()) {
-                    binding.chatHistory.scrollToPosition(it.size - 1)
+            viewModel.getChatMessages().observe(viewLifecycleOwner, Observer { messages ->
+                launchMain {
+                    viewModel.unreadMessageCount.value = messages.count { !it.isRead }
+                    adapter.data = messages
+                    if (messages.isNotEmpty()) {
+                        binding.chatHistory.scrollToPosition(messages.size - 1)
+                    }
                 }
             })
         }

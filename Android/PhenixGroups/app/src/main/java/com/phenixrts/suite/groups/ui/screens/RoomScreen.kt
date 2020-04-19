@@ -47,14 +47,18 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
         room_menu_button.setOnClickListener {
             showBottomMenu()
         }
-        refreshTabs(0)
+        refreshTabs()
 
         viewModel.isControlsEnabled.value = false
         viewModel.isInRoom.value = true
 
         viewModel.memberCount.observe(viewLifecycleOwner, Observer { count ->
             Timber.d("Member count changed: $count")
-            refreshTabs(count)
+            setMemberCount(count)
+        })
+        viewModel.unreadMessageCount.observe(viewLifecycleOwner, Observer { count ->
+            Timber.d("Unread message count changed")
+            setMessageCount(count)
         })
     }
 
@@ -71,7 +75,8 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
         // Hide member list surfaces when page scrolled
         (childFragmentManager.findFragmentByTag(
             "android:switcher:${fragment_pager.id}:0"
-        ) as? MemberFragment)?.hidePreviews(position != 0)
+        ) as? MemberFragment)?.hidePreviews(position != TAB_MEMBERS)
+        viewModel.setViewingChat(position == TAB_CHAT)
         hideKeyboard()
     }
 
@@ -83,15 +88,28 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
         return fragment
     }
 
-    private fun refreshTabs(memberCount: Int) {
+    private fun setMemberCount(memberCount: Int) {
         val label =  if (memberCount > 0) resources.getString(R.string.tab_members_count, memberCount) else " "
-        fragment_tab_layout.getTabAt(0)?.text = label
-        fragment_tab_layout.getTabAt(0)?.setIcon(R.drawable.ic_people)
-        fragment_tab_layout.getTabAt(1)?.setIcon(R.drawable.ic_chat)
-        fragment_tab_layout.getTabAt(2)?.setIcon(R.drawable.ic_info)
-        fragment_tab_layout.getTabAt(0)?.view?.id = R.id.tab_members
-        fragment_tab_layout.getTabAt(1)?.view?.id = R.id.tab_chat
-        fragment_tab_layout.getTabAt(2)?.view?.id = R.id.tab_info
+        fragment_tab_layout.getTabAt(TAB_MEMBERS)?.text = label
+        refreshTabs()
+    }
+
+    private fun setMessageCount(messageCount: Int) {
+        fragment_tab_layout.getTabAt(TAB_CHAT)?.orCreateBadge?.apply {
+            isVisible = messageCount > 0
+            maxCharacterCount = 3
+            number = messageCount
+        }
+        refreshTabs()
+    }
+
+    private fun refreshTabs() {
+        fragment_tab_layout.getTabAt(TAB_MEMBERS)?.setIcon(R.drawable.ic_people)
+        fragment_tab_layout.getTabAt(TAB_CHAT)?.setIcon(R.drawable.ic_chat)
+        fragment_tab_layout.getTabAt(TAB_INFO)?.setIcon(R.drawable.ic_info)
+        fragment_tab_layout.getTabAt(TAB_MEMBERS)?.view?.id = R.id.tab_members
+        fragment_tab_layout.getTabAt(TAB_CHAT)?.view?.id = R.id.tab_chat
+        fragment_tab_layout.getTabAt(TAB_INFO)?.view?.id = R.id.tab_info
     }
 
     fun selectTab(index: Int) {
@@ -139,5 +157,8 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
 
     private companion object {
         private const val SCREEN_FADE_DELAY = 300L
+        private const val TAB_MEMBERS = 0
+        private const val TAB_CHAT = 1
+        private const val TAB_INFO= 2
     }
 }

@@ -112,7 +112,8 @@
                         android:elevation="5dp"
                         android:clickable="true"
                         android:focusable="true"
-                        android:src="@drawable/ic_mic_off"/>
+                        android:src="@drawable/ic_mic_off"
+                        app:backgroundTint="@color/accentColor" />
 
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/end_call_button"
@@ -124,7 +125,8 @@
                         android:focusable="true"
                         android:visibility="@{model.isInRoom ? View.VISIBLE : View.GONE}"
                         android:src="@drawable/ic_call_end"
-                        android:tint="@color/primaryTextColor" />
+                        android:tint="@color/primaryTextColor"
+                        app:backgroundTint="@color/accentColor" />
 
                     <com.google.android.material.floatingactionbutton.FloatingActionButton
                         android:id="@+id/camera_button"
@@ -134,7 +136,8 @@
                         android:elevation="5dp"
                         android:clickable="true"
                         android:focusable="true"
-                        android:src="@drawable/ic_camera_off" />
+                        android:src="@drawable/ic_camera_off"
+                        app:backgroundTint="@color/accentColor" />
                 </LinearLayout>
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -250,6 +253,8 @@
             android:background="@color/primaryTranslucentColor" />
 
         <include layout="@layout/view_bottom_menu" android:id="@+id/bottom_menu" />
+
+        <include layout="@layout/view_debug_menu" android:id="@+id/debug_menu" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

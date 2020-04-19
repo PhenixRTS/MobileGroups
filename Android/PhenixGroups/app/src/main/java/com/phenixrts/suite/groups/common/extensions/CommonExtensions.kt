@@ -4,7 +4,9 @@
 
 package com.phenixrts.suite.groups.common.extensions
 
+import android.view.View
 import androidx.lifecycle.MutableLiveData
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.phenixrts.chat.ChatMessage
 import com.phenixrts.room.Member
 import com.phenixrts.suite.groups.BuildConfig
@@ -21,10 +23,11 @@ private const val DAY_MILLIS = HOUR_MILLIS * 24L
 private const val MONTH_MILLIS = DAY_MILLIS * 30L
 private const val YEAR_MILLIS = MONTH_MILLIS * 12L
 
-fun MutableList<RoomMessage>.addUnique(messages: Array<ChatMessage>, selfName: String) {
+fun MutableList<RoomMessage>.addUnique(messages: Array<ChatMessage>, selfName: String, isViewingChat: Boolean) {
     messages.forEach {message ->
         if (this.find { it.message.messageId == message.messageId } == null) {
-            this.add(RoomMessage(message, selfName == message.observableFrom.value.observableScreenName.value))
+            val isSelf = selfName == message.observableFrom.value.observableScreenName.value
+            this.add(RoomMessage(message, isSelf, isViewingChat))
         }
     }
     this.sortBy { it.message.observableTimeStamp.value }
@@ -42,8 +45,26 @@ fun MutableLiveData<RoomMember>.call(roomMember: RoomMember) {
     value = roomMember
 }
 
+fun MutableLiveData<List<RoomMessage>>.refresh() {
+    value = this.value
+}
+
 fun RowMemberItemBinding.refresh() {
     this.member = this.member
+}
+
+fun BottomSheetBehavior<View>.isOpened() = state == BottomSheetBehavior.STATE_EXPANDED
+
+fun BottomSheetBehavior<View>.open() {
+    if (state != BottomSheetBehavior.STATE_EXPANDED) {
+        state = BottomSheetBehavior.STATE_EXPANDED
+    }
+}
+
+fun BottomSheetBehavior<View>.hide() {
+    if (state != BottomSheetBehavior.STATE_HIDDEN) {
+        state = BottomSheetBehavior.STATE_HIDDEN
+    }
 }
 
 fun Member.mapRoomMember(members: List<RoomMember>?, selfSessionId: String) =

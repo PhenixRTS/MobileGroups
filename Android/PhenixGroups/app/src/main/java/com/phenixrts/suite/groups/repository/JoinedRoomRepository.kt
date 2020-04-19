@@ -11,9 +11,7 @@ import com.phenixrts.common.RequestStatus
 import com.phenixrts.express.ExpressPublisher
 import com.phenixrts.room.RoomService
 import com.phenixrts.suite.groups.cache.CacheProvider
-import com.phenixrts.suite.groups.common.extensions.addUnique
-import com.phenixrts.suite.groups.common.extensions.launchIO
-import com.phenixrts.suite.groups.common.extensions.launchMain
+import com.phenixrts.suite.groups.common.extensions.*
 import com.phenixrts.suite.groups.models.RoomMessage
 import com.phenixrts.suite.groups.models.RoomStatus
 import timber.log.Timber
@@ -30,6 +28,7 @@ class JoinedRoomRepository(
     private val chatService = RoomChatServiceFactory.createRoomChatService(roomService)
     private val disposables: MutableList<Disposable?> = mutableListOf()
     private val chatHistory = MutableLiveData<List<RoomMessage>>()
+    private var isViewingChat = false
 
     private fun dispose() = launchIO {
         launchMain {
@@ -45,13 +44,23 @@ class JoinedRoomRepository(
         Timber.d("Joined room disposed")
     }
 
+    fun setViewingChat(viewingChat: Boolean) {
+        isViewingChat = viewingChat
+        if (viewingChat) {
+            chatHistory.value?.filter { !it.isRead }?.takeIf { it.isNotEmpty() }?.let { messages ->
+                messages.forEach { it.isRead = true }
+                chatHistory.refresh()
+            }
+        }
+    }
+
     fun getObservableChatMessages(): MutableLiveData<List<RoomMessage>> {
         chatService.observableChatMessages.subscribe { messages ->
             Timber.d("Message list updated ${messages.size}")
             launchMain {
                 Timber.d("Message list updated")
                 val history = chatHistory.value?.toMutableList() ?: mutableListOf()
-                history.addUnique(messages, roomService.self.observableScreenName.value)
+                history.addUnique(messages, roomService.self.observableScreenName.value, isViewingChat)
                 chatHistory.value = history
             }
         }.run { disposables.add(this) }

@@ -101,6 +101,7 @@ class RoomMemberRepository(
             // Deselect current active renderer
             members.find { it.isActiveRenderer }?.run {
                 isActiveRenderer = false
+                Timber.d("Deselect active member: ${toString()}")
                 onUpdate.call(this)
             }
 
@@ -159,12 +160,14 @@ class RoomMemberRepository(
         roomMembers.value?.find { it.isActiveRenderer }?.run {
             isPinned = false
             isActiveRenderer = false
+            Timber.d("Unpin member: ${toString()}")
             onUpdate.call(this)
         }
         // Pin new member
         roomMembers.value?.find { it.isThisMember(roomMember.member.sessionId) }?.run {
             isActiveRenderer = true
             isPinned = !wasPinned
+            Timber.d("Pin member: ${toString()}")
             onUpdate.call(this)
         }
         rePickMember(false)

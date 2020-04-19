@@ -14,12 +14,12 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
+import com.phenixrts.suite.groups.common.FileWriterDebugTree
 import com.phenixrts.suite.groups.common.extensions.*
 import com.phenixrts.suite.groups.databinding.ActivityMainBinding
 import com.phenixrts.suite.groups.receivers.CellularStateReceiver
@@ -30,7 +30,6 @@ import com.phenixrts.suite.groups.ui.screens.RoomScreen
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
 import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.view_bottom_menu.*
 import kotlinx.coroutines.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -47,21 +46,6 @@ class MainActivity : EasyPermissionActivity() {
     @Inject lateinit var preferenceProvider: PreferenceProvider
     @Inject lateinit var cellularStateReceiver: CellularStateReceiver
 
-    private val bottomMenu by lazy { BottomSheetBehavior.from(bottom_menu) }
-    private val sheetListener = object : BottomSheetBehavior.BottomSheetCallback() {
-        override fun onSlide(bottomSheet: View, slideOffset: Float) {
-            menu_background.visibility = View.VISIBLE
-            menu_background.alpha = slideOffset
-        }
-
-        override fun onStateChanged(bottomSheet: View, newState: Int) {
-            if (newState == BottomSheetBehavior.STATE_HIDDEN || newState == BottomSheetBehavior.STATE_COLLAPSED) {
-                menu_background.visibility = View.GONE
-                menu_background.alpha = 0f
-            }
-        }
-    }
-
     private val timerHandler = Handler()
     private val timerRunnable = Runnable {
         launchMain {
@@ -75,6 +59,8 @@ class MainActivity : EasyPermissionActivity() {
     private val viewModel: GroupsViewModel by lazyViewModel {
         GroupsViewModel(cacheProvider, preferenceProvider, roomExpressRepository, userMediaRepository)
     }
+
+    val menuHandler: MenuHandler by lazy { MenuHandler(this, viewModel) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,8 +83,9 @@ class MainActivity : EasyPermissionActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        bottomMenu.removeBottomSheetCallback(sheetListener)
+        menuHandler.onStop()
         cellularStateReceiver.unregister()
+        FileWriterDebugTree.clearLogs()
     }
 
     override fun onBackPressed() {
@@ -109,9 +96,7 @@ class MainActivity : EasyPermissionActivity() {
                 }
             }
         }
-        if (bottomMenu.state == BottomSheetBehavior.STATE_EXPANDED) {
-            hideBottomMenu()
-        } else {
+        if (menuHandler.isClosed()){
             super.onBackPressed()
         }
     }
@@ -156,6 +141,7 @@ class MainActivity : EasyPermissionActivity() {
         }
         preview_container.setOnClickListener {
             launchMain {
+                menuHandler.onScreenTapped()
                 if (viewModel.isInRoom.isTrue()) {
                     restartTimer()
                     if (tryHideRoomScreen()) {
@@ -171,20 +157,6 @@ class MainActivity : EasyPermissionActivity() {
         end_call_button.setOnClickListener {
             hideKeyboard()
             onBackPressed()
-        }
-
-        bottomMenu.addBottomSheetCallback(sheetListener)
-        menu_button.setOnClickListener { switchMenu() }
-        menu_background.setOnClickListener { hideBottomMenu() }
-        menu_close.setOnClickListener { hideBottomMenu() }
-        menu_switch_camera.setOnClickListener {
-            launchMain {
-                hideBottomMenu()
-                delay(BOTTOM_MENU_DELAY)
-                launchIO {
-                    viewModel.switchCameraFacing()
-                }
-            }
         }
 
         main_landscape_members_holder.setOnClickListener {
@@ -228,9 +200,9 @@ class MainActivity : EasyPermissionActivity() {
         viewModel.isControlsEnabled.observe(this, Observer { enabled ->
             if (viewModel.isInRoom.isTrue()) {
                 if (enabled) {
-                    showTopMenu()
+                    menuHandler.showTopMenu()
                 } else {
-                    hideTopMenu()
+                    menuHandler.hideTopMenu()
                 }
             }
         })
@@ -238,6 +210,7 @@ class MainActivity : EasyPermissionActivity() {
             initMediaButtons()
         })
         initMediaButtons()
+        menuHandler.onStart()
     }
 
     private fun initMediaButtons() = launchMain {
@@ -287,55 +260,9 @@ class MainActivity : EasyPermissionActivity() {
         }
     }
 
-    private fun switchMenu() {
-        if (bottomMenu.state != BottomSheetBehavior.STATE_EXPANDED) {
-            showBottomMenu()
-        } else {
-            hideBottomMenu()
-        }
-    }
-
-    private fun showTopMenu() {
-        if (main_menu_holder.alpha == MENU_INVISIBLE) {
-            Timber.d("Showing top menu")
-            main_menu_holder.visibility = View.VISIBLE
-            main_menu_holder.animate()
-                .setStartDelay(MENU_FADE_DURATION)
-                .setDuration(MENU_FADE_DURATION)
-                .alpha(MENU_VISIBLE)
-                .withEndAction {
-                    main_menu_holder.alpha = MENU_VISIBLE
-                }.start()
-        }
-    }
-
-    fun hideTopMenu() {
-        if (main_menu_holder.alpha == MENU_VISIBLE) {
-            Timber.d("Hiding top menu")
-            main_menu_holder.animate()
-                .setStartDelay(0)
-                .setDuration(MENU_FADE_DURATION)
-                .alpha(MENU_INVISIBLE)
-                .withEndAction {
-                    main_menu_holder.alpha = MENU_INVISIBLE
-                    main_menu_holder.visibility = View.GONE
-                }.start()
-        }
-    }
-
-    fun showBottomMenu() {
-        Timber.d("Showing bottom menu")
-        bottomMenu.state = BottomSheetBehavior.STATE_EXPANDED
-    }
-
-    private fun hideBottomMenu() {
-        Timber.d("Hiding bottom menu")
-        bottomMenu.state = BottomSheetBehavior.STATE_HIDDEN
-    }
-
     private fun showRoomScreen(selectedTab: Int) {
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            hideTopMenu()
+            menuHandler.hideTopMenu()
             (supportFragmentManager.findFragmentByTag(RoomScreen::class.java.name) as? RoomScreen)?.let { roomScreen ->
                 roomScreen.selectTab(selectedTab)
                 roomScreen.fadeIn()
@@ -398,10 +325,6 @@ class MainActivity : EasyPermissionActivity() {
 
     private companion object {
         private const val HIDE_CONTROLS_DELAY = 5000L
-        private const val BOTTOM_MENU_DELAY = 200L
-        private const val MENU_FADE_DURATION = 300L
-        private const val MENU_VISIBLE = 1f
-        private const val MENU_INVISIBLE = 0f
         private const val LEAVE_ROOM_DELAY = 1000L
     }
 
