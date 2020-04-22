@@ -4,5 +4,5 @@
   -->
 
 <paths>
-    <files-path path="logs/" name="logs" />
+    <files-path path="./logs/" name="logs" />
 </paths>

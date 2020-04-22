@@ -30,6 +30,7 @@ import com.phenixrts.suite.groups.repository.RoomExpressRepository
 import com.phenixrts.suite.groups.repository.RoomMemberRepository
 import com.phenixrts.suite.groups.repository.UserMediaRepository
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 import java.util.*
 import kotlin.coroutines.resume
@@ -38,8 +39,8 @@ import kotlin.coroutines.suspendCoroutine
 class GroupsViewModel(
     private val cacheProvider: CacheProvider,
     private val preferenceProvider: PreferenceProvider,
-    private val roomExpressRepository: RoomExpressRepository,
-    private val userMediaRepository: UserMediaRepository
+    private var roomExpressRepository: RoomExpressRepository,
+    private var userMediaRepository: UserMediaRepository
 ) : ViewModel() {
 
     private val mainRendererSurface = AndroidVideoRenderSurface()
@@ -70,8 +71,8 @@ class GroupsViewModel(
     }
 
     private fun getRoomListItems() = launchMain {
-        cacheProvider.cacheDao().getVisitedRooms().collect {
-            roomList.value = it
+        cacheProvider.cacheDao().getVisitedRooms().collect { rooms ->
+            roomList.value = rooms
         }
     }
 
@@ -79,12 +80,14 @@ class GroupsViewModel(
         if (joinedRoomStatus.status == RequestStatus.OK) {
             joinedRoomStatus.roomService?.let { roomService ->
                 joinedRoomStatus.publisher?.let { publisher ->
-                    launchMain {
-                        Timber.d("Joined room repository created")
+                    runBlocking {
                         val selfMember = RoomMember(roomService.self, true)
                         selfMember.setSelfRenderer(userMediaRenderer, mainRendererSurface, userAudioTrack)
-                        currentRoomAlias.value = roomService.observableActiveRoom.value.observableAlias.value
-                        joinedRoomRepository = JoinedRoomRepository(roomService, publisher)
+                        val roomAlias = roomService.observableActiveRoom.value.observableAlias.value
+                        currentRoomAlias.value = roomAlias
+                        val dateRoomLeft = getRoomDateLeft(roomAlias)
+                        Timber.d("Joined room repository created: $roomAlias $dateRoomLeft")
+                        joinedRoomRepository = JoinedRoomRepository(roomService, publisher, dateRoomLeft)
                         roomMemberRepository = RoomMemberRepository(roomExpressRepository.roomExpress, roomService, selfMember)
                         // Update audio / video state
                         joinedRoomRepository?.switchAudioStreamState(isMicrophoneEnabled.isTrue())
@@ -92,6 +95,17 @@ class GroupsViewModel(
                     }
                 }
             }
+        }
+    }
+
+    private suspend fun getRoomDateLeft(roomAlias: String) = suspendCoroutine<Date> { continuation ->
+        launchIO {
+            var dateRoomLeft = Date()
+            cacheProvider.cacheDao().getVisitedRoom(roomAlias).getOrNull(0)?.let { room ->
+                dateRoomLeft = room.dateLeft
+            }
+            Timber.d("Room with alias: $roomAlias left at: $dateRoomLeft")
+            continuation.resume(dateRoomLeft)
         }
     }
 
@@ -107,6 +121,11 @@ class GroupsViewModel(
             joinedRoomRepository?.switchVideoStreamState(enabled)
             roomMemberRepository?.switchVideoStreamState(enabled)
         })
+    }
+
+    fun updateRepositories(roomExpressRepository: RoomExpressRepository, userMediaRepository: UserMediaRepository) {
+        this.roomExpressRepository = roomExpressRepository
+        this.userMediaRepository = userMediaRepository
     }
 
     suspend fun waitForPCast(): Unit = suspendCoroutine {
@@ -200,11 +219,11 @@ class GroupsViewModel(
         }
     }
 
-    suspend fun collectPhenixLogs(): Unit = suspendCoroutine { continuation ->
+    suspend fun collectPhenixLogs(fileWriterTree: FileWriterDebugTree): Unit = suspendCoroutine { continuation ->
         launchIO {
             roomExpressRepository.roomExpress.pCastExpress.pCast.collectLogMessages { _, _, messages ->
                 launchIO {
-                    FileWriterDebugTree.writeSdkLogs(messages)
+                    fileWriterTree.writeSdkLogs(messages)
                     continuation.resume(Unit)
                 }
             }
@@ -218,10 +237,10 @@ class GroupsViewModel(
     fun leaveRoom() = launchMain {
         Timber.d("Leaving room")
         isInRoom.value = false
-        joinedRoomRepository?.leaveRoom(cacheProvider)
-        joinedRoomRepository = null
         roomMemberRepository?.dispose()
         roomMemberRepository = null
+        joinedRoomRepository?.leaveRoom(cacheProvider)
+        joinedRoomRepository = null
     }
 
     fun getChatMessages(): MutableLiveData<List<RoomMessage>> =

@@ -12,23 +12,34 @@ import com.phenixrts.suite.groups.injection.DaggerInjectionComponent
 import com.phenixrts.suite.groups.injection.InjectionComponent
 import com.phenixrts.suite.groups.injection.InjectionModule
 import timber.log.Timber
+import javax.inject.Inject
+
+const val TIMBER_TAG = "PhenixApp"
 
 class GroupsApplication: Application() {
+
+    @Inject
+    lateinit var fileWriterTree: FileWriterDebugTree
+
+    private val injectionModule = InjectionModule(this)
 
     override fun onCreate() {
         super.onCreate()
 
+        module = injectionModule
+        component = DaggerInjectionComponent.builder().injectionModule(injectionModule).build()
+        component.inject(this)
         if (BuildConfig.DEBUG) {
-            Timber.plant(LineNumberDebugTree("PhenixApp"))
-            Timber.plant(FileWriterDebugTree(this))
+            Timber.plant(LineNumberDebugTree(TIMBER_TAG))
+            Timber.plant(fileWriterTree)
         }
-
-        component = DaggerInjectionComponent.builder().injectionModule(InjectionModule(this)).build()
         resourceContext = resources
     }
 
     companion object {
         lateinit var component: InjectionComponent
+            private set
+        lateinit var module: InjectionModule
             private set
 
         private lateinit var resourceContext: Resources

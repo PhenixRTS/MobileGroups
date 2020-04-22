@@ -22,6 +22,7 @@ import com.phenixrts.suite.groups.cache.PreferenceProvider
 import com.phenixrts.suite.groups.common.FileWriterDebugTree
 import com.phenixrts.suite.groups.common.extensions.*
 import com.phenixrts.suite.groups.databinding.ActivityMainBinding
+import com.phenixrts.suite.groups.models.DeepLinkModel
 import com.phenixrts.suite.groups.receivers.CellularStateReceiver
 import com.phenixrts.suite.groups.repository.RoomExpressRepository
 import com.phenixrts.suite.groups.repository.UserMediaRepository
@@ -36,7 +37,7 @@ import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-const val EXTRA_DEEP_LINK_CODE = "ExtraDeepLinkCode"
+const val EXTRA_DEEP_LINK_MODEL = "ExtraDeepLinkModel"
 
 class MainActivity : EasyPermissionActivity() {
 
@@ -45,6 +46,7 @@ class MainActivity : EasyPermissionActivity() {
     @Inject lateinit var cacheProvider: CacheProvider
     @Inject lateinit var preferenceProvider: PreferenceProvider
     @Inject lateinit var cellularStateReceiver: CellularStateReceiver
+    @Inject lateinit var fileWriterTree: FileWriterDebugTree
 
     private val timerHandler = Handler()
     private val timerRunnable = Runnable {
@@ -85,7 +87,6 @@ class MainActivity : EasyPermissionActivity() {
         super.onDestroy()
         menuHandler.onStop()
         cellularStateReceiver.unregister()
-        FileWriterDebugTree.clearLogs()
     }
 
     override fun onBackPressed() {
@@ -103,19 +104,23 @@ class MainActivity : EasyPermissionActivity() {
 
     private fun checkDeepLink(intent: Intent?) = launchMain {
         intent?.let { intent ->
-            if (intent.hasExtra(EXTRA_DEEP_LINK_CODE)) {
-                intent.getStringExtra(EXTRA_DEEP_LINK_CODE)?.let { roomCode ->
-                    Timber.d("Received deep link: $roomCode")
+            if (intent.hasExtra(EXTRA_DEEP_LINK_MODEL)) {
+                (intent.getSerializableExtra(EXTRA_DEEP_LINK_MODEL) as? DeepLinkModel)?.let { deepLinkModel ->
+                    Timber.d("Received deep link: $deepLinkModel")
                     if (viewModel.isInRoom.isTrue()) {
                         Timber.d("Leaving current room")
                         onBackPressed()
                         showLoadingScreen()
                         delay(LEAVE_ROOM_DELAY)
                     }
-                    Timber.d("Joining deep link room: $roomCode")
-                    joinRoom(viewModel, roomCode, preferenceProvider.getDisplayName())
+                    if (deepLinkModel.roomCode != null) {
+                        Timber.d("Joining deep link room: $deepLinkModel")
+                        joinRoom(viewModel, deepLinkModel.roomCode, preferenceProvider.getDisplayName())
+                    } else {
+                        hideLoadingScreen()
+                    }
                 }
-                intent.removeExtra(EXTRA_DEEP_LINK_CODE)
+                intent.removeExtra(EXTRA_DEEP_LINK_MODEL)
             }
         }
     }
@@ -196,6 +201,11 @@ class MainActivity : EasyPermissionActivity() {
             val label =  if (memberCount > 0) getString(R.string.tab_members_count, memberCount) else " "
             main_landscape_member_count.visibility = if (memberCount > 0) View.VISIBLE else View.GONE
             main_landscape_member_count.text = label
+        })
+        viewModel.unreadMessageCount.observe(this, Observer { messageCount ->
+            val label = if (messageCount < 100) "$messageCount" else getString(R.string.tab_message_count)
+            main_landscape_message_count.visibility = if (messageCount > 0) View.VISIBLE else View.GONE
+            main_landscape_message_count.text = label
         })
         viewModel.isControlsEnabled.observe(this, Observer { enabled ->
             if (viewModel.isInRoom.isTrue()) {

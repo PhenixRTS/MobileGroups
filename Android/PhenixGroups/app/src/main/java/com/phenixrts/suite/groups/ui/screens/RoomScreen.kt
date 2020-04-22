@@ -47,6 +47,7 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
         room_menu_button.setOnClickListener {
             showBottomMenu()
         }
+        setMessageCount(0)
         refreshTabs()
 
         viewModel.isControlsEnabled.value = false
@@ -57,9 +58,10 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
             setMemberCount(count)
         })
         viewModel.unreadMessageCount.observe(viewLifecycleOwner, Observer { count ->
-            Timber.d("Unread message count changed")
+            Timber.d("Unread message count changed: $count")
             setMessageCount(count)
         })
+        Timber.d("Room screen created: ${viewModel.currentRoomAlias.value}")
     }
 
     override fun onBackPressed() {
@@ -141,6 +143,7 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
         val offset = resources.getDimension(R.dimen.room_pager_offset_gone)
         if (currentOffset == 0) {
             Timber.d("Fading out")
+            viewModel.setViewingChat(false)
             val animation: Animation = object : Animation() {
                 override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
                     params.rightMargin = (offset * interpolatedTime).toInt()

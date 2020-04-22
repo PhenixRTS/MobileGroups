@@ -4,6 +4,7 @@
 
 package com.phenixrts.suite.groups.injection
 
+import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.ui.MainActivity
 import com.phenixrts.suite.groups.ui.SplashActivity
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
@@ -13,6 +14,7 @@ import javax.inject.Singleton
 @Singleton
 @Component(modules = [InjectionModule::class])
 interface InjectionComponent {
+    fun inject(target: GroupsApplication)
     fun inject(target: BaseFragment)
     fun inject(target: MainActivity)
     fun inject(target: SplashActivity)

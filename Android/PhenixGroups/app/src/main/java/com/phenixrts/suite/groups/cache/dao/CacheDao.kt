@@ -15,7 +15,7 @@ interface CacheDao {
     @Query("SELECT * FROM room_item ORDER BY dateLeft DESC")
     fun getVisitedRooms(): Flow<List<RoomInfoItem>>
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertRoom(roomInfoItem: RoomInfoItem)
 
     @Query("UPDATE room_item SET dateLeft = :dateLeft WHERE roomId = :roomId")
@@ -23,5 +23,8 @@ interface CacheDao {
 
     @Query("DELETE FROM room_item WHERE dateLeft < :expirationDate")
     fun expireOldRooms(expirationDate: Date)
+
+    @Query("SELECT * FROM room_item WHERE alias = :alias")
+    fun getVisitedRoom(alias: String): List<RoomInfoItem>
 
 }

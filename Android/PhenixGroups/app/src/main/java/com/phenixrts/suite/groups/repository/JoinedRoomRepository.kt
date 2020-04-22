@@ -22,7 +22,8 @@ import kotlin.coroutines.suspendCoroutine
 
 class JoinedRoomRepository(
     private val roomService: RoomService,
-    private val publisher: ExpressPublisher
+    private val publisher: ExpressPublisher,
+    private val dateRoomLeft: Date
 ) {
 
     private val chatService = RoomChatServiceFactory.createRoomChatService(roomService)
@@ -60,7 +61,7 @@ class JoinedRoomRepository(
             launchMain {
                 Timber.d("Message list updated")
                 val history = chatHistory.value?.toMutableList() ?: mutableListOf()
-                history.addUnique(messages, roomService.self.observableScreenName.value, isViewingChat)
+                history.addUnique(messages, roomService.self.observableScreenName.value, dateRoomLeft, isViewingChat)
                 chatHistory.value = history
             }
         }.run { disposables.add(this) }

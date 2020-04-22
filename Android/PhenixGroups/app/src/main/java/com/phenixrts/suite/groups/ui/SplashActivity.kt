@@ -13,6 +13,7 @@ import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
 import com.phenixrts.suite.groups.common.extensions.*
+import com.phenixrts.suite.groups.models.DeepLinkModel
 import com.phenixrts.suite.groups.repository.RoomExpressRepository
 import com.phenixrts.suite.groups.repository.UserMediaRepository
 import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
@@ -52,19 +53,33 @@ class SplashActivity : FragmentActivity() {
 
     private fun checkDeepLink(intent: Intent?) = launchMain {
         Timber.d("Checking deep link: ${intent?.data}")
-        val roomCode = intent?.data?.toString()?.substringAfterLast("#")
-        showLandingScreen(roomCode)
+        var deepLinkModel: DeepLinkModel? = null
+        intent?.data?.let { data ->
+            val roomCode = data.toString().takeIf { it.contains("#") }?.substringAfterLast("#")
+            val uri = data.getQueryParameter(QUERY_URI)
+            val backend = data.getQueryParameter(QUERY_BACKEND)
+            DeepLinkModel(roomCode, uri, backend).let { model ->
+                deepLinkModel = model
+                if (GroupsApplication.module.hasUrisChanged(model)) {
+                    roomExpressRepository = GroupsApplication.module.provideRoomExpressRepository(cacheProvider)
+                    userMediaRepository = GroupsApplication.module.provideUserMediaRepository(roomExpressRepository)
+                    viewModel.updateRepositories(roomExpressRepository, userMediaRepository)
+                    Timber.d("URIs changed - view model updated")
+                }
+            }
+        }
+        showLandingScreen(deepLinkModel)
     }
 
-    private fun showLandingScreen(roomCode: String?) = launchMain {
-        Timber.d("Waiting fro PCast")
+    private fun showLandingScreen(deepLinkModel: DeepLinkModel?) = launchMain {
+        Timber.d("Waiting for PCast")
         timeoutHandler.postDelayed(timeoutRunnable, TIMEOUT_DELAY)
         viewModel.waitForPCast()
         timeoutHandler.removeCallbacks(timeoutRunnable)
         Timber.d("Navigating to Landing Screen")
         val intent = Intent(this@SplashActivity, MainActivity::class.java)
-        if (roomCode != null) {
-            intent.putExtra(EXTRA_DEEP_LINK_CODE, roomCode)
+        deepLinkModel?.let { model ->
+            intent.putExtra(EXTRA_DEEP_LINK_MODEL, model)
         }
         startActivity(intent)
         finish()
@@ -72,5 +87,7 @@ class SplashActivity : FragmentActivity() {
 
     private companion object {
         private const val TIMEOUT_DELAY = 5000L
+        private const val QUERY_URI = "uri"
+        private const val QUERY_BACKEND = "backend"
     }
 }

@@ -23,11 +23,12 @@ private const val DAY_MILLIS = HOUR_MILLIS * 24L
 private const val MONTH_MILLIS = DAY_MILLIS * 30L
 private const val YEAR_MILLIS = MONTH_MILLIS * 12L
 
-fun MutableList<RoomMessage>.addUnique(messages: Array<ChatMessage>, selfName: String, isViewingChat: Boolean) {
+fun MutableList<RoomMessage>.addUnique(messages: Array<ChatMessage>, selfName: String, dateRoomLeft: Date, isViewingChat: Boolean) {
     messages.forEach {message ->
         if (this.find { it.message.messageId == message.messageId } == null) {
             val isSelf = selfName == message.observableFrom.value.observableScreenName.value
-            this.add(RoomMessage(message, isSelf, isViewingChat))
+            val isRead = isViewingChat || message.observableTimeStamp.value.time < dateRoomLeft.time
+            this.add(RoomMessage(message, isSelf, isRead))
         }
     }
     this.sortBy { it.message.observableTimeStamp.value }

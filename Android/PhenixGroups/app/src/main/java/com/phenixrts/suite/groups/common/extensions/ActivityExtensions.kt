@@ -111,7 +111,7 @@ fun MainActivity.joinRoom(viewModel: GroupsViewModel, roomAlias: String, display
     hideKeyboard()
     showLoadingScreen()
     val joinedRoomStatus = viewModel.joinRoomByAlias(this@joinRoom, roomAlias, displayName)
-    Timber.d("Room joined with status: $joinedRoomStatus")
+    Timber.d("Room joined with status: $joinedRoomStatus $roomAlias")
     hideLoadingScreen()
     if (joinedRoomStatus.status == RequestStatus.OK) {
         launchFragment(RoomScreen())

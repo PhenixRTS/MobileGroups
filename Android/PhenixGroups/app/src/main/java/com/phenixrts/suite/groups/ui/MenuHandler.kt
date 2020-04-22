@@ -5,12 +5,11 @@
 package com.phenixrts.suite.groups.ui
 
 import android.content.Intent
+import android.net.Uri
 import android.view.View
-import androidx.core.content.FileProvider
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.phenixrts.suite.groups.BuildConfig
 import com.phenixrts.suite.groups.R
-import com.phenixrts.suite.groups.common.FileWriterDebugTree
 import com.phenixrts.suite.groups.common.extensions.*
 import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
 import kotlinx.android.synthetic.main.activity_main.*
@@ -18,7 +17,6 @@ import kotlinx.android.synthetic.main.view_bottom_menu.*
 import kotlinx.android.synthetic.main.view_debug_menu.*
 import kotlinx.coroutines.delay
 import timber.log.Timber
-import java.io.File
 
 class MenuHandler(
     private val activity: MainActivity,
@@ -101,28 +99,23 @@ class MenuHandler(
         activity.debug_share.setOnClickListener { shareLogs() }
     }
 
-    private fun getFileUri(fileName: String) = FileProvider.getUriForFile(
-        activity,
-        "${BuildConfig.APPLICATION_ID}.provider",
-        File(activity.filesDir.toString() + "/logs", fileName)
-    )
-
     private fun shareLogs() = launchMain {
         Timber.d("Share Logs clicked")
-        viewModel.collectPhenixLogs()
-        val sdkLogs = getFileUri(FileWriterDebugTree.SDK_LOGS_FILENAME)
-        val appLogs = getFileUri(FileWriterDebugTree.APP_LOGS_FILENAME)
-        Timber.d("Sharing files: $sdkLogs $appLogs")
-        val files = arrayListOf(sdkLogs, appLogs)
-
-        val intent = Intent().apply {
-            action = Intent.ACTION_SEND_MULTIPLE
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            putParcelableArrayListExtra(Intent.EXTRA_STREAM, files)
-            type = INTENT_CHOOSER_TYPE
-        }
-        intent.resolveActivity(activity.packageManager)?.run {
-            activity.startActivity(Intent.createChooser(intent, activity.getString(R.string.debug_share_app_logs)))
+        val files = ArrayList<Uri>()
+        viewModel.collectPhenixLogs(activity.fileWriterTree)
+        files.addAll(activity.fileWriterTree.getLogFileUris())
+        if (files.isNotEmpty()) {
+            val intent = Intent().apply {
+                action = Intent.ACTION_SEND_MULTIPLE
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                putParcelableArrayListExtra(Intent.EXTRA_STREAM, files)
+                type = INTENT_CHOOSER_TYPE
+            }
+            intent.resolveActivity(activity.packageManager)?.run {
+                activity.startActivity(Intent.createChooser(intent, activity.getString(R.string.debug_share_app_logs)))
+            }
+        } else {
+            activity.showToast(activity.getString(R.string.err_failed_to_collect_logs))
         }
     }
 

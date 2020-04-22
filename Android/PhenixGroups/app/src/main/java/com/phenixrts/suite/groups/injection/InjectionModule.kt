@@ -14,6 +14,8 @@ import com.phenixrts.suite.groups.BuildConfig
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
+import com.phenixrts.suite.groups.common.FileWriterDebugTree
+import com.phenixrts.suite.groups.models.DeepLinkModel
 import com.phenixrts.suite.groups.models.RoomStatus
 import com.phenixrts.suite.groups.receivers.CellularStateReceiver
 import com.phenixrts.suite.groups.repository.RoomExpressRepository
@@ -26,36 +28,65 @@ import javax.inject.Singleton
 @Module
 class InjectionModule(private val context: GroupsApplication) {
 
-    @Provides
-    @Singleton
-    fun provideRoomExpressRepository(cacheProvider: CacheProvider): RoomExpressRepository {
-        Timber.d("Create Room Express Singleton")
-        val roomStatus = MutableLiveData<RoomStatus>()
-        roomStatus.value = RoomStatus(RequestStatus.OK, "")
-        AndroidContext.setContext(context)
-        val pcastExpressOptions = PCastExpressFactory.createPCastExpressOptionsBuilder()
-            .withBackendUri(BuildConfig.BACKEND_URL)
-            .withPCastUri(BuildConfig.PCAST_URL)
-            .withUnrecoverableErrorCallback { status: RequestStatus, description: String ->
-                Timber.e("Unrecoverable error in PhenixSDK. Error status: [$status]. Description: [$description]")
-                roomStatus.value = RoomStatus(status, description)
-            }
-            .withMinimumConsoleLogLevel("info")
-            .buildPCastExpressOptions()
+    private var roomExpressRepository: RoomExpressRepository? = null
+    private var userMediaRepository: UserMediaRepository? = null
+    private var pCastUrl = BuildConfig.PCAST_URL
+    private var backendUrl = BuildConfig.BACKEND_URL
 
-        val roomExpressOptions = RoomExpressFactory.createRoomExpressOptionsBuilder()
-            .withPCastExpressOptions(pcastExpressOptions)
-            .buildRoomExpressOptions()
-        return RoomExpressRepository(
-            cacheProvider,
-            RoomExpressFactory.createRoomExpress(roomExpressOptions),
-            roomStatus)
+    fun hasUrisChanged(deepLinkModel: DeepLinkModel): Boolean {
+        Timber.d("Updating Room Express uris: $deepLinkModel")
+        var changed = false
+        if (deepLinkModel.uri != null && pCastUrl != deepLinkModel.uri) {
+            pCastUrl = deepLinkModel.uri
+            roomExpressRepository = null
+            userMediaRepository = null
+            changed = true
+        }
+        if (deepLinkModel.backend != null && backendUrl != deepLinkModel.backend) {
+            backendUrl = deepLinkModel.backend
+            roomExpressRepository = null
+            userMediaRepository = null
+            changed = true
+        }
+        return changed
     }
 
     @Provides
-    @Singleton
-    fun provideUserMediaRepository(roomExpressRepository: RoomExpressRepository): UserMediaRepository
-            = UserMediaRepository(roomExpressRepository.roomExpress)
+    fun provideRoomExpressRepository(cacheProvider: CacheProvider): RoomExpressRepository {
+        if (roomExpressRepository == null) {
+            Timber.d("Create Room Express Singleton")
+            val roomStatus = MutableLiveData<RoomStatus>()
+            roomStatus.value = RoomStatus(RequestStatus.OK, "")
+            AndroidContext.setContext(context)
+            val pcastExpressOptions = PCastExpressFactory.createPCastExpressOptionsBuilder()
+                .withBackendUri(backendUrl)
+                .withPCastUri(pCastUrl)
+                .withUnrecoverableErrorCallback { status: RequestStatus, description: String ->
+                    Timber.e("Unrecoverable error in PhenixSDK. Error status: [$status]. Description: [$description]")
+                    roomStatus.value = RoomStatus(status, description)
+                }
+                .withMinimumConsoleLogLevel("info")
+                .buildPCastExpressOptions()
+
+            val roomExpressOptions = RoomExpressFactory.createRoomExpressOptionsBuilder()
+                .withPCastExpressOptions(pcastExpressOptions)
+                .buildRoomExpressOptions()
+            roomExpressRepository = RoomExpressRepository(
+                cacheProvider,
+                RoomExpressFactory.createRoomExpress(roomExpressOptions),
+                roomStatus
+            )
+        }
+        return roomExpressRepository!!
+    }
+
+    @Provides
+    fun provideUserMediaRepository(roomExpressRepository: RoomExpressRepository): UserMediaRepository {
+        if (userMediaRepository == null) {
+            userMediaRepository = UserMediaRepository(roomExpressRepository.roomExpress)
+        }
+        return userMediaRepository!!
+    }
 
     @Provides
     @Singleton
@@ -69,5 +100,9 @@ class InjectionModule(private val context: GroupsApplication) {
     @Provides
     @Singleton
     fun provideCellularStateReceiver(): CellularStateReceiver = CellularStateReceiver(context)
+
+    @Provides
+    @Singleton
+    fun provideFileWriterDebugTree(): FileWriterDebugTree = FileWriterDebugTree(context)
 
 }

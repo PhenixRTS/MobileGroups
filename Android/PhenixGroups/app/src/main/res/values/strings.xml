@@ -17,6 +17,7 @@
 
     <!--  Room call screen  -->
     <string name="tab_members_count"> (%1$d)</string>
+    <string name="tab_message_count">99+</string>
     <string name="menu_switch_camera">Switch camera</string>
     <string name="menu_cancel">Cancel</string>
 
@@ -53,6 +54,7 @@
     <string name="err_microphone_lost">Phenix Groups has lost access to microphone</string>
     <string name="err_network_problems">Experiencing problems connecting to Phenix. Check your network status.</string>
     <string name="err_enter_valid_room_code">Please enter a valid room code</string>
+    <string name="err_failed_to_collect_logs">Failed to collect application logs</string>
 
     <!-- Join Meeting -->
     <string name="join_room_button_label">Join meeting</string>
