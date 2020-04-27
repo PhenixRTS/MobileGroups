@@ -5,40 +5,41 @@
 package com.phenixrts.suite.groups.repository
 
 import android.os.Handler
-import androidx.lifecycle.MutableLiveData
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.express.*
 import com.phenixrts.pcast.*
 import com.phenixrts.suite.groups.common.extensions.getUserMedia
 import com.phenixrts.suite.groups.common.extensions.launchIO
-import com.phenixrts.suite.groups.common.extensions.launchMain
 import com.phenixrts.suite.groups.common.getUserMediaOptions
-import com.phenixrts.suite.groups.models.UserMediaStatus
 import timber.log.Timber
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 class UserMediaRepository(private val roomExpress: RoomExpress) {
 
-    private var collectingUserMedia = false
     private var currentFacingMode = FacingMode.USER
     private var mediaStateCallback: OnMediaStateChange? = null
+    private var isDisposed = false
 
     private val audioFailureHandler = Handler()
     private val videoFailureHandler = Handler()
     private val audioFailureRunnable = Runnable {
-        Timber.d("Audio recording has stopped")
-        mediaStateCallback?.onMicrophoneLost()
+        if (!isDisposed) {
+            Timber.d("Audio recording has stopped")
+            mediaStateCallback?.onMicrophoneLost()
+        }
     }
     private val videoFailureRunnable = Runnable {
-        Timber.d("Video recording is stopped")
-        mediaStateCallback?.onCameraLost()
+        if (!isDisposed) {
+            Timber.d("Video recording is stopped")
+            mediaStateCallback?.onCameraLost()
+        }
     }
 
-    val userMediaStream = MutableLiveData<UserMediaStream>()
+    var userMediaStream: UserMediaStream? = null
 
     private fun observeMediaStreams() {
-        userMediaStream.value?.apply {
+        userMediaStream?.apply {
             mediaStream.videoTracks.getOrNull(0)?.let { videoTrack ->
                 setFrameReadyCallback(videoTrack) {
                     videoFailureHandler.removeCallbacks(videoFailureRunnable)
@@ -54,34 +55,20 @@ class UserMediaRepository(private val roomExpress: RoomExpress) {
         }
     }
 
-    suspend fun getUserMediaStream(): UserMediaStatus = suspendCoroutine { continuation ->
-        launchIO {
-            if (!collectingUserMedia) {
-                collectingUserMedia = true
-                if (userMediaStream.value != null) {
-                    Timber.d("Returning already collected stream")
-                    continuation.resume(UserMediaStatus(userMediaStream = userMediaStream.value))
-                } else {
-                    Timber.d("Media stream not collected yet - getting from pCast")
-                    val status = roomExpress.pCastExpress.getUserMedia(getUserMediaOptions())
-                    launchMain {
-                        userMediaStream.value = status.userMediaStream
-                        observeMediaStreams()
-                        continuation.resume(status)
-                    }
-                }
-                collectingUserMedia = false
-            } else {
-                continuation.resume(UserMediaStatus(status = RequestStatus.FAILED))
-            }
-        }
+    suspend fun waitForUserStream(): RequestStatus {
+        Timber.d("Media stream not collected yet - getting from pCast")
+        val userMediaStatus = roomExpress.pCastExpress.getUserMedia(getUserMediaOptions())
+        Timber.d("Media stream collected from pCast")
+        userMediaStream = userMediaStatus.userMediaStream
+        observeMediaStreams()
+        return userMediaStatus.status
     }
 
     suspend fun switchCameraFacing(): RequestStatus = suspendCoroutine { continuation ->
         launchIO {
             val facingMode = if (currentFacingMode == FacingMode.USER) FacingMode.ENVIRONMENT else FacingMode.USER
             var requestStatus = RequestStatus.FAILED
-            userMediaStream.value?.applyOptions(getUserMediaOptions(facingMode))?.let { status ->
+            userMediaStream?.applyOptions(getUserMediaOptions(facingMode))?.let { status ->
                 requestStatus = status
                 if (status == RequestStatus.OK) {
                     currentFacingMode = facingMode
@@ -93,16 +80,25 @@ class UserMediaRepository(private val roomExpress: RoomExpress) {
 
     fun switchVideoStreamState(enabled: Boolean) = launchIO {
         Timber.d("Switching video streams: $enabled")
-        userMediaStream.value?.mediaStream?.videoTracks?.forEach { it.isEnabled = enabled }
+        userMediaStream?.mediaStream?.videoTracks?.forEach { it.isEnabled = enabled }
     }
 
     fun switchAudioStreamState(enabled: Boolean) = launchIO {
         Timber.d("Switching audio streams: $enabled")
-        userMediaStream.value?.mediaStream?.audioTracks?.forEach { it.isEnabled = enabled }
+        userMediaStream?.mediaStream?.audioTracks?.forEach { it.isEnabled = enabled }
     }
 
     fun observeMediaState(callback: OnMediaStateChange) {
         mediaStateCallback = callback
+    }
+
+    fun dispose() = try {
+        isDisposed = true
+        // TODO: User media cannot be disposed without breaking the rendering and streaming
+        //userMediaStream?.dispose()
+        Timber.d("User media repository disposed")
+    } catch (e: Exception) {
+        Timber.d("Failed to dispose user media repository")
     }
 
     interface OnMediaStateChange {

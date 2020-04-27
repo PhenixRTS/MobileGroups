@@ -13,5 +13,6 @@ data class RoomInfoItem(
     @PrimaryKey
     val roomId: String,
     val alias: String,
+    val backendUri: String,
     var dateLeft: Date = Date()
 )

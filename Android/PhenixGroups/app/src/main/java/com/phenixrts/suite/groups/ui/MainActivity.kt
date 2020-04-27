@@ -24,7 +24,7 @@ import com.phenixrts.suite.groups.common.extensions.*
 import com.phenixrts.suite.groups.databinding.ActivityMainBinding
 import com.phenixrts.suite.groups.models.DeepLinkModel
 import com.phenixrts.suite.groups.receivers.CellularStateReceiver
-import com.phenixrts.suite.groups.repository.RoomExpressRepository
+import com.phenixrts.suite.groups.repository.RepositoryProvider
 import com.phenixrts.suite.groups.repository.UserMediaRepository
 import com.phenixrts.suite.groups.ui.screens.LandingScreen
 import com.phenixrts.suite.groups.ui.screens.RoomScreen
@@ -41,12 +41,17 @@ const val EXTRA_DEEP_LINK_MODEL = "ExtraDeepLinkModel"
 
 class MainActivity : EasyPermissionActivity() {
 
-    @Inject lateinit var roomExpressRepository: RoomExpressRepository
-    @Inject lateinit var userMediaRepository: UserMediaRepository
+    @Inject lateinit var repositoryProvider: RepositoryProvider
     @Inject lateinit var cacheProvider: CacheProvider
     @Inject lateinit var preferenceProvider: PreferenceProvider
     @Inject lateinit var cellularStateReceiver: CellularStateReceiver
     @Inject lateinit var fileWriterTree: FileWriterDebugTree
+
+    private val viewModel: GroupsViewModel by lazyViewModel {
+        GroupsViewModel(cacheProvider, preferenceProvider, repositoryProvider)
+    }
+
+    val menuHandler: MenuHandler by lazy { MenuHandler(this, viewModel) }
 
     private val timerHandler = Handler()
     private val timerRunnable = Runnable {
@@ -57,12 +62,6 @@ class MainActivity : EasyPermissionActivity() {
             }
         }
     }
-
-    private val viewModel: GroupsViewModel by lazyViewModel {
-        GroupsViewModel(cacheProvider, preferenceProvider, roomExpressRepository, userMediaRepository)
-    }
-
-    val menuHandler: MenuHandler by lazy { MenuHandler(this, viewModel) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,7 +106,7 @@ class MainActivity : EasyPermissionActivity() {
             if (intent.hasExtra(EXTRA_DEEP_LINK_MODEL)) {
                 (intent.getSerializableExtra(EXTRA_DEEP_LINK_MODEL) as? DeepLinkModel)?.let { deepLinkModel ->
                     Timber.d("Received deep link: $deepLinkModel")
-                    if (viewModel.isInRoom.isTrue()) {
+                    if (viewModel.isInRoom.isTrue() && deepLinkModel.isUpdated()) {
                         Timber.d("Leaving current room")
                         onBackPressed()
                         showLoadingScreen()
@@ -246,12 +245,12 @@ class MainActivity : EasyPermissionActivity() {
     }
 
     private fun handleExceptions() {
-        roomExpressRepository.roomStatus.observe(this, Observer {
+        repositoryProvider.onRoomStatusChanged.observe(this, Observer {
             if (it.status != RequestStatus.OK) {
                 closeApp(it.message)
             }
         })
-        userMediaRepository.observeMediaState(object: UserMediaRepository.OnMediaStateChange {
+        repositoryProvider.getUserMediaRepository()?.observeMediaState(object: UserMediaRepository.OnMediaStateChange {
             override fun onMicrophoneLost() {
                 showToast(getString(R.string.err_microphone_lost))
                 viewModel.isMicrophoneEnabled.value = false

@@ -25,12 +25,10 @@ import com.phenixrts.suite.groups.models.RoomMessage
 import com.phenixrts.suite.groups.models.JoinedRoomStatus
 import com.phenixrts.suite.groups.models.RoomMember
 import com.phenixrts.suite.groups.models.RoomStatus
-import com.phenixrts.suite.groups.repository.JoinedRoomRepository
-import com.phenixrts.suite.groups.repository.RoomExpressRepository
-import com.phenixrts.suite.groups.repository.RoomMemberRepository
-import com.phenixrts.suite.groups.repository.UserMediaRepository
+import com.phenixrts.suite.groups.repository.*
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
 import java.util.*
 import kotlin.coroutines.resume
@@ -39,11 +37,10 @@ import kotlin.coroutines.suspendCoroutine
 class GroupsViewModel(
     private val cacheProvider: CacheProvider,
     private val preferenceProvider: PreferenceProvider,
-    private var roomExpressRepository: RoomExpressRepository,
-    private var userMediaRepository: UserMediaRepository
+    private val repositoryProvider: RepositoryProvider
 ) : ViewModel() {
 
-    private val mainRendererSurface = AndroidVideoRenderSurface()
+    private val mainRendererSurface by lazy { AndroidVideoRenderSurface() }
     private var roomMemberRepository: RoomMemberRepository? = null
     private var joinedRoomRepository: JoinedRoomRepository? = null
     private var userMediaRenderer: Renderer? = null
@@ -66,12 +63,18 @@ class GroupsViewModel(
         getRoomListItems()
     }
 
+    private fun getRoomRepository() = repositoryProvider.getRoomExpressRepository()
+
+    private fun getMediaRepository() = repositoryProvider.getUserMediaRepository()
+
+    private fun getUserMediaStream() = repositoryProvider.getUserMediaStream()
+
     private fun expireOldRooms() = launchIO {
         cacheProvider.cacheDao().expireOldRooms(Calendar.getInstance().expirationDate())
     }
 
     private fun getRoomListItems() = launchMain {
-        cacheProvider.cacheDao().getVisitedRooms().collect { rooms ->
+        cacheProvider.cacheDao().getVisitedRooms(repositoryProvider.getCurrentConfiguration().backend).collect { rooms ->
             roomList.value = rooms
         }
     }
@@ -88,7 +91,7 @@ class GroupsViewModel(
                         val dateRoomLeft = getRoomDateLeft(roomAlias)
                         Timber.d("Joined room repository created: $roomAlias $dateRoomLeft")
                         joinedRoomRepository = JoinedRoomRepository(roomService, publisher, dateRoomLeft)
-                        roomMemberRepository = RoomMemberRepository(roomExpressRepository.roomExpress, roomService, selfMember)
+                        roomMemberRepository = RoomMemberRepository(repositoryProvider.roomExpress!!, roomService, selfMember)
                         // Update audio / video state
                         joinedRoomRepository?.switchAudioStreamState(isMicrophoneEnabled.isTrue())
                         joinedRoomRepository?.switchVideoStreamState(isVideoEnabled.isTrue())
@@ -112,56 +115,51 @@ class GroupsViewModel(
     fun initObservers(lifecycleOwner: LifecycleOwner) = launchMain {
         displayName.value = preferenceProvider.getDisplayName()
         isMicrophoneEnabled.observe(lifecycleOwner, Observer { enabled ->
-            userMediaRepository.switchAudioStreamState(enabled)
+            getMediaRepository()?.switchAudioStreamState(enabled)
             joinedRoomRepository?.switchAudioStreamState(enabled)
             roomMemberRepository?.switchAudioStreamState(enabled)
         })
         isVideoEnabled.observe(lifecycleOwner, Observer { enabled ->
-            userMediaRepository.switchVideoStreamState(enabled)
+            getMediaRepository()?.switchVideoStreamState(enabled)
             joinedRoomRepository?.switchVideoStreamState(enabled)
             roomMemberRepository?.switchVideoStreamState(enabled)
         })
     }
 
-    fun updateRepositories(roomExpressRepository: RoomExpressRepository, userMediaRepository: UserMediaRepository) {
-        this.roomExpressRepository = roomExpressRepository
-        this.userMediaRepository = userMediaRepository
-    }
-
-    suspend fun waitForPCast(): Unit = suspendCoroutine {
-        launchMain {
-            roomExpressRepository.waitForPCast()
-            it.resume(Unit)
+    suspend fun joinRoomById(roomId: String, userScreenName: String): JoinedRoomStatus
+            = suspendCancellableCoroutine { continuation ->
+        Timber.d("Joining room by id: $roomId")
+        getUserMediaStream()?.let { userMediaStream ->
+            launchMain {
+                val joinedRoomStatus = getRoomRepository()?.joinRoomById(roomId, userScreenName, userMediaStream)
+                    ?: JoinedRoomStatus(RequestStatus.FAILED)
+                handleJoinedRoom(joinedRoomStatus)
+                if (continuation.isActive) {
+                    continuation.resume(joinedRoomStatus)
+                }
+            }
         }
     }
 
-    suspend fun joinRoomById(owner: LifecycleOwner, roomId: String, userScreenName: String): JoinedRoomStatus = suspendCoroutine { continuation ->
-        userMediaRepository.userMediaStream.observe(owner, Observer {
-            launchMain {
-                Timber.d("Joining room by id: $roomId")
-                val joinedRoomStatus = roomExpressRepository.joinRoomById(roomId, userScreenName, it)
-                userMediaRepository.userMediaStream.removeObservers(owner)
-                handleJoinedRoom(joinedRoomStatus)
-                continuation.resume(joinedRoomStatus)
-            }
-        })
-    }
-
-    suspend fun joinRoomByAlias(owner: LifecycleOwner, roomAlias: String, userScreenName: String): JoinedRoomStatus = suspendCoroutine { continuation ->
-        userMediaRepository.userMediaStream.observe(owner, Observer {
+    suspend fun joinRoomByAlias(roomAlias: String, userScreenName: String): JoinedRoomStatus
+            = suspendCancellableCoroutine { continuation ->
+        Timber.d("Joining room by alias: $roomAlias")
+        getUserMediaStream()?.let { userMediaStream ->
             launchMain {
                 Timber.d("Joining room by alias: $roomAlias")
-                val joinedRoomStatus = roomExpressRepository.joinRoomByAlias(roomAlias, userScreenName, it)
-                userMediaRepository.userMediaStream.removeObservers(owner)
+                val joinedRoomStatus = getRoomRepository()?.joinRoomByAlias(roomAlias, userScreenName, userMediaStream)
+                    ?: JoinedRoomStatus(RequestStatus.FAILED)
                 handleJoinedRoom(joinedRoomStatus)
-                continuation.resume(joinedRoomStatus)
+                if (continuation.isActive) {
+                    continuation.resume(joinedRoomStatus)
+                }
             }
-        })
+        }
     }
 
     suspend fun createRoom(): RoomStatus = suspendCoroutine { continuation ->
         launchMain {
-            continuation.resume(roomExpressRepository.createRoom())
+            continuation.resume(getRoomRepository()?.createRoom() ?: RoomStatus(RequestStatus.FAILED))
         }
     }
 
@@ -172,30 +170,27 @@ class GroupsViewModel(
         }
     }
 
-    suspend fun startUserMediaPreview(holder: SurfaceHolder): RoomStatus = suspendCoroutine { continuation ->
+    suspend fun startUserMediaPreview(holder: SurfaceHolder): RoomStatus = suspendCancellableCoroutine { continuation ->
         mainRendererSurface.setSurfaceHolder(holder)
+        var status = RequestStatus.OK
         if (isVideoEnabled.isTrue()) {
-            launchMain {
-                Timber.d("Start user media: ${isVideoEnabled.isTrue()}")
-                var status = RequestStatus.OK
+            Timber.d("Start user media: ${isVideoEnabled.isTrue()}")
+            status = RequestStatus.FAILED
+            getUserMediaStream()?.let { userMediaStream ->
+                status = RequestStatus.OK
                 if (userMediaRenderer == null) {
-                    userMediaRepository.getUserMediaStream().let { userMedia ->
-                        status = userMedia.status
-                        if (status == RequestStatus.OK) {
-                            userMediaRenderer = userMedia.userMediaStream?.mediaStream?.createRenderer()
-                            userAudioTrack = userMedia.userMediaStream?.mediaStream?.audioTracks?.getOrNull(0)
-                            val renderStatus = userMediaRenderer?.start(mainRendererSurface)
-                            if (renderStatus != RendererStartStatus.OK) {
-                                status = RequestStatus.FAILED
-                            }
-                            Timber.d("Video render created and started: $renderStatus")
-                        }
+                    userMediaRenderer = userMediaStream.mediaStream?.createRenderer()
+                    userAudioTrack = userMediaStream.mediaStream?.audioTracks?.getOrNull(0)
+                    val renderStatus = userMediaRenderer?.start(mainRendererSurface)
+                    if (renderStatus != RendererStartStatus.OK) {
+                        status = RequestStatus.FAILED
                     }
+                    Timber.d("Video render created and started: $renderStatus")
                 }
-                continuation.resume(RoomStatus(status))
             }
-        } else {
-            continuation.resume(RoomStatus(RequestStatus.FAILED))
+        }
+        if (continuation.isActive) {
+            continuation.resume(RoomStatus(status))
         }
     }
 
@@ -215,18 +210,14 @@ class GroupsViewModel(
 
     suspend fun switchCameraFacing(): RequestStatus = suspendCoroutine { continuation ->
         launchMain {
-            continuation.resume(userMediaRepository.switchCameraFacing())
+            continuation.resume(getMediaRepository()?.switchCameraFacing() ?: RequestStatus.FAILED)
         }
     }
 
     suspend fun collectPhenixLogs(fileWriterTree: FileWriterDebugTree): Unit = suspendCoroutine { continuation ->
         launchIO {
-            roomExpressRepository.roomExpress.pCastExpress.pCast.collectLogMessages { _, _, messages ->
-                launchIO {
-                    fileWriterTree.writeSdkLogs(messages)
-                    continuation.resume(Unit)
-                }
-            }
+            fileWriterTree.writeSdkLogs(repositoryProvider.collectLogMessages())
+            continuation.resume(Unit)
         }
     }
 

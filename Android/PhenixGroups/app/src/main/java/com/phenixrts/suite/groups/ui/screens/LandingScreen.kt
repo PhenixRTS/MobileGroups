@@ -104,7 +104,7 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
             return@launchMain
         }
         showLoadingScreen()
-        val joinedRoomStatus = viewModel.joinRoomById(this@LandingScreen, roomId, preferenceProvider.getDisplayName())
+        val joinedRoomStatus = viewModel.joinRoomById(roomId, preferenceProvider.getDisplayName())
         Timber.d("Room joined with status: $joinedRoomStatus")
         hideLoadingScreen()
         if (joinedRoomStatus.status == RequestStatus.OK) {

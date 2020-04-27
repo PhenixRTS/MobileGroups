@@ -4,7 +4,6 @@
 
 package com.phenixrts.suite.groups.repository
 
-import androidx.lifecycle.MutableLiveData
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.express.*
 import com.phenixrts.pcast.UserMediaStream
@@ -17,6 +16,7 @@ import com.phenixrts.suite.groups.common.getPublishOptions
 import com.phenixrts.suite.groups.common.getPublishToRoomOptions
 import com.phenixrts.suite.groups.common.getRoomOptions
 import com.phenixrts.suite.groups.models.JoinedRoomStatus
+import com.phenixrts.suite.groups.models.RoomExpressConfiguration
 import com.phenixrts.suite.groups.models.RoomStatus
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -26,9 +26,11 @@ import kotlin.coroutines.suspendCoroutine
 
 class RoomExpressRepository(
     private val cacheProvider: CacheProvider,
-    val roomExpress: RoomExpress,
-    val roomStatus: MutableLiveData<RoomStatus>
+    private val roomExpress: RoomExpress,
+    private val configuration: RoomExpressConfiguration
 ) {
+
+    private var isDisposed = false
 
     /**
      * Try to join a room with given room options and block until executed
@@ -41,7 +43,7 @@ class RoomExpressRepository(
             var requestStatus = status
             if (status == RequestStatus.OK) {
                 roomService?.observableActiveRoom?.value?.let { room ->
-                    cacheProvider.cacheDao().insertRoom(RoomInfoItem(room.roomId, room.observableAlias.value))
+                    cacheProvider.cacheDao().insertRoom(RoomInfoItem(room.roomId, room.observableAlias.value, configuration.backend))
                 }
             }
             if (roomService == null || publisher == null) {
@@ -56,9 +58,13 @@ class RoomExpressRepository(
     /**
      * Wait unit PCast is online to continue
      */
-    suspend fun waitForPCast(): Unit = suspendCoroutine {
-        roomExpress.pCastExpress.waitForOnline {
-            it.resume(Unit)
+    suspend fun waitForPCast(): Unit = suspendCoroutine { continuation ->
+        if (!isDisposed) {
+            roomExpress.pCastExpress.waitForOnline {
+                continuation.resume(Unit)
+            }
+        } else {
+            continuation.resume(Unit)
         }
     }
 
@@ -79,8 +85,8 @@ class RoomExpressRepository(
     /**
      * Join a room with given room ID and user screen name
      */
-    suspend fun joinRoomById(roomId: String, userScreenName: String,
-                             userMediaStream: UserMediaStream): JoinedRoomStatus = suspendCancellableCoroutine { continuation ->
+    suspend fun joinRoomById(roomId: String, userScreenName: String, userMediaStream: UserMediaStream): JoinedRoomStatus
+            = suspendCancellableCoroutine { continuation ->
         val publishOptions = getPublishOptions(userMediaStream)
         val publishToRoomOptions = getPublishToRoomOptions(roomId, userScreenName, publishOptions)
         joinRoom(publishToRoomOptions, continuation)
@@ -89,12 +95,23 @@ class RoomExpressRepository(
     /**
      * Join a room with given room alias and user screen name
      */
-    suspend fun joinRoomByAlias(roomAlias: String, userScreenName: String,
-                                userMediaStream: UserMediaStream): JoinedRoomStatus = suspendCancellableCoroutine { continuation ->
+    suspend fun joinRoomByAlias(roomAlias: String, userScreenName: String, userMediaStream: UserMediaStream): JoinedRoomStatus
+            = suspendCancellableCoroutine { continuation ->
         val roomOptions = getRoomOptions(roomAlias)
         val publishOptions = getPublishOptions(userMediaStream)
         val publishToRoomOptions = getPublishToRoomOptions(userScreenName, roomOptions, publishOptions)
         joinRoom(publishToRoomOptions, continuation)
+    }
+
+    fun dispose() = try {
+        isDisposed = true
+        // TODO: Neither of these can be disposed without breaking UserMediaStream
+        //roomExpress.pCastExpress.pCast.dispose()
+        //roomExpress.pCastExpress.dispose()
+        //roomExpress.dispose()
+        Timber.d("Room express repository disposed")
+    } catch (e: Exception) {
+        Timber.d("Failed to dispose room express repository")
     }
 
 }

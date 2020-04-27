@@ -55,6 +55,9 @@
     <string name="err_network_problems">Experiencing problems connecting to Phenix. Check your network status.</string>
     <string name="err_enter_valid_room_code">Please enter a valid room code</string>
     <string name="err_failed_to_collect_logs">Failed to collect application logs</string>
+    <string name="err_configuration_changed">Configuration has changed. Please start the app again to apply the changes.</string>
+    <string name="err_room_express_not_initialized">Room Express is not initialized</string>
+    <string name="err_user_media_not_initialized">User Media is not initialized</string>
 
     <!-- Join Meeting -->
     <string name="join_room_button_label">Join meeting</string>
@@ -74,5 +77,6 @@
     <string name="debug_sdk_version">SDK version: %1$s build: %2$d</string>
     <string name="debug_share_app_logs">Share App logs</string>
     <string name="debug_close">Close</string>
+    <string name="popup_ok">OK</string>
 
 </resources>

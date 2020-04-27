@@ -7,29 +7,22 @@ package com.phenixrts.suite.groups.ui
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.FragmentActivity
+import com.phenixrts.suite.groups.BuildConfig
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.R
-import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
 import com.phenixrts.suite.groups.common.extensions.*
-import com.phenixrts.suite.groups.models.DeepLinkModel
-import com.phenixrts.suite.groups.repository.RoomExpressRepository
-import com.phenixrts.suite.groups.repository.UserMediaRepository
-import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
+import com.phenixrts.suite.groups.models.*
+import com.phenixrts.suite.groups.repository.RepositoryProvider
 import timber.log.Timber
 import javax.inject.Inject
 
 class SplashActivity : FragmentActivity() {
 
-    @Inject lateinit var roomExpressRepository: RoomExpressRepository
-    @Inject lateinit var userMediaRepository: UserMediaRepository
-    @Inject lateinit var cacheProvider: CacheProvider
+    @Inject lateinit var repositoryProvider: RepositoryProvider
     @Inject lateinit var preferenceProvider: PreferenceProvider
-
-    private val viewModel: GroupsViewModel by lazyViewModel {
-        GroupsViewModel(cacheProvider, preferenceProvider, roomExpressRepository, userMediaRepository)
-    }
 
     private val timeoutHandler = Handler()
     private val timeoutRunnable = Runnable {
@@ -51,30 +44,63 @@ class SplashActivity : FragmentActivity() {
         checkDeepLink(intent)
     }
 
-    private fun checkDeepLink(intent: Intent?) = launchMain {
-        Timber.d("Checking deep link: ${intent?.data}")
+    private fun checkDeepLink(intent: Intent?) {
+        val savedConfiguration = preferenceProvider.getConfiguration()
+        val savedRoomAlias = preferenceProvider.getRoomAlias()
+        Timber.d("Checking deep link: ${intent?.data} $savedConfiguration $savedRoomAlias")
         var deepLinkModel: DeepLinkModel? = null
-        intent?.data?.let { data ->
-            val roomCode = data.toString().takeIf { it.contains("#") }?.substringAfterLast("#")
-            val uri = data.getQueryParameter(QUERY_URI)
-            val backend = data.getQueryParameter(QUERY_BACKEND)
-            DeepLinkModel(roomCode, uri, backend).let { model ->
-                deepLinkModel = model
-                if (GroupsApplication.module.hasUrisChanged(model)) {
-                    roomExpressRepository = GroupsApplication.module.provideRoomExpressRepository(cacheProvider)
-                    userMediaRepository = GroupsApplication.module.provideUserMediaRepository(roomExpressRepository)
-                    viewModel.updateRepositories(roomExpressRepository, userMediaRepository)
-                    Timber.d("URIs changed - view model updated")
+        savedRoomAlias?.let { alias ->
+            deepLinkModel = DeepLinkModel(alias)
+        }
+        if (intent?.data != null) {
+            intent.data?.let { data ->
+                val roomCode = data.toString().takeIf { it.contains(ROOM_CODE_DELIMITER) }?.substringAfterLast(ROOM_CODE_DELIMITER)
+                deepLinkModel = DeepLinkModel(roomCode)
+                val uri = data.getQueryParameter(QUERY_URI) ?: BuildConfig.PCAST_URL
+                val backend = data.getQueryParameter(QUERY_BACKEND) ?: BuildConfig.BACKEND_URL
+                val configuration = RoomExpressConfiguration(uri, backend)
+                Timber.d("Checking deep link: $roomCode $uri $backend")
+                if (repositoryProvider.hasConfigurationChanged(configuration)) {
+                    if (repositoryProvider.isRoomExpressInitialized()) {
+                        preferenceProvider.saveConfiguration(configuration)
+                        preferenceProvider.saveRoomAlias(roomCode)
+                        showAppRestartRequired()
+                        return
+                    }
+                    Timber.d("Repository not yet initialized")
+                    reloadConfiguration(configuration)
+                    deepLinkModel?.hasConfigurationChanged = true
                 }
             }
+        } else if (savedConfiguration != null) {
+            reloadConfiguration(savedConfiguration)
         }
+        preferenceProvider.saveConfiguration(null)
+        preferenceProvider.saveRoomAlias(null)
         showLandingScreen(deepLinkModel)
+    }
+
+    private fun reloadConfiguration(configuration: RoomExpressConfiguration) {
+        launchMain{
+            repositoryProvider.reinitializeRoomExpress(configuration)
+        }
+    }
+
+    private fun showAppRestartRequired() {
+        AlertDialog.Builder(this@SplashActivity)
+            .setCancelable(false)
+            .setView(R.layout.view_popup)
+            .setPositiveButton(getString(R.string.popup_ok)) { _, _ ->
+                closeApp()
+            }
+            .create()
+            .show()
     }
 
     private fun showLandingScreen(deepLinkModel: DeepLinkModel?) = launchMain {
         Timber.d("Waiting for PCast")
         timeoutHandler.postDelayed(timeoutRunnable, TIMEOUT_DELAY)
-        viewModel.waitForPCast()
+        repositoryProvider.waitForPCast()
         timeoutHandler.removeCallbacks(timeoutRunnable)
         Timber.d("Navigating to Landing Screen")
         val intent = Intent(this@SplashActivity, MainActivity::class.java)
@@ -87,7 +113,6 @@ class SplashActivity : FragmentActivity() {
 
     private companion object {
         private const val TIMEOUT_DELAY = 5000L
-        private const val QUERY_URI = "uri"
-        private const val QUERY_BACKEND = "backend"
+        private const val ROOM_CODE_DELIMITER = "#"
     }
 }

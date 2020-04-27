@@ -47,9 +47,10 @@ fun FragmentActivity.showToast(message: String) {
     }
 }
 
-fun FragmentActivity.closeApp(message: String) {
-    showToast(message)
+fun FragmentActivity.closeApp(message: String? = null) {
+    message?.let { showToast(it) }
     Handler().postDelayed({
+        finishAffinity()
         finishAndRemoveTask()
         exitProcess(0)
     }, QUIT_DELAY)
@@ -110,7 +111,7 @@ fun MainActivity.joinRoom(viewModel: GroupsViewModel, roomAlias: String, display
     }
     hideKeyboard()
     showLoadingScreen()
-    val joinedRoomStatus = viewModel.joinRoomByAlias(this@joinRoom, roomAlias, displayName)
+    val joinedRoomStatus = viewModel.joinRoomByAlias(roomAlias, displayName)
     Timber.d("Room joined with status: $joinedRoomStatus $roomAlias")
     hideLoadingScreen()
     if (joinedRoomStatus.status == RequestStatus.OK) {

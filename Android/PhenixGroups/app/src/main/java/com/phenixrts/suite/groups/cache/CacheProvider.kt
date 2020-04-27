@@ -13,7 +13,7 @@ import com.phenixrts.suite.groups.cache.entities.RoomInfoItem
 
 @Database(
     entities = [RoomInfoItem::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(DateConverter::class)

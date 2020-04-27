@@ -58,6 +58,12 @@ class FileWriterDebugTree(private val context: Application) : Timber.DebugTree()
         }
     }
 
+    /**
+     * Makes logged out class names clickable in Logcat
+     */
+    override fun createStackElementTag(element: StackTraceElement) =
+        "$TIMBER_TAG: (${element.fileName}:${element.lineNumber}) #${element.methodName} "
+
     private fun initFileWriter() {
         val contextWrapper = ContextWrapper(context)
         filePath = File(contextWrapper.filesDir, LOG_FOLDER)

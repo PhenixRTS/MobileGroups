@@ -17,11 +17,12 @@ import com.phenixrts.suite.groups.models.RoomMember
 import com.phenixrts.suite.groups.models.RoomMessage
 import java.util.*
 
-private const val MINUTE_MILLIS = 1000 * 60L
-private const val HOUR_MILLIS = MINUTE_MILLIS * 60L
-private const val DAY_MILLIS = HOUR_MILLIS * 24L
-private const val MONTH_MILLIS = DAY_MILLIS * 30L
-private const val YEAR_MILLIS = MONTH_MILLIS * 12L
+const val SECOND_MILLIS = 1000L
+const val MINUTE_MILLIS = SECOND_MILLIS * 60L
+const val HOUR_MILLIS = MINUTE_MILLIS * 60L
+const val DAY_MILLIS = HOUR_MILLIS * 24L
+const val MONTH_MILLIS = DAY_MILLIS * 30L
+const val YEAR_MILLIS = MONTH_MILLIS * 12L
 
 fun MutableList<RoomMessage>.addUnique(messages: Array<ChatMessage>, selfName: String, dateRoomLeft: Date, isViewingChat: Boolean) {
     messages.forEach {message ->
@@ -80,22 +81,23 @@ fun Calendar.expirationDate(): Date {
 }
 
 fun Date.elapsedTime(): String {
-    val currentCalendar = Calendar.getInstance()
-    val calendar = Calendar.getInstance()
-    calendar.time = this
+    val currentTime = System.currentTimeMillis()
 
-    val minutes = calendar.time.time / MINUTE_MILLIS
-    val hours = calendar.time.time / HOUR_MILLIS
-    val days = calendar.time.time / DAY_MILLIS
-    val months = calendar.time.time / MONTH_MILLIS
-    val years = calendar.time.time / YEAR_MILLIS
-    val currentMinutes = currentCalendar.time.time / MINUTE_MILLIS
-    val currentHours = currentCalendar.time.time / HOUR_MILLIS
-    val currentDays = currentCalendar.time.time / DAY_MILLIS
-    val currentMonths = currentCalendar.time.time / MONTH_MILLIS
-    val currentYears = currentCalendar.time.time / YEAR_MILLIS
+    val seconds = time / SECOND_MILLIS
+    val minutes = time / MINUTE_MILLIS
+    val hours = time / HOUR_MILLIS
+    val days = time / DAY_MILLIS
+    val months = time / MONTH_MILLIS
+    val years = time / YEAR_MILLIS
+    val currentSeconds = currentTime / SECOND_MILLIS
+    val currentMinutes = currentTime / MINUTE_MILLIS
+    val currentHours = currentTime / HOUR_MILLIS
+    val currentDays = currentTime / DAY_MILLIS
+    val currentMonths = currentTime / MONTH_MILLIS
+    val currentYears = currentTime / YEAR_MILLIS
 
-    val minutesElapsed = currentMinutes - minutes
+    val secondsElapsed = currentSeconds - seconds
+    val minutesElapsed = if (secondsElapsed > 59) currentMinutes - minutes else 0
     val hoursElapsed = if (minutesElapsed > 59) currentHours - hours else 0
     val daysElapsed = if (hoursElapsed > 23) currentDays - days else 0
     val monthsElapsed = if (daysElapsed > 29) currentMonths - months else 0
