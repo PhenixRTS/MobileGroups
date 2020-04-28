@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--New Meeting View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController storyboardIdentifier="NewMeetingViewController" id="BYZ-38-t0r" customClass="NewMeetingViewController" customModule="Phenix_Groups" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kPC-iH-iC5">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="592"/>
+                                <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DXQ-6c-J4t">
+                                <rect key="frame" x="0.0" y="562" width="414" height="300"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JCi-MA-itN" customClass="NewMeetingControlView" customModule="Phenix_Groups" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="414" height="300"/>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                    </view>
+                                </subviews>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="JCi-MA-itN" secondAttribute="trailing" id="12G-Iu-GDS"/>
+                                    <constraint firstItem="JCi-MA-itN" firstAttribute="top" secondItem="DXQ-6c-J4t" secondAttribute="top" id="PJq-5q-2fA"/>
+                                    <constraint firstAttribute="bottom" secondItem="JCi-MA-itN" secondAttribute="bottom" id="VOT-13-ixe"/>
+                                    <constraint firstItem="JCi-MA-itN" firstAttribute="leading" secondItem="DXQ-6c-J4t" secondAttribute="leading" id="Zev-fy-ctE"/>
+                                    <constraint firstAttribute="height" constant="300" placeholder="YES" id="fzJ-ly-af8"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="DXQ-6c-J4t" secondAttribute="trailing" id="D2T-qN-KiT"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="DXQ-6c-J4t" secondAttribute="bottom" id="JbR-Ax-Bvy"/>
+                            <constraint firstItem="kPC-iH-iC5" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="Lzv-v1-Huf"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="kPC-iH-iC5" secondAttribute="trailing" id="NmT-wI-65A"/>
+                            <constraint firstItem="DXQ-6c-J4t" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="Up4-Rk-ZZI"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="top" secondItem="kPC-iH-iC5" secondAttribute="top" constant="44" id="bF0-md-kM7"/>
+                            <constraint firstItem="DXQ-6c-J4t" firstAttribute="top" secondItem="kPC-iH-iC5" secondAttribute="bottom" constant="-30" id="dgA-Ip-zQT"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                    </view>
+                    <connections>
+                        <outlet property="controlView" destination="JCi-MA-itN" id="x2G-Dd-EZV"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="137.68115942028987" y="137.94642857142856"/>
+        </scene>
+        <!--Active Meeting View Controller-->
+        <scene sceneID="OUo-L4-m7i">
+            <objects>
+                <viewController storyboardIdentifier="ActiveMeetingViewController" id="AEN-sP-zZR" customClass="ActiveMeetingViewController" customModule="Phenix_Groups" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="fXQ-sp-Ao3">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="e00-RX-8fe">
+                                <rect key="frame" x="157" y="438" width="100" height="30"/>
+                                <state key="normal" title="Leave meeting"/>
+                                <connections>
+                                    <action selector="leaveMeetingTapped:" destination="AEN-sP-zZR" eventType="touchUpInside" id="khJ-uF-rvi"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="e00-RX-8fe" firstAttribute="centerY" secondItem="VPf-6c-Kla" secondAttribute="centerY" id="0Sh-8k-udN"/>
+                            <constraint firstItem="e00-RX-8fe" firstAttribute="centerX" secondItem="VPf-6c-Kla" secondAttribute="centerX" id="fhe-tq-fkc"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="VPf-6c-Kla"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="d97-sz-JXH" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="968" y="138"/>
+        </scene>
+    </scenes>
+</document>
