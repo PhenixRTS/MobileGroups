@@ -7,8 +7,10 @@ import PhenixCore
 
 class DependencyContainer {
     let phenixManager: PhenixManager
+    let preferences: Preferences
 
-    init(phenixManager: PhenixManager) {
+    init(phenixManager: PhenixManager, preferences: Preferences) {
         self.phenixManager = phenixManager
+        self.preferences = preferences
     }
 }

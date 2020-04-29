@@ -1,9 +1,5 @@
 //
-//  PhenixCore.h
-//  PhenixCore
-//
-//  Created by Maris Lagzdins on 22/04/2020.
-//  Copyright © 2020 PhenixRTS. All rights reserved.
+// Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

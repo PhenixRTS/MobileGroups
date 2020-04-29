@@ -6,7 +6,7 @@ import Foundation
 
 public extension String {
     static var randomRoomAlias: String {
-        let symbols = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        let symbols = "abcdefghijklmnopqrstuvwxyz"
 
         let firstPart = symbols.randomElements(3)
         let secondPart = symbols.randomElements(4)

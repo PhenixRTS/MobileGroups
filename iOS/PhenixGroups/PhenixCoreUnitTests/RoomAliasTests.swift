@@ -18,7 +18,7 @@ class RoomAliasTests: XCTestCase {
 
     func testAliasPattern() {
         // Given
-        let regex = try! NSRegularExpression(pattern: "^[a-zA-Z]{3}-[a-zA-Z]{4}-[a-zA-Z]{3}$")
+        let regex = try! NSRegularExpression(pattern: "^[a-z]{3}-[a-z]{4}-[a-z]{3}$")
         // When
         let alias: String = .randomRoomAlias
 

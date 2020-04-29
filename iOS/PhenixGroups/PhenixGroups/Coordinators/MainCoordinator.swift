@@ -31,6 +31,7 @@ class MainCoordinator: Coordinator {
         let vc = NewMeetingViewController.instantiate()
         vc.coordinator = self
         vc.phenix = dependencyContainer.phenixManager
+        vc.preferences = dependencyContainer.preferences
 
         navigationController.isNavigationBarHidden = true
         navigationController.pushViewController(vc, animated: false)

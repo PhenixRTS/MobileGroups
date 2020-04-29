@@ -6,9 +6,14 @@ import os.log
 import PhenixCore
 import UIKit
 
+protocol DisplayNameDelegate: AnyObject {
+    func saveDisplayName(_ displayName: String)
+}
+
 class NewMeetingViewController: UIViewController, Storyboarded {
     weak var coordinator: Meeting?
     weak var phenix: (PhenixRoomCreation & PhenixRoomJoining)?
+    weak var preferences: Preferences?
 
     var roomID: String?
     var device: UIDevice = .current
@@ -18,7 +23,8 @@ class NewMeetingViewController: UIViewController, Storyboarded {
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
-        controlView.displayName = device.name
+        controlView.displayName = preferences?.displayName ?? device.name
+        controlView.delegate = self
     }
 }
 
@@ -79,5 +85,11 @@ private extension NewMeetingViewController {
                 }
             }
         }
+    }
+}
+
+extension NewMeetingViewController: DisplayNameDelegate {
+    func saveDisplayName(_ displayName: String) {
+        preferences?.displayName = displayName
     }
 }

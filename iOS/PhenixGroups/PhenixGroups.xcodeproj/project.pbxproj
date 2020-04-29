@@ -14,6 +14,7 @@
 		B50195E0245717DC00DDF6AB /* TextFields.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50195DF245717DC00DDF6AB /* TextFields.swift */; };
 		B50195E2245717F800DDF6AB /* Labels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50195E1245717F800DDF6AB /* Labels.swift */; };
 		B50195E42457180F00DDF6AB /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50195E32457180F00DDF6AB /* Buttons.swift */; };
+		B50195EE24585C6200DDF6AB /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50195ED24585C6200DDF6AB /* Preferences.swift */; };
 		B51F3C012453202E00857D3E /* PhenixCoreIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51F3C002453202E00857D3E /* PhenixCoreIntegrationTests.swift */; };
 		B51F3C032453202E00857D3E /* PhenixCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B54D597E2450622A00454066 /* PhenixCore.framework */; };
 		B53D8F50244DCBA30055CE66 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B53D8F4F244DCBA30055CE66 /* AppDelegate.swift */; };
@@ -102,6 +103,7 @@
 		B50195DF245717DC00DDF6AB /* TextFields.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFields.swift; sourceTree = "<group>"; };
 		B50195E1245717F800DDF6AB /* Labels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Labels.swift; sourceTree = "<group>"; };
 		B50195E32457180F00DDF6AB /* Buttons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
+		B50195ED24585C6200DDF6AB /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		B51F3BFE2453202E00857D3E /* PhenixCoreIntegrationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PhenixCoreIntegrationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B51F3C002453202E00857D3E /* PhenixCoreIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixCoreIntegrationTests.swift; sourceTree = "<group>"; };
 		B51F3C022453202E00857D3E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -397,6 +399,7 @@
 			children = (
 				B54D599D2451B5D100454066 /* DependencyContainer.swift */,
 				B54D599F2451B7C900454066 /* Launcher.swift */,
+				B50195ED24585C6200DDF6AB /* Preferences.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -484,6 +487,7 @@
 				5D31D42803500D4317EF34A3 /* [CP] Embed Pods Frameworks */,
 				B5BB084B244F36B50094F254 /* Embed Frameworks */,
 				B54D599A2451AF9B00454066 /* Static Analysis for Swift using SwiftLint */,
+				B50195EB2458125F00DDF6AB /* Catch bad copyrights */,
 			);
 			buildRules = (
 			);
@@ -713,6 +717,24 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		B50195EB2458125F00DDF6AB /* Catch bad copyrights */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Catch bad copyrights";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "COPYRIGHT=\"Copyright $(date +\"%Y\") Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.\"\n\n# Paths which contains files, which needs to be checked.\nPATH1=\"${SRCROOT}/PhenixGroups\"\nPATH2=\"${SRCROOT}/PhenixCore\"\nPATH3=\"${SRCROOT}/PhenixCoreIntegrationTests\"\nPATH4=\"${SRCROOT}/PhenixCoreUnitTests\"\n\nPATHS=(${PATH1} ${PATH2} ${PATH3} ${PATH4})\n\nfor i in \"${PATHS[@]}\"\ndo\n   echo \"searching ${i}/PhenixGroups for ${COPYRIGHT}\"\n   find \"${i}\" \\( -name \"*.h\" -or -name \"*.m\" -or -name \"*.swift\" \\) -print0 \\\n       | xargs -0 egrep --with-filename --files-without-match \"($COPYRIGHT)\" \\\n       | perl -p -e \"s/(.*)$/\\$1: warning: Incorrect or no copyright \\$1/\"\ndone\n";
+		};
 		B54D599A2451AF9B00454066 /* Static Analysis for Swift using SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -786,6 +808,7 @@
 				B50195E42457180F00DDF6AB /* Buttons.swift in Sources */,
 				B53D8F52244DCBA30055CE66 /* SceneDelegate.swift in Sources */,
 				B54D599E2451B5D100454066 /* DependencyContainer.swift in Sources */,
+				B50195EE24585C6200DDF6AB /* Preferences.swift in Sources */,
 				B54D59B2245307F600454066 /* ActiveMeetingViewController.swift in Sources */,
 				B5BB0838244F28E80094F254 /* Storyboarded.swift in Sources */,
 				B54D59A32451BCDD00454066 /* NewMeetingViewController.swift in Sources */,
@@ -1051,6 +1074,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 2020.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.testdevlab.phenixrts.suite.groups;
 				PRODUCT_NAME = "Phenix Groups";
 				SWIFT_VERSION = 5.0;
@@ -1072,6 +1096,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 2020.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.testdevlab.phenixrts.suite.groups;
 				PRODUCT_NAME = "Phenix Groups";
 				SWIFT_VERSION = 5.0;

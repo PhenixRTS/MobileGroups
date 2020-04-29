@@ -17,15 +17,15 @@ class PhenixCoreIntegrationTests: XCTestCase {
         let alias = "Testing"
         let displayName = "Test User"
 
-        let sut = PhenixManager(backend: url, privateQueue: .main)
-        sut.start()
+        let phenixManager = PhenixManager(backend: url, privateQueue: .main)
+        phenixManager.start(unrecoverableErrorCompletion: nil)
 
         // When
-        sut.createRoom(withAlias: alias) { result in
+        phenixManager.createRoom(withAlias: alias) { result in
             if case let Result.success(room) = result {
                 expectation1.fulfill()
 
-                sut.joinRoom(with: .identifier(room.getId()), displayName: displayName) { error in
+                phenixManager.joinRoom(with: .identifier(room.getId()), displayName: displayName) { error in
                     if error == nil {
                         expectation2.fulfill()
                     }

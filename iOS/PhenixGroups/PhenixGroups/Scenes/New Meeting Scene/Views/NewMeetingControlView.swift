@@ -14,13 +14,11 @@ class NewMeetingControlView: UIView {
     private var bottomConstraint: NSLayoutConstraint!
 
     var displayName: String {
-        get {
-            displayNameTextField.text ?? ""
-        }
-        set {
-            displayNameTextField.text = newValue
-        }
+        get { displayNameTextField.text ?? "" }
+        set { displayNameTextField.text = newValue }
     }
+
+    weak var delegate: DisplayNameDelegate?
 
     var newMeetingTapHandler: ButtonTapHandler?
     var joinMeetingTapHandler: ButtonTapHandler?
@@ -177,6 +175,7 @@ private extension NewMeetingControlView {
 extension NewMeetingControlView: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
+        delegate?.saveDisplayName(textField.text ?? "")
         return true
     }
 }

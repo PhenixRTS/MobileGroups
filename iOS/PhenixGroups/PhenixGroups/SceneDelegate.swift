@@ -12,14 +12,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
 
-        let launcher = Launcher()
+        let window = UIWindow(frame: windowScene.coordinateSpace.bounds)
+        self.window = window
+        window.windowScene = windowScene
+
+        let launcher = Launcher(window: window)
 
         let coordinator = launcher.start()
         self.coordinator = coordinator
-
-        window = UIWindow(frame: windowScene.coordinateSpace.bounds)
-        window?.windowScene = windowScene
-        window?.rootViewController = coordinator.navigationController
-        window?.makeKeyAndVisible()
     }
 }

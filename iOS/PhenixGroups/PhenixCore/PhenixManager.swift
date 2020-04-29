@@ -34,13 +34,13 @@ public final class PhenixManager {
     ///
     /// Method needs to be executed before trying to create or join rooms.
     /// It is thread-safe.
-    public func start() {
+    public func start(unrecoverableErrorCompletion: ((_ description: String?) -> Void)?) {
         privateQueue.async { [unowned self] in
             let pcastExpressOptions = PhenixPCastExpressFactory.createPCastExpressOptionsBuilder()
                 .withBackendUri(self.backend.absoluteString)
                 .withUnrecoverableErrorCallback { _, description in
                     os_log(.error, log: .phenixManager, "Unrecoverable Error: %{PUBLIC}@", String(describing: description))
-                    fatalError("Unrecoverable Error: \(String(describing: description))")
+                    unrecoverableErrorCompletion?(description)
                 }
                 .buildPCastExpressOptions()
 
