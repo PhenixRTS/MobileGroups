@@ -16,5 +16,6 @@ extension OSLog {
     static let coordinator = OSLog(subsystem: subsystem, category: "Phenix.App.Coordinator")
     static let launcher = OSLog(subsystem: subsystem, category: "Phenix.App.Launcher")
     static let newMeetingScene = OSLog(subsystem: subsystem, category: "Phenix.App.Scene.NewMeeting")
+    static let joinMeetingScene = OSLog(subsystem: subsystem, category: "Phenix.App.Scene.JoinMeeting")
     static let activeMeetingScene = OSLog(subsystem: subsystem, category: "Phenix.App.Scene.ActiveMeeting")
 }

@@ -11,10 +11,13 @@
 		50E1E7314241CA127E4AA4F0 /* Pods_PhenixCoreUnitTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 523835AD0E716DA1A6D2BFDB /* Pods_PhenixCoreUnitTests.framework */; };
 		B50195D42456F27800DDF6AB /* PhenixCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B54D597E2450622A00454066 /* PhenixCore.framework */; };
 		B50195DD2456F30600DDF6AB /* RoomAliasTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50195DC2456F30600DDF6AB /* RoomAliasTests.swift */; };
-		B50195E0245717DC00DDF6AB /* TextFields.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50195DF245717DC00DDF6AB /* TextFields.swift */; };
-		B50195E2245717F800DDF6AB /* Labels.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50195E1245717F800DDF6AB /* Labels.swift */; };
-		B50195E42457180F00DDF6AB /* Buttons.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50195E32457180F00DDF6AB /* Buttons.swift */; };
+		B50195E0245717DC00DDF6AB /* UITextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50195DF245717DC00DDF6AB /* UITextField.swift */; };
+		B50195E2245717F800DDF6AB /* UILabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50195E1245717F800DDF6AB /* UILabel.swift */; };
+		B50195E42457180F00DDF6AB /* UIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50195E32457180F00DDF6AB /* UIButton.swift */; };
 		B50195EE24585C6200DDF6AB /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50195ED24585C6200DDF6AB /* Preferences.swift */; };
+		B50195FE245AAB4300DDF6AB /* MeetingHistoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50195FD245AAB4300DDF6AB /* MeetingHistoryTableViewController.swift */; };
+		B5019600245AABA600DDF6AB /* MeetingHistoryTableDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50195FF245AABA600DDF6AB /* MeetingHistoryTableDataSource.swift */; };
+		B5019602245AAD9B00DDF6AB /* ChildController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5019601245AAD9B00DDF6AB /* ChildController.swift */; };
 		B51F3C012453202E00857D3E /* PhenixCoreIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51F3C002453202E00857D3E /* PhenixCoreIntegrationTests.swift */; };
 		B51F3C032453202E00857D3E /* PhenixCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B54D597E2450622A00454066 /* PhenixCore.framework */; };
 		B53D8F50244DCBA30055CE66 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B53D8F4F244DCBA30055CE66 /* AppDelegate.swift */; };
@@ -38,10 +41,20 @@
 		B54D59AD2453040100454066 /* PhenixConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59AC2453040100454066 /* PhenixConfiguration.swift */; };
 		B54D59AF2453065800454066 /* PhenixRoomLeaving.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59AE2453065800454066 /* PhenixRoomLeaving.swift */; };
 		B54D59B2245307F600454066 /* ActiveMeetingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59B1245307F600454066 /* ActiveMeetingViewController.swift */; };
+		B59D19DA2461A021008E2C2D /* CameraControlButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19D92461A021008E2C2D /* CameraControlButton.swift */; };
+		B59D19DD24629F69008E2C2D /* JoinMeetingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19DC24629F69008E2C2D /* JoinMeetingViewController.swift */; };
+		B59D19E024629FAE008E2C2D /* JoinMeetingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19DF24629FAE008E2C2D /* JoinMeetingView.swift */; };
+		B59D19E52462DFCB008E2C2D /* ShowMeeting.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19E42462DFCB008E2C2D /* ShowMeeting.swift */; };
+		B59D19E72462DFDF008E2C2D /* JoinMeeting.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19E62462DFDF008E2C2D /* JoinMeeting.swift */; };
+		B59D19EB2462E010008E2C2D /* JoinCancellation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19EA2462E010008E2C2D /* JoinCancellation.swift */; };
+		B59D19EE2462E038008E2C2D /* MeetingFinished.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19ED2462E038008E2C2D /* MeetingFinished.swift */; };
 		B5BB082D244F1FB20094F254 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5BB082C244F1FB20094F254 /* Colors.xcassets */; };
 		B5BB0832244F281F0094F254 /* Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BB0831244F281F0094F254 /* Coordinator.swift */; };
 		B5BB0836244F287F0094F254 /* MainCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BB0835244F287F0094F254 /* MainCoordinator.swift */; };
 		B5BB0838244F28E80094F254 /* Storyboarded.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BB0837244F28E80094F254 /* Storyboarded.swift */; };
+		B5C25EF5245B010600542E1C /* ControlButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C25EF4245B010600542E1C /* ControlButton.swift */; };
+		B5C25EFD245B33D900542E1C /* NewMeetingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C25EFC245B33D900542E1C /* NewMeetingView.swift */; };
+		B5C25F2724619B3F00542E1C /* MicrophoneControlButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C25F2624619B3F00542E1C /* MicrophoneControlButton.swift */; };
 		E5615D68AA3F078E666D2911 /* Pods_PhenixGroups.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2FBDD988943A994D0336EC /* Pods_PhenixGroups.framework */; };
 		E670063F4541A24DBF7C86E2 /* Pods_PhenixCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFA941014B5CCB73D1134E8F /* Pods_PhenixCore.framework */; };
 /* End PBXBuildFile section */
@@ -67,6 +80,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = B54D597D2450622A00454066;
 			remoteInfo = PhenixCore;
+		};
+		B5C25F2424618FA500542E1C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B53D8F44244DCBA30055CE66 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B53D8F4B244DCBA30055CE66;
+			remoteInfo = PhenixGroups;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -100,10 +120,13 @@
 		B50195D32456F27800DDF6AB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B50195DC2456F30600DDF6AB /* RoomAliasTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomAliasTests.swift; sourceTree = "<group>"; };
 		B50195DE2456FA0800DDF6AB /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
-		B50195DF245717DC00DDF6AB /* TextFields.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFields.swift; sourceTree = "<group>"; };
-		B50195E1245717F800DDF6AB /* Labels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Labels.swift; sourceTree = "<group>"; };
-		B50195E32457180F00DDF6AB /* Buttons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Buttons.swift; sourceTree = "<group>"; };
+		B50195DF245717DC00DDF6AB /* UITextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITextField.swift; sourceTree = "<group>"; };
+		B50195E1245717F800DDF6AB /* UILabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabel.swift; sourceTree = "<group>"; };
+		B50195E32457180F00DDF6AB /* UIButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIButton.swift; sourceTree = "<group>"; };
 		B50195ED24585C6200DDF6AB /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
+		B50195FD245AAB4300DDF6AB /* MeetingHistoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingHistoryTableViewController.swift; sourceTree = "<group>"; };
+		B50195FF245AABA600DDF6AB /* MeetingHistoryTableDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingHistoryTableDataSource.swift; sourceTree = "<group>"; };
+		B5019601245AAD9B00DDF6AB /* ChildController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildController.swift; sourceTree = "<group>"; };
 		B51F3BFE2453202E00857D3E /* PhenixCoreIntegrationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PhenixCoreIntegrationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B51F3C002453202E00857D3E /* PhenixCoreIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixCoreIntegrationTests.swift; sourceTree = "<group>"; };
 		B51F3C022453202E00857D3E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -130,10 +153,20 @@
 		B54D59AC2453040100454066 /* PhenixConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixConfiguration.swift; sourceTree = "<group>"; };
 		B54D59AE2453065800454066 /* PhenixRoomLeaving.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixRoomLeaving.swift; sourceTree = "<group>"; };
 		B54D59B1245307F600454066 /* ActiveMeetingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingViewController.swift; sourceTree = "<group>"; };
+		B59D19D92461A021008E2C2D /* CameraControlButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraControlButton.swift; sourceTree = "<group>"; };
+		B59D19DC24629F69008E2C2D /* JoinMeetingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinMeetingViewController.swift; sourceTree = "<group>"; };
+		B59D19DF24629FAE008E2C2D /* JoinMeetingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinMeetingView.swift; sourceTree = "<group>"; };
+		B59D19E42462DFCB008E2C2D /* ShowMeeting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowMeeting.swift; sourceTree = "<group>"; };
+		B59D19E62462DFDF008E2C2D /* JoinMeeting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinMeeting.swift; sourceTree = "<group>"; };
+		B59D19EA2462E010008E2C2D /* JoinCancellation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinCancellation.swift; sourceTree = "<group>"; };
+		B59D19ED2462E038008E2C2D /* MeetingFinished.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingFinished.swift; sourceTree = "<group>"; };
 		B5BB082C244F1FB20094F254 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		B5BB0831244F281F0094F254 /* Coordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coordinator.swift; sourceTree = "<group>"; };
 		B5BB0835244F287F0094F254 /* MainCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainCoordinator.swift; sourceTree = "<group>"; };
 		B5BB0837244F28E80094F254 /* Storyboarded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storyboarded.swift; sourceTree = "<group>"; };
+		B5C25EF4245B010600542E1C /* ControlButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlButton.swift; sourceTree = "<group>"; };
+		B5C25EFC245B33D900542E1C /* NewMeetingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMeetingView.swift; sourceTree = "<group>"; };
+		B5C25F2624619B3F00542E1C /* MicrophoneControlButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicrophoneControlButton.swift; sourceTree = "<group>"; };
 		C14018589F0F82A57D4D0B42 /* Pods-PhenixGroups.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixGroups.release.xcconfig"; path = "Target Support Files/Pods-PhenixGroups/Pods-PhenixGroups.release.xcconfig"; sourceTree = "<group>"; };
 		D8BC44E9C5B4596C131E7876 /* Pods-PhenixCoreIntegrationTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixCoreIntegrationTests.debug.xcconfig"; path = "Target Support Files/Pods-PhenixCoreIntegrationTests/Pods-PhenixCoreIntegrationTests.debug.xcconfig"; sourceTree = "<group>"; };
 		EF50CA9C0F0DB5BDECAE00C7 /* Pods-PhenixCoreIntegrationTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixCoreIntegrationTests.release.xcconfig"; path = "Target Support Files/Pods-PhenixCoreIntegrationTests/Pods-PhenixCoreIntegrationTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -233,14 +266,13 @@
 			path = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		B50195E524571C0E00DDF6AB /* UIKit Elements */ = {
+		B50195E524571C0E00DDF6AB /* Elements */ = {
 			isa = PBXGroup;
 			children = (
-				B50195E32457180F00DDF6AB /* Buttons.swift */,
-				B50195E1245717F800DDF6AB /* Labels.swift */,
-				B50195DF245717DC00DDF6AB /* TextFields.swift */,
+				B59D19D92461A021008E2C2D /* CameraControlButton.swift */,
+				B5C25F2624619B3F00542E1C /* MicrophoneControlButton.swift */,
 			);
-			path = "UIKit Elements";
+			path = Elements;
 			sourceTree = "<group>";
 		};
 		B51F3BFF2453202E00857D3E /* PhenixCoreIntegrationTests */ = {
@@ -284,6 +316,7 @@
 				B53D8F51244DCBA30055CE66 /* SceneDelegate.swift */,
 				B5BB0830244F27BD0094F254 /* Coordinators */,
 				B5BB082F244F27B30094F254 /* Managers */,
+				B59D19EF2462E230008E2C2D /* Models */,
 				B53D8F64244DCBEF0055CE66 /* Resources */,
 				B5BB082E244F27960094F254 /* Scenes */,
 				B53D8F63244DCBDF0055CE66 /* Supporting Files */,
@@ -314,6 +347,8 @@
 		B53D8F66244DD7210055CE66 /* User Interface */ = {
 			isa = PBXGroup;
 			children = (
+				B59D19E22462A75C008E2C2D /* Elements */,
+				B5C25EF3245B005400542E1C /* Views */,
 				B53D8F55244DCBA30055CE66 /* Main.storyboard */,
 			);
 			path = "User Interface";
@@ -362,8 +397,10 @@
 		B54D59A12451BCBF00454066 /* New Meeting Scene */ = {
 			isa = PBXGroup;
 			children = (
-				B54D59AB2452CA6B00454066 /* Views */,
+				B50195FF245AABA600DDF6AB /* MeetingHistoryTableDataSource.swift */,
+				B50195FD245AAB4300DDF6AB /* MeetingHistoryTableViewController.swift */,
 				B54D59A22451BCDC00454066 /* NewMeetingViewController.swift */,
+				B54D59AB2452CA6B00454066 /* Views */,
 			);
 			path = "New Meeting Scene";
 			sourceTree = "<group>";
@@ -372,7 +409,8 @@
 			isa = PBXGroup;
 			children = (
 				B54D59A42451C13400454066 /* NewMeetingControlView.swift */,
-				B50195E524571C0E00DDF6AB /* UIKit Elements */,
+				B5C25EFC245B33D900542E1C /* NewMeetingView.swift */,
+				B50195E524571C0E00DDF6AB /* Elements */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -385,10 +423,56 @@
 			path = "Active Meeting Scene";
 			sourceTree = "<group>";
 		};
+		B59D19DB24629F47008E2C2D /* Join Meeting Scene */ = {
+			isa = PBXGroup;
+			children = (
+				B59D19DC24629F69008E2C2D /* JoinMeetingViewController.swift */,
+				B59D19DE24629F96008E2C2D /* Views */,
+			);
+			path = "Join Meeting Scene";
+			sourceTree = "<group>";
+		};
+		B59D19DE24629F96008E2C2D /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				B59D19DF24629FAE008E2C2D /* JoinMeetingView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		B59D19E22462A75C008E2C2D /* Elements */ = {
+			isa = PBXGroup;
+			children = (
+				B50195E32457180F00DDF6AB /* UIButton.swift */,
+				B50195E1245717F800DDF6AB /* UILabel.swift */,
+				B50195DF245717DC00DDF6AB /* UITextField.swift */,
+			);
+			path = Elements;
+			sourceTree = "<group>";
+		};
+		B59D19E32462DFBC008E2C2D /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				B59D19EA2462E010008E2C2D /* JoinCancellation.swift */,
+				B59D19E62462DFDF008E2C2D /* JoinMeeting.swift */,
+				B59D19ED2462E038008E2C2D /* MeetingFinished.swift */,
+				B59D19E42462DFCB008E2C2D /* ShowMeeting.swift */,
+			);
+			path = Protocols;
+			sourceTree = "<group>";
+		};
+		B59D19EF2462E230008E2C2D /* Models */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		B5BB082E244F27960094F254 /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
 				B54D59B0245307CC00454066 /* Active Meeting Scene */,
+				B59D19DB24629F47008E2C2D /* Join Meeting Scene */,
 				B54D59A12451BCBF00454066 /* New Meeting Scene */,
 			);
 			path = Scenes;
@@ -407,6 +491,7 @@
 		B5BB0830244F27BD0094F254 /* Coordinators */ = {
 			isa = PBXGroup;
 			children = (
+				B59D19E32462DFBC008E2C2D /* Protocols */,
 				B5BB0831244F281F0094F254 /* Coordinator.swift */,
 				B5BB0835244F287F0094F254 /* MainCoordinator.swift */,
 			);
@@ -418,8 +503,17 @@
 			children = (
 				B5BB0837244F28E80094F254 /* Storyboarded.swift */,
 				B54D599B2451B3E500454066 /* OSLog.swift */,
+				B5019601245AAD9B00DDF6AB /* ChildController.swift */,
 			);
 			path = Utils;
+			sourceTree = "<group>";
+		};
+		B5C25EF3245B005400542E1C /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				B5C25EF4245B010600542E1C /* ControlButton.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -470,6 +564,7 @@
 			);
 			dependencies = (
 				B51F3C052453202E00857D3E /* PBXTargetDependency */,
+				B5C25F2524618FA500542E1C /* PBXTargetDependency */,
 			);
 			name = PhenixCoreIntegrationTests;
 			productName = PhenixCoreIntegrationTests;
@@ -799,20 +894,33 @@
 			buildActionMask = 2147483647;
 			files = (
 				B5BB0832244F281F0094F254 /* Coordinator.swift in Sources */,
+				B5C25EF5245B010600542E1C /* ControlButton.swift in Sources */,
+				B5C25F2724619B3F00542E1C /* MicrophoneControlButton.swift in Sources */,
+				B59D19EE2462E038008E2C2D /* MeetingFinished.swift in Sources */,
 				B54D59A02451B7C900454066 /* Launcher.swift in Sources */,
+				B59D19E72462DFDF008E2C2D /* JoinMeeting.swift in Sources */,
+				B59D19E024629FAE008E2C2D /* JoinMeetingView.swift in Sources */,
 				B54D59A52451C13400454066 /* NewMeetingControlView.swift in Sources */,
 				B53D8F50244DCBA30055CE66 /* AppDelegate.swift in Sources */,
+				B50195FE245AAB4300DDF6AB /* MeetingHistoryTableViewController.swift in Sources */,
 				B5BB0836244F287F0094F254 /* MainCoordinator.swift in Sources */,
-				B50195E2245717F800DDF6AB /* Labels.swift in Sources */,
+				B59D19EB2462E010008E2C2D /* JoinCancellation.swift in Sources */,
+				B50195E2245717F800DDF6AB /* UILabel.swift in Sources */,
 				B54D599C2451B3E500454066 /* OSLog.swift in Sources */,
-				B50195E42457180F00DDF6AB /* Buttons.swift in Sources */,
+				B59D19DA2461A021008E2C2D /* CameraControlButton.swift in Sources */,
+				B5C25EFD245B33D900542E1C /* NewMeetingView.swift in Sources */,
+				B50195E42457180F00DDF6AB /* UIButton.swift in Sources */,
+				B59D19DD24629F69008E2C2D /* JoinMeetingViewController.swift in Sources */,
 				B53D8F52244DCBA30055CE66 /* SceneDelegate.swift in Sources */,
+				B5019602245AAD9B00DDF6AB /* ChildController.swift in Sources */,
 				B54D599E2451B5D100454066 /* DependencyContainer.swift in Sources */,
+				B5019600245AABA600DDF6AB /* MeetingHistoryTableDataSource.swift in Sources */,
 				B50195EE24585C6200DDF6AB /* Preferences.swift in Sources */,
+				B59D19E52462DFCB008E2C2D /* ShowMeeting.swift in Sources */,
 				B54D59B2245307F600454066 /* ActiveMeetingViewController.swift in Sources */,
 				B5BB0838244F28E80094F254 /* Storyboarded.swift in Sources */,
 				B54D59A32451BCDD00454066 /* NewMeetingViewController.swift in Sources */,
-				B50195E0245717DC00DDF6AB /* TextFields.swift in Sources */,
+				B50195E0245717DC00DDF6AB /* UITextField.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -848,6 +956,11 @@
 			target = B54D597D2450622A00454066 /* PhenixCore */;
 			targetProxy = B54D59832450622A00454066 /* PBXContainerItemProxy */;
 		};
+		B5C25F2524618FA500542E1C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B53D8F4B244DCBA30055CE66 /* PhenixGroups */;
+			targetProxy = B5C25F2424618FA500542E1C /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
@@ -875,14 +988,14 @@
 			baseConfigurationReference = AA30080ACB7EAFD74C5393F0 /* Pods-PhenixCoreUnitTests.debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = G3988GSF98;
+				DEVELOPMENT_TEAM = LU4S6LX25U;
 				INFOPLIST_FILE = "PhenixCoreUnitTests/Supporting Files/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.testdevlab.phenixrts.suite.groups.core.UnitTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.phenixrts.suite.groups.core.UnitTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -894,14 +1007,14 @@
 			baseConfigurationReference = 8E042A23CD3819CFAA3A3D3A /* Pods-PhenixCoreUnitTests.release.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = G3988GSF98;
+				DEVELOPMENT_TEAM = LU4S6LX25U;
 				INFOPLIST_FILE = "PhenixCoreUnitTests/Supporting Files/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.testdevlab.phenixrts.suite.groups.core.UnitTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.phenixrts.suite.groups.core.UnitTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -913,14 +1026,14 @@
 			baseConfigurationReference = D8BC44E9C5B4596C131E7876 /* Pods-PhenixCoreIntegrationTests.debug.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = G3988GSF98;
+				DEVELOPMENT_TEAM = LU4S6LX25U;
 				INFOPLIST_FILE = "PhenixCoreIntegrationTests/Supporting Files/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.testdevlab.phenixrts.suite.groups.core.IntegrationTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.phenixrts.suite.groups.core.IntegrationTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -932,14 +1045,14 @@
 			baseConfigurationReference = EF50CA9C0F0DB5BDECAE00C7 /* Pods-PhenixCoreIntegrationTests.release.xcconfig */;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = G3988GSF98;
+				DEVELOPMENT_TEAM = LU4S6LX25U;
 				INFOPLIST_FILE = "PhenixCoreIntegrationTests/Supporting Files/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.testdevlab.phenixrts.suite.groups.core.IntegrationTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.phenixrts.suite.groups.core.IntegrationTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -996,7 +1109,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1050,7 +1163,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -1067,15 +1180,15 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = G3988GSF98;
+				DEVELOPMENT_TEAM = LU4S6LX25U;
 				INFOPLIST_FILE = "PhenixGroups/Supporting Files/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2020.0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.testdevlab.phenixrts.suite.groups;
+				MARKETING_VERSION = 2020.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.phenixrts.suite.groups;
 				PRODUCT_NAME = "Phenix Groups";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1089,15 +1202,15 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = G3988GSF98;
+				DEVELOPMENT_TEAM = LU4S6LX25U;
 				INFOPLIST_FILE = "PhenixGroups/Supporting Files/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2020.0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.testdevlab.phenixrts.suite.groups;
+				MARKETING_VERSION = 2020.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.phenixrts.suite.groups;
 				PRODUCT_NAME = "Phenix Groups";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1112,19 +1225,20 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = G3988GSF98;
+				DEVELOPMENT_TEAM = LU4S6LX25U;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = "PhenixCore/Supporting Files/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.testdevlab.phenixrts.suite.groups.core;
+				MARKETING_VERSION = 2020.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.phenixrts.suite.groups.core;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1143,19 +1257,20 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = G3988GSF98;
+				DEVELOPMENT_TEAM = LU4S6LX25U;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				INFOPLIST_FILE = "PhenixCore/Supporting Files/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.testdevlab.phenixrts.suite.groups.core;
+				MARKETING_VERSION = 2020.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.phenixrts.suite.groups.core;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
 				SWIFT_VERSION = 5.0;

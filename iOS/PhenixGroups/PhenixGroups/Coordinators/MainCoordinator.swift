@@ -6,14 +6,6 @@ import os.log
 import PhenixCore
 import UIKit
 
-protocol Meeting: AnyObject {
-    func showMeeting()
-}
-
-protocol MeetingFinished: AnyObject {
-    func meetingFinished()
-}
-
 class MainCoordinator: Coordinator {
     let navigationController: UINavigationController
     private(set) var childCoordinators = [Coordinator]()
@@ -38,16 +30,30 @@ class MainCoordinator: Coordinator {
     }
 }
 
-extension MainCoordinator: Meeting {
+extension MainCoordinator: ShowMeeting {
     func showMeeting() {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
+        navigationController.presentedViewController?.dismiss(animated: true)
 
-            let vc = ActiveMeetingViewController.instantiate()
-            vc.coordinator = self
-            vc.phenix = self.dependencyContainer.phenixManager
-            self.navigationController.pushViewController(vc, animated: true)
-        }
+        let vc = ActiveMeetingViewController.instantiate()
+        vc.coordinator = self
+        vc.phenix = dependencyContainer.phenixManager
+        navigationController.pushViewController(vc, animated: true)
+    }
+}
+
+extension MainCoordinator: JoinMeeting {
+    func joinMeeting(displayName: String) {
+        let vc = JoinMeetingViewController.instantiate()
+        vc.coordinator = self
+        vc.phenix = self.dependencyContainer.phenixManager
+        vc.displayName = displayName
+        navigationController.present(vc, animated: true)
+    }
+}
+
+extension MainCoordinator: JoinCancellation {
+    func cancel(_ vc: UIViewController) {
+        vc.dismiss(animated: true)
     }
 }
 

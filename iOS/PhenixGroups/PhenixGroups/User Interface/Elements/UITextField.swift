@@ -5,10 +5,10 @@
 import UIKit
 
 extension UITextField {
-    static var displayNameTextField: UITextField {
+    static func mainTextField(placeholder: String) -> UITextField {
         let textField = UITextField()
         textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.placeholder = "Display name"
+        textField.placeholder = placeholder
         textField.font = .preferredFont(forTextStyle: .body)
         textField.adjustsFontForContentSizeCategory = true
         textField.returnKeyType = .done

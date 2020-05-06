@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16096" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
-    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <device id="retina6_1" orientation="portrait" appearance="dark"/>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16086"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -11,7 +12,7 @@
         <scene sceneID="tne-QT-ifu">
             <objects>
                 <viewController storyboardIdentifier="NewMeetingViewController" id="BYZ-38-t0r" customClass="NewMeetingViewController" customModule="Phenix_Groups" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC" customClass="NewMeetingView" customModule="Phenix_Groups" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
@@ -19,43 +20,148 @@
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="592"/>
                                 <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
+                            <view opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cJO-GY-Ejx">
+                                <rect key="frame" x="0.0" y="442" width="414" height="150"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DXQ-6c-J4t">
                                 <rect key="frame" x="0.0" y="562" width="414" height="300"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JCi-MA-itN" customClass="NewMeetingControlView" customModule="Phenix_Groups" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="414" height="300"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="414" height="200"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="200" placeholder="YES" id="PGQ-mZ-P6u"/>
+                                        </constraints>
                                     </view>
+                                    <containerView clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pst-6j-HmE">
+                                        <rect key="frame" x="0.0" y="200" width="414" height="100"/>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="100" id="LnP-i1-eoS"/>
+                                        </constraints>
+                                    </containerView>
                                 </subviews>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstAttribute="trailing" secondItem="JCi-MA-itN" secondAttribute="trailing" id="12G-Iu-GDS"/>
                                     <constraint firstItem="JCi-MA-itN" firstAttribute="top" secondItem="DXQ-6c-J4t" secondAttribute="top" id="PJq-5q-2fA"/>
-                                    <constraint firstAttribute="bottom" secondItem="JCi-MA-itN" secondAttribute="bottom" id="VOT-13-ixe"/>
+                                    <constraint firstItem="pst-6j-HmE" firstAttribute="top" secondItem="JCi-MA-itN" secondAttribute="bottom" id="VTT-Zq-gUp"/>
+                                    <constraint firstAttribute="bottom" secondItem="pst-6j-HmE" secondAttribute="bottom" id="Vmu-bG-LgP"/>
                                     <constraint firstItem="JCi-MA-itN" firstAttribute="leading" secondItem="DXQ-6c-J4t" secondAttribute="leading" id="Zev-fy-ctE"/>
-                                    <constraint firstAttribute="height" constant="300" placeholder="YES" id="fzJ-ly-af8"/>
+                                    <constraint firstAttribute="trailing" secondItem="pst-6j-HmE" secondAttribute="trailing" id="dCN-WC-PAX"/>
+                                    <constraint firstItem="pst-6j-HmE" firstAttribute="leading" secondItem="DXQ-6c-J4t" secondAttribute="leading" id="rCI-Sf-1zH"/>
                                 </constraints>
                             </view>
+                            <stackView opaque="NO" contentMode="scaleToFill" spacing="50" translatesAutoresizingMaskIntoConstraints="NO" id="a9t-KK-F5G">
+                                <rect key="frame" x="122" y="482" width="170" height="60"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1wP-da-RBs" customClass="MicrophoneControlButton" customModule="Phenix_Groups" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="60" height="60"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="60" id="Lz1-aS-GY0"/>
+                                            <constraint firstAttribute="height" constant="60" id="kpv-kr-p4W"/>
+                                        </constraints>
+                                        <connections>
+                                            <action selector="microphoneButtonTapped:" destination="8bC-Xf-vdC" eventType="touchUpInside" id="jV8-qH-G83"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eyV-Hz-BOe" customClass="CameraControlButton" customModule="Phenix_Groups" customModuleProvider="target">
+                                        <rect key="frame" x="110" y="0.0" width="60" height="60"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="60" id="5dk-ku-S85"/>
+                                            <constraint firstAttribute="height" constant="60" id="7Jf-rT-iFw"/>
+                                        </constraints>
+                                        <connections>
+                                            <action selector="cameraButtonTapped:" destination="8bC-Xf-vdC" eventType="touchUpInside" id="cVU-1W-Vky"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                            </stackView>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
+                            <constraint firstItem="cJO-GY-Ejx" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="3j3-Xf-57l"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="DXQ-6c-J4t" secondAttribute="trailing" id="D2T-qN-KiT"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="DXQ-6c-J4t" secondAttribute="bottom" id="JbR-Ax-Bvy"/>
                             <constraint firstItem="kPC-iH-iC5" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="Lzv-v1-Huf"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="kPC-iH-iC5" secondAttribute="trailing" id="NmT-wI-65A"/>
                             <constraint firstItem="DXQ-6c-J4t" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="Up4-Rk-ZZI"/>
+                            <constraint firstItem="a9t-KK-F5G" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="Vh5-8H-fgx"/>
+                            <constraint firstItem="DXQ-6c-J4t" firstAttribute="top" secondItem="a9t-KK-F5G" secondAttribute="bottom" constant="20" id="aQt-ve-Rrz"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="top" secondItem="kPC-iH-iC5" secondAttribute="top" constant="44" id="bF0-md-kM7"/>
                             <constraint firstItem="DXQ-6c-J4t" firstAttribute="top" secondItem="kPC-iH-iC5" secondAttribute="bottom" constant="-30" id="dgA-Ip-zQT"/>
+                            <constraint firstItem="DXQ-6c-J4t" firstAttribute="top" secondItem="cJO-GY-Ejx" secondAttribute="bottom" constant="-30" id="lkb-PB-TOq"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="cJO-GY-Ejx" secondAttribute="trailing" id="rO3-WS-GtY"/>
+                            <constraint firstItem="cJO-GY-Ejx" firstAttribute="height" secondItem="a9t-KK-F5G" secondAttribute="height" multiplier="2.5" id="zuO-g5-C7S"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <connections>
+                            <outlet property="buttonShadowView" destination="cJO-GY-Ejx" id="9BB-bp-9Dg"/>
+                            <outlet property="cameraButton" destination="eyV-Hz-BOe" id="K2j-ct-1OY"/>
+                            <outlet property="controlView" destination="JCi-MA-itN" id="Ofl-bM-4Qg"/>
+                            <outlet property="controlViewContainer" destination="DXQ-6c-J4t" id="K24-mE-SJm"/>
+                            <outlet property="historyContainerHeightConstraint" destination="LnP-i1-eoS" id="tRz-Nw-1M2"/>
+                            <outlet property="historyViewContainer" destination="pst-6j-HmE" id="Nbk-d6-F5S"/>
+                            <outlet property="microphoneButton" destination="1wP-da-RBs" id="M8g-yK-koo"/>
+                        </connections>
                     </view>
-                    <connections>
-                        <outlet property="controlView" destination="JCi-MA-itN" id="x2G-Dd-EZV"/>
-                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="137.68115942028987" y="137.94642857142856"/>
+        </scene>
+        <!--Meeting History Table View Controller-->
+        <scene sceneID="wjK-Gh-LuS">
+            <objects>
+                <tableViewController storyboardIdentifier="MeetingHistoryTableViewController" id="9rI-ph-Wfa" customClass="MeetingHistoryTableViewController" customModule="Phenix_Groups" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="NHH-Nw-cTc">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cell" textLabel="YvA-bb-b3c" style="IBUITableViewCellStyleDefault" id="gKQ-LX-2mF">
+                                <rect key="frame" x="0.0" y="28" width="414" height="43.5"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="gKQ-LX-2mF" id="3Fk-ua-Iqq">
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="YvA-bb-b3c">
+                                            <rect key="frame" x="20" y="0.0" width="374" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="9rI-ph-Wfa" id="UXI-CZ-GvK"/>
+                            <outlet property="delegate" destination="9rI-ph-Wfa" id="kRs-L6-EJM"/>
+                        </connections>
+                    </tableView>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="O4U-Bk-Vnr" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="878" y="138"/>
+        </scene>
+        <!--Join Meeting View Controller-->
+        <scene sceneID="u1Z-Za-5J0">
+            <objects>
+                <viewController storyboardIdentifier="JoinMeetingViewController" id="qLZ-cv-lH4" customClass="JoinMeetingViewController" customModule="Phenix_Groups" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="9Vh-6I-7iR" customClass="JoinMeetingView" customModule="Phenix_Groups" customModuleProvider="target">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="Hva-fu-fqh"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="BQj-6E-6IE" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1612" y="138"/>
         </scene>
         <!--Active Meeting View Controller-->
         <scene sceneID="OUo-L4-m7i">
@@ -83,7 +189,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="d97-sz-JXH" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="968" y="138"/>
+            <point key="canvasLocation" x="2354" y="138"/>
         </scene>
     </scenes>
 </document>

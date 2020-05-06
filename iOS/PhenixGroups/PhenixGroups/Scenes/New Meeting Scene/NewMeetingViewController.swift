@@ -11,31 +11,49 @@ protocol DisplayNameDelegate: AnyObject {
 }
 
 class NewMeetingViewController: UIViewController, Storyboarded {
-    weak var coordinator: Meeting?
+    weak var coordinator: (ShowMeeting & JoinMeeting)?
     weak var phenix: (PhenixRoomCreation & PhenixRoomJoining)?
     weak var preferences: Preferences?
 
     var roomID: String?
     var device: UIDevice = .current
+    var historyController: MeetingHistoryTableViewController!
 
-    @IBOutlet private var controlView: NewMeetingControlView!
+    var newMeetingView: NewMeetingView {
+        view as! NewMeetingView
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         configure()
-        controlView.displayName = preferences?.displayName ?? device.name
-        controlView.delegate = self
     }
 }
 
 private extension NewMeetingViewController {
     func configure() {
+        newMeetingView.configure(displayName: preferences?.displayName ?? device.name)
+        newMeetingView.setDisplayNameDelegate(self)
+
+        configureHistoryController()
+        configureInteractions()
+    }
+
+    func configureInteractions() {
         configureNewMeetingHandler()
         configureJoinMeetingHandler()
     }
 
+    func configureHistoryController() {
+        let vc = MeetingHistoryTableViewController.instantiate()
+        historyController = vc
+        vc.delegate = newMeetingView
+        add(vc) { childView in
+            self.newMeetingView.setupHistoryView(childView)
+        }
+    }
+
     func configureNewMeetingHandler() {
-        controlView.newMeetingTapHandler = { [weak self] displayName in
+        newMeetingView.setNewMeetingHandler { [weak self] _ in
             guard let self = self else { return }
 
             self.phenix?.createRoom(withAlias: .randomRoomAlias) { result in
@@ -48,6 +66,8 @@ private extension NewMeetingViewController {
                     self.roomID = roomID
 
                     DispatchQueue.main.async {
+                        self.historyController.addMeeting(roomID)
+
                         let alert = UIAlertController(title: "Room created", message: "Room ID: \(roomID)", preferredStyle: .alert)
                         alert.addAction(UIAlertAction(title: "OK", style: .default))
                         self.present(alert, animated: true)
@@ -62,28 +82,8 @@ private extension NewMeetingViewController {
     }
 
     func configureJoinMeetingHandler() {
-        controlView.joinMeetingTapHandler = { [weak self] displayName in
-            guard let self = self else { return }
-            guard let roomID = self.roomID else {
-                let alert = UIAlertController(title: "Room not created", message: nil, preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: "OK", style: .default))
-
-                DispatchQueue.main.async {
-                    self.present(alert, animated: true)
-                }
-                return
-            }
-
-            self.phenix?.joinRoom(with: .identifier(roomID), displayName: displayName) { error in
-                switch error {
-                case .none:
-                    os_log(.debug, log: .newMeetingScene, "Joining meeting")
-                    self.coordinator?.showMeeting()
-
-                case .failureStatus(let status):
-                    os_log(.debug, log: .newMeetingScene, "Failed to create and/or connect to a meeting, status code: %{PUBLIC}d", status.rawValue)
-                }
-            }
+        newMeetingView.setJoinMeetingHandler { [weak self] displayName in
+            self?.coordinator?.joinMeeting(displayName: displayName)
         }
     }
 }

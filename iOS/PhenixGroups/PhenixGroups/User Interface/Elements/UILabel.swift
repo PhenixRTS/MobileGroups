@@ -5,10 +5,10 @@
 import UIKit
 
 extension UILabel {
-    static var displayNameLabel: UILabel {
+    static func textFieldCaptionLabel(_ text: String) -> UILabel {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.text = "Enter display name"
+        label.text = text
         label.font = .preferredFont(forTextStyle: .caption1)
         label.adjustsFontForContentSizeCategory = true
         label.textColor = .systemGray

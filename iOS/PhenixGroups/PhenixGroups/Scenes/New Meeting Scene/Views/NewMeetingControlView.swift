@@ -7,7 +7,6 @@ import UIKit
 class NewMeetingControlView: UIView {
     typealias ButtonTapHandler = (_ displayName: String) -> Void
 
-    private var displayNameLabel: UILabel!
     private var displayNameTextField: UITextField!
     private var newMeetingButton: UIButton!
     private var joinMeetingButton: UIButton!
@@ -54,12 +53,13 @@ class NewMeetingControlView: UIView {
 
         let keyboardScreenEndFrame = keyboardValue.cgRectValue
         let keyboardAnimation = keyboardAnimationDuration.doubleValue
+
         let keyboardViewEndFrame = convert(keyboardScreenEndFrame, from: window)
 
         if notification.name == UIResponder.keyboardWillHideNotification {
             bottomConstraint.constant = -16
         } else {
-            bottomConstraint.constant = -(keyboardViewEndFrame.height - (frame.height - displayNameTextField.frame.maxY - 10))
+            bottomConstraint.constant = -16 - (displayNameTextField.frame.maxY - keyboardViewEndFrame.minY) - 20
         }
 
         UIView.animate(withDuration: keyboardAnimation) {
@@ -89,7 +89,7 @@ private extension NewMeetingControlView {
 
         stack.translatesAutoresizingMaskIntoConstraints = false
         stack.axis = .vertical
-        stack.spacing = 10
+        stack.spacing = 20
 
         bottomConstraint = stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -16)
 
@@ -112,24 +112,24 @@ private extension NewMeetingControlView {
         view.translatesAutoresizingMaskIntoConstraints = false
 
         // Display name label
-        displayNameLabel = UILabel.displayNameLabel
-        view.addSubview(displayNameLabel)
+        let label = UILabel.textFieldCaptionLabel("Enter display name")
+        view.addSubview(label)
 
         // swiftlint:disable multiline_arguments_brackets
         NSLayoutConstraint.activate([
-            displayNameLabel.topAnchor.constraint(equalTo: view.topAnchor),
-            displayNameLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            displayNameLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+            label.topAnchor.constraint(equalTo: view.topAnchor),
+            label.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            label.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
 
         // Display name text field
-        displayNameTextField = UITextField.displayNameTextField
+        displayNameTextField = UITextField.mainTextField(placeholder: "Display name")
         displayNameTextField.delegate = self
         view.addSubview(displayNameTextField)
 
         // swiftlint:disable multiline_arguments_brackets
         NSLayoutConstraint.activate([
-            displayNameTextField.topAnchor.constraint(equalTo: displayNameLabel.bottomAnchor, constant: 5),
+            displayNameTextField.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 5),
             displayNameTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             displayNameTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             displayNameTextField.bottomAnchor.constraint(equalTo: view.bottomAnchor)
@@ -142,11 +142,19 @@ private extension NewMeetingControlView {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
 
-        newMeetingButton = .meetingButton(title: "NEW MEETING")
-        newMeetingButton.addTarget(self, action: #selector(newMeetingTapped), for: .touchUpInside)
+        let spacing: CGFloat = 10 // the amount of spacing to appear between image and title
 
-        joinMeetingButton = .meetingButton(title: "JOIN MEETING")
+        newMeetingButton = UIButton.mainButton(title: "New meeting")
+        newMeetingButton.setImage(UIImage(named: "add"), for: .normal)
+        newMeetingButton.addTarget(self, action: #selector(newMeetingTapped), for: .touchUpInside)
+        newMeetingButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: spacing)
+        newMeetingButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: spacing, bottom: 0, right: 0)
+
+        joinMeetingButton = UIButton.mainButton(title: "Meeting code")
+        joinMeetingButton.setImage(UIImage(named: "keyboard"), for: .normal)
         joinMeetingButton.addTarget(self, action: #selector(joinMeetingTapped), for: .touchUpInside)
+        joinMeetingButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: spacing)
+        joinMeetingButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: spacing, bottom: 0, right: 0)
 
         let buttonStack = UIStackView(arrangedSubviews: [
             newMeetingButton,

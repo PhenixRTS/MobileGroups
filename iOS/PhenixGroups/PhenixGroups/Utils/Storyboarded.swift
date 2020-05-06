@@ -11,7 +11,7 @@ protocol Storyboarded {
 extension Storyboarded where Self: UIViewController {
     static func instantiate(from board: UIStoryboard = .main) -> Self {
         let id = String(describing: self)
-        return board.instantiateViewController(identifier: id) as! Self
+        return board.instantiateViewController(withIdentifier: id) as! Self
     }
 }
 
