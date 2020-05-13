@@ -4,6 +4,8 @@
 
 import Foundation
 
-protocol ShowMeeting: AnyObject {
-    func showMeeting(code: String)
+struct Meeting: Codable {
+    var code: String
+    var leaveDate: Date
+    var url: URL
 }

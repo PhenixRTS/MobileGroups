@@ -14,8 +14,12 @@ public protocol PhenixRoomLeaving: AnyObject {
 extension PhenixManager: PhenixRoomLeaving {
     public func leaveRoom() {
         privateQueue.async { [weak self] in
+            guard let self = self else { return }
             os_log(.debug, log: .phenixManager, "Leaving active room")
-            self?.joinedRoomService = nil
+
+            self.joinedRoomService?.leaveRoom { _, _ in
+                self.joinedRoomService = nil
+            }
         }
     }
 }

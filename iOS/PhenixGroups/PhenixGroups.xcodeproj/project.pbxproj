@@ -41,20 +41,28 @@
 		B54D59AD2453040100454066 /* PhenixConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59AC2453040100454066 /* PhenixConfiguration.swift */; };
 		B54D59AF2453065800454066 /* PhenixRoomLeaving.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59AE2453065800454066 /* PhenixRoomLeaving.swift */; };
 		B54D59B2245307F600454066 /* ActiveMeetingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59B1245307F600454066 /* ActiveMeetingViewController.swift */; };
-		B59D19DA2461A021008E2C2D /* CameraControlButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19D92461A021008E2C2D /* CameraControlButton.swift */; };
+		B5704D2E24642B0900D9703A /* PhenixInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D2D24642B0900D9703A /* PhenixInformation.swift */; };
+		B5704D3024642BEB00D9703A /* CurrentDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D2F24642BEB00D9703A /* CurrentDate.swift */; };
+		B5704D3224642DBA00D9703A /* Encode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D3124642DBA00D9703A /* Encode.swift */; };
+		B5704D342464346500D9703A /* Decode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D332464346500D9703A /* Decode.swift */; };
+		B5704D362464436F00D9703A /* ViewControllerAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D352464436F00D9703A /* ViewControllerAlerts.swift */; };
+		B5704D682465369000D9703A /* ActiveMeetingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D672465369000D9703A /* ActiveMeetingView.swift */; };
+		B5704D7B2465701400D9703A /* ControlButtonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D7A2465701400D9703A /* ControlButtonTests.swift */; };
 		B59D19DD24629F69008E2C2D /* JoinMeetingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19DC24629F69008E2C2D /* JoinMeetingViewController.swift */; };
 		B59D19E024629FAE008E2C2D /* JoinMeetingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19DF24629FAE008E2C2D /* JoinMeetingView.swift */; };
 		B59D19E52462DFCB008E2C2D /* ShowMeeting.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19E42462DFCB008E2C2D /* ShowMeeting.swift */; };
 		B59D19E72462DFDF008E2C2D /* JoinMeeting.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19E62462DFDF008E2C2D /* JoinMeeting.swift */; };
 		B59D19EB2462E010008E2C2D /* JoinCancellation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19EA2462E010008E2C2D /* JoinCancellation.swift */; };
 		B59D19EE2462E038008E2C2D /* MeetingFinished.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19ED2462E038008E2C2D /* MeetingFinished.swift */; };
+		B59D19F62462EE65008E2C2D /* Meeting.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19F52462EE65008E2C2D /* Meeting.swift */; };
+		B59D19F82463132C008E2C2D /* MeetingHistoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19F72463132C008E2C2D /* MeetingHistoryTableViewCell.swift */; };
+		B59D19FA24631398008E2C2D /* CellIdentified.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19F924631398008E2C2D /* CellIdentified.swift */; };
 		B5BB082D244F1FB20094F254 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5BB082C244F1FB20094F254 /* Colors.xcassets */; };
 		B5BB0832244F281F0094F254 /* Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BB0831244F281F0094F254 /* Coordinator.swift */; };
 		B5BB0836244F287F0094F254 /* MainCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BB0835244F287F0094F254 /* MainCoordinator.swift */; };
 		B5BB0838244F28E80094F254 /* Storyboarded.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BB0837244F28E80094F254 /* Storyboarded.swift */; };
 		B5C25EF5245B010600542E1C /* ControlButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C25EF4245B010600542E1C /* ControlButton.swift */; };
 		B5C25EFD245B33D900542E1C /* NewMeetingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C25EFC245B33D900542E1C /* NewMeetingView.swift */; };
-		B5C25F2724619B3F00542E1C /* MicrophoneControlButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C25F2624619B3F00542E1C /* MicrophoneControlButton.swift */; };
 		E5615D68AA3F078E666D2911 /* Pods_PhenixGroups.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2FBDD988943A994D0336EC /* Pods_PhenixGroups.framework */; };
 		E670063F4541A24DBF7C86E2 /* Pods_PhenixCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFA941014B5CCB73D1134E8F /* Pods_PhenixCore.framework */; };
 /* End PBXBuildFile section */
@@ -80,6 +88,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = B54D597D2450622A00454066;
 			remoteInfo = PhenixCore;
+		};
+		B5704D7424656FBE00D9703A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B53D8F44244DCBA30055CE66 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B53D8F4B244DCBA30055CE66;
+			remoteInfo = PhenixGroups;
 		};
 		B5C25F2424618FA500542E1C /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -153,20 +168,30 @@
 		B54D59AC2453040100454066 /* PhenixConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixConfiguration.swift; sourceTree = "<group>"; };
 		B54D59AE2453065800454066 /* PhenixRoomLeaving.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixRoomLeaving.swift; sourceTree = "<group>"; };
 		B54D59B1245307F600454066 /* ActiveMeetingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingViewController.swift; sourceTree = "<group>"; };
-		B59D19D92461A021008E2C2D /* CameraControlButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraControlButton.swift; sourceTree = "<group>"; };
+		B5704D2D24642B0900D9703A /* PhenixInformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixInformation.swift; sourceTree = "<group>"; };
+		B5704D2F24642BEB00D9703A /* CurrentDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentDate.swift; sourceTree = "<group>"; };
+		B5704D3124642DBA00D9703A /* Encode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Encode.swift; sourceTree = "<group>"; };
+		B5704D332464346500D9703A /* Decode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Decode.swift; sourceTree = "<group>"; };
+		B5704D352464436F00D9703A /* ViewControllerAlerts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewControllerAlerts.swift; sourceTree = "<group>"; };
+		B5704D672465369000D9703A /* ActiveMeetingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingView.swift; sourceTree = "<group>"; };
+		B5704D6F24656FBE00D9703A /* PhenixGroupsUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PhenixGroupsUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B5704D7324656FBE00D9703A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B5704D7A2465701400D9703A /* ControlButtonTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlButtonTests.swift; sourceTree = "<group>"; };
 		B59D19DC24629F69008E2C2D /* JoinMeetingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinMeetingViewController.swift; sourceTree = "<group>"; };
 		B59D19DF24629FAE008E2C2D /* JoinMeetingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinMeetingView.swift; sourceTree = "<group>"; };
 		B59D19E42462DFCB008E2C2D /* ShowMeeting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowMeeting.swift; sourceTree = "<group>"; };
 		B59D19E62462DFDF008E2C2D /* JoinMeeting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinMeeting.swift; sourceTree = "<group>"; };
 		B59D19EA2462E010008E2C2D /* JoinCancellation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinCancellation.swift; sourceTree = "<group>"; };
 		B59D19ED2462E038008E2C2D /* MeetingFinished.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingFinished.swift; sourceTree = "<group>"; };
+		B59D19F52462EE65008E2C2D /* Meeting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Meeting.swift; sourceTree = "<group>"; };
+		B59D19F72463132C008E2C2D /* MeetingHistoryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingHistoryTableViewCell.swift; sourceTree = "<group>"; };
+		B59D19F924631398008E2C2D /* CellIdentified.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellIdentified.swift; sourceTree = "<group>"; };
 		B5BB082C244F1FB20094F254 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		B5BB0831244F281F0094F254 /* Coordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coordinator.swift; sourceTree = "<group>"; };
 		B5BB0835244F287F0094F254 /* MainCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainCoordinator.swift; sourceTree = "<group>"; };
 		B5BB0837244F28E80094F254 /* Storyboarded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storyboarded.swift; sourceTree = "<group>"; };
 		B5C25EF4245B010600542E1C /* ControlButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlButton.swift; sourceTree = "<group>"; };
 		B5C25EFC245B33D900542E1C /* NewMeetingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMeetingView.swift; sourceTree = "<group>"; };
-		B5C25F2624619B3F00542E1C /* MicrophoneControlButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicrophoneControlButton.swift; sourceTree = "<group>"; };
 		C14018589F0F82A57D4D0B42 /* Pods-PhenixGroups.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixGroups.release.xcconfig"; path = "Target Support Files/Pods-PhenixGroups/Pods-PhenixGroups.release.xcconfig"; sourceTree = "<group>"; };
 		D8BC44E9C5B4596C131E7876 /* Pods-PhenixCoreIntegrationTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixCoreIntegrationTests.debug.xcconfig"; path = "Target Support Files/Pods-PhenixCoreIntegrationTests/Pods-PhenixCoreIntegrationTests.debug.xcconfig"; sourceTree = "<group>"; };
 		EF50CA9C0F0DB5BDECAE00C7 /* Pods-PhenixCoreIntegrationTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixCoreIntegrationTests.release.xcconfig"; path = "Target Support Files/Pods-PhenixCoreIntegrationTests/Pods-PhenixCoreIntegrationTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -206,6 +231,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				E670063F4541A24DBF7C86E2 /* Pods_PhenixCore.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B5704D6C24656FBE00D9703A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -266,15 +298,6 @@
 			path = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		B50195E524571C0E00DDF6AB /* Elements */ = {
-			isa = PBXGroup;
-			children = (
-				B59D19D92461A021008E2C2D /* CameraControlButton.swift */,
-				B5C25F2624619B3F00542E1C /* MicrophoneControlButton.swift */,
-			);
-			path = Elements;
-			sourceTree = "<group>";
-		};
 		B51F3BFF2453202E00857D3E /* PhenixCoreIntegrationTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -289,6 +312,7 @@
 			children = (
 				B50195DE2456FA0800DDF6AB /* README.md */,
 				B53D8F4E244DCBA30055CE66 /* PhenixGroups */,
+				B5704D7024656FBE00D9703A /* PhenixGroupsUnitTests */,
 				B54D597F2450622A00454066 /* PhenixCore */,
 				B51F3BFF2453202E00857D3E /* PhenixCoreIntegrationTests */,
 				B50195D02456F27800DDF6AB /* PhenixCoreUnitTests */,
@@ -305,6 +329,7 @@
 				B54D597E2450622A00454066 /* PhenixCore.framework */,
 				B51F3BFE2453202E00857D3E /* PhenixCoreIntegrationTests.xctest */,
 				B50195CF2456F27800DDF6AB /* PhenixCoreUnitTests.xctest */,
+				B5704D6F24656FBE00D9703A /* PhenixGroupsUnitTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -381,6 +406,7 @@
 				B54D599224507D3700454066 /* PhenixRoomCreation.swift */,
 				B54D599424507D4200454066 /* PhenixRoomJoining.swift */,
 				B54D59AE2453065800454066 /* PhenixRoomLeaving.swift */,
+				B5704D2D24642B0900D9703A /* PhenixInformation.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -408,9 +434,9 @@
 		B54D59AB2452CA6B00454066 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				B59D19F72463132C008E2C2D /* MeetingHistoryTableViewCell.swift */,
 				B54D59A42451C13400454066 /* NewMeetingControlView.swift */,
 				B5C25EFC245B33D900542E1C /* NewMeetingView.swift */,
-				B50195E524571C0E00DDF6AB /* Elements */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -419,8 +445,34 @@
 			isa = PBXGroup;
 			children = (
 				B54D59B1245307F600454066 /* ActiveMeetingViewController.swift */,
+				B5704D662465366D00D9703A /* Views */,
 			);
 			path = "Active Meeting Scene";
+			sourceTree = "<group>";
+		};
+		B5704D662465366D00D9703A /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				B5704D672465369000D9703A /* ActiveMeetingView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		B5704D7024656FBE00D9703A /* PhenixGroupsUnitTests */ = {
+			isa = PBXGroup;
+			children = (
+				B5704D7924656FF500D9703A /* Supporting Files */,
+				B5704D7A2465701400D9703A /* ControlButtonTests.swift */,
+			);
+			path = PhenixGroupsUnitTests;
+			sourceTree = "<group>";
+		};
+		B5704D7924656FF500D9703A /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				B5704D7324656FBE00D9703A /* Info.plist */,
+			);
+			path = "Supporting Files";
 			sourceTree = "<group>";
 		};
 		B59D19DB24629F47008E2C2D /* Join Meeting Scene */ = {
@@ -464,6 +516,7 @@
 		B59D19EF2462E230008E2C2D /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				B59D19F52462EE65008E2C2D /* Meeting.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -491,9 +544,9 @@
 		B5BB0830244F27BD0094F254 /* Coordinators */ = {
 			isa = PBXGroup;
 			children = (
-				B59D19E32462DFBC008E2C2D /* Protocols */,
 				B5BB0831244F281F0094F254 /* Coordinator.swift */,
 				B5BB0835244F287F0094F254 /* MainCoordinator.swift */,
+				B59D19E32462DFBC008E2C2D /* Protocols */,
 			);
 			path = Coordinators;
 			sourceTree = "<group>";
@@ -501,9 +554,14 @@
 		B5BB0833244F28270094F254 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				B5BB0837244F28E80094F254 /* Storyboarded.swift */,
-				B54D599B2451B3E500454066 /* OSLog.swift */,
+				B59D19F924631398008E2C2D /* CellIdentified.swift */,
 				B5019601245AAD9B00DDF6AB /* ChildController.swift */,
+				B5704D2F24642BEB00D9703A /* CurrentDate.swift */,
+				B5704D332464346500D9703A /* Decode.swift */,
+				B5704D3124642DBA00D9703A /* Encode.swift */,
+				B54D599B2451B3E500454066 /* OSLog.swift */,
+				B5BB0837244F28E80094F254 /* Storyboarded.swift */,
+				B5704D352464436F00D9703A /* ViewControllerAlerts.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -613,6 +671,24 @@
 			productReference = B54D597E2450622A00454066 /* PhenixCore.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		B5704D6E24656FBE00D9703A /* PhenixGroupsUnitTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B5704D7824656FBF00D9703A /* Build configuration list for PBXNativeTarget "PhenixGroupsUnitTests" */;
+			buildPhases = (
+				B5704D6B24656FBE00D9703A /* Sources */,
+				B5704D6C24656FBE00D9703A /* Frameworks */,
+				B5704D6D24656FBE00D9703A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B5704D7524656FBE00D9703A /* PBXTargetDependency */,
+			);
+			name = PhenixGroupsUnitTests;
+			productName = PhenixGroupsUnitTests;
+			productReference = B5704D6F24656FBE00D9703A /* PhenixGroupsUnitTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -636,6 +712,10 @@
 						CreatedOnToolsVersion = 11.4;
 						LastSwiftMigration = 1140;
 					};
+					B5704D6E24656FBE00D9703A = {
+						CreatedOnToolsVersion = 11.4;
+						TestTargetID = B53D8F4B244DCBA30055CE66;
+					};
 				};
 			};
 			buildConfigurationList = B53D8F47244DCBA30055CE66 /* Build configuration list for PBXProject "PhenixGroups" */;
@@ -655,6 +735,7 @@
 				B54D597D2450622A00454066 /* PhenixCore */,
 				B51F3BFD2453202E00857D3E /* PhenixCoreIntegrationTests */,
 				B50195CE2456F27800DDF6AB /* PhenixCoreUnitTests */,
+				B5704D6E24656FBE00D9703A /* PhenixGroupsUnitTests */,
 			);
 		};
 /* End PBXProject section */
@@ -686,6 +767,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		B54D597C2450622A00454066 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B5704D6D24656FBE00D9703A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -895,19 +983,23 @@
 			files = (
 				B5BB0832244F281F0094F254 /* Coordinator.swift in Sources */,
 				B5C25EF5245B010600542E1C /* ControlButton.swift in Sources */,
-				B5C25F2724619B3F00542E1C /* MicrophoneControlButton.swift in Sources */,
 				B59D19EE2462E038008E2C2D /* MeetingFinished.swift in Sources */,
 				B54D59A02451B7C900454066 /* Launcher.swift in Sources */,
+				B5704D362464436F00D9703A /* ViewControllerAlerts.swift in Sources */,
 				B59D19E72462DFDF008E2C2D /* JoinMeeting.swift in Sources */,
 				B59D19E024629FAE008E2C2D /* JoinMeetingView.swift in Sources */,
 				B54D59A52451C13400454066 /* NewMeetingControlView.swift in Sources */,
+				B5704D682465369000D9703A /* ActiveMeetingView.swift in Sources */,
 				B53D8F50244DCBA30055CE66 /* AppDelegate.swift in Sources */,
 				B50195FE245AAB4300DDF6AB /* MeetingHistoryTableViewController.swift in Sources */,
 				B5BB0836244F287F0094F254 /* MainCoordinator.swift in Sources */,
+				B59D19F62462EE65008E2C2D /* Meeting.swift in Sources */,
+				B5704D342464346500D9703A /* Decode.swift in Sources */,
 				B59D19EB2462E010008E2C2D /* JoinCancellation.swift in Sources */,
 				B50195E2245717F800DDF6AB /* UILabel.swift in Sources */,
+				B5704D3024642BEB00D9703A /* CurrentDate.swift in Sources */,
 				B54D599C2451B3E500454066 /* OSLog.swift in Sources */,
-				B59D19DA2461A021008E2C2D /* CameraControlButton.swift in Sources */,
+				B59D19F82463132C008E2C2D /* MeetingHistoryTableViewCell.swift in Sources */,
 				B5C25EFD245B33D900542E1C /* NewMeetingView.swift in Sources */,
 				B50195E42457180F00DDF6AB /* UIButton.swift in Sources */,
 				B59D19DD24629F69008E2C2D /* JoinMeetingViewController.swift in Sources */,
@@ -915,11 +1007,13 @@
 				B5019602245AAD9B00DDF6AB /* ChildController.swift in Sources */,
 				B54D599E2451B5D100454066 /* DependencyContainer.swift in Sources */,
 				B5019600245AABA600DDF6AB /* MeetingHistoryTableDataSource.swift in Sources */,
+				B59D19FA24631398008E2C2D /* CellIdentified.swift in Sources */,
 				B50195EE24585C6200DDF6AB /* Preferences.swift in Sources */,
 				B59D19E52462DFCB008E2C2D /* ShowMeeting.swift in Sources */,
 				B54D59B2245307F600454066 /* ActiveMeetingViewController.swift in Sources */,
 				B5BB0838244F28E80094F254 /* Storyboarded.swift in Sources */,
 				B54D59A32451BCDD00454066 /* NewMeetingViewController.swift in Sources */,
+				B5704D3224642DBA00D9703A /* Encode.swift in Sources */,
 				B50195E0245717DC00DDF6AB /* UITextField.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -932,9 +1026,18 @@
 				B54D598B2450626C00454066 /* PhenixManager.swift in Sources */,
 				B54D599824519E9000454066 /* OSLog.swift in Sources */,
 				B54D59AD2453040100454066 /* PhenixConfiguration.swift in Sources */,
+				B5704D2E24642B0900D9703A /* PhenixInformation.swift in Sources */,
 				B54D59AF2453065800454066 /* PhenixRoomLeaving.swift in Sources */,
 				B54D599324507D3700454066 /* PhenixRoomCreation.swift in Sources */,
 				B54D59A72451D78100454066 /* RoomAlias.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B5704D6B24656FBE00D9703A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B5704D7B2465701400D9703A /* ControlButtonTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -955,6 +1058,11 @@
 			isa = PBXTargetDependency;
 			target = B54D597D2450622A00454066 /* PhenixCore */;
 			targetProxy = B54D59832450622A00454066 /* PBXContainerItemProxy */;
+		};
+		B5704D7524656FBE00D9703A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B53D8F4B244DCBA30055CE66 /* PhenixGroups */;
+			targetProxy = B5704D7424656FBE00D9703A /* PBXContainerItemProxy */;
 		};
 		B5C25F2524618FA500542E1C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -1280,6 +1388,48 @@
 			};
 			name = Release;
 		};
+		B5704D7624656FBF00D9703A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = LU4S6LX25U;
+				INFOPLIST_FILE = "PhenixGroupsUnitTests/Supporting Files/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.phenixrts.suite.groups.UnitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Phenix Groups.app/Phenix Groups";
+			};
+			name = Debug;
+		};
+		B5704D7724656FBF00D9703A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = LU4S6LX25U;
+				INFOPLIST_FILE = "PhenixGroupsUnitTests/Supporting Files/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.phenixrts.suite.groups.UnitTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Phenix Groups.app/Phenix Groups";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1324,6 +1474,15 @@
 			buildConfigurations = (
 				B54D59882450622A00454066 /* Debug */,
 				B54D59892450622A00454066 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B5704D7824656FBF00D9703A /* Build configuration list for PBXNativeTarget "PhenixGroupsUnitTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B5704D7624656FBF00D9703A /* Debug */,
+				B5704D7724656FBF00D9703A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

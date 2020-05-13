@@ -15,12 +15,15 @@ class NewMeetingViewController: UIViewController, Storyboarded {
     weak var phenix: (PhenixRoomCreation & PhenixRoomJoining)?
     weak var preferences: Preferences?
 
-    var roomID: String?
     var device: UIDevice = .current
     var historyController: MeetingHistoryTableViewController!
 
     var newMeetingView: NewMeetingView {
         view as! NewMeetingView
+    }
+
+    var displayName: String {
+        newMeetingView.displayName
     }
 
     override func viewDidLoad() {
@@ -34,7 +37,7 @@ private extension NewMeetingViewController {
         newMeetingView.configure(displayName: preferences?.displayName ?? device.name)
         newMeetingView.setDisplayNameDelegate(self)
 
-        configureHistoryController()
+        configureHistoryView()
         configureInteractions()
     }
 
@@ -43,39 +46,34 @@ private extension NewMeetingViewController {
         configureJoinMeetingHandler()
     }
 
-    func configureHistoryController() {
-        let vc = MeetingHistoryTableViewController.instantiate()
-        historyController = vc
-        vc.delegate = newMeetingView
-        add(vc) { childView in
+    func configureHistoryView() {
+        add(historyController) { childView in
             self.newMeetingView.setupHistoryView(childView)
         }
     }
 
     func configureNewMeetingHandler() {
-        newMeetingView.setNewMeetingHandler { [weak self] _ in
+        newMeetingView.setNewMeetingHandler { [weak self] displayName in
             guard let self = self else { return }
+            guard let phenix = self.phenix else { return }
 
-            self.phenix?.createRoom(withAlias: .randomRoomAlias) { result in
+            phenix.createRoom(withAlias: .randomRoomAlias) { result in
                 switch result {
                 case .success(let room):
-                    os_log(.debug, log: .newMeetingScene, "Meeting created and joined")
-                    guard let roomID = room.getId() else {
-                        fatalError("Could not get Room ID")
-                    }
-                    self.roomID = roomID
+                    os_log(.debug, log: .newMeetingScene, "Meeting created")
 
-                    DispatchQueue.main.async {
-                        self.historyController.addMeeting(roomID)
-
-                        let alert = UIAlertController(title: "Room created", message: "Room ID: \(roomID)", preferredStyle: .alert)
-                        alert.addAction(UIAlertAction(title: "OK", style: .default))
-                        self.present(alert, animated: true)
+                    guard let alias = room.getObservableAlias()?.getValue() as String? else {
+                        return
                     }
+
+                    self.joinMeeting(code: alias, displayName: displayName)
 
                 case .failure(.failureStatus(let status)):
                     os_log(.debug, log: .newMeetingScene, "Failed to create a meeting, status code: %{PUBLIC}d", status.rawValue)
-                    self.roomID = nil
+
+                    DispatchQueue.main.async {
+                        self.presentAlert("Failed to create a meeting")
+                    }
                 }
             }
         }
@@ -86,10 +84,53 @@ private extension NewMeetingViewController {
             self?.coordinator?.joinMeeting(displayName: displayName)
         }
     }
+
+    func joinMeeting(code: String, displayName: String) {
+        phenix?.joinRoom(with: .alias(code), displayName: displayName) { [weak self] error in
+            guard let self = self else { return }
+            switch error {
+            case .none:
+                os_log(.debug, log: .newMeetingScene, "Joined meeting with alias %{PUBLIC}@", code)
+                DispatchQueue.main.async {
+                    self.coordinator?.showMeeting(code: code)
+                }
+
+            case .failureStatus(let status):
+                os_log(.debug, log: .newMeetingScene, "Failed to join a meeting with alias: %{PUBLIC}@, status code: %{PUBLIC}d", code, status.rawValue)
+
+                DispatchQueue.main.async {
+                    self.presentAlert("Failed to join a meeting")
+                }
+            }
+        }
+    }
 }
 
 extension NewMeetingViewController: DisplayNameDelegate {
     func saveDisplayName(_ displayName: String) {
         preferences?.displayName = displayName
+    }
+}
+
+extension NewMeetingViewController: MeetingHistoryDelegate {
+    func rejoin(_ meeting: Meeting) {
+        os_log(.debug, log: .newMeetingScene, "Rejoin meeting %{PUBLIC}@ (%{PRIVATE}@)", meeting.code, meeting.url.absoluteString)
+        phenix?.joinRoom(with: .alias(meeting.code), displayName: displayName) { [weak self] error in
+            guard let self = self else { return }
+            switch error {
+            case .none:
+                os_log(.debug, log: .newMeetingScene, "Joined meeting with alias %{PUBLIC}@", meeting.code)
+                DispatchQueue.main.async {
+                    self.coordinator?.showMeeting(code: meeting.code)
+                }
+
+            case .failureStatus(let status):
+                os_log(.debug, log: .newMeetingScene, "Failed to join a meeting with alias: %{PUBLIC}@, status code: %{PUBLIC}d", meeting.code, status.rawValue)
+
+                DispatchQueue.main.async {
+                    self.presentAlert("Failed to join a meeting")
+                }
+            }
+        }
     }
 }

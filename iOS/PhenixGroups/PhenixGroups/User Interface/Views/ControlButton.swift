@@ -21,33 +21,77 @@ class ControlButton: UIButton {
 
     override var isHighlighted: Bool {
         didSet {
-            guard controlState == .on else {
-                return
-            }
-
-            backgroundColor = isHighlighted == true ? UIColor.white.withAlphaComponent(0.2) : .clear
+            backgroundColor = isHighlighted == true ? currentHighlightedBackgroundColor : currentBackgroundColor
         }
     }
 
-    var borderColor: CGColor? {
-        guard controlState == .on else {
-            return UIColor.clear.cgColor
-        }
+    /// Image presented when **controlState** parameter is on
+    private(set) var onStateImage: UIImage?
 
-        if #available(iOS 13.0, *) {
-            return UIColor(named: "Button Border Color")?.cgColor
-        } else {
-            return UIColor.white.cgColor
+    private(set) var onStateBorderColor: UIColor = .clear
+    private(set) var onStateBackgroundColor: UIColor = .clear
+
+    private(set) var onStateHighlightedBorderColor: UIColor = .clear
+    private(set) var onStateHighlightedBackgroundColor: UIColor = .clear
+
+    /// Image presented when **controlState** parameter is off
+    private(set) var offStateImage: UIImage?
+
+    private(set) var offStateBorderColor: UIColor = .clear
+    private(set) var offStateBackgroundColor: UIColor = .clear
+
+    private(set) var offStateHighlightedBorderColor: UIColor = .clear
+    private(set) var offStateHighlightedBackgroundColor: UIColor = .clear
+
+    override var currentImage: UIImage? {
+        switch controlState {
+        case .on:
+            return onStateImage
+        case .off:
+            return offStateImage
         }
     }
 
+    var currentBorderColor: CGColor {
+        switch controlState {
+        case .on:
+            return onStateBorderColor.cgColor
+        case .off:
+            return offStateBorderColor.cgColor
+        }
+    }
+
+    var currentHighlightedBorderColor: CGColor {
+        switch controlState {
+        case .on:
+            return onStateHighlightedBorderColor.cgColor
+        case .off:
+            return offStateHighlightedBorderColor.cgColor
+        }
+    }
+
+    var currentBackgroundColor: UIColor {
+        switch controlState {
+        case .on:
+            return onStateBackgroundColor
+        case .off:
+            return offStateBackgroundColor
+        }
+    }
+
+    var currentHighlightedBackgroundColor: UIColor {
+        switch controlState {
+        case .on:
+            return onStateHighlightedBackgroundColor
+        case .off:
+            return offStateHighlightedBackgroundColor
+        }
+    }
+
+    /// Represents current control button state
     var controlState: ControlState = .on {
         didSet {
-            if oldValue != controlState {
-                setImage(controlImage(for: controlState), for: .normal)
-                backgroundColor = controlBackground(for: controlState)
-                layer.borderColor = borderColor
-            }
+            refreshStateRepresentation()
         }
     }
 
@@ -63,30 +107,72 @@ class ControlButton: UIButton {
 
     override func awakeFromNib() {
         super.awakeFromNib()
-        setImage(controlImage(for: controlState), for: .normal)
-        backgroundColor = controlBackground(for: controlState)
+        refreshStateRepresentation()
     }
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         if #available(iOS 13.0, *) {
             if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
-                layer.borderColor = UIColor(named: "Button Border Color")?.cgColor
+                layer.borderColor = currentBorderColor
             }
         }
     }
 
-    func controlImage(for state: ControlState) -> UIImage {
-        fatalError("Variable needs to be overridden by the subclass providing necessary values")
+    func setImage(_ image: UIImage?, for state: ControlState) {
+        switch state {
+        case .on:
+            onStateImage = image
+        case .off:
+            offStateImage = image
+        }
     }
 
-    func controlBackground(for state: ControlState) -> UIColor {
-        fatalError("Variable needs to be overridden by the subclass providing necessary values")
+    func setBorderColor(_ color: UIColor, for state: ControlState) {
+        switch state {
+        case .on:
+            onStateBorderColor = color
+        case .off:
+            offStateBorderColor = color
+        }
+    }
+
+    func setBackgroundColor(_ color: UIColor, for state: ControlState) {
+        switch state {
+        case .on:
+            onStateBackgroundColor = color
+        case .off:
+            offStateBackgroundColor = color
+        }
+    }
+
+    func setHighlightedBorderColor(_ color: UIColor, for state: ControlState) {
+        switch state {
+        case .on:
+            onStateHighlightedBorderColor = color
+        case .off:
+            offStateHighlightedBorderColor = color
+        }
+    }
+
+    func setHighlightedBackgroundColor(_ color: UIColor, for state: ControlState) {
+        switch state {
+        case .on:
+            onStateHighlightedBackgroundColor = color
+        case .off:
+            offStateHighlightedBackgroundColor = color
+        }
+    }
+
+    func refreshStateRepresentation() {
+        setImage(currentImage, for: .normal)
+        backgroundColor = currentBackgroundColor
+        layer.borderColor = currentBorderColor
     }
 }
 
 private extension ControlButton {
     func setup() {
-        layer.borderColor = borderColor
+        layer.borderColor = currentBorderColor
         layer.borderWidth = 1
         setTitleShadowColor(.black, for: .normal)
         layer.cornerRadius = frame.width / 2

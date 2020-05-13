@@ -28,6 +28,16 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "B5704D6E24656FBE00D9703A"
+               BuildableName = "PhenixGroupsUnitTests.xctest"
+               BlueprintName = "PhenixGroupsUnitTests"
+               ReferencedContainer = "container:PhenixGroups.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction

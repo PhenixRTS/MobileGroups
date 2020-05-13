@@ -25,18 +25,29 @@ class MainCoordinator: Coordinator {
         vc.phenix = dependencyContainer.phenixManager
         vc.preferences = dependencyContainer.preferences
 
+        let hvc = MeetingHistoryTableViewController.instantiate()
+        vc.historyController = hvc
+        hvc.delegate = vc
+        hvc.viewDelegate = vc.newMeetingView
+        hvc.loadMeetings = { [weak self] in
+            self?.dependencyContainer.preferences.meetings.sorted { $0.leaveDate > $1.leaveDate } ?? []
+        }
+
         navigationController.isNavigationBarHidden = true
         navigationController.pushViewController(vc, animated: false)
     }
 }
 
 extension MainCoordinator: ShowMeeting {
-    func showMeeting() {
-        navigationController.presentedViewController?.dismiss(animated: true)
+    func showMeeting(code: String) {
+        if navigationController.presentedViewController is JoinMeetingViewController {
+            navigationController.presentedViewController?.dismiss(animated: true)
+        }
 
         let vc = ActiveMeetingViewController.instantiate()
         vc.coordinator = self
         vc.phenix = dependencyContainer.phenixManager
+        vc.code = code
         navigationController.pushViewController(vc, animated: true)
     }
 }
@@ -58,7 +69,8 @@ extension MainCoordinator: JoinCancellation {
 }
 
 extension MainCoordinator: MeetingFinished {
-    func meetingFinished() {
+    func meetingFinished(_ meeting: Meeting) {
+        dependencyContainer.preferences.meetings.append(meeting)
         DispatchQueue.main.async { [weak self] in
             self?.navigationController.popViewController(animated: true)
         }

@@ -42,24 +42,17 @@ private extension JoinMeetingViewController {
             guard let self = self else { return }
             switch error {
             case .none:
-                os_log(.debug, log: .joinMeetingScene, "Joining meeting")
+                os_log(.debug, log: .joinMeetingScene, "Joined meeting with alias %{PUBLIC}@", code)
                 DispatchQueue.main.async {
-                    self.coordinator?.showMeeting()
+                    self.coordinator?.showMeeting(code: code)
                 }
             case .failureStatus(let status):
-                os_log(.debug, log: .joinMeetingScene, "Failed to create and/or connect to a meeting, status code: %{PUBLIC}d", status.rawValue)
+                os_log(.debug, log: .joinMeetingScene, "Failed to join a meeting with alias: %{PUBLIC}@, status code: %{PUBLIC}d", code, status.rawValue)
 
                 DispatchQueue.main.async {
                     self.presentAlert("Failed to join meeting")
                 }
             }
         }
-    }
-
-    func presentAlert(_ title: String, message: String? = nil) {
-        let ac = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        ac.addAction(UIAlertAction(title: "OK", style: .default))
-
-        present(ac, animated: true)
     }
 }

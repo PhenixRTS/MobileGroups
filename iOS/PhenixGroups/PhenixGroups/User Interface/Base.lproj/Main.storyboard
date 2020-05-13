@@ -56,7 +56,7 @@
                             <stackView opaque="NO" contentMode="scaleToFill" spacing="50" translatesAutoresizingMaskIntoConstraints="NO" id="a9t-KK-F5G">
                                 <rect key="frame" x="122" y="482" width="170" height="60"/>
                                 <subviews>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1wP-da-RBs" customClass="MicrophoneControlButton" customModule="Phenix_Groups" customModuleProvider="target">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1wP-da-RBs" customClass="ControlButton" customModule="Phenix_Groups" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="60" height="60"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="60" id="Lz1-aS-GY0"/>
@@ -66,7 +66,7 @@
                                             <action selector="microphoneButtonTapped:" destination="8bC-Xf-vdC" eventType="touchUpInside" id="jV8-qH-G83"/>
                                         </connections>
                                     </button>
-                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eyV-Hz-BOe" customClass="CameraControlButton" customModule="Phenix_Groups" customModuleProvider="target">
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eyV-Hz-BOe" customClass="ControlButton" customModule="Phenix_Groups" customModuleProvider="target">
                                         <rect key="frame" x="110" y="0.0" width="60" height="60"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="60" id="5dk-ku-S85"/>
@@ -119,25 +119,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
-                        <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cell" textLabel="YvA-bb-b3c" style="IBUITableViewCellStyleDefault" id="gKQ-LX-2mF">
-                                <rect key="frame" x="0.0" y="28" width="414" height="43.5"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="gKQ-LX-2mF" id="3Fk-ua-Iqq">
-                                    <rect key="frame" x="0.0" y="0.0" width="414" height="43.5"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="YvA-bb-b3c">
-                                            <rect key="frame" x="20" y="0.0" width="374" height="43.5"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                            <nil key="textColor"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                    </subviews>
-                                </tableViewCellContentView>
-                            </tableViewCell>
-                        </prototypes>
                         <connections>
                             <outlet property="dataSource" destination="9rI-ph-Wfa" id="UXI-CZ-GvK"/>
                             <outlet property="delegate" destination="9rI-ph-Wfa" id="kRs-L6-EJM"/>
@@ -164,32 +145,90 @@
             <point key="canvasLocation" x="1612" y="138"/>
         </scene>
         <!--Active Meeting View Controller-->
-        <scene sceneID="OUo-L4-m7i">
+        <scene sceneID="h3v-fq-t01">
             <objects>
-                <viewController storyboardIdentifier="ActiveMeetingViewController" id="AEN-sP-zZR" customClass="ActiveMeetingViewController" customModule="Phenix_Groups" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="fXQ-sp-Ao3">
+                <viewController storyboardIdentifier="ActiveMeetingViewController" id="eaH-mH-wJg" customClass="ActiveMeetingViewController" customModule="Phenix_Groups" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="DeJ-7H-C7N" customClass="ActiveMeetingView" customModule="Phenix_Groups" customModuleProvider="target">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="e00-RX-8fe">
-                                <rect key="frame" x="157" y="438" width="100" height="30"/>
-                                <state key="normal" title="Leave meeting"/>
-                                <connections>
-                                    <action selector="leaveMeetingTapped:" destination="AEN-sP-zZR" eventType="touchUpInside" id="khJ-uF-rvi"/>
-                                </connections>
-                            </button>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="9Xo-Pu-n5a">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="392"/>
+                                <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
+                            <view opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ad1-Bv-DUc">
+                                <rect key="frame" x="0.0" y="272" width="414" height="150"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="too-zG-rch" userLabel="Container view">
+                                <rect key="frame" x="0.0" y="392" width="414" height="470"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
+                            <stackView opaque="NO" contentMode="scaleToFill" spacing="30" translatesAutoresizingMaskIntoConstraints="NO" id="bfA-qW-Uno">
+                                <rect key="frame" x="87" y="312" width="240" height="60"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="X1C-54-M6Q" customClass="ControlButton" customModule="Phenix_Groups" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="60" height="60"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="60" id="Te8-cJ-xHN"/>
+                                            <constraint firstAttribute="height" constant="60" id="uyZ-Ea-H3f"/>
+                                        </constraints>
+                                        <connections>
+                                            <action selector="microphoneButtonTapped:" destination="DeJ-7H-C7N" eventType="touchUpInside" id="njg-L1-zEf"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="c0c-T1-zbt" customClass="ControlButton" customModule="Phenix_Groups" customModuleProvider="target">
+                                        <rect key="frame" x="90" y="0.0" width="60" height="60"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="60" id="hfk-FW-6xz"/>
+                                            <constraint firstAttribute="height" constant="60" id="t47-xn-Uw7"/>
+                                        </constraints>
+                                        <connections>
+                                            <action selector="leaveMeetingTapped:" destination="DeJ-7H-C7N" eventType="touchUpInside" id="ld0-LC-h0t"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="9Nv-v2-RlB" customClass="ControlButton" customModule="Phenix_Groups" customModuleProvider="target">
+                                        <rect key="frame" x="180" y="0.0" width="60" height="60"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="60" id="bMx-9E-Hqj"/>
+                                            <constraint firstAttribute="height" constant="60" id="qau-0o-QRX"/>
+                                        </constraints>
+                                        <connections>
+                                            <action selector="cameraButtonTapped:" destination="DeJ-7H-C7N" eventType="touchUpInside" id="Heg-rj-XOF"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                            </stackView>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
-                            <constraint firstItem="e00-RX-8fe" firstAttribute="centerY" secondItem="VPf-6c-Kla" secondAttribute="centerY" id="0Sh-8k-udN"/>
-                            <constraint firstItem="e00-RX-8fe" firstAttribute="centerX" secondItem="VPf-6c-Kla" secondAttribute="centerX" id="fhe-tq-fkc"/>
+                            <constraint firstItem="too-zG-rch" firstAttribute="height" secondItem="9Xo-Pu-n5a" secondAttribute="height" multiplier="1.2" id="3iq-jq-TQU"/>
+                            <constraint firstItem="9Xo-Pu-n5a" firstAttribute="leading" secondItem="xSR-HS-McD" secondAttribute="leading" id="ARq-nZ-XaI"/>
+                            <constraint firstItem="too-zG-rch" firstAttribute="top" secondItem="ad1-Bv-DUc" secondAttribute="bottom" constant="-30" id="Db6-bg-QFK"/>
+                            <constraint firstItem="xSR-HS-McD" firstAttribute="bottom" secondItem="too-zG-rch" secondAttribute="bottom" id="EUo-zo-2uM"/>
+                            <constraint firstItem="ad1-Bv-DUc" firstAttribute="leading" secondItem="xSR-HS-McD" secondAttribute="leading" id="K8q-wq-Mx4"/>
+                            <constraint firstItem="xSR-HS-McD" firstAttribute="trailing" secondItem="too-zG-rch" secondAttribute="trailing" id="OxY-Ub-6fe"/>
+                            <constraint firstItem="bfA-qW-Uno" firstAttribute="centerX" secondItem="xSR-HS-McD" secondAttribute="centerX" id="R0i-yC-0bG"/>
+                            <constraint firstItem="too-zG-rch" firstAttribute="top" secondItem="9Xo-Pu-n5a" secondAttribute="bottom" id="YrX-Wx-NTD"/>
+                            <constraint firstItem="xSR-HS-McD" firstAttribute="trailing" secondItem="9Xo-Pu-n5a" secondAttribute="trailing" id="Z9a-MC-1yp"/>
+                            <constraint firstItem="xSR-HS-McD" firstAttribute="trailing" secondItem="ad1-Bv-DUc" secondAttribute="trailing" id="eCY-oU-bzk"/>
+                            <constraint firstItem="too-zG-rch" firstAttribute="top" secondItem="bfA-qW-Uno" secondAttribute="bottom" constant="20" id="ghd-mQ-wfb"/>
+                            <constraint firstItem="ad1-Bv-DUc" firstAttribute="height" secondItem="bfA-qW-Uno" secondAttribute="height" multiplier="2.5" id="hwe-MF-wZz"/>
+                            <constraint firstItem="too-zG-rch" firstAttribute="leading" secondItem="xSR-HS-McD" secondAttribute="leading" id="ox0-ud-Dh8"/>
+                            <constraint firstItem="xSR-HS-McD" firstAttribute="top" secondItem="9Xo-Pu-n5a" secondAttribute="top" constant="44" id="yv4-NJ-A8t"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="VPf-6c-Kla"/>
+                        <viewLayoutGuide key="safeArea" id="xSR-HS-McD"/>
+                        <connections>
+                            <outlet property="buttonShadowView" destination="ad1-Bv-DUc" id="Tpe-5G-D2X"/>
+                            <outlet property="cameraButton" destination="9Nv-v2-RlB" id="3e4-st-OgJ"/>
+                            <outlet property="leaveMeetingButton" destination="c0c-T1-zbt" id="ShS-Co-fuN"/>
+                            <outlet property="microphoneButton" destination="X1C-54-M6Q" id="agv-ad-8L3"/>
+                        </connections>
                     </view>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="d97-sz-JXH" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ejM-IJ-NcB" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2354" y="138"/>
+            <point key="canvasLocation" x="2333" y="138"/>
         </scene>
     </scenes>
 </document>

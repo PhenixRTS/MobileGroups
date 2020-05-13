@@ -4,6 +4,6 @@
 
 import Foundation
 
-protocol ShowMeeting: AnyObject {
-    func showMeeting(code: String)
+extension Date {
+    static var now: Date { Date() }
 }

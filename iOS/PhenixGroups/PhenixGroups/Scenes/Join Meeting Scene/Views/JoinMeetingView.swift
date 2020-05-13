@@ -72,7 +72,7 @@ private extension JoinMeetingView {
         // swiftlint:disable multiline_arguments_brackets
         NSLayoutConstraint.activate([
             button.topAnchor.constraint(equalTo: topAnchor, constant: 16),
-            button.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 8),
+            button.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 8),
             button.widthAnchor.constraint(equalToConstant: 44),
             button.heightAnchor.constraint(equalToConstant: 44)
         ])
@@ -94,8 +94,9 @@ private extension JoinMeetingView {
         // swiftlint:disable multiline_arguments_brackets
         NSLayoutConstraint.activate([
             stack.topAnchor.constraint(equalTo: closeButton.bottomAnchor, constant: 30),
-            stack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
-            stack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -16)
+            stack.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            stack.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            stack.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -16)
         ])
     }
 

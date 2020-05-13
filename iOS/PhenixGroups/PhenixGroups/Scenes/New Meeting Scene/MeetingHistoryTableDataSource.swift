@@ -5,7 +5,10 @@
 import UIKit
 
 class MeetingHistoryTableDataSource: NSObject, UITableViewDataSource {
-    var meetings = [String]()
+    typealias RejoinHandler = MeetingHistoryTableViewController.RejoinHandler
+
+    var meetings = [Meeting]()
+    var rejoinHandler: RejoinHandler?
 
     // MARK: - Table view data source
 
@@ -16,8 +19,8 @@ class MeetingHistoryTableDataSource: NSObject, UITableViewDataSource {
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        cell.textLabel?.text = meetings[indexPath.row]
+        let cell: MeetingHistoryTableViewCell = tableView.dequeueReusableCell(for: indexPath)
+        cell.configure(with: meetings[indexPath.row], rejoin: rejoinHandler)
         return cell
     }
 }

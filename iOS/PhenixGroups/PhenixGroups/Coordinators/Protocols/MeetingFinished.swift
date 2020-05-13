@@ -5,5 +5,5 @@
 import Foundation
 
 protocol MeetingFinished: AnyObject {
-    func meetingFinished()
+    func meetingFinished(_ meeting: Meeting)
 }

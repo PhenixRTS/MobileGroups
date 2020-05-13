@@ -4,7 +4,7 @@
 
 - Xcode (11.4)
 - Swift 5.2
-- iOS 13 and above
+- iOS 12.0 and above
 
 ## 1. step - Build
 *(Commands must be executed from the project's **root** directory)*

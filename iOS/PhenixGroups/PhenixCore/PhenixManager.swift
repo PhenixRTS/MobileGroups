@@ -12,6 +12,8 @@ public final class PhenixManager {
     internal let privateQueue: DispatchQueue
 
     internal private(set) var roomExpress: PhenixRoomExpress!
+
+    #warning("Fix potential issue, when user tries to leave a room and quickly join another room (multiple simultaneous room joining and leaving)")
     internal var joinedRoomService: PhenixRoomService?
 
     /// Initializer for Phenix manager
