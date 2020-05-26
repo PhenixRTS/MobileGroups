@@ -41,14 +41,18 @@ public final class PhenixManager {
         let group = DispatchGroup()
 
         group.enter()
+        os_log(.debug, log: .phenixManager, "Room Express setup started")
         setupRoomExpress(backend: backend, unrecoverableErrorCompletion) {
+            os_log(.debug, log: .phenixManager, "Room Express setup completed")
             group.leave()
         }
 
         group.wait()
 
         group.enter()
-        setupMedia {
+        os_log(.debug, log: .phenixManager, "User Media Stream setup started")
+        setupMedia(unrecoverableErrorCompletion) {
+            os_log(.debug, log: .phenixManager, "User Media Stream setup completed")
             group.leave()
         }
 
@@ -88,17 +92,45 @@ private extension PhenixManager {
         }
     }
 
-    func setupMedia(completion: @escaping () -> Void) {
+    func setupMedia(_ unrecoverableErrorCompletion: UnrecoverableErrorHandler? = nil, completion: @escaping () -> Void) {
         let options = PhenixUserMediaOptions.makeUserMediaOptions()
         roomExpress.pcastExpress.getUserMedia(options) { [weak self] status, userMediaStream in
             guard let self = self else { return }
 
-            #warning("Implement failure scenario")
-            if let stream = userMediaStream {
-                self.userMediaStreamController = UserMediaStreamController(stream)
-                completion()
+            if status == .ok {
+                if let stream = userMediaStream {
+                    self.userMediaStreamController = UserMediaStreamController(stream)
+                    os_log(.debug, log: .phenixManager, "User Media Stream initialized")
+                    completion()
+                    return
+                }
             }
+
+            unrecoverableErrorCompletion?("Could not provide user media stream (\(status.rawValue)")
         }
+    }
+}
+
+extension PhenixManager: JoinedRoomDelegate {
+    func roomLeft(_ room: JoinedRoom) {
+        privateQueue.async { [weak self] in
+            guard let self = self else { return }
+
+            self.joinedRooms.remove(room)
+            os_log(.debug, log: .phenixManager, "Joined room instance removed: %{PRIVATE}s", room.description)
+        }
+    }
+}
+
+// MARK: - Helper methods
+
+internal extension PhenixManager {
+    func makeRoomOptions(with alias: String) -> PhenixRoomOptions {
+        PhenixRoomServiceFactory.createRoomOptionsBuilder()
+            .withName(alias)
+            .withAlias(alias)
+            .withType(.multiPartyChat)
+            .buildRoomOptions()
     }
 }
 

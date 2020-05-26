@@ -10,27 +10,36 @@ class MainCoordinator: Coordinator {
     let navigationController: UINavigationController
     private(set) var childCoordinators = [Coordinator]()
     private let dependencyContainer: DependencyContainer
+    private let device: UIDevice
 
-    init(navigationController: UINavigationController, dependencyContainer: DependencyContainer) {
+    private var preferences: Preferences { dependencyContainer.preferences }
+    private var phenixManager: PhenixManager { dependencyContainer.phenixManager }
+
+    init(navigationController: UINavigationController, dependencyContainer: DependencyContainer, device: UIDevice = .current) {
         self.navigationController = navigationController
         self.dependencyContainer = dependencyContainer
+        self.device = device
     }
 
     func start() {
         os_log(.debug, log: .coordinator, "Main coordinator started")
 
+        if preferences.displayName == nil {
+            preferences.displayName = device.name
+        }
+
         let vc = NewMeetingViewController.instantiate()
         vc.coordinator = self
-        vc.phenix = dependencyContainer.phenixManager
-        vc.media = dependencyContainer.phenixManager.userMediaStreamController
-        vc.preferences = dependencyContainer.preferences
+        vc.phenix = phenixManager
+        vc.media = phenixManager.userMediaStreamController
+        vc.preferences = preferences
 
         let hvc = MeetingHistoryTableViewController.instantiate()
         vc.historyController = hvc
         hvc.delegate = vc
         hvc.viewDelegate = vc.newMeetingView
         hvc.loadMeetings = { [weak self] in
-            self?.dependencyContainer.preferences.meetings.sorted { $0.leaveDate > $1.leaveDate } ?? []
+            self?.preferences.meetings.sorted { $0.leaveDate > $1.leaveDate } ?? []
         }
 
         UIView.transition(with: navigationController.view) {
@@ -47,8 +56,9 @@ extension MainCoordinator: ShowMeeting {
 
         let vc = ActiveMeetingViewController.instantiate()
         vc.coordinator = self
-        vc.media = dependencyContainer.phenixManager.userMediaStreamController
+        vc.media = phenixManager.userMediaStreamController
         vc.joinedRoom = joinedRoom
+        vc.displayName = preferences.displayName
 
         UIView.transition(with: navigationController.view) {
             self.navigationController.pushViewController(vc, animated: false)
@@ -60,7 +70,7 @@ extension MainCoordinator: JoinMeeting {
     func joinMeeting(displayName: String) {
         let vc = JoinMeetingViewController.instantiate()
         vc.coordinator = self
-        vc.phenix = self.dependencyContainer.phenixManager
+        vc.phenix = self.phenixManager
         vc.displayName = displayName
         navigationController.present(vc, animated: true)
     }
@@ -74,7 +84,7 @@ extension MainCoordinator: JoinCancellation {
 
 extension MainCoordinator: MeetingFinished {
     func meetingFinished(_ meeting: Meeting) {
-        var meetings = dependencyContainer.preferences.meetings
+        var meetings = preferences.meetings
 
         if let savedMeetingIndex = meetings.firstIndex(where: { $0.code == meeting.code }) {
             // It was previously created meeting and user re-joined it.
@@ -82,7 +92,7 @@ extension MainCoordinator: MeetingFinished {
         }
 
         meetings.append(meeting)
-        dependencyContainer.preferences.meetings = meetings
+        preferences.meetings = meetings
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }

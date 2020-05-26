@@ -32,7 +32,7 @@ extension PhenixManager: PhenixRoomPublishing {
             let localPublishToRoomOptions = self.makeLocalPublishToRoomOptions(displayName: displayName, roomOptions: roomOptions, publishOptions: publishOptions)
 
             precondition(self.roomExpress != nil, "Must call PhenixManager.start() before this method")
-            self.roomExpress.publish(toRoom: localPublishToRoomOptions) { status, roomService, _ in
+            self.roomExpress.publish(toRoom: localPublishToRoomOptions) { status, roomService, publisher in
                 os_log(.debug, log: .phenixManager, "Room publishing completed with status: %{PUBLIC}d", status.rawValue)
                 switch status {
                 case .ok:
@@ -40,7 +40,11 @@ extension PhenixManager: PhenixRoomPublishing {
                         fatalError("Could not get RoomService parameter")
                     }
 
-                    let joinedRoom = JoinedRoom(backend: self.backend, roomService: roomService)
+                    guard let publisher = publisher else {
+                        fatalError("Could not get Publisher parameter")
+                    }
+
+                    let joinedRoom = JoinedRoom(backend: self.backend, roomService: roomService, publisher: publisher)
                     joinedRoom.delegate = self
                     self.add(joinedRoom)
 

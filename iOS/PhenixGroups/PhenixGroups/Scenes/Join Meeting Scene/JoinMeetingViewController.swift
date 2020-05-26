@@ -38,6 +38,7 @@ private extension JoinMeetingViewController {
     }
 
     func joinMeeting(code: String, displayName: String) {
+        os_log(.debug, log: .joinMeetingScene, "Join meeting with alias %{PUBLIC}@", code)
         phenix?.publishRoom(withAlias: code, displayName: displayName) { [weak self] result in
             guard let self = self else { return }
             switch result {

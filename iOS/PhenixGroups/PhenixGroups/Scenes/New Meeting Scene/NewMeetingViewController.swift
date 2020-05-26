@@ -81,13 +81,33 @@ private extension NewMeetingViewController {
     }
 
     func configureControls() {
-        newMeetingView.microphoneHandler = { [weak media] enabled in
-            media?.setAudioEnabled(enabled)
+        newMeetingView.microphoneHandler = { [weak self] enabled in
+            self?.setAudio(enabled: enabled)
         }
 
-        newMeetingView.cameraHandler = { [weak media] enabled in
-            media?.setVideoEnabled(enabled)
+        newMeetingView.cameraHandler = { [weak self] enabled in
+            self?.setVideo(enabled: enabled)
         }
+    }
+
+    func configureMedia() {
+        guard let media = media else { return }
+        media.providePreview { layer in
+            self.newMeetingView.setCameraLayer(layer)
+        }
+
+        newMeetingView.setMicrophone(enabled: media.isAudioEnabled)
+        newMeetingView.setCamera(enabled: media.isVideoEnabled)
+    }
+
+    func setVideo(enabled: Bool) {
+         os_log(.debug, log: .newMeetingScene, "Set video enabled - %{PUBLIC}d", enabled)
+        media?.setVideo(enabled: enabled)
+    }
+
+    func setAudio(enabled: Bool) {
+         os_log(.debug, log: .newMeetingScene, "Set audio enabled - %{PUBLIC}d", enabled)
+        media?.setAudio(enabled: enabled)
     }
 
     func publishMeeting(with code: String, displayName: String) {
@@ -115,6 +135,7 @@ private extension NewMeetingViewController {
 extension NewMeetingViewController: DisplayNameDelegate {
     func saveDisplayName(_ displayName: String) {
         preferences?.displayName = displayName
+        newMeetingView.displayName = displayName
     }
 }
 

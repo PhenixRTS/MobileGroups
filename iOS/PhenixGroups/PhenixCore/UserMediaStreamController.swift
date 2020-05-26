@@ -2,8 +2,8 @@
 //  Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
+import Foundation
 import PhenixSdk
-import UIKit
 
 public class UserMediaStreamController {
     private var cameraLayer: CALayer!
@@ -18,18 +18,20 @@ public class UserMediaStreamController {
         self.userMediaStream = userMediaStream
     }
 
-    public func setPreview(on view: UIView) {
+    public func providePreview(addLayerToViewHandler: (CALayer) -> Void) {
         if renderer == nil {
             renderer = makeRenderer()
         }
 
         if let cameraLayer = cameraLayer {
-            if view.layer != cameraLayer.superlayer {
-                view.layer.add(cameraLayer)
-            }
+            addLayerToViewHandler(cameraLayer)
         } else {
             cameraLayer = CALayer()
-            view.layer.add(cameraLayer)
+            cameraLayer.name = "Phenix Camera Layer" // Layer identifier, not required.
+            cameraLayer.isOpaque = true
+
+            addLayerToViewHandler(cameraLayer)
+
             renderer?.start(cameraLayer)
         }
     }
@@ -42,12 +44,12 @@ public class UserMediaStreamController {
         userMediaStream.apply(options)
     }
 
-    public func setAudioEnabled(_ enabled: Bool) {
+    public func setAudio(enabled: Bool) {
         isAudioEnabled = enabled
         userMediaStream.mediaStream.getAudioTracks()?.forEach { $0.setEnabled(enabled) }
     }
 
-    public func setVideoEnabled(_ enabled: Bool) {
+    public func setVideo(enabled: Bool) {
         isVideoEnabled = enabled
         userMediaStream.mediaStream.getVideoTracks()?.forEach { $0.setEnabled(enabled) }
     }
@@ -77,16 +79,5 @@ extension PhenixUserMediaOptions {
     func setCamera(facing mode: PhenixFacingMode) -> PhenixUserMediaOptions {
         video.capabilityConstraints[PhenixDeviceCapability.facingMode.rawValue] = [PhenixDeviceConstraint.initWith(mode)]
         return self
-    }
-}
-
-fileprivate extension CALayer {
-    func resize(as otherLayer: CALayer) {
-        frame = otherLayer.bounds
-    }
-
-    func add(_ layer: CALayer) {
-        layer.resize(as: self)
-        addSublayer(layer)
     }
 }

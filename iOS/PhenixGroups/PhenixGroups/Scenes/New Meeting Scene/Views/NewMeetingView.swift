@@ -9,13 +9,16 @@ class NewMeetingView: UIView {
 
     static let maxHistoryHeight: CGFloat = 186
 
-    var displayName: String { controlView.displayName }
-    var camera: UIView { cameraView }
+    var displayName: String {
+        get { controlView.displayName }
+        set { cameraPlaceholderView.text = newValue }
+    }
 
     var microphoneHandler: ControlButtonHandler?
     var cameraHandler: ControlButtonHandler?
 
-    @IBOutlet private var cameraView: UIView!
+    private var cameraPlaceholderView: CameraPlaceholderView!
+    @IBOutlet private var cameraView: CameraView!
     @IBOutlet private var controlView: NewMeetingControlView!
     @IBOutlet private var controlViewContainer: UIView!
     @IBOutlet private var historyViewContainer: UIView!
@@ -33,7 +36,11 @@ class NewMeetingView: UIView {
     @IBAction
     private func cameraButtonTapped(_ sender: ControlButton) {
         sender.controlState.toggle()
-        cameraHandler?(sender.controlState == .on)
+
+        let enabled = sender.controlState == .on
+        cameraHandler?(enabled)
+
+        showCamera(enabled)
     }
 
     func configure(displayName: String) {
@@ -47,6 +54,8 @@ class NewMeetingView: UIView {
         controlView.displayName = displayName
         configureShadowView()
         configureButtons()
+
+        setupCameraPlaceholderView(text: displayName)
     }
 
     func setNewMeetingHandler(_ completion: @escaping NewMeetingControlView.ButtonTapHandler) {
@@ -57,22 +66,27 @@ class NewMeetingView: UIView {
         controlView.joinMeetingTapHandler = completion
     }
 
-    func setMicrophoneButtonStateEnabled(_ enabled: Bool) {
+    func setMicrophone(enabled: Bool) {
         setControl(microphoneButton, enabled: enabled)
     }
 
-    func setCameraButtonStateEnabled(_ enabled: Bool) {
+    func setCamera(enabled: Bool) {
         setControl(cameraButton, enabled: enabled)
+        showCamera(enabled)
     }
 
     func setDisplayNameDelegate(_ delegate: DisplayNameDelegate) {
         controlView.delegate = delegate
     }
 
+    func setCameraLayer(_ layer: CALayer) {
+        cameraView.setCameraLayer(layer)
+    }
+
     func setupHistoryView(_ view: UIView) {
         historyViewContainer.addSubview(view)
         view.translatesAutoresizingMaskIntoConstraints = false
-        // swiftlint:disable multiline_arguments_brackets
+
         NSLayoutConstraint.activate([
             view.topAnchor.constraint(equalTo: historyViewContainer.topAnchor),
             view.bottomAnchor.constraint(equalTo: historyViewContainer.bottomAnchor),
@@ -135,8 +149,29 @@ private extension NewMeetingView {
         cameraButton.refreshStateRepresentation()
     }
 
+    func setupCameraPlaceholderView(text: String) {
+        let view = CameraPlaceholderView()
+        cameraPlaceholderView = view
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.text = text
+
+        insertSubview(view, aboveSubview: cameraView)
+
+        NSLayoutConstraint.activate([
+            view.topAnchor.constraint(equalTo: topAnchor),
+            view.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+            view.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+            view.bottomAnchor.constraint(equalTo: controlViewContainer.topAnchor, constant: 30)
+        ])
+    }
+
     func setControl(_ control: ControlButton, enabled: Bool) {
         control.controlState = enabled == true ? .on : .off
+    }
+
+    func showCamera(_ show: Bool) {
+        cameraView.isHidden = !show
+        cameraPlaceholderView.isHidden = show
     }
 }
 

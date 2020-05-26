@@ -69,7 +69,6 @@ private extension JoinMeetingView {
         button.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         addSubview(button)
 
-        // swiftlint:disable multiline_arguments_brackets
         NSLayoutConstraint.activate([
             button.topAnchor.constraint(equalTo: topAnchor, constant: 16),
             button.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 8),
@@ -79,7 +78,6 @@ private extension JoinMeetingView {
     }
 
     func setupUserInterfaceElements() {
-        // swiftlint:disable multiline_arguments_brackets
         let stack = UIStackView(arrangedSubviews: [
             makeTextField(),
             makeJoinButton()
@@ -91,7 +89,6 @@ private extension JoinMeetingView {
         stack.axis = .vertical
         stack.spacing = 10
 
-        // swiftlint:disable multiline_arguments_brackets
         NSLayoutConstraint.activate([
             stack.topAnchor.constraint(equalTo: closeButton.bottomAnchor, constant: 30),
             stack.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 16),
@@ -108,7 +105,6 @@ private extension JoinMeetingView {
         let label = UILabel.textFieldCaptionLabel("Enter a meeting code")
         view.addSubview(label)
 
-        // swiftlint:disable multiline_arguments_brackets
         NSLayoutConstraint.activate([
             label.topAnchor.constraint(equalTo: view.topAnchor),
             label.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -122,7 +118,6 @@ private extension JoinMeetingView {
         view.addSubview(textField)
         textField.becomeFirstResponder()
 
-        // swiftlint:disable multiline_arguments_brackets
         NSLayoutConstraint.activate([
             textField.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 5),
             textField.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -144,7 +139,6 @@ private extension JoinMeetingView {
         button.addTarget(self, action: #selector(joinButtonTapped), for: .touchUpInside)
         view.addSubview(button)
 
-        // swiftlint:disable multiline_arguments_brackets
         NSLayoutConstraint.activate([
             button.topAnchor.constraint(equalTo: view.topAnchor),
             button.bottomAnchor.constraint(equalTo: view.bottomAnchor),

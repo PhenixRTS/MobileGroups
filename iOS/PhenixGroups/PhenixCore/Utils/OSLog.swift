@@ -11,4 +11,5 @@ extension OSLog {
 
     /// Logs the main Phenix manager
     static let phenixManager = OSLog(subsystem: subsystem, category: "Phenix.Core.PhenixManager")
+    static let joinedRoom = OSLog(subsystem: subsystem, category: "Phenix.Core.JoinedRoom")
 }

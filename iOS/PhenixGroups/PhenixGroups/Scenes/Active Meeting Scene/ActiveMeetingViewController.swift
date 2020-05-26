@@ -10,6 +10,7 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
     weak var coordinator: MeetingFinished?
     weak var media: UserMediaStreamController?
 
+    var displayName: String!
     var joinedRoom: JoinedRoom!
 
     var activeMeetingView: ActiveMeetingView {
@@ -20,6 +21,7 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
         super.viewDidLoad()
 
         assert(joinedRoom != nil, "Joined meeting instance is necessary")
+        assert(displayName != nil, "Display name is necessary")
 
         configure()
     }
@@ -41,7 +43,7 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
 
 private extension ActiveMeetingViewController {
     func configure() {
-        activeMeetingView.configure()
+        activeMeetingView.configure(displayName: displayName)
         activeMeetingView.leaveMeetingHandler = { [weak self] in
             guard let self = self else { return }
             self.leave()
@@ -50,37 +52,37 @@ private extension ActiveMeetingViewController {
     }
 
     func configureControls() {
-        activeMeetingView.microphoneHandler = { [weak media] enabled in
-            media?.setAudioEnabled(enabled)
+        activeMeetingView.microphoneHandler = { [weak self] enabled in
+            self?.setAudio(enabled: enabled)
         }
 
-        activeMeetingView.cameraHandler = { [weak media] enabled in
-            media?.setVideoEnabled(enabled)
-        }
-        configureControls()
-    }
-
-    func configureControls() {
-        activeMeetingView.microphoneHandler = { [weak media] enabled in
-            media?.setAudioEnabled(enabled)
-        }
-
-        activeMeetingView.cameraHandler = { [weak media] enabled in
-            media?.setVideoEnabled(enabled)
+        activeMeetingView.cameraHandler = { [weak self] enabled in
+            self?.setVideo(enabled: enabled)
         }
     }
 
     func configureMedia() {
         guard let media = media else { return }
-        media.setPreview(on: activeMeetingView.camera)
-        activeMeetingView.setMicrophoneButtonStateEnabled(media.isAudioEnabled)
-        activeMeetingView.setCameraButtonStateEnabled(media.isVideoEnabled)
+        media.providePreview { layer in
+            self.activeMeetingView.setCameraLayer(layer)
+        }
+
+        joinedRoom.setAudio(enabled: media.isAudioEnabled)
+        joinedRoom.setVideo(enabled: media.isVideoEnabled)
+
+        activeMeetingView.setMicrophone(enabled: media.isAudioEnabled)
+        activeMeetingView.setCamera(enabled: media.isVideoEnabled)
     }
 
-    func configureMedia() {
-        guard let media = media else { return }
-        media.setPreview(on: activeMeetingView.camera)
-        activeMeetingView.setMicrophoneButtonStateEnabled(media.isAudioEnabled)
-        activeMeetingView.setCameraButtonStateEnabled(media.isVideoEnabled)
+    func setVideo(enabled: Bool) {
+        os_log(.debug, log: .activeMeetingScene, "Set video enabled - %{PUBLIC}d", enabled)
+        joinedRoom.setVideo(enabled: enabled)
+        media?.setVideo(enabled: enabled)
+    }
+
+    func setAudio(enabled: Bool) {
+        os_log(.debug, log: .activeMeetingScene, "Set audio enabled - %{PUBLIC}d", enabled)
+        joinedRoom.setAudio(enabled: enabled)
+        media?.setAudio(enabled: enabled)
     }
 }

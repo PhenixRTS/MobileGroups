@@ -9,16 +9,16 @@ class ActiveMeetingView: UIView {
 
     var leaveMeetingHandler: (() -> Void)?
 
-    var camera: UIView { cameraView }
-
     var microphoneHandler: ControlButtonHandler?
     var cameraHandler: ControlButtonHandler?
 
-    @IBOutlet private var cameraView: UIView!
+    private var cameraPlaceholderView: CameraPlaceholderView!
+    @IBOutlet private var cameraView: CameraView!
     @IBOutlet private var buttonShadowView: UIView!
     @IBOutlet private var microphoneButton: ControlButton!
     @IBOutlet private var leaveMeetingButton: ControlButton!
     @IBOutlet private var cameraButton: ControlButton!
+    @IBOutlet private var containerView: UIView!
 
     @IBAction
     private func leaveMeetingTapped(_ sender: ControlButton) {
@@ -34,12 +34,29 @@ class ActiveMeetingView: UIView {
     @IBAction
     private func cameraButtonTapped(_ sender: ControlButton) {
         sender.controlState.toggle()
-        cameraHandler?(sender.controlState == .on)
+
+        let enabled = sender.controlState == .on
+        cameraHandler?(enabled)
+
+        showCamera(enabled)
     }
 
-    func configure() {
-        layer.masksToBounds = true
+    func configure(displayName: String) {
         configureButtons()
+        setupCameraPlaceholderView(text: displayName)
+    }
+
+    func setMicrophone(enabled: Bool) {
+        setControl(microphoneButton, enabled: enabled)
+    }
+
+    func setCamera(enabled: Bool) {
+        setControl(cameraButton, enabled: enabled)
+        showCamera(enabled)
+    }
+
+    func setCameraLayer(_ layer: CALayer) {
+        cameraView.setCameraLayer(layer)
     }
 
     func setMicrophoneButtonStateEnabled(_ enabled: Bool) {
@@ -127,5 +144,26 @@ private extension ActiveMeetingView {
 
     func setControl(_ control: ControlButton, enabled: Bool) {
         control.controlState = enabled == true ? .on : .off
+    }
+
+    func setupCameraPlaceholderView(text: String) {
+        let view = CameraPlaceholderView()
+        cameraPlaceholderView = view
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.text = text
+
+        insertSubview(view, aboveSubview: cameraView)
+
+        NSLayoutConstraint.activate([
+            view.topAnchor.constraint(equalTo: topAnchor),
+            view.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
+            view.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
+            view.bottomAnchor.constraint(equalTo: containerView.topAnchor, constant: 0)
+        ])
+    }
+
+    func showCamera(_ show: Bool) {
+        cameraView.isHidden = !show
+        cameraPlaceholderView.isHidden = show
     }
 }

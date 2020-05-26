@@ -79,7 +79,6 @@ private extension NewMeetingControlView {
     }
 
     func setupUserInterfaceElements() {
-        // swiftlint:disable multiline_arguments_brackets
         let stack = UIStackView(arrangedSubviews: [
             makeDisplayNameElements(),
             makeMeetingButtons()
@@ -93,7 +92,6 @@ private extension NewMeetingControlView {
 
         bottomConstraint = stack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -16)
 
-        // swiftlint:disable multiline_arguments_brackets
         NSLayoutConstraint.activate([
             stack.topAnchor.constraint(equalTo: topAnchor, constant: 16),
             stack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
@@ -115,7 +113,6 @@ private extension NewMeetingControlView {
         let label = UILabel.textFieldCaptionLabel("Enter display name")
         view.addSubview(label)
 
-        // swiftlint:disable multiline_arguments_brackets
         NSLayoutConstraint.activate([
             label.topAnchor.constraint(equalTo: view.topAnchor),
             label.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -127,7 +124,6 @@ private extension NewMeetingControlView {
         displayNameTextField.delegate = self
         view.addSubview(displayNameTextField)
 
-        // swiftlint:disable multiline_arguments_brackets
         NSLayoutConstraint.activate([
             displayNameTextField.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 5),
             displayNameTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -167,7 +163,6 @@ private extension NewMeetingControlView {
         buttonStack.alignment = .center
         view.addSubview(buttonStack)
 
-        // swiftlint:disable multiline_arguments_brackets
         NSLayoutConstraint.activate([
             newMeetingButton.widthAnchor.constraint(equalTo: joinMeetingButton.widthAnchor),
             buttonStack.topAnchor.constraint(equalTo: view.topAnchor, constant: 0),

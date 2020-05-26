@@ -66,7 +66,6 @@ private extension MeetingHistoryTableViewCell {
     }
 
     func setupConstraints() {
-        // swiftlint:disable multiline_arguments_brackets
         NSLayoutConstraint.activate([
             codeLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
             codeLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),

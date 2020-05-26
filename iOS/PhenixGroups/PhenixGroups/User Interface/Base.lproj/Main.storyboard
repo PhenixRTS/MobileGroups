@@ -17,7 +17,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kPC-iH-iC5">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kPC-iH-iC5" customClass="CameraView" customModule="Phenix_Groups" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="592"/>
                                 <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
@@ -90,7 +90,7 @@
                             <constraint firstItem="DXQ-6c-J4t" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="Up4-Rk-ZZI"/>
                             <constraint firstItem="a9t-KK-F5G" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="Vh5-8H-fgx"/>
                             <constraint firstItem="DXQ-6c-J4t" firstAttribute="top" secondItem="a9t-KK-F5G" secondAttribute="bottom" constant="20" id="aQt-ve-Rrz"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="top" secondItem="kPC-iH-iC5" secondAttribute="top" constant="44" id="bF0-md-kM7"/>
+                            <constraint firstAttribute="top" secondItem="kPC-iH-iC5" secondAttribute="top" id="bF0-md-kM7"/>
                             <constraint firstItem="DXQ-6c-J4t" firstAttribute="top" secondItem="kPC-iH-iC5" secondAttribute="bottom" constant="-30" id="dgA-Ip-zQT"/>
                             <constraint firstItem="DXQ-6c-J4t" firstAttribute="top" secondItem="cJO-GY-Ejx" secondAttribute="bottom" constant="-30" id="lkb-PB-TOq"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="cJO-GY-Ejx" secondAttribute="trailing" id="rO3-WS-GtY"/>
@@ -154,7 +154,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="9Xo-Pu-n5a">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="9Xo-Pu-n5a" customClass="CameraView" customModule="Phenix_Groups" customModuleProvider="target">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="392"/>
                                 <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
@@ -224,6 +224,7 @@
                             <outlet property="buttonShadowView" destination="ad1-Bv-DUc" id="Tpe-5G-D2X"/>
                             <outlet property="cameraButton" destination="9Nv-v2-RlB" id="3e4-st-OgJ"/>
                             <outlet property="cameraView" destination="9Xo-Pu-n5a" id="EBI-a1-Hu0"/>
+                            <outlet property="containerView" destination="too-zG-rch" id="22p-WK-3KT"/>
                             <outlet property="leaveMeetingButton" destination="c0c-T1-zbt" id="ShS-Co-fuN"/>
                             <outlet property="microphoneButton" destination="X1C-54-M6Q" id="agv-ad-8L3"/>
                         </connections>

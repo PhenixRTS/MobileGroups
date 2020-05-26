@@ -65,6 +65,8 @@
 		B5C25EFD245B33D900542E1C /* NewMeetingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C25EFC245B33D900542E1C /* NewMeetingView.swift */; };
 		B5E4EA48246EC12200F48B38 /* PhenixRoomPublishing.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E4EA47246EC12200F48B38 /* PhenixRoomPublishing.swift */; };
 		B5E4EA722473F17C00F48B38 /* JoinedRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E4EA712473F17C00F48B38 /* JoinedRoom.swift */; };
+		B5E4EA7424741B8400F48B38 /* CameraPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E4EA7324741B8400F48B38 /* CameraPlaceholderView.swift */; };
+		B5E4EA7E2475379100F48B38 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E4EA7D2475379100F48B38 /* CameraView.swift */; };
 		E5615D68AA3F078E666D2911 /* Pods_PhenixGroups.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2FBDD988943A994D0336EC /* Pods_PhenixGroups.framework */; };
 		E670063F4541A24DBF7C86E2 /* Pods_PhenixCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFA941014B5CCB73D1134E8F /* Pods_PhenixCore.framework */; };
 /* End PBXBuildFile section */
@@ -196,6 +198,8 @@
 		B5C25EFC245B33D900542E1C /* NewMeetingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMeetingView.swift; sourceTree = "<group>"; };
 		B5E4EA47246EC12200F48B38 /* PhenixRoomPublishing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixRoomPublishing.swift; sourceTree = "<group>"; };
 		B5E4EA712473F17C00F48B38 /* JoinedRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinedRoom.swift; sourceTree = "<group>"; };
+		B5E4EA7324741B8400F48B38 /* CameraPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPlaceholderView.swift; sourceTree = "<group>"; };
+		B5E4EA7D2475379100F48B38 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		C14018589F0F82A57D4D0B42 /* Pods-PhenixGroups.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixGroups.release.xcconfig"; path = "Target Support Files/Pods-PhenixGroups/Pods-PhenixGroups.release.xcconfig"; sourceTree = "<group>"; };
 		D8BC44E9C5B4596C131E7876 /* Pods-PhenixCoreIntegrationTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixCoreIntegrationTests.debug.xcconfig"; path = "Target Support Files/Pods-PhenixCoreIntegrationTests/Pods-PhenixCoreIntegrationTests.debug.xcconfig"; sourceTree = "<group>"; };
 		EF50CA9C0F0DB5BDECAE00C7 /* Pods-PhenixCoreIntegrationTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixCoreIntegrationTests.release.xcconfig"; path = "Target Support Files/Pods-PhenixCoreIntegrationTests/Pods-PhenixCoreIntegrationTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -584,6 +588,8 @@
 		B5C25EF3245B005400542E1C /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				B5E4EA7324741B8400F48B38 /* CameraPlaceholderView.swift */,
+				B5E4EA7D2475379100F48B38 /* CameraView.swift */,
 				B5C25EF4245B010600542E1C /* ControlButton.swift */,
 			);
 			path = Views;
@@ -1005,6 +1011,8 @@
 				B59D19E024629FAE008E2C2D /* JoinMeetingView.swift in Sources */,
 				B54D59A52451C13400454066 /* NewMeetingControlView.swift in Sources */,
 				B5704D682465369000D9703A /* ActiveMeetingView.swift in Sources */,
+				B5E4EA7424741B8400F48B38 /* CameraPlaceholderView.swift in Sources */,
+				B5E4EA7E2475379100F48B38 /* CameraView.swift in Sources */,
 				B53D8F50244DCBA30055CE66 /* AppDelegate.swift in Sources */,
 				B50195FE245AAB4300DDF6AB /* MeetingHistoryTableViewController.swift in Sources */,
 				B5BB0836244F287F0094F254 /* MainCoordinator.swift in Sources */,
