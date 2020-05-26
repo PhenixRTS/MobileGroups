@@ -11,7 +11,7 @@ class MeetingHistoryTableViewCell: UITableViewCell, CellIdentified {
     private var leaveTimeLabel: UILabel!
     private var rejoinButton: UIButton!
 
-    private var meeting: Meeting?
+    private var meeting: Meeting!
     private var rejoinHandler: RejoinHandler?
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -38,10 +38,6 @@ class MeetingHistoryTableViewCell: UITableViewCell, CellIdentified {
 
     @objc
     func rejoinButtonTapped(_ sender: Any) {
-        guard let meeting = meeting else {
-            return
-        }
-
         rejoinHandler?(meeting)
     }
 }

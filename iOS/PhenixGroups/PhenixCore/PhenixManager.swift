@@ -14,10 +14,9 @@ public final class PhenixManager {
     internal let privateQueue: DispatchQueue
 
     internal private(set) var roomExpress: PhenixRoomExpress!
-    public private(set) var userMediaStreamController: UserMediaStreamController!
+    internal private(set) var joinedRooms = Set<JoinedRoom>()
 
-    #warning("Fix potential issue, when user tries to leave a room and quickly join another room (multiple simultaneous room joining and leaving)")
-    internal var joinedRoomService: PhenixRoomService?
+    public private(set) var userMediaStreamController: UserMediaStreamController!
 
     /// Initializer for Phenix manager
     /// - Parameter backend: Backend URL for Phenix SDK
@@ -55,6 +54,15 @@ public final class PhenixManager {
 
         group.wait()
     }
+
+    func add(_ room: JoinedRoom) {
+        privateQueue.async { [weak self] in
+            guard let self = self else { return }
+
+            self.joinedRooms.insert(room)
+            os_log(.debug, log: .phenixManager, "Joined room instance added")
+        }
+    }
 }
 
 private extension PhenixManager {
@@ -90,6 +98,17 @@ private extension PhenixManager {
                 self.userMediaStreamController = UserMediaStreamController(stream)
                 completion()
             }
+        }
+    }
+}
+
+extension PhenixManager: JoinedRoomDelegate {
+    func roomLeft(_ room: JoinedRoom) {
+        privateQueue.async { [weak self] in
+            guard let self = self else { return }
+
+            self.joinedRooms.remove(room)
+            os_log(.debug, log: .phenixManager, "Removed joined room instance")
         }
     }
 }

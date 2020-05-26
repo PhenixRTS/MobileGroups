@@ -3,7 +3,8 @@
 //
 
 import Foundation
+import PhenixCore
 
 protocol ShowMeeting: AnyObject {
-    func showMeeting(code: String)
+    func showMeeting(_ joinedRoom: JoinedRoom)
 }

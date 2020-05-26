@@ -41,11 +41,11 @@ private extension JoinMeetingViewController {
         phenix?.publishRoom(withAlias: code, displayName: displayName) { [weak self] result in
             guard let self = self else { return }
             switch result {
-            case .success(_):
+            case .success(let joinedRoom):
                 os_log(.debug, log: .joinMeetingScene, "Joined meeting with alias %{PUBLIC}@", code)
 
                 DispatchQueue.main.async {
-                    self.coordinator?.showMeeting(code: code)
+                    self.coordinator?.showMeeting(joinedRoom)
                 }
 
             case .failure(.failureStatus(let status)):

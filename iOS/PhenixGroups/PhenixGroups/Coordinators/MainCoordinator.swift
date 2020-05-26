@@ -9,7 +9,6 @@ import UIKit
 class MainCoordinator: Coordinator {
     let navigationController: UINavigationController
     private(set) var childCoordinators = [Coordinator]()
-
     private let dependencyContainer: DependencyContainer
 
     init(navigationController: UINavigationController, dependencyContainer: DependencyContainer) {
@@ -41,16 +40,15 @@ class MainCoordinator: Coordinator {
 }
 
 extension MainCoordinator: ShowMeeting {
-    func showMeeting(code: String) {
+    func showMeeting(_ joinedRoom: JoinedRoom) {
         if navigationController.presentedViewController is JoinMeetingViewController {
             navigationController.presentedViewController?.dismiss(animated: true)
         }
 
         let vc = ActiveMeetingViewController.instantiate()
         vc.coordinator = self
-        vc.phenix = dependencyContainer.phenixManager
         vc.media = dependencyContainer.phenixManager.userMediaStreamController
-        vc.code = code
+        vc.joinedRoom = joinedRoom
 
         UIView.transition(with: navigationController.view) {
             self.navigationController.pushViewController(vc, animated: false)
@@ -76,7 +74,15 @@ extension MainCoordinator: JoinCancellation {
 
 extension MainCoordinator: MeetingFinished {
     func meetingFinished(_ meeting: Meeting) {
-        dependencyContainer.preferences.meetings.append(meeting)
+        var meetings = dependencyContainer.preferences.meetings
+
+        if let savedMeetingIndex = meetings.firstIndex(where: { $0.code == meeting.code }) {
+            // It was previously created meeting and user re-joined it.
+            meetings.remove(at: savedMeetingIndex)
+        }
+
+        meetings.append(meeting)
+        dependencyContainer.preferences.meetings = meetings
 
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }

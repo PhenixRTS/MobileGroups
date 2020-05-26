@@ -25,7 +25,7 @@ public enum PhenixRoomJoiningError: Error {
 }
 
 public protocol PhenixRoomJoining: AnyObject {
-    typealias JoinRoomHandler = (PhenixRoomJoiningError?) -> Void
+    typealias JoinRoomHandler = (Result<JoinedRoom, PhenixRoomJoiningError>) -> Void
 
     /// Join already created room
     /// - Parameters:
@@ -66,13 +66,22 @@ extension PhenixManager {
         dispatchPrecondition(condition: .onQueue(privateQueue))
         precondition(self.roomExpress != nil, "Must call PhenixManager.start() before this method")
         self.roomExpress.joinRoom(options) { [weak self] status, roomService in
+            guard let self = self else { return }
             os_log(.debug, log: .phenixManager, "Joining a room completed with status: %{PUBLIC}d", status.rawValue)
-            self?.joinedRoomService = roomService
             switch status {
             case .ok:
-                completion(.none)
+                guard let roomService = roomService else {
+                    fatalError("Could not get RoomService parameter")
+                }
+
+                let joinedRoom = JoinedRoom(backend: self.backend, roomService: roomService)
+                joinedRoom.delegate = self
+                self.add(joinedRoom)
+
+                completion(.success(joinedRoom))
+
             default:
-                completion(.failureStatus(status))
+                completion(.failure(.failureStatus(status)))
             }
         }
     }

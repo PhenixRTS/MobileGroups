@@ -39,9 +39,7 @@
 		B54D59A52451C13400454066 /* NewMeetingControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59A42451C13400454066 /* NewMeetingControlView.swift */; };
 		B54D59A72451D78100454066 /* RoomAlias.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59A62451D78100454066 /* RoomAlias.swift */; };
 		B54D59AD2453040100454066 /* PhenixConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59AC2453040100454066 /* PhenixConfiguration.swift */; };
-		B54D59AF2453065800454066 /* PhenixRoomLeaving.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59AE2453065800454066 /* PhenixRoomLeaving.swift */; };
 		B54D59B2245307F600454066 /* ActiveMeetingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59B1245307F600454066 /* ActiveMeetingViewController.swift */; };
-		B5704D2E24642B0900D9703A /* PhenixInformation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D2D24642B0900D9703A /* PhenixInformation.swift */; };
 		B5704D3024642BEB00D9703A /* CurrentDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D2F24642BEB00D9703A /* CurrentDate.swift */; };
 		B5704D3224642DBA00D9703A /* Encode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D3124642DBA00D9703A /* Encode.swift */; };
 		B5704D342464346500D9703A /* Decode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D332464346500D9703A /* Decode.swift */; };
@@ -66,6 +64,7 @@
 		B5C25EF5245B010600542E1C /* ControlButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C25EF4245B010600542E1C /* ControlButton.swift */; };
 		B5C25EFD245B33D900542E1C /* NewMeetingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C25EFC245B33D900542E1C /* NewMeetingView.swift */; };
 		B5E4EA48246EC12200F48B38 /* PhenixRoomPublishing.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E4EA47246EC12200F48B38 /* PhenixRoomPublishing.swift */; };
+		B5E4EA722473F17C00F48B38 /* JoinedRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E4EA712473F17C00F48B38 /* JoinedRoom.swift */; };
 		E5615D68AA3F078E666D2911 /* Pods_PhenixGroups.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2FBDD988943A994D0336EC /* Pods_PhenixGroups.framework */; };
 		E670063F4541A24DBF7C86E2 /* Pods_PhenixCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFA941014B5CCB73D1134E8F /* Pods_PhenixCore.framework */; };
 /* End PBXBuildFile section */
@@ -169,9 +168,7 @@
 		B54D59A42451C13400454066 /* NewMeetingControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMeetingControlView.swift; sourceTree = "<group>"; };
 		B54D59A62451D78100454066 /* RoomAlias.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomAlias.swift; sourceTree = "<group>"; };
 		B54D59AC2453040100454066 /* PhenixConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixConfiguration.swift; sourceTree = "<group>"; };
-		B54D59AE2453065800454066 /* PhenixRoomLeaving.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixRoomLeaving.swift; sourceTree = "<group>"; };
 		B54D59B1245307F600454066 /* ActiveMeetingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingViewController.swift; sourceTree = "<group>"; };
-		B5704D2D24642B0900D9703A /* PhenixInformation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixInformation.swift; sourceTree = "<group>"; };
 		B5704D2F24642BEB00D9703A /* CurrentDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentDate.swift; sourceTree = "<group>"; };
 		B5704D3124642DBA00D9703A /* Encode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Encode.swift; sourceTree = "<group>"; };
 		B5704D332464346500D9703A /* Decode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Decode.swift; sourceTree = "<group>"; };
@@ -198,6 +195,7 @@
 		B5C25EF4245B010600542E1C /* ControlButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlButton.swift; sourceTree = "<group>"; };
 		B5C25EFC245B33D900542E1C /* NewMeetingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMeetingView.swift; sourceTree = "<group>"; };
 		B5E4EA47246EC12200F48B38 /* PhenixRoomPublishing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixRoomPublishing.swift; sourceTree = "<group>"; };
+		B5E4EA712473F17C00F48B38 /* JoinedRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinedRoom.swift; sourceTree = "<group>"; };
 		C14018589F0F82A57D4D0B42 /* Pods-PhenixGroups.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixGroups.release.xcconfig"; path = "Target Support Files/Pods-PhenixGroups/Pods-PhenixGroups.release.xcconfig"; sourceTree = "<group>"; };
 		D8BC44E9C5B4596C131E7876 /* Pods-PhenixCoreIntegrationTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixCoreIntegrationTests.debug.xcconfig"; path = "Target Support Files/Pods-PhenixCoreIntegrationTests/Pods-PhenixCoreIntegrationTests.debug.xcconfig"; sourceTree = "<group>"; };
 		EF50CA9C0F0DB5BDECAE00C7 /* Pods-PhenixCoreIntegrationTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixCoreIntegrationTests.release.xcconfig"; path = "Target Support Files/Pods-PhenixCoreIntegrationTests/Pods-PhenixCoreIntegrationTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -388,6 +386,7 @@
 		B54D597F2450622A00454066 /* PhenixCore */ = {
 			isa = PBXGroup;
 			children = (
+				B5E4EA712473F17C00F48B38 /* JoinedRoom.swift */,
 				B54D59AC2453040100454066 /* PhenixConfiguration.swift */,
 				B54D598A2450626C00454066 /* PhenixManager.swift */,
 				B5777E71246D6015000B4CA9 /* UserMediaStreamController.swift */,
@@ -413,7 +412,6 @@
 				B5704D2D24642B0900D9703A /* PhenixInformation.swift */,
 				B54D599224507D3700454066 /* PhenixRoomCreation.swift */,
 				B54D599424507D4200454066 /* PhenixRoomJoining.swift */,
-				B54D59AE2453065800454066 /* PhenixRoomLeaving.swift */,
 				B5E4EA47246EC12200F48B38 /* PhenixRoomPublishing.swift */,
 			);
 			path = Protocols;
@@ -1041,12 +1039,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				B54D599524507D4200454066 /* PhenixRoomJoining.swift in Sources */,
+				B5E4EA722473F17C00F48B38 /* JoinedRoom.swift in Sources */,
 				B54D598B2450626C00454066 /* PhenixManager.swift in Sources */,
 				B54D599824519E9000454066 /* OSLog.swift in Sources */,
 				B54D59AD2453040100454066 /* PhenixConfiguration.swift in Sources */,
 				B5777E72246D6015000B4CA9 /* UserMediaStreamController.swift in Sources */,
-				B5704D2E24642B0900D9703A /* PhenixInformation.swift in Sources */,
-				B54D59AF2453065800454066 /* PhenixRoomLeaving.swift in Sources */,
 				B5E4EA48246EC12200F48B38 /* PhenixRoomPublishing.swift in Sources */,
 				B54D599324507D3700454066 /* PhenixRoomCreation.swift in Sources */,
 				B54D59A72451D78100454066 /* RoomAlias.swift in Sources */,

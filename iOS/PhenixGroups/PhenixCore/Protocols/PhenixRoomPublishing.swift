@@ -11,7 +11,7 @@ public enum PhenixRoomPublishingError: Error {
 }
 
 public protocol PhenixRoomPublishing: AnyObject {
-    typealias RoomPublishHandler = (Result<PhenixRoom, PhenixRoomPublishingError>) -> Void
+    typealias RoomPublishHandler = (Result<JoinedRoom, PhenixRoomPublishingError>) -> Void
 
     /// Joins existing room or crates a new room and then joins it, also publishes local media
     /// - Parameters:
@@ -34,13 +34,18 @@ extension PhenixManager: PhenixRoomPublishing {
             precondition(self.roomExpress != nil, "Must call PhenixManager.start() before this method")
             self.roomExpress.publish(toRoom: localPublishToRoomOptions) { status, roomService, _ in
                 os_log(.debug, log: .phenixManager, "Room publishing completed with status: %{PUBLIC}d", status.rawValue)
-                self.joinedRoomService = roomService
                 switch status {
                 case .ok:
-                    guard let room = roomService?.getObservableActiveRoom()?.getValue() else {
-                        fatalError("Could not get RoomService parameters")
+                    guard let roomService = roomService else {
+                        fatalError("Could not get RoomService parameter")
                     }
-                    completion(.success(room))
+
+                    let joinedRoom = JoinedRoom(backend: self.backend, roomService: roomService)
+                    joinedRoom.delegate = self
+                    self.add(joinedRoom)
+
+                    completion(.success(joinedRoom))
+
                 default:
                     completion(.failure(.failureStatus(status)))
                 }

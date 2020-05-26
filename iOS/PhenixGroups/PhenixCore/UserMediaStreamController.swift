@@ -65,7 +65,7 @@ extension PhenixUserMediaOptions {
 
         userMediaConstraints.video.enabled = true
         userMediaConstraints.video.capabilityConstraints[PhenixDeviceCapability.facingMode.rawValue] = [PhenixDeviceConstraint.initWith(.user)]
-        userMediaConstraints.video.capabilityConstraints[PhenixDeviceCapability.height.rawValue]     = [PhenixDeviceConstraint.initWith(360)]
+        userMediaConstraints.video.capabilityConstraints[PhenixDeviceCapability.height.rawValue] = [PhenixDeviceConstraint.initWith(360)]
         userMediaConstraints.video.capabilityConstraints[PhenixDeviceCapability.frameRate.rawValue] = [PhenixDeviceConstraint.initWith(15)]
 
         userMediaConstraints.audio.enabled = true
