@@ -18,8 +18,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window.windowScene = windowScene
 
         let launcher = Launcher(window: window)
-
-        let coordinator = launcher.start()
-        self.coordinator = coordinator
+        launcher.start { coordinator in
+            self.coordinator = coordinator
+        }
     }
 }

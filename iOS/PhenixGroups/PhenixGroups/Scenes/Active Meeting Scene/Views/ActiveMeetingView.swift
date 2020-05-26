@@ -7,6 +7,9 @@ import UIKit
 class ActiveMeetingView: UIView {
     var leaveMeetingHandler: (() -> Void)?
 
+    var camera: UIView { cameraView }
+
+    @IBOutlet private var cameraView: UIView!
     @IBOutlet private var buttonShadowView: UIView!
     @IBOutlet private var microphoneButton: ControlButton!
     @IBOutlet private var leaveMeetingButton: ControlButton!
@@ -28,6 +31,7 @@ class ActiveMeetingView: UIView {
     }
 
     func configure() {
+        layer.masksToBounds = true
         configureButtons()
     }
 }

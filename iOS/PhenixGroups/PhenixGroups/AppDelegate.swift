@@ -18,9 +18,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             self.window = window
 
             let launcher = Launcher(window: window)
-
-            let coordinator = launcher.start()
-            self.coordinator = coordinator
+            launcher.start { coordinator in
+                self.coordinator = coordinator
+            }
 
             return true
         }

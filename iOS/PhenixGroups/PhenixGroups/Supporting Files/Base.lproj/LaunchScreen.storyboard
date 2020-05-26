@@ -38,8 +38,8 @@
                         </subviews>
                         <color key="backgroundColor" name="Launchscreen Background Color"/>
                         <constraints>
-                            <constraint firstItem="gpp-SN-ofe" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="TjJ-5t-72k"/>
-                            <constraint firstItem="gpp-SN-ofe" firstAttribute="centerY" secondItem="6Tk-OE-BBY" secondAttribute="centerY" id="sKa-Vk-BVR"/>
+                            <constraint firstItem="gpp-SN-ofe" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="TjJ-5t-72k"/>
+                            <constraint firstItem="gpp-SN-ofe" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" constant="5" id="sKa-Vk-BVR"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>

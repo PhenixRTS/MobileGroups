@@ -13,6 +13,7 @@ protocol DisplayNameDelegate: AnyObject {
 class NewMeetingViewController: UIViewController, Storyboarded {
     weak var coordinator: (ShowMeeting & JoinMeeting)?
     weak var phenix: (PhenixRoomCreation & PhenixRoomJoining)?
+    weak var media: UserMediaStreamController?
     weak var preferences: Preferences?
 
     var device: UIDevice = .current
@@ -28,7 +29,14 @@ class NewMeetingViewController: UIViewController, Storyboarded {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
         configure()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        media?.setPreview(on: newMeetingView.camera)
     }
 }
 
@@ -44,6 +52,7 @@ private extension NewMeetingViewController {
     func configureInteractions() {
         configureNewMeetingHandler()
         configureJoinMeetingHandler()
+        configureControls()
     }
 
     func configureHistoryView() {
@@ -85,6 +94,16 @@ private extension NewMeetingViewController {
         }
     }
 
+    func configureControls() {
+        newMeetingView.microphoneHandler = { [weak media] enabled in
+            media?.setAudioEnabled(enabled)
+        }
+
+        newMeetingView.cameraHandler = { [weak media] enabled in
+            media?.setVideoEnabled(enabled)
+        }
+    }
+
     func joinMeeting(code: String, displayName: String) {
         phenix?.joinRoom(with: .alias(code), displayName: displayName) { [weak self] error in
             guard let self = self else { return }
@@ -114,7 +133,7 @@ extension NewMeetingViewController: DisplayNameDelegate {
 
 extension NewMeetingViewController: MeetingHistoryDelegate {
     func rejoin(_ meeting: Meeting) {
-        os_log(.debug, log: .newMeetingScene, "Rejoin meeting %{PUBLIC}@ (%{PRIVATE}@)", meeting.code, meeting.url.absoluteString)
+        os_log(.debug, log: .newMeetingScene, "Rejoin meeting %{PUBLIC}@ (%{PRIVATE}@)", meeting.code, meeting.backendUrl.absoluteString)
         phenix?.joinRoom(with: .alias(meeting.code), displayName: displayName) { [weak self] error in
             guard let self = self else { return }
             switch error {

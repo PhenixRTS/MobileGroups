@@ -88,9 +88,8 @@ extension PhenixManager: PhenixRoomCreation {
 
 extension PhenixManager {
     private func makePublishOptions() -> PhenixPublishOptions {
-        #warning("Use User Media stream")
-        return PhenixPCastExpressFactory.createPublishOptionsBuilder()
-            //.withUserMedia(PhenixUserMediaStream)
+        PhenixPCastExpressFactory.createPublishOptionsBuilder()
+            .withUserMedia(userMediaStreamController.userMediaStream)
             .withCapabilities(PhenixConfiguration.capabilities)
             .buildPublishOptions()
     }

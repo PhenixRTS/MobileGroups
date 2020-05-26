@@ -48,6 +48,8 @@
 		B5704D362464436F00D9703A /* ViewControllerAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D352464436F00D9703A /* ViewControllerAlerts.swift */; };
 		B5704D682465369000D9703A /* ActiveMeetingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D672465369000D9703A /* ActiveMeetingView.swift */; };
 		B5704D7B2465701400D9703A /* ControlButtonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D7A2465701400D9703A /* ControlButtonTests.swift */; };
+		B5777E5F246C25CB000B4CA9 /* LaunchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5777E5E246C25CB000B4CA9 /* LaunchViewController.swift */; };
+		B5777E72246D6015000B4CA9 /* UserMediaStreamController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5777E71246D6015000B4CA9 /* UserMediaStreamController.swift */; };
 		B59D19DD24629F69008E2C2D /* JoinMeetingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19DC24629F69008E2C2D /* JoinMeetingViewController.swift */; };
 		B59D19E024629FAE008E2C2D /* JoinMeetingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19DF24629FAE008E2C2D /* JoinMeetingView.swift */; };
 		B59D19E52462DFCB008E2C2D /* ShowMeeting.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19E42462DFCB008E2C2D /* ShowMeeting.swift */; };
@@ -177,6 +179,8 @@
 		B5704D6F24656FBE00D9703A /* PhenixGroupsUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PhenixGroupsUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5704D7324656FBE00D9703A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B5704D7A2465701400D9703A /* ControlButtonTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlButtonTests.swift; sourceTree = "<group>"; };
+		B5777E5E246C25CB000B4CA9 /* LaunchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchViewController.swift; sourceTree = "<group>"; };
+		B5777E71246D6015000B4CA9 /* UserMediaStreamController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserMediaStreamController.swift; sourceTree = "<group>"; };
 		B59D19DC24629F69008E2C2D /* JoinMeetingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinMeetingViewController.swift; sourceTree = "<group>"; };
 		B59D19DF24629FAE008E2C2D /* JoinMeetingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinMeetingView.swift; sourceTree = "<group>"; };
 		B59D19E42462DFCB008E2C2D /* ShowMeeting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowMeeting.swift; sourceTree = "<group>"; };
@@ -384,6 +388,7 @@
 			children = (
 				B54D59AC2453040100454066 /* PhenixConfiguration.swift */,
 				B54D598A2450626C00454066 /* PhenixManager.swift */,
+				B5777E71246D6015000B4CA9 /* UserMediaStreamController.swift */,
 				B54D599124507CD200454066 /* Protocols */,
 				B54D598C2450629C00454066 /* Supporting Files */,
 				B54D599624519E7A00454066 /* Utils */,
@@ -403,10 +408,10 @@
 		B54D599124507CD200454066 /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
+				B5704D2D24642B0900D9703A /* PhenixInformation.swift */,
 				B54D599224507D3700454066 /* PhenixRoomCreation.swift */,
 				B54D599424507D4200454066 /* PhenixRoomJoining.swift */,
 				B54D59AE2453065800454066 /* PhenixRoomLeaving.swift */,
-				B5704D2D24642B0900D9703A /* PhenixInformation.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -475,6 +480,14 @@
 			path = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		B5777E5D246C2590000B4CA9 /* Launch Scene */ = {
+			isa = PBXGroup;
+			children = (
+				B5777E5E246C25CB000B4CA9 /* LaunchViewController.swift */,
+			);
+			path = "Launch Scene";
+			sourceTree = "<group>";
+		};
 		B59D19DB24629F47008E2C2D /* Join Meeting Scene */ = {
 			isa = PBXGroup;
 			children = (
@@ -526,6 +539,7 @@
 			children = (
 				B54D59B0245307CC00454066 /* Active Meeting Scene */,
 				B59D19DB24629F47008E2C2D /* Join Meeting Scene */,
+				B5777E5D246C2590000B4CA9 /* Launch Scene */,
 				B54D59A12451BCBF00454066 /* New Meeting Scene */,
 			);
 			path = Scenes;
@@ -1007,6 +1021,7 @@
 				B5019602245AAD9B00DDF6AB /* ChildController.swift in Sources */,
 				B54D599E2451B5D100454066 /* DependencyContainer.swift in Sources */,
 				B5019600245AABA600DDF6AB /* MeetingHistoryTableDataSource.swift in Sources */,
+				B5777E5F246C25CB000B4CA9 /* LaunchViewController.swift in Sources */,
 				B59D19FA24631398008E2C2D /* CellIdentified.swift in Sources */,
 				B50195EE24585C6200DDF6AB /* Preferences.swift in Sources */,
 				B59D19E52462DFCB008E2C2D /* ShowMeeting.swift in Sources */,
@@ -1026,6 +1041,7 @@
 				B54D598B2450626C00454066 /* PhenixManager.swift in Sources */,
 				B54D599824519E9000454066 /* OSLog.swift in Sources */,
 				B54D59AD2453040100454066 /* PhenixConfiguration.swift in Sources */,
+				B5777E72246D6015000B4CA9 /* UserMediaStreamController.swift in Sources */,
 				B5704D2E24642B0900D9703A /* PhenixInformation.swift in Sources */,
 				B54D59AF2453065800454066 /* PhenixRoomLeaving.swift in Sources */,
 				B54D599324507D3700454066 /* PhenixRoomCreation.swift in Sources */,

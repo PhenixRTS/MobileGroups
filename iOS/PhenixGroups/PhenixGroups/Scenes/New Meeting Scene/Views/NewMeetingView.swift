@@ -5,10 +5,17 @@
 import UIKit
 
 class NewMeetingView: UIView {
+    typealias ControlButtonHandler = (_ enabled: Bool) -> Void
+
     static let maxHistoryHeight: CGFloat = 186
 
     var displayName: String { controlView.displayName }
+    var camera: UIView { cameraView }
 
+    var microphoneHandler: ControlButtonHandler?
+    var cameraHandler: ControlButtonHandler?
+
+    @IBOutlet private var cameraView: UIView!
     @IBOutlet private var controlView: NewMeetingControlView!
     @IBOutlet private var controlViewContainer: UIView!
     @IBOutlet private var historyViewContainer: UIView!
@@ -20,14 +27,18 @@ class NewMeetingView: UIView {
     @IBAction
     private func microphoneButtonTapped(_ sender: ControlButton) {
         sender.controlState.toggle()
+        microphoneHandler?(sender.controlState == .on)
     }
 
     @IBAction
     private func cameraButtonTapped(_ sender: ControlButton) {
         sender.controlState.toggle()
+        cameraHandler?(sender.controlState == .on)
     }
 
     func configure(displayName: String) {
+        layer.masksToBounds = true
+
         historyContainerHeightConstraint.constant = Self.maxHistoryHeight
 
         controlViewContainer.layer.masksToBounds = true

@@ -7,5 +7,5 @@ import Foundation
 struct Meeting: Codable {
     var code: String
     var leaveDate: Date
-    var url: URL
+    var backendUrl: URL
 }

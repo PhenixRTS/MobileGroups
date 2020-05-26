@@ -23,6 +23,7 @@ class MainCoordinator: Coordinator {
         let vc = NewMeetingViewController.instantiate()
         vc.coordinator = self
         vc.phenix = dependencyContainer.phenixManager
+        vc.media = dependencyContainer.phenixManager.userMediaStreamController
         vc.preferences = dependencyContainer.preferences
 
         let hvc = MeetingHistoryTableViewController.instantiate()
@@ -33,8 +34,9 @@ class MainCoordinator: Coordinator {
             self?.dependencyContainer.preferences.meetings.sorted { $0.leaveDate > $1.leaveDate } ?? []
         }
 
-        navigationController.isNavigationBarHidden = true
-        navigationController.pushViewController(vc, animated: false)
+        UIView.transition(with: navigationController.view) {
+            self.navigationController.setViewControllers([vc], animated: false)
+        }
     }
 }
 
@@ -47,8 +49,12 @@ extension MainCoordinator: ShowMeeting {
         let vc = ActiveMeetingViewController.instantiate()
         vc.coordinator = self
         vc.phenix = dependencyContainer.phenixManager
+        vc.media = dependencyContainer.phenixManager.userMediaStreamController
         vc.code = code
-        navigationController.pushViewController(vc, animated: true)
+
+        UIView.transition(with: navigationController.view) {
+            self.navigationController.pushViewController(vc, animated: false)
+        }
     }
 }
 
@@ -71,8 +77,19 @@ extension MainCoordinator: JoinCancellation {
 extension MainCoordinator: MeetingFinished {
     func meetingFinished(_ meeting: Meeting) {
         dependencyContainer.preferences.meetings.append(meeting)
+
         DispatchQueue.main.async { [weak self] in
-            self?.navigationController.popViewController(animated: true)
+            guard let self = self else { return }
+
+            UIView.transition(with: self.navigationController.view) {
+                self.navigationController.popViewController(animated: false)
+            }
         }
+    }
+}
+
+fileprivate extension UIView {
+    class func transition(with view: UIView, duration: TimeInterval = 0.25, options: UIView.AnimationOptions = [.transitionCrossDissolve], animations: (() -> Void)?) {
+        UIView.transition(with: view, duration: duration, options: options, animations: animations, completion: nil)
     }
 }
