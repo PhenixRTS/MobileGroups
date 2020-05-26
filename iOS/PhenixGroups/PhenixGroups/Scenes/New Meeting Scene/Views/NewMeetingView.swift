@@ -57,6 +57,14 @@ class NewMeetingView: UIView {
         controlView.joinMeetingTapHandler = completion
     }
 
+    func setMicrophoneButtonStateEnabled(_ enabled: Bool) {
+        setControl(microphoneButton, enabled: enabled)
+    }
+
+    func setCameraButtonStateEnabled(_ enabled: Bool) {
+        setControl(cameraButton, enabled: enabled)
+    }
+
     func setDisplayNameDelegate(_ delegate: DisplayNameDelegate) {
         controlView.delegate = delegate
     }
@@ -125,6 +133,10 @@ private extension NewMeetingView {
         cameraButton.setHighlightedBackgroundColor(UIColor.systemRed.withAlphaComponent(0.2), for: .off)
 
         cameraButton.refreshStateRepresentation()
+    }
+
+    func setControl(_ control: ControlButton, enabled: Bool) {
+        control.controlState = enabled == true ? .on : .off
     }
 }
 

@@ -5,9 +5,14 @@
 import UIKit
 
 class ActiveMeetingView: UIView {
+    typealias ControlButtonHandler = (_ enabled: Bool) -> Void
+
     var leaveMeetingHandler: (() -> Void)?
 
     var camera: UIView { cameraView }
+
+    var microphoneHandler: ControlButtonHandler?
+    var cameraHandler: ControlButtonHandler?
 
     @IBOutlet private var cameraView: UIView!
     @IBOutlet private var buttonShadowView: UIView!
@@ -23,16 +28,26 @@ class ActiveMeetingView: UIView {
     @IBAction
     private func microphoneButtonTapped(_ sender: ControlButton) {
         sender.controlState.toggle()
+        microphoneHandler?(sender.controlState == .on)
     }
 
     @IBAction
     private func cameraButtonTapped(_ sender: ControlButton) {
         sender.controlState.toggle()
+        cameraHandler?(sender.controlState == .on)
     }
 
     func configure() {
         layer.masksToBounds = true
         configureButtons()
+    }
+
+    func setMicrophoneButtonStateEnabled(_ enabled: Bool) {
+        setControl(microphoneButton, enabled: enabled)
+    }
+
+    func setCameraButtonStateEnabled(_ enabled: Bool) {
+        setControl(cameraButton, enabled: enabled)
     }
 }
 
@@ -108,5 +123,9 @@ private extension ActiveMeetingView {
         leaveMeetingButton.setHighlightedBackgroundColor(UIColor.systemRed.withAlphaComponent(0.2), for: .off)
 
         leaveMeetingButton.refreshStateRepresentation()
+    }
+
+    func setControl(_ control: ControlButton, enabled: Bool) {
+        control.controlState = enabled == true ? .on : .off
     }
 }

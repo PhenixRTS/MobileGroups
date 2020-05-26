@@ -22,6 +22,18 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
 
         assert(code != nil, "Meeting code is necessary")
 
+        configure()
+    }
+
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        configureMedia()
+    }
+}
+
+private extension ActiveMeetingViewController {
+    func configure() {
         activeMeetingView.configure()
         activeMeetingView.leaveMeetingHandler = { [weak self] in
             guard let self = self else { return }
@@ -34,6 +46,24 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
             let meeting = Meeting(code: self.code, leaveDate: .now, backendUrl: phenix.backendUri)
             self.coordinator?.meetingFinished(meeting)
         }
+        configureControls()
+    }
+
+    func configureControls() {
+        activeMeetingView.microphoneHandler = { [weak media] enabled in
+            media?.setAudioEnabled(enabled)
+        }
+
+        activeMeetingView.cameraHandler = { [weak media] enabled in
+            media?.setVideoEnabled(enabled)
+        }
+    }
+
+    func configureMedia() {
+        guard let media = media else { return }
+        media.setPreview(on: activeMeetingView.camera)
+        activeMeetingView.setMicrophoneButtonStateEnabled(media.isAudioEnabled)
+        activeMeetingView.setCameraButtonStateEnabled(media.isVideoEnabled)
     }
 
     override func viewWillAppear(_ animated: Bool) {

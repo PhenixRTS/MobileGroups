@@ -36,7 +36,7 @@ class NewMeetingViewController: UIViewController, Storyboarded {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        media?.setPreview(on: newMeetingView.camera)
+        configureMedia()
     }
 }
 
@@ -47,6 +47,13 @@ private extension NewMeetingViewController {
 
         configureHistoryView()
         configureInteractions()
+    }
+
+    func configureMedia() {
+        guard let media = media else { return }
+        media.setPreview(on: newMeetingView.camera)
+        newMeetingView.setMicrophoneButtonStateEnabled(media.isAudioEnabled)
+        newMeetingView.setCameraButtonStateEnabled(media.isVideoEnabled)
     }
 
     func configureInteractions() {

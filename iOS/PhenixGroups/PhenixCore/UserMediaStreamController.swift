@@ -6,10 +6,13 @@ import PhenixSdk
 import UIKit
 
 public class UserMediaStreamController {
-    internal let userMediaStream: PhenixUserMediaStream
-
     private var cameraLayer: CALayer!
     private var renderer: PhenixRenderer?
+
+    internal let userMediaStream: PhenixUserMediaStream
+
+    public private(set) var isAudioEnabled: Bool = true
+    public private(set) var isVideoEnabled: Bool = true
 
     init(_ userMediaStream: PhenixUserMediaStream) {
         self.userMediaStream = userMediaStream
@@ -39,12 +42,14 @@ public class UserMediaStreamController {
         userMediaStream.apply(options)
     }
 
-    public func setVideoEnabled(_ enabled: Bool) {
-        userMediaStream.mediaStream.getVideoTracks()?.first?.setEnabled(enabled)
+    public func setAudioEnabled(_ enabled: Bool) {
+        isAudioEnabled = enabled
+        userMediaStream.mediaStream.getAudioTracks()?.forEach { $0.setEnabled(enabled) }
     }
 
-    public func setAudioEnabled(_ enabled: Bool) {
-        userMediaStream.mediaStream.getAudioTracks()?.first?.setEnabled(enabled)
+    public func setVideoEnabled(_ enabled: Bool) {
+        isVideoEnabled = enabled
+        userMediaStream.mediaStream.getVideoTracks()?.forEach { $0.setEnabled(enabled) }
     }
 }
 
