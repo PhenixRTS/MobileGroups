@@ -65,10 +65,4 @@ private extension ActiveMeetingViewController {
         activeMeetingView.setMicrophoneButtonStateEnabled(media.isAudioEnabled)
         activeMeetingView.setCameraButtonStateEnabled(media.isVideoEnabled)
     }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-
-        media?.setPreview(on: activeMeetingView.camera)
-    }
 }

@@ -93,3 +93,15 @@ private extension PhenixManager {
         }
     }
 }
+
+// MARK: - Helper methods
+
+internal extension PhenixManager {
+    func makeRoomOptions(with alias: String) -> PhenixRoomOptions {
+        PhenixRoomServiceFactory.createRoomOptionsBuilder()
+            .withName(alias)
+            .withAlias(alias)
+            .withType(.multiPartyChat)
+            .buildRoomOptions()
+    }
+}

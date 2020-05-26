@@ -8,7 +8,7 @@ import UIKit
 
 class JoinMeetingViewController: UIViewController, Storyboarded {
     weak var coordinator: (ShowMeeting & JoinCancellation)?
-    weak var phenix: PhenixRoomJoining?
+    weak var phenix: PhenixRoomPublishing?
 
     var displayName: String!
 
@@ -38,15 +38,17 @@ private extension JoinMeetingViewController {
     }
 
     func joinMeeting(code: String, displayName: String) {
-        phenix?.joinRoom(with: .alias(code), displayName: displayName) { [weak self] error in
+        phenix?.publishRoom(withAlias: code, displayName: displayName) { [weak self] result in
             guard let self = self else { return }
-            switch error {
-            case .none:
+            switch result {
+            case .success(_):
                 os_log(.debug, log: .joinMeetingScene, "Joined meeting with alias %{PUBLIC}@", code)
+
                 DispatchQueue.main.async {
                     self.coordinator?.showMeeting(code: code)
                 }
-            case .failureStatus(let status):
+
+            case .failure(.failureStatus(let status)):
                 os_log(.debug, log: .joinMeetingScene, "Failed to join a meeting with alias: %{PUBLIC}@, status code: %{PUBLIC}d", code, status.rawValue)
 
                 DispatchQueue.main.async {
