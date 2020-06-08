@@ -5,8 +5,33 @@
 import UIKit
 
 class CameraPlaceholderView: UIView {
+    enum Size {
+        case small
+        case big
+
+        var width: CGFloat {
+            switch self {
+            case .small:
+                return 40
+            case .big:
+                return 80
+            }
+        }
+
+        var height: CGFloat {
+            switch self {
+            case .small:
+                return 40
+            case .big:
+                return 80
+            }
+        }
+    }
+
     private var imageView: UIImageView!
     private var displayNameLabel: UILabel!
+
+    let size: CameraPlaceholderView.Size
 
     var text: String = "" {
         didSet {
@@ -14,14 +39,21 @@ class CameraPlaceholderView: UIView {
         }
     }
 
-    override init(frame: CGRect) {
+    var displayNameEnabled: Bool = true {
+        didSet {
+            displayNameLabel.isHidden = displayNameEnabled == false
+        }
+    }
+
+    init(size: CameraPlaceholderView.Size, frame: CGRect = .zero) {
+        self.size = size
         super.init(frame: frame)
         setup()
     }
 
+    @available(*, unavailable)
     required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setup()
+        fatalError("init(coder:) has not been implemented")
     }
 }
 
@@ -55,16 +87,13 @@ private extension CameraPlaceholderView {
     }
 
     func makeImageView() -> UIImageView {
-        guard let image = UIImage(named: "camera_placeholder") else {
-            fatalError("Could not locate necessary image")
-        }
-
+        let image = UIImage(named: "camera_placeholder")
         let imageView = UIImageView(image: image)
         imageView.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            imageView.widthAnchor.constraint(equalToConstant: 80),
-            imageView.heightAnchor.constraint(equalToConstant: 80)
+            imageView.widthAnchor.constraint(equalToConstant: size.width),
+            imageView.heightAnchor.constraint(equalToConstant: size.height)
         ])
 
         return imageView

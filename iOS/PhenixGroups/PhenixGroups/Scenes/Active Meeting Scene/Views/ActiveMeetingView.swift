@@ -151,7 +151,7 @@ private extension ActiveMeetingView {
     }
 
     func setupCameraPlaceholderView(text: String) {
-        let view = CameraPlaceholderView()
+        let view = CameraPlaceholderView(size: .big)
         cameraPlaceholderView = view
         view.translatesAutoresizingMaskIntoConstraints = false
         view.text = text

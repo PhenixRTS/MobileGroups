@@ -10,6 +10,7 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
     private var pageController: UIPageViewController!
     /// Page sub-controllers, like *Member List Controller*, *Information Controller*, *Chat Controller*, displayed by a `UIPageViewController`
     private var controllers = [UIViewController]()
+    private var membersListViewController: ActiveMeetingMemberListViewController!
 
     weak var coordinator: MeetingFinished?
     weak var media: UserMediaStreamController?
@@ -28,6 +29,8 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
         assert(displayName != nil, "Display name is necessary")
 
         configure()
+
+        joinedRoom.subscribeToMemberList(membersListViewController)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -99,8 +102,8 @@ private extension ActiveMeetingViewController {
     }
 
     func makeMembersViewController() -> UIViewController {
-        let vc = UIViewController()
-        vc.view.backgroundColor = .purple
+        let vc = ActiveMeetingMemberListViewController()
+        membersListViewController = vc
         return vc
     }
 
