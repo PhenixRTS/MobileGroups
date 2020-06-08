@@ -7,7 +7,6 @@ import UIKit
 
 class ActiveMeetingMemberTableViewCell: UITableViewCell, CellIdentified {
     private var cameraView: CameraView!
-    private var cameraPlaceholderView: CameraPlaceholderView!
     private var displayNameLabel: UILabel!
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -20,24 +19,35 @@ class ActiveMeetingMemberTableViewCell: UITableViewCell, CellIdentified {
         setup()
     }
 
-    func configure(displayName: String) {
+    override func prepareForReuse() {
+        super.prepareForReuse()
+
+        cameraView.removeCameraLayer()
+    }
+
+    func configure(displayName: String, cameraEnabled: Bool) {
         displayNameLabel.text = displayName
-        showCamera(false)
+        showCamera(cameraEnabled)
+    }
+
+    func setCamera(_ layer: CALayer?) {
+        if let layer = layer {
+            cameraView.setCameraLayer(layer)
+        } else {
+            cameraView.removeCameraLayer()
+        }
     }
 }
 
 private extension ActiveMeetingMemberTableViewCell {
     func setup() {
         cameraView = CameraView()
-        cameraView.backgroundColor = .green
         cameraView.translatesAutoresizingMaskIntoConstraints = false
-
-        cameraPlaceholderView = makeCameraPlaceholderView()
+        cameraView.placeholderText = nil
 
         displayNameLabel = makeDisplayNameLabel()
 
         contentView.addSubview(cameraView)
-        contentView.addSubview(cameraPlaceholderView)
         contentView.addSubview(displayNameLabel)
 
         NSLayoutConstraint.activate([
@@ -45,30 +55,15 @@ private extension ActiveMeetingMemberTableViewCell {
             cameraView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             cameraView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             cameraView.widthAnchor.constraint(equalToConstant: 120),
-            cameraView.heightAnchor.constraint(equalToConstant: 60),
-
-            cameraPlaceholderView.topAnchor.constraint(equalTo: cameraView.topAnchor),
-            cameraPlaceholderView.leadingAnchor.constraint(equalTo: cameraView.leadingAnchor),
-            cameraPlaceholderView.trailingAnchor.constraint(equalTo: cameraView.trailingAnchor),
-            cameraPlaceholderView.bottomAnchor.constraint(equalTo: cameraView.bottomAnchor),
+            cameraView.heightAnchor.constraint(equalToConstant: 80),
 
             displayNameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             displayNameLabel.leadingAnchor.constraint(equalTo: cameraView.trailingAnchor, constant: 10)
         ])
     }
 
-    func makeCameraPlaceholderView() -> CameraPlaceholderView {
-        let view = CameraPlaceholderView(size: .small)
-
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.displayNameEnabled = false
-
-        return view
-    }
-
     func showCamera(_ show: Bool) {
-        cameraView.isHidden = !show
-        cameraPlaceholderView.isHidden = show
+        cameraView.showCamera = show
     }
 
     func makeDisplayNameLabel() -> UILabel {
@@ -83,5 +78,17 @@ private extension ActiveMeetingMemberTableViewCell {
         }
 
         return label
+    }
+}
+
+extension ActiveMeetingMemberTableViewCell: RoomMemberDelegate {
+    func roomMemberAudioStateDidChange(_ member: RoomMember, enabled: Bool) {
+        // Audio updated
+    }
+
+    func roomMemberVideoStateDidChange(_ member: RoomMember, enabled: Bool) {
+        DispatchQueue.main.async { [weak self] in
+            self?.showCamera(enabled)
+        }
     }
 }

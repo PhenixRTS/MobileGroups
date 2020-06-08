@@ -44,7 +44,7 @@ extension PhenixManager: PhenixRoomPublishing {
                         fatalError("Could not get Publisher parameter")
                     }
 
-                    let joinedRoom = JoinedRoom(backend: self.backend, roomService: roomService, publisher: publisher)
+                    let joinedRoom = JoinedRoom(roomExpress: self.roomExpress, backend: self.backend, roomService: roomService, publisher: publisher)
                     joinedRoom.delegate = self
                     self.add(joinedRoom)
 

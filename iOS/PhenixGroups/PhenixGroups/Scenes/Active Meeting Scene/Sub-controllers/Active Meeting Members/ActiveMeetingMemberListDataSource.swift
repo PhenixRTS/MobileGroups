@@ -2,10 +2,11 @@
 //  Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
+import PhenixCore
 import UIKit
 
 class ActiveMeetingMemberListDataSource: NSObject, UITableViewDataSource {
-    var members = [String]()
+    var members = [RoomMember]()
 
     // MARK: - Table view data source
 
@@ -15,7 +16,10 @@ class ActiveMeetingMemberListDataSource: NSObject, UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: ActiveMeetingMemberTableViewCell = tableView.dequeueReusableCell(for: indexPath)
-        cell.configure(displayName: members[indexPath.row])
+        let member = members[indexPath.row]
+        member.delegate = cell
+        cell.configure(displayName: member.screenName, cameraEnabled: member.isVideoAvailable)
+        cell.setCamera(member.previewLayer)
         return cell
     }
 }

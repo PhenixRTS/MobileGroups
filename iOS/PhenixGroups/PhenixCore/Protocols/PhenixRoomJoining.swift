@@ -74,7 +74,7 @@ extension PhenixManager {
                     fatalError("Could not get RoomService parameter")
                 }
 
-                let joinedRoom = JoinedRoom(backend: self.backend, roomService: roomService)
+                let joinedRoom = JoinedRoom(roomExpress: self.roomExpress, backend: self.backend, roomService: roomService)
                 joinedRoom.delegate = self
                 self.add(joinedRoom)
 

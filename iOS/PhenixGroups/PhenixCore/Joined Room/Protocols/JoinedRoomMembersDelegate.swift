@@ -5,5 +5,5 @@
 import Foundation
 
 public protocol JoinedRoomMembersDelegate: AnyObject {
-    func memberListDidChange(_ list: [String])
+    func memberListDidChange(_ list: [RoomMember])
 }

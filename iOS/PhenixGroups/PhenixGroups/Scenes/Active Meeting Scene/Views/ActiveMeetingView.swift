@@ -12,7 +12,6 @@ class ActiveMeetingView: UIView {
     var microphoneHandler: ControlButtonHandler?
     var cameraHandler: ControlButtonHandler?
 
-    private var cameraPlaceholderView: CameraPlaceholderView!
     @IBOutlet private var cameraView: CameraView!
     @IBOutlet private var buttonShadowView: UIView!
     @IBOutlet private var microphoneButton: ControlButton!
@@ -43,7 +42,7 @@ class ActiveMeetingView: UIView {
 
     func configure(displayName: String) {
         configureButtons()
-        setupCameraPlaceholderView(text: displayName)
+        cameraView.placeholderText = displayName
     }
 
     func setMicrophone(enabled: Bool) {
@@ -150,24 +149,7 @@ private extension ActiveMeetingView {
         control.controlState = enabled == true ? .on : .off
     }
 
-    func setupCameraPlaceholderView(text: String) {
-        let view = CameraPlaceholderView(size: .big)
-        cameraPlaceholderView = view
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.text = text
-
-        insertSubview(view, aboveSubview: cameraView)
-
-        NSLayoutConstraint.activate([
-            view.topAnchor.constraint(equalTo: topAnchor),
-            view.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-            view.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
-            view.bottomAnchor.constraint(equalTo: containerView.topAnchor, constant: 0)
-        ])
-    }
-
     func showCamera(_ show: Bool) {
-        cameraView.isHidden = !show
-        cameraPlaceholderView.isHidden = show
+        cameraView.showCamera = show
     }
 }

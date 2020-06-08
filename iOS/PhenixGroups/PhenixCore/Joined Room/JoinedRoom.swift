@@ -7,26 +7,30 @@ import os.log
 import PhenixSdk
 
 public class JoinedRoom: CustomStringConvertible {
+    enum JoinedRoomError: Error {
+        case noRoomExpress
+    }
+
+    private weak var roomExpress: PhenixRoomExpress?
+    private weak var membersDelegate: JoinedRoomMembersDelegate?
     private let roomService: PhenixRoomService
     private let publisher: PhenixExpressPublisher?
-
     private var disposables = [PhenixDisposable]()
-    private var memberList = [PhenixMember]()
 
-    private weak var membersDelegate: JoinedRoomMembersDelegate?
+    internal weak var delegate: JoinedRoomDelegate?
 
+    public private(set) var members = Set<RoomMember>()
     public let backend: URL
     public var alias: String? {
         roomService.getObservableActiveRoom()?.getValue()?.getObservableAlias()?.getValue() as String?
     }
 
-    weak var delegate: JoinedRoomDelegate?
-
     public var description: String {
         "Joined Room, backend: \(backend.absoluteURL), alias: \(String(describing: alias))"
     }
 
-    init(backend: URL, roomService: PhenixRoomService, publisher: PhenixExpressPublisher? = nil) {
+    init(roomExpress: PhenixRoomExpress, backend: URL, roomService: PhenixRoomService, publisher: PhenixExpressPublisher? = nil) {
+        self.roomExpress = roomExpress
         self.backend = backend
         self.roomService = roomService
         self.publisher = publisher
@@ -36,6 +40,7 @@ public class JoinedRoom: CustomStringConvertible {
         os_log(.debug, log: .joinedRoom, "Leaving joined room %{PRIVATE}s", self.description)
         publisher?.stop()
         disposables.removeAll() // Disposables must be cleared so that they could not cause a memory leak.
+        membersLeft(members)
         roomService.leaveRoom { [weak self] _, _ in
             guard let self = self else { return }
             self.delegate?.roomLeft(self)
@@ -67,24 +72,68 @@ public class JoinedRoom: CustomStringConvertible {
         os_log(.debug, log: .joinedRoom, "Subscribe to member list updates")
         membersDelegate = delegate
         if let members = roomService.getObservableActiveRoom()?.getValue()?.getObservableMembers() {
-            disposables.append(members.subscribe(memberListDidChange))
-            os_log(.debug, log: .joinedRoom, "Subscribe to member list updates")
+            members.subscribe(memberListDidChange)?.append(to: &disposables)
+            os_log(.debug, log: .joinedRoom, "Successfully subscribed to member list updates")
         }
     }
 }
 
 private extension JoinedRoom {
     func memberListDidChange(_ changes: PhenixObservableChange<NSArray>?) {
-        guard let newMemberList = changes?.value as? [PhenixMember] else {
+        guard let updatedList = changes?.value as? [PhenixMember] else {
             return
         }
 
-        // Logic for members list
+        let updatedMemberList = Set(updatedList.compactMap { try? makeRoomMember($0) })
 
-        if newMemberList.count != memberList.count {
-            memberList = newMemberList
-            membersDelegate?.memberListDidChange(newMemberList.compactMap { $0.getObservableScreenName()?.getValue() as String? })
+        let memberListChanged = processUpdatedMemberList(updatedMemberList, currentMemberList: members, membersJoined: membersJoined, membersLeft: membersLeft)
+
+        if memberListChanged {
+            let memberList = Array(members).sorted()
+            membersDelegate?.memberListDidChange(memberList)
         }
+    }
+
+    func processUpdatedMemberList(_ updatedMemberList: Set<RoomMember>, currentMemberList: Set<RoomMember>, membersJoined: (Set<RoomMember>) -> Void, membersLeft: (Set<RoomMember>) -> Void) -> Bool {
+        // Get list of elements which does not exist in updatedMemberList but exist in currentMemberList, in simple words, members who left
+        let leftMembers = currentMemberList.subtracting(updatedMemberList)
+        membersLeft(leftMembers)
+
+        // Get list of elements which does not exist in currentMemberList but exist in updatedMemberList, in simple words, members who joined recently
+        let joinedMembers = updatedMemberList.subtracting(currentMemberList)
+        membersJoined(joinedMembers)
+
+        return leftMembers.isEmpty == false || joinedMembers.isEmpty == false
+    }
+
+    func membersJoined(_ newMembers: Set<RoomMember>) {
+        guard newMembers.isEmpty == false else { return }
+        os_log(.debug, log: .joinedRoom, "Members joined: %{PRIVATE}s", newMembers.description)
+        members.formUnion(newMembers)
+        newMembers.forEach { $0.observe() }
+    }
+
+    func membersLeft(_ oldMembers: Set<RoomMember>) {
+        guard oldMembers.isEmpty == false else { return }
+        os_log(.debug, log: .joinedRoom, "Members left: %{PRIVATE}s", oldMembers.description)
+        members.subtract(oldMembers)
+        oldMembers.forEach { $0.dispose() }
+    }
+
+    func makeRoomMember(_ member: PhenixMember) throws -> RoomMember {
+        guard let roomExpress = roomExpress else {
+            throw JoinedRoomError.noRoomExpress
+        }
+
+        let isSelf: Bool = {
+            guard let currentMember = roomService.getSelf() else {
+                return false
+            }
+
+            return currentMember.getSessionId() == member.getSessionId()
+        }()
+
+        return RoomMember(member, isSelf: isSelf, roomExpress: roomExpress)
     }
 }
 

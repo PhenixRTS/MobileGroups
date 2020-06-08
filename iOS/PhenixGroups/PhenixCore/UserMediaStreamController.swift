@@ -27,7 +27,6 @@ public class UserMediaStreamController {
             addLayerToViewHandler(cameraLayer)
         } else {
             cameraLayer = CALayer()
-            cameraLayer.name = "Phenix Camera Layer" // Layer identifier, not required.
             cameraLayer.isOpaque = true
 
             addLayerToViewHandler(cameraLayer)

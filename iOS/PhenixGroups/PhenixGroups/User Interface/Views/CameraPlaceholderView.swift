@@ -5,48 +5,17 @@
 import UIKit
 
 class CameraPlaceholderView: UIView {
-    enum Size {
-        case small
-        case big
-
-        var width: CGFloat {
-            switch self {
-            case .small:
-                return 40
-            case .big:
-                return 80
-            }
-        }
-
-        var height: CGFloat {
-            switch self {
-            case .small:
-                return 40
-            case .big:
-                return 80
-            }
-        }
-    }
-
     private var imageView: UIImageView!
-    private var displayNameLabel: UILabel!
+    private var textLabel: UILabel!
 
-    let size: CameraPlaceholderView.Size
-
-    var text: String = "" {
+    var text: String? {
         didSet {
-            displayNameLabel.text = text
+            textLabel.text = text
+            textLabel.isHidden = text == nil
         }
     }
 
-    var displayNameEnabled: Bool = true {
-        didSet {
-            displayNameLabel.isHidden = displayNameEnabled == false
-        }
-    }
-
-    init(size: CameraPlaceholderView.Size, frame: CGRect = .zero) {
-        self.size = size
+    override init(frame: CGRect) {
         super.init(frame: frame)
         setup()
     }
@@ -92,8 +61,8 @@ private extension CameraPlaceholderView {
         imageView.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            imageView.widthAnchor.constraint(equalToConstant: size.width),
-            imageView.heightAnchor.constraint(equalToConstant: size.height)
+            imageView.widthAnchor.constraint(lessThanOrEqualToConstant: 80),
+            imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor)
         ])
 
         return imageView
@@ -101,7 +70,7 @@ private extension CameraPlaceholderView {
 
     func makeCaption() -> UILabel {
         let label = UILabel()
-        displayNameLabel = label
+        textLabel = label
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.textAlignment = .center
         label.sizeToFit()

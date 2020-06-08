@@ -11,13 +11,12 @@ class NewMeetingView: UIView {
 
     var displayName: String {
         get { controlView.displayName }
-        set { cameraPlaceholderView.text = newValue }
+        set { cameraView.placeholderText = newValue }
     }
 
     var microphoneHandler: ControlButtonHandler?
     var cameraHandler: ControlButtonHandler?
 
-    private var cameraPlaceholderView: CameraPlaceholderView!
     @IBOutlet private var cameraView: CameraView!
     @IBOutlet private var controlView: NewMeetingControlView!
     @IBOutlet private var controlViewContainer: UIView!
@@ -55,7 +54,7 @@ class NewMeetingView: UIView {
         configureShadowView()
         configureButtons()
 
-        setupCameraPlaceholderView(text: displayName)
+        cameraView.placeholderText = displayName
     }
 
     func setNewMeetingHandler(_ completion: @escaping NewMeetingControlView.ButtonTapHandler) {
@@ -149,29 +148,12 @@ private extension NewMeetingView {
         cameraButton.refreshStateRepresentation()
     }
 
-    func setupCameraPlaceholderView(text: String) {
-        let view = CameraPlaceholderView(size: .big)
-        cameraPlaceholderView = view
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.text = text
-
-        insertSubview(view, aboveSubview: cameraView)
-
-        NSLayoutConstraint.activate([
-            view.topAnchor.constraint(equalTo: topAnchor),
-            view.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor),
-            view.trailingAnchor.constraint(equalTo: safeAreaLayoutGuide.trailingAnchor),
-            view.bottomAnchor.constraint(equalTo: controlViewContainer.topAnchor, constant: 30)
-        ])
-    }
-
     func setControl(_ control: ControlButton, enabled: Bool) {
         control.controlState = enabled == true ? .on : .off
     }
 
     func showCamera(_ show: Bool) {
-        cameraView.isHidden = !show
-        cameraPlaceholderView.isHidden = show
+        cameraView.showCamera = show
     }
 }
 
