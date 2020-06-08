@@ -133,26 +133,3 @@ internal extension PhenixManager {
             .buildRoomOptions()
     }
 }
-
-extension PhenixManager: JoinedRoomDelegate {
-    func roomLeft(_ room: JoinedRoom) {
-        privateQueue.async { [weak self] in
-            guard let self = self else { return }
-
-            self.joinedRooms.remove(room)
-            os_log(.debug, log: .phenixManager, "Removed joined room instance")
-        }
-    }
-}
-
-// MARK: - Helper methods
-
-internal extension PhenixManager {
-    func makeRoomOptions(with alias: String) -> PhenixRoomOptions {
-        PhenixRoomServiceFactory.createRoomOptionsBuilder()
-            .withName(alias)
-            .withAlias(alias)
-            .withType(.multiPartyChat)
-            .buildRoomOptions()
-    }
-}

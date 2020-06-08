@@ -49,13 +49,6 @@ private extension NewMeetingViewController {
         configureInteractions()
     }
 
-    func configureMedia() {
-        guard let media = media else { return }
-        media.setPreview(on: newMeetingView.camera)
-        newMeetingView.setMicrophoneButtonStateEnabled(media.isAudioEnabled)
-        newMeetingView.setCameraButtonStateEnabled(media.isVideoEnabled)
-    }
-
     func configureInteractions() {
         configureNewMeetingHandler()
         configureJoinMeetingHandler()

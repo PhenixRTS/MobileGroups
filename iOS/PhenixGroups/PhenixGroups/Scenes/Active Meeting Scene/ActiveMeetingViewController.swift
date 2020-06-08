@@ -7,6 +7,10 @@ import PhenixCore
 import UIKit
 
 class ActiveMeetingViewController: UIViewController, Storyboarded {
+    private var pageController: UIPageViewController!
+    /// Page sub-controllers, like *Member List Controller*, *Information Controller*, *Chat Controller*, displayed by a `UIPageViewController`
+    private var controllers = [UIViewController]()
+
     weak var coordinator: MeetingFinished?
     weak var media: UserMediaStreamController?
 
@@ -49,6 +53,7 @@ private extension ActiveMeetingViewController {
             self.leave()
         }
         configureControls()
+        configurePageController()
     }
 
     func configureControls() {
@@ -74,6 +79,41 @@ private extension ActiveMeetingViewController {
         activeMeetingView.setCamera(enabled: media.isVideoEnabled)
     }
 
+    func configurePageController() {
+        pageController = UIPageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal, options: nil)
+        pageController.dataSource = self
+        pageController.delegate = self
+
+        addChild(pageController)
+        activeMeetingView.setPageView(pageController.view)
+
+        configureChildControllers()
+
+        pageController.setViewControllers([controllers[0]], direction: .forward, animated: false)
+    }
+
+    func configureChildControllers() {
+        controllers.append(makeMembersViewController())
+        controllers.append(makeChatViewController())
+        controllers.append(makeInformationViewController(code: joinedRoom.alias ?? "N/A"))
+    }
+
+    func makeMembersViewController() -> UIViewController {
+        let vc = UIViewController()
+        vc.view.backgroundColor = .purple
+        return vc
+    }
+
+    func makeChatViewController() -> UIViewController {
+        let vc = UIViewController()
+        vc.view.backgroundColor = .green
+        return vc
+    }
+
+    func makeInformationViewController(code: String) -> UIViewController {
+        ActiveMeetingInformationViewController(code: code)
+    }
+
     func setVideo(enabled: Bool) {
         os_log(.debug, log: .activeMeetingScene, "Set video enabled - %{PUBLIC}d", enabled)
         joinedRoom.setVideo(enabled: enabled)
@@ -84,5 +124,27 @@ private extension ActiveMeetingViewController {
         os_log(.debug, log: .activeMeetingScene, "Set audio enabled - %{PUBLIC}d", enabled)
         joinedRoom.setAudio(enabled: enabled)
         media?.setAudio(enabled: enabled)
+    }
+}
+
+extension ActiveMeetingViewController: UIPageViewControllerDataSource, UIPageViewControllerDelegate {
+    func pageViewController(_ pageViewController: UIPageViewController, viewControllerBefore viewController: UIViewController) -> UIViewController? {
+        if let index = controllers.firstIndex(of: viewController) {
+            if index > 0 {
+                return controllers[index - 1]
+            }
+        }
+
+        return nil
+    }
+
+    func pageViewController(_ pageViewController: UIPageViewController, viewControllerAfter viewController: UIViewController) -> UIViewController? {
+        if let index = controllers.firstIndex(of: viewController) {
+            if index < controllers.count - 1 {
+                return controllers[index + 1]
+            }
+        }
+
+        return nil
     }
 }

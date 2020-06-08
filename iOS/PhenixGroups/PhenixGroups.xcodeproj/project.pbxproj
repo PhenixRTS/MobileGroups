@@ -40,6 +40,7 @@
 		B54D59A72451D78100454066 /* RoomAlias.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59A62451D78100454066 /* RoomAlias.swift */; };
 		B54D59AD2453040100454066 /* PhenixConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59AC2453040100454066 /* PhenixConfiguration.swift */; };
 		B54D59B2245307F600454066 /* ActiveMeetingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59B1245307F600454066 /* ActiveMeetingViewController.swift */; };
+		B563A4B6247D51FF007101C7 /* ActiveMeetingInformationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B563A4B5247D51FF007101C7 /* ActiveMeetingInformationViewController.swift */; };
 		B5704D3024642BEB00D9703A /* CurrentDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D2F24642BEB00D9703A /* CurrentDate.swift */; };
 		B5704D3224642DBA00D9703A /* Encode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D3124642DBA00D9703A /* Encode.swift */; };
 		B5704D342464346500D9703A /* Decode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D332464346500D9703A /* Decode.swift */; };
@@ -171,6 +172,7 @@
 		B54D59A62451D78100454066 /* RoomAlias.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomAlias.swift; sourceTree = "<group>"; };
 		B54D59AC2453040100454066 /* PhenixConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixConfiguration.swift; sourceTree = "<group>"; };
 		B54D59B1245307F600454066 /* ActiveMeetingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingViewController.swift; sourceTree = "<group>"; };
+		B563A4B5247D51FF007101C7 /* ActiveMeetingInformationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingInformationViewController.swift; sourceTree = "<group>"; };
 		B5704D2F24642BEB00D9703A /* CurrentDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentDate.swift; sourceTree = "<group>"; };
 		B5704D3124642DBA00D9703A /* Encode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Encode.swift; sourceTree = "<group>"; };
 		B5704D332464346500D9703A /* Decode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Decode.swift; sourceTree = "<group>"; };
@@ -455,9 +457,34 @@
 			isa = PBXGroup;
 			children = (
 				B54D59B1245307F600454066 /* ActiveMeetingViewController.swift */,
+				B563A4B3247D4996007101C7 /* Active Meeting Chat */,
+				B563A4B4247D499E007101C7 /* Active Meeting Information */,
+				B563A4B2247D496C007101C7 /* Active Meeting Members */,
 				B5704D662465366D00D9703A /* Views */,
 			);
 			path = "Active Meeting Scene";
+			sourceTree = "<group>";
+		};
+		B563A4B2247D496C007101C7 /* Active Meeting Members */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "Active Meeting Members";
+			sourceTree = "<group>";
+		};
+		B563A4B3247D4996007101C7 /* Active Meeting Chat */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = "Active Meeting Chat";
+			sourceTree = "<group>";
+		};
+		B563A4B4247D499E007101C7 /* Active Meeting Information */ = {
+			isa = PBXGroup;
+			children = (
+				B563A4B5247D51FF007101C7 /* ActiveMeetingInformationViewController.swift */,
+			);
+			path = "Active Meeting Information";
 			sourceTree = "<group>";
 		};
 		B5704D662465366D00D9703A /* Views */ = {
@@ -1029,6 +1056,7 @@
 				B53D8F52244DCBA30055CE66 /* SceneDelegate.swift in Sources */,
 				B5019602245AAD9B00DDF6AB /* ChildController.swift in Sources */,
 				B54D599E2451B5D100454066 /* DependencyContainer.swift in Sources */,
+				B563A4B6247D51FF007101C7 /* ActiveMeetingInformationViewController.swift in Sources */,
 				B5019600245AABA600DDF6AB /* MeetingHistoryTableDataSource.swift in Sources */,
 				B5777E5F246C25CB000B4CA9 /* LaunchViewController.swift in Sources */,
 				B59D19FA24631398008E2C2D /* CellIdentified.swift in Sources */,
