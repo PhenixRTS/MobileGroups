@@ -104,6 +104,7 @@ private extension NewMeetingViewController {
     }
 
     func publishMeeting(with code: String, displayName: String) {
+        presentActivityIndicator()
         phenix?.publishRoom(withAlias: code, displayName: displayName) { [weak self] result in
             guard let self = self else { return }
             switch result {
@@ -111,14 +112,18 @@ private extension NewMeetingViewController {
                 os_log(.debug, log: .newMeetingScene, "Meeting created/joined, alias: %{PUBLIC}@", code)
 
                 DispatchQueue.main.async {
-                    self.coordinator?.showMeeting(joinedRoom)
+                    self.dismissActivityIndicator {
+                        self.coordinator?.showMeeting(joinedRoom)
+                    }
                 }
 
             case .failure(.failureStatus(let status)):
                 os_log(.debug, log: .newMeetingScene, "Failed to create/join a meeting with alias: %{PUBLIC}@, status code: %{PUBLIC}d", code, status.rawValue)
 
                 DispatchQueue.main.async {
-                    self.presentAlert("Failed to create/join a meeting")
+                    self.dismissActivityIndicator {
+                        self.presentAlert("Failed to create/join a meeting")
+                    }
                 }
             }
         }

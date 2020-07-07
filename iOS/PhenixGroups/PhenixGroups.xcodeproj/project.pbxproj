@@ -20,6 +20,8 @@
 		B5019602245AAD9B00DDF6AB /* ChildController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5019601245AAD9B00DDF6AB /* ChildController.swift */; };
 		B510D0842489430E003FAEC0 /* RoomMemberDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B510D0832489430D003FAEC0 /* RoomMemberDelegate.swift */; };
 		B510D0D0248E65AD003FAEC0 /* PhenixDisposables.swift in Sources */ = {isa = PBXBuildFile; fileRef = B510D0CF248E65AD003FAEC0 /* PhenixDisposables.swift */; };
+		B510D0E6248FC258003FAEC0 /* ActivityIndicatorController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B510D0E5248FC258003FAEC0 /* ActivityIndicatorController.swift */; };
+		B510D0E8248FCA63003FAEC0 /* ActivityIndicatorProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B510D0E7248FCA63003FAEC0 /* ActivityIndicatorProvider.swift */; };
 		B51F3C012453202E00857D3E /* PhenixCoreIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51F3C002453202E00857D3E /* PhenixCoreIntegrationTests.swift */; };
 		B51F3C032453202E00857D3E /* PhenixCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B54D597E2450622A00454066 /* PhenixCore.framework */; };
 		B53D8F50244DCBA30055CE66 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B53D8F4F244DCBA30055CE66 /* AppDelegate.swift */; };
@@ -157,6 +159,8 @@
 		B5019601245AAD9B00DDF6AB /* ChildController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildController.swift; sourceTree = "<group>"; };
 		B510D0832489430D003FAEC0 /* RoomMemberDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberDelegate.swift; sourceTree = "<group>"; };
 		B510D0CF248E65AD003FAEC0 /* PhenixDisposables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixDisposables.swift; sourceTree = "<group>"; };
+		B510D0E5248FC258003FAEC0 /* ActivityIndicatorController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicatorController.swift; sourceTree = "<group>"; };
+		B510D0E7248FCA63003FAEC0 /* ActivityIndicatorProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicatorProvider.swift; sourceTree = "<group>"; };
 		B51F3BFE2453202E00857D3E /* PhenixCoreIntegrationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PhenixCoreIntegrationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B51F3C002453202E00857D3E /* PhenixCoreIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixCoreIntegrationTests.swift; sourceTree = "<group>"; };
 		B51F3C022453202E00857D3E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -635,6 +639,7 @@
 		B5BB082F244F27B30094F254 /* Managers */ = {
 			isa = PBXGroup;
 			children = (
+				B510D0E5248FC258003FAEC0 /* ActivityIndicatorController.swift */,
 				B54D599D2451B5D100454066 /* DependencyContainer.swift */,
 				B54D599F2451B7C900454066 /* Launcher.swift */,
 				B50195ED24585C6200DDF6AB /* Preferences.swift */,
@@ -655,6 +660,7 @@
 		B5BB0833244F28270094F254 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				B510D0E7248FCA63003FAEC0 /* ActivityIndicatorProvider.swift */,
 				B59D19F924631398008E2C2D /* CellIdentified.swift */,
 				B5019601245AAD9B00DDF6AB /* ChildController.swift */,
 				B5704D2F24642BEB00D9703A /* CurrentDate.swift */,
@@ -699,7 +705,7 @@
 				B50195CB2456F27800DDF6AB /* Sources */,
 				B50195CC2456F27800DDF6AB /* Frameworks */,
 				B50195CD2456F27800DDF6AB /* Resources */,
-				8F59FB435D01411E22E9FAF1 /* [CP] Embed Pods Frameworks */,
+				5E558DA366A7A364912826FA /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -719,7 +725,7 @@
 				B51F3BFA2453202E00857D3E /* Sources */,
 				B51F3BFB2453202E00857D3E /* Frameworks */,
 				B51F3BFC2453202E00857D3E /* Resources */,
-				0B67732370FE9B9CC9A7C49C /* [CP] Embed Pods Frameworks */,
+				87A7F0D9FBA1A6A130E47F95 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -740,7 +746,7 @@
 				B53D8F48244DCBA30055CE66 /* Sources */,
 				B53D8F49244DCBA30055CE66 /* Frameworks */,
 				B53D8F4A244DCBA30055CE66 /* Resources */,
-				5D31D42803500D4317EF34A3 /* [CP] Embed Pods Frameworks */,
+				594052BA36E76897B145B368 /* [CP] Embed Pods Frameworks */,
 				B5BB084B244F36B50094F254 /* Embed Frameworks */,
 				B54D599A2451AF9B00454066 /* Static Analysis for Swift using SwiftLint */,
 				B50195EB2458125F00DDF6AB /* Catch bad copyrights */,
@@ -908,23 +914,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		0B67732370FE9B9CC9A7C49C /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-PhenixCoreIntegrationTests/Pods-PhenixCoreIntegrationTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-PhenixCoreIntegrationTests/Pods-PhenixCoreIntegrationTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PhenixCoreIntegrationTests/Pods-PhenixCoreIntegrationTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		256AA2B59988FFE3F28BF5B6 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -947,7 +936,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		5D31D42803500D4317EF34A3 /* [CP] Embed Pods Frameworks */ = {
+		594052BA36E76897B145B368 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -964,7 +953,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PhenixGroups/Pods-PhenixGroups-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		8F59FB435D01411E22E9FAF1 /* [CP] Embed Pods Frameworks */ = {
+		5E558DA366A7A364912826FA /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -979,6 +968,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PhenixCoreUnitTests/Pods-PhenixCoreUnitTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		87A7F0D9FBA1A6A130E47F95 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-PhenixCoreIntegrationTests/Pods-PhenixCoreIntegrationTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-PhenixCoreIntegrationTests/Pods-PhenixCoreIntegrationTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PhenixCoreIntegrationTests/Pods-PhenixCoreIntegrationTests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		B4D41F0A25CCFDD7B2788D39 /* [CP] Check Pods Manifest.lock */ = {
@@ -1112,6 +1118,7 @@
 				B59D19DD24629F69008E2C2D /* JoinMeetingViewController.swift in Sources */,
 				B53D8F52244DCBA30055CE66 /* SceneDelegate.swift in Sources */,
 				B566BF76248143F700A2DE75 /* ActiveMeetingMemberTableViewCell.swift in Sources */,
+				B510D0E6248FC258003FAEC0 /* ActivityIndicatorController.swift in Sources */,
 				B5019602245AAD9B00DDF6AB /* ChildController.swift in Sources */,
 				B54D599E2451B5D100454066 /* DependencyContainer.swift in Sources */,
 				B563A4B6247D51FF007101C7 /* ActiveMeetingInformationViewController.swift in Sources */,
@@ -1124,6 +1131,7 @@
 				B5BB0838244F28E80094F254 /* Storyboarded.swift in Sources */,
 				B54D59A32451BCDD00454066 /* NewMeetingViewController.swift in Sources */,
 				B5704D3224642DBA00D9703A /* Encode.swift in Sources */,
+				B510D0E8248FCA63003FAEC0 /* ActivityIndicatorProvider.swift in Sources */,
 				B50195E0245717DC00DDF6AB /* UITextField.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
