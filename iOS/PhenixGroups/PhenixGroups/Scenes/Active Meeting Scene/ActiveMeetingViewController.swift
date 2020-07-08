@@ -136,7 +136,12 @@ private extension ActiveMeetingViewController {
 
     func makeChatViewController() -> UIViewController {
         let vc = ActiveMeetingChatViewController()
+
         chatViewController = vc
+        vc.sendMessageHandler = { [weak self] message in
+            self?.joinedRoom.send(message: message)
+        }
+
         return vc
     }
 

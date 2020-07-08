@@ -6,6 +6,8 @@ import PhenixCore
 import UIKit
 
 class ActiveMeetingChatViewController: UIViewController, PageContainerMember {
+    typealias SendMessageHandler = (String) -> Void
+
     private var timer: Timer?
 
     lazy var dataSource = ActiveMeetingChatDataSource()
@@ -15,6 +17,8 @@ class ActiveMeetingChatViewController: UIViewController, PageContainerMember {
         view as! ActiveMeetingChatView
     }
 
+    var sendMessageHandler: SendMessageHandler?
+
     override func loadView() {
         view = ActiveMeetingChatView()
     }
@@ -23,9 +27,7 @@ class ActiveMeetingChatViewController: UIViewController, PageContainerMember {
         super.viewDidLoad()
 
         configureTableView()
-        activeMeetingChatView.sendMessageHandler = { [weak self] message in
-            self?.send(message: message)
-        }
+        activeMeetingChatView.sendMessageHandler = sendMessageHandler
 
         let timer = Timer(timeInterval: 1.0, target: self, selector: #selector(refreshDates), userInfo: nil, repeats: true)
         self.timer = timer
@@ -36,10 +38,6 @@ class ActiveMeetingChatViewController: UIViewController, PageContainerMember {
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         timer?.invalidate()
-    }
-
-    func send(message: String) {
-        // TODO: Implement message sending.
     }
 }
 

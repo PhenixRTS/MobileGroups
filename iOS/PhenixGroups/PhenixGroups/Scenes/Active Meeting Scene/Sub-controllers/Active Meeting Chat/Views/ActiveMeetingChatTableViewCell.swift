@@ -9,8 +9,8 @@ class ActiveMeetingChatTableViewCell: UITableViewCell, CellIdentified {
     private var displayNameLabel: UILabel!
     private var dateLabel: UILabel!
     private var messageTextView: UITextView!
-    private var message: RoomChatMessage?
 
+    private var message: RoomChatMessage?
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -24,7 +24,7 @@ class ActiveMeetingChatTableViewCell: UITableViewCell, CellIdentified {
 
     func configure(message: RoomChatMessage) {
         self.message = message
-      
+
         displayNameLabel.text = message.authorName
         dateLabel.text = message.date.localizedRelativeDateTime
         messageTextView.text = message.text
@@ -58,10 +58,10 @@ private extension ActiveMeetingChatTableViewCell {
             dateLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
             dateLabel.lastBaselineAnchor.constraint(equalTo: displayNameLabel.lastBaselineAnchor),
 
-            messageTextView.topAnchor.constraint(equalTo: displayNameLabel.bottomAnchor, constant: 5),
+            messageTextView.topAnchor.constraint(equalTo: displayNameLabel.bottomAnchor, constant: 0),
             messageTextView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
             messageTextView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
-            messageTextView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+            messageTextView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -10)
         ])
     }
 }
@@ -109,7 +109,11 @@ extension ActiveMeetingChatTableViewCell {
         textView.font = .preferredFont(forTextStyle: .footnote)
         textView.autocapitalizationType = .none
         textView.autocorrectionType = .no
+        textView.textContainerInset = .zero
         textView.isScrollEnabled = false
+        textView.isEditable = false
+        textView.dataDetectorTypes = .all
+
         if #available(iOS 13.0, *) {
             textView.textColor = .label
         } else {

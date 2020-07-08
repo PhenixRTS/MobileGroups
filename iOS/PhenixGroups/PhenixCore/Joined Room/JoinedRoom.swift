@@ -39,6 +39,7 @@ public class JoinedRoom: CustomStringConvertible {
         self.publisher = publisher
         self.roomService = roomService
         self.chatService = PhenixRoomChatServiceFactory.createRoomChatService(roomService)
+      
         self.currentMember = RoomMember(roomService.getSelf(), isSelf: true, roomExpress: roomExpress)
     }
 
@@ -75,6 +76,10 @@ public class JoinedRoom: CustomStringConvertible {
         }
     }
 
+    public func send(message: String) {
+        chatService.sendMessage(toRoom: message)
+    }
+
     public func subscribeToMemberList(_ delegate: JoinedRoomMembersDelegate) {
         os_log(.debug, log: .joinedRoom, "Subscribe to member list updates")
         membersDelegate = delegate
@@ -102,16 +107,15 @@ private extension JoinedRoom {
         let memberListChanged = processUpdatedMemberList(updatedMemberList, currentMemberList: members, membersJoined: membersJoined, membersLeft: membersLeft)
 
         if memberListChanged {
-            let memberList = Array(members)
-                .sorted { lhs, rhs -> Bool in
-                    if lhs.isSelf {
-                        return true
-                    } else if rhs.isSelf {
-                        return false
-                    }
-
-                    return lhs > rhs
+            let memberList = Array(members).sorted { lhs, rhs -> Bool in
+                if lhs.isSelf {
+                    return true
+                } else if rhs.isSelf {
+                    return false
                 }
+
+                return lhs > rhs
+            }
             membersDelegate?.memberListDidChange(memberList)
         }
     }

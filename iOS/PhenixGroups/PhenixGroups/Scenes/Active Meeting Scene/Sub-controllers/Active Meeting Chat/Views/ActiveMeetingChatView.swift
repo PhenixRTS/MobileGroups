@@ -7,13 +7,15 @@ import UIKit
 class ActiveMeetingChatView: UIView {
     private let textViewHeightInitialHeight: CGFloat = 50
 
+    var notificationCenter: NotificationCenter = .default
     var tableView: UITableView!
 
     private var textView: PlaceholderTextView!
     private var textViewHeightConstraint: NSLayoutConstraint!
     private var sendButton: UIButton!
 
-    var sendMessageHandler: ((String) -> Void)?
+    var sendMessageHandler: ActiveMeetingChatViewController.SendMessageHandler?
+
 
     override init(frame: CGRect) {
          super.init(frame: frame)
@@ -88,6 +90,17 @@ private extension ActiveMeetingChatView {
         ])
 
         tableView.scrollToBottom(animated: false)
+
+        subscribeToNotifications()
+    }
+
+    func subscribeToNotifications() {
+        notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillShowNotification, object: nil)
+    }
+
+    @objc
+    func adjustForKeyboard(notification: Notification) {
+        tableView.scrollToBottom(animated: true)
     }
 }
 
