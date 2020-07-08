@@ -10,7 +10,7 @@ import com.phenixrts.chat.ChatMessage
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.common.extensions.elapsedTime
-import com.phenixrts.suite.groups.common.extensions.launchMain
+import com.phenixrts.suite.phenixcommon.common.launchMain
 
 data class RoomMessage(
     val message: ChatMessage,

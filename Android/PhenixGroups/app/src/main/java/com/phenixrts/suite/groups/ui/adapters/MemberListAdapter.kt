@@ -11,7 +11,7 @@ import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.phenixrts.suite.groups.common.extensions.isFalse
 import com.phenixrts.suite.groups.common.extensions.isTrue
-import com.phenixrts.suite.groups.common.extensions.launchMain
+import com.phenixrts.suite.phenixcommon.common.launchMain
 import com.phenixrts.suite.groups.common.extensions.refresh
 import com.phenixrts.suite.groups.common.getSubscribeAudioOptions
 import com.phenixrts.suite.groups.common.getSubscribeVideoOptions

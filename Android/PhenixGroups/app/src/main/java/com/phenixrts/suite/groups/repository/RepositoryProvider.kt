@@ -14,7 +14,7 @@ import com.phenixrts.pcast.UserMediaStream
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.cache.CacheProvider
-import com.phenixrts.suite.groups.common.extensions.launchMain
+import com.phenixrts.suite.phenixcommon.common.launchMain
 import com.phenixrts.suite.groups.models.RoomExpressConfiguration
 import com.phenixrts.suite.groups.models.RoomStatus
 import kotlinx.coroutines.delay
@@ -35,14 +35,13 @@ class RepositoryProvider(
 
     private suspend fun initializeRoomExpress() {
         Timber.d("Creating Room Express with configuration: $expressConfiguration")
-        val roomStatus = MutableLiveData<RoomStatus>()
         AndroidContext.setContext(context)
         val pcastExpressOptions = PCastExpressFactory.createPCastExpressOptionsBuilder()
             .withBackendUri(expressConfiguration.backend)
             .withPCastUri(expressConfiguration.uri)
             .withUnrecoverableErrorCallback { status: RequestStatus, description: String ->
                 Timber.e("Unrecoverable error in PhenixSDK. Error status: [$status]. Description: [$description]")
-                roomStatus.value = RoomStatus(status, description)
+                onRoomStatusChanged.value = RoomStatus(status, description)
             }
             .withMinimumConsoleLogLevel("info")
             .buildPCastExpressOptions()
@@ -87,12 +86,6 @@ class RepositoryProvider(
             roomExpressRepository?.waitForPCast()
             it.resume(Unit)
         }
-    }
-
-    suspend fun collectLogMessages(): String = suspendCoroutine { continuation ->
-        roomExpress?.pCastExpress?.pCast?.collectLogMessages { _, _, messages ->
-            continuation.resume(messages)
-        } ?: continuation.resume("")
     }
 
     fun hasConfigurationChanged(configuration: RoomExpressConfiguration): Boolean = expressConfiguration != configuration

@@ -16,6 +16,7 @@ import com.phenixrts.suite.groups.cache.PreferenceProvider
 import com.phenixrts.suite.groups.common.extensions.*
 import com.phenixrts.suite.groups.models.*
 import com.phenixrts.suite.groups.repository.RepositoryProvider
+import com.phenixrts.suite.phenixcommon.common.launchMain
 import timber.log.Timber
 import javax.inject.Inject
 

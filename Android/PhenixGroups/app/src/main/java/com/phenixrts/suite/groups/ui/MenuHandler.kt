@@ -4,17 +4,12 @@
 
 package com.phenixrts.suite.groups.ui
 
-import android.content.Intent
-import android.net.Uri
 import android.view.View
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.phenixrts.suite.groups.BuildConfig
-import com.phenixrts.suite.groups.R
-import com.phenixrts.suite.groups.common.extensions.*
 import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
+import com.phenixrts.suite.phenixcommon.common.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.view_bottom_menu.*
-import kotlinx.android.synthetic.main.view_debug_menu.*
 import kotlinx.coroutines.delay
 import timber.log.Timber
 
@@ -23,10 +18,7 @@ class MenuHandler(
     private val viewModel: GroupsViewModel
 ) {
 
-    private var lastTapTime = System.currentTimeMillis()
-    private var tapCount = 0
     private val bottomMenu by lazy { BottomSheetBehavior.from(activity.bottom_menu) }
-    private val debugMenu by lazy { BottomSheetBehavior.from(activity.debug_menu)}
 
     private val sheetListener = object : BottomSheetBehavior.BottomSheetCallback() {
         override fun onSlide(bottomSheet: View, slideOffset: Float) {
@@ -40,16 +32,6 @@ class MenuHandler(
                 activity.menu_background.alpha = 0f
             }
         }
-    }
-
-    private fun showDebugMenu() {
-        Timber.d("Showing debug menu")
-        debugMenu.open()
-    }
-
-    private fun hideDebugMenu() {
-        Timber.d("Hiding bottom menu")
-        debugMenu.hide()
     }
 
     private fun switchBottomMenu() {
@@ -72,7 +54,6 @@ class MenuHandler(
 
     fun onStart() {
         bottomMenu.addBottomSheetCallback(sheetListener)
-        debugMenu.addBottomSheetCallback(sheetListener)
 
         activity.menu_button.setOnClickListener { switchBottomMenu() }
         activity.menu_background.setOnClickListener { hideBottomMenu() }
@@ -86,50 +67,15 @@ class MenuHandler(
                 }
             }
         }
-
-        activity.debug_app_version.text = activity.getString(R.string.debug_app_version,
-            BuildConfig.VERSION_NAME,
-            BuildConfig.VERSION_CODE
-        )
-        activity.debug_sdk_version.text = activity.getString(R.string.debug_sdk_version,
-            com.phenixrts.sdk.BuildConfig.VERSION_NAME,
-            com.phenixrts.sdk.BuildConfig.VERSION_CODE
-        )
-        activity.debug_close.setOnClickListener { hideDebugMenu() }
-        activity.debug_share.setOnClickListener { shareLogs() }
-    }
-
-    private fun shareLogs() = launchMain {
-        Timber.d("Share Logs clicked")
-        val files = ArrayList<Uri>()
-        viewModel.collectPhenixLogs(activity.fileWriterTree)
-        files.addAll(activity.fileWriterTree.getLogFileUris())
-        if (files.isNotEmpty()) {
-            val intent = Intent().apply {
-                action = Intent.ACTION_SEND_MULTIPLE
-                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                putParcelableArrayListExtra(Intent.EXTRA_STREAM, files)
-                type = INTENT_CHOOSER_TYPE
-            }
-            intent.resolveActivity(activity.packageManager)?.run {
-                activity.startActivity(Intent.createChooser(intent, activity.getString(R.string.debug_share_app_logs)))
-            }
-        } else {
-            activity.showToast(activity.getString(R.string.err_failed_to_collect_logs))
-        }
     }
 
     fun onStop() {
         bottomMenu.removeBottomSheetCallback(sheetListener)
-        debugMenu.removeBottomSheetCallback(sheetListener)
     }
 
     fun isClosed(): Boolean {
         if (bottomMenu.isOpened()) {
             bottomMenu.hide()
-            return false
-        } else if (debugMenu.isOpened()) {
-            debugMenu.hide()
             return false
         }
         return true
@@ -163,28 +109,10 @@ class MenuHandler(
         }
     }
 
-    fun onScreenTapped() {
-        val currentTapTime = System.currentTimeMillis()
-        if (currentTapTime - lastTapTime <= TAP_DELTA) {
-            tapCount++
-        } else {
-            tapCount = 0
-        }
-        lastTapTime = currentTapTime
-        if (tapCount == TAP_GOAL) {
-            tapCount = 0
-            Timber.d("Debug menu unlocked")
-            showDebugMenu()
-        }
-    }
-
     private companion object {
-        private const val INTENT_CHOOSER_TYPE = "text/plain"
         private const val MENU_HIDE_DELAY = 200L
         private const val MENU_FADE_DURATION = 300L
         private const val MENU_VISIBLE = 1f
         private const val MENU_INVISIBLE = 0f
-        private const val TAP_DELTA = 250L
-        private const val TAP_GOAL = 5
     }
 }

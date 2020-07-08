@@ -4,9 +4,7 @@
 
 package com.phenixrts.suite.groups.common.extensions
 
-import android.view.View
 import androidx.lifecycle.MutableLiveData
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.phenixrts.chat.ChatMessage
 import com.phenixrts.room.Member
 import com.phenixrts.suite.groups.BuildConfig
@@ -53,20 +51,6 @@ fun MutableLiveData<List<RoomMessage>>.refresh() {
 
 fun RowMemberItemBinding.refresh() {
     this.member = this.member
-}
-
-fun BottomSheetBehavior<View>.isOpened() = state == BottomSheetBehavior.STATE_EXPANDED
-
-fun BottomSheetBehavior<View>.open() {
-    if (state != BottomSheetBehavior.STATE_EXPANDED) {
-        state = BottomSheetBehavior.STATE_EXPANDED
-    }
-}
-
-fun BottomSheetBehavior<View>.hide() {
-    if (state != BottomSheetBehavior.STATE_HIDDEN) {
-        state = BottomSheetBehavior.STATE_HIDDEN
-    }
 }
 
 fun Member.mapRoomMember(members: List<RoomMember>?, selfSessionId: String) =

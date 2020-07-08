@@ -16,16 +16,15 @@ import com.phenixrts.pcast.android.AndroidVideoRenderSurface
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
 import com.phenixrts.suite.groups.cache.entities.RoomInfoItem
-import com.phenixrts.suite.groups.common.FileWriterDebugTree
 import com.phenixrts.suite.groups.common.extensions.expirationDate
 import com.phenixrts.suite.groups.common.extensions.isTrue
-import com.phenixrts.suite.groups.common.extensions.launchIO
-import com.phenixrts.suite.groups.common.extensions.launchMain
 import com.phenixrts.suite.groups.models.RoomMessage
 import com.phenixrts.suite.groups.models.JoinedRoomStatus
 import com.phenixrts.suite.groups.models.RoomMember
 import com.phenixrts.suite.groups.models.RoomStatus
 import com.phenixrts.suite.groups.repository.*
+import com.phenixrts.suite.phenixcommon.common.launchIO
+import com.phenixrts.suite.phenixcommon.common.launchMain
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -211,13 +210,6 @@ class GroupsViewModel(
     suspend fun switchCameraFacing(): RequestStatus = suspendCoroutine { continuation ->
         launchMain {
             continuation.resume(getMediaRepository()?.switchCameraFacing() ?: RequestStatus.FAILED)
-        }
-    }
-
-    suspend fun collectPhenixLogs(fileWriterTree: FileWriterDebugTree): Unit = suspendCoroutine { continuation ->
-        launchIO {
-            fileWriterTree.writeSdkLogs(repositoryProvider.collectLogMessages())
-            continuation.resume(Unit)
         }
     }
 

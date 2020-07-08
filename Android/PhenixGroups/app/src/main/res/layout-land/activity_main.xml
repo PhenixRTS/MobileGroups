@@ -15,6 +15,7 @@
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/main_root"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -277,8 +278,6 @@
             android:background="@color/primaryTranslucentColor" />
 
         <include layout="@layout/view_bottom_menu" android:id="@+id/bottom_menu" />
-
-        <include layout="@layout/view_debug_menu" android:id="@+id/debug_menu" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

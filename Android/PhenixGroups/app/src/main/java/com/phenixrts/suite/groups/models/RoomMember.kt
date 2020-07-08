@@ -18,7 +18,7 @@ import com.phenixrts.room.MemberState
 import com.phenixrts.room.TrackState
 import com.phenixrts.suite.groups.common.enums.AudioLevel
 import com.phenixrts.suite.groups.common.extensions.call
-import com.phenixrts.suite.groups.common.extensions.launchMain
+import com.phenixrts.suite.phenixcommon.common.launchMain
 import timber.log.Timber
 import kotlin.math.abs
 import kotlin.math.log10

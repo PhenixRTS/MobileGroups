@@ -17,6 +17,7 @@ import com.phenixrts.suite.groups.common.extensions.*
 import com.phenixrts.suite.groups.databinding.ScreenLandingBinding
 import com.phenixrts.suite.groups.ui.adapters.RoomListAdapter
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
+import com.phenixrts.suite.phenixcommon.common.launchMain
 import timber.log.Timber
 
 class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {

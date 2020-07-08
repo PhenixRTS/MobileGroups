@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.Observer
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.suite.groups.R
-import com.phenixrts.suite.groups.common.extensions.launchMain
+import com.phenixrts.suite.phenixcommon.common.launchMain
 import com.phenixrts.suite.groups.common.extensions.showToast
 import com.phenixrts.suite.groups.databinding.FragmentChatBinding
 import com.phenixrts.suite.groups.ui.adapters.ChatListAdapter

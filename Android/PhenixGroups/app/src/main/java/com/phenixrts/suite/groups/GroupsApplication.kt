@@ -6,14 +6,12 @@ package com.phenixrts.suite.groups
 
 import android.app.Application
 import android.content.res.Resources
-import com.phenixrts.suite.groups.common.FileWriterDebugTree
+import com.phenixrts.suite.phenixcommon.common.FileWriterDebugTree
 import com.phenixrts.suite.groups.injection.DaggerInjectionComponent
 import com.phenixrts.suite.groups.injection.InjectionComponent
 import com.phenixrts.suite.groups.injection.InjectionModule
 import timber.log.Timber
 import javax.inject.Inject
-
-const val TIMBER_TAG = "PhenixApp"
 
 class GroupsApplication: Application() {
 

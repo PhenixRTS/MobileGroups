@@ -15,11 +15,12 @@ import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import com.phenixrts.common.RequestStatus
+import com.phenixrts.suite.groups.BuildConfig
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
-import com.phenixrts.suite.groups.common.FileWriterDebugTree
+import com.phenixrts.suite.phenixcommon.common.FileWriterDebugTree
 import com.phenixrts.suite.groups.common.extensions.*
 import com.phenixrts.suite.groups.databinding.ActivityMainBinding
 import com.phenixrts.suite.groups.models.DeepLinkModel
@@ -30,6 +31,8 @@ import com.phenixrts.suite.groups.ui.screens.LandingScreen
 import com.phenixrts.suite.groups.ui.screens.RoomScreen
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
 import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
+import com.phenixrts.suite.phenixcommon.DebugMenu
+import com.phenixrts.suite.phenixcommon.common.launchMain
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 import timber.log.Timber
@@ -51,6 +54,13 @@ class MainActivity : EasyPermissionActivity() {
         GroupsViewModel(cacheProvider, preferenceProvider, repositoryProvider)
     }
 
+    private val debugMenu: DebugMenu by lazy {
+        DebugMenu(fileWriterTree, repositoryProvider.roomExpress, main_root, { files ->
+            debugMenu.showAppChooser(this, files)
+        }, { error ->
+            showToast(getString(error))
+        })
+    }
     val menuHandler: MenuHandler by lazy { MenuHandler(this, viewModel) }
 
     private val timerHandler = Handler()
@@ -85,6 +95,7 @@ class MainActivity : EasyPermissionActivity() {
     override fun onDestroy() {
         super.onDestroy()
         menuHandler.onStop()
+        debugMenu.onStop()
         cellularStateReceiver.unregister()
     }
 
@@ -96,7 +107,7 @@ class MainActivity : EasyPermissionActivity() {
                 }
             }
         }
-        if (menuHandler.isClosed()){
+        if (menuHandler.isClosed() && debugMenu.isClosed()){
             super.onBackPressed()
         }
     }
@@ -145,7 +156,7 @@ class MainActivity : EasyPermissionActivity() {
         }
         preview_container.setOnClickListener {
             launchMain {
-                menuHandler.onScreenTapped()
+                debugMenu.onScreenTapped()
                 if (viewModel.isInRoom.isTrue()) {
                     restartTimer()
                     if (tryHideRoomScreen()) {
@@ -220,6 +231,13 @@ class MainActivity : EasyPermissionActivity() {
         })
         initMediaButtons()
         menuHandler.onStart()
+        debugMenu.onStart(getString(R.string.debug_app_version,
+            BuildConfig.VERSION_NAME,
+            BuildConfig.VERSION_CODE
+        ), getString(R.string.debug_sdk_version,
+            com.phenixrts.sdk.BuildConfig.VERSION_NAME,
+            com.phenixrts.sdk.BuildConfig.VERSION_CODE
+        ))
     }
 
     private fun initMediaButtons() = launchMain {

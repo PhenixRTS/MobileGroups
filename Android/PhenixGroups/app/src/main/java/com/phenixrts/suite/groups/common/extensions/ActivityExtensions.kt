@@ -21,6 +21,7 @@ import com.phenixrts.suite.groups.ui.screens.JoinScreen
 import com.phenixrts.suite.groups.ui.screens.LoadingScreen
 import com.phenixrts.suite.groups.ui.screens.RoomScreen
 import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
+import com.phenixrts.suite.phenixcommon.common.launchMain
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_splash.*
 import kotlinx.coroutines.Dispatchers

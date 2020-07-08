@@ -11,6 +11,7 @@ import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.ui.MainActivity
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
 import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
+import com.phenixrts.suite.phenixcommon.common.launchMain
 import timber.log.Timber
 
 fun BaseFragment.injectDependencies() {

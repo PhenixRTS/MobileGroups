@@ -2,21 +2,29 @@
  * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
-package com.phenixrts.suite.groups.common
+package com.phenixrts.suite.phenixcommon.common
 
 import android.app.Application
 import android.content.ContextWrapper
 import android.net.Uri
+import android.os.Process
+import android.util.Log
 import androidx.core.content.FileProvider
-import com.phenixrts.suite.groups.BuildConfig
-import com.phenixrts.suite.groups.TIMBER_TAG
-import com.phenixrts.suite.groups.common.extensions.launchIO
 import timber.log.Timber
 import java.io.*
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-class FileWriterDebugTree(private val context: Application) : Timber.DebugTree() {
+private const val DATE_FORMAT = "MM-dd HH:mm:ss.SSS"
+private val LEVEL_NAMES = arrayOf("F", "?", "T", "D", "I", "W", "E")
+
+class FileWriterDebugTree(
+    private val context: Application,
+    private val logTag: String,
+    private val providerAuthority: String
+) : Timber.DebugTree() {
 
     private var filePath: File? = null
     private var sdkFileWriter: BufferedWriter? = null
@@ -43,7 +51,7 @@ class FileWriterDebugTree(private val context: Application) : Timber.DebugTree()
     override fun log(priority: Int, message: String?, vararg args: Any?) {
         super.log(priority, message, *args)
         launchIO {
-            getFormattedLogMessage(TIMBER_TAG, priority, message, null).run {
+            getFormattedLogMessage(logTag, priority, message, null).run {
                 writeAppLogs(this)
             }
         }
@@ -52,7 +60,7 @@ class FileWriterDebugTree(private val context: Application) : Timber.DebugTree()
     override fun log(priority: Int, t: Throwable?, message: String?, vararg args: Any?) {
         super.log(priority, t, message, *args)
         launchIO {
-            getFormattedLogMessage(TIMBER_TAG, priority, message, t).run {
+            getFormattedLogMessage(logTag, priority, message, t).run {
                 writeAppLogs(this)
             }
         }
@@ -62,7 +70,7 @@ class FileWriterDebugTree(private val context: Application) : Timber.DebugTree()
      * Makes logged out class names clickable in Logcat
      */
     override fun createStackElementTag(element: StackTraceElement) =
-        "$TIMBER_TAG: (${element.fileName}:${element.lineNumber}) #${element.methodName} "
+        "$logTag: (${element.fileName}:${element.lineNumber}) #${element.methodName} "
 
     private fun initFileWriter() {
         val contextWrapper = ContextWrapper(context)
@@ -135,22 +143,40 @@ class FileWriterDebugTree(private val context: Application) : Timber.DebugTree()
         continuation.resume(Unit)
     }
 
+    private fun getFormattedLogMessage(tag: String?, level: Int, message: String?, e: Throwable?): String {
+        val id: Long = try {
+            Process.myTid().toLong()
+        } catch (e1: RuntimeException) {
+            Thread.currentThread().id
+        }
+        val builder: StringBuilder = StringBuilder()
+            .append(SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(Date()))
+            .append(' ').append(id)
+            .append(' ').append(LEVEL_NAMES[level])
+            .append(' ').append(tag)
+            .append(' ').append(message)
+        if (e != null) {
+            builder.append(": throwable=").append(Log.getStackTraceString(e))
+        }
+        return builder.toString()
+    }
+
     fun getLogFileUris(): List<Uri> {
         val fileUris = arrayListOf<Uri>()
         sdkFileWriter?.flush()
         appFileWriter?.flush()
         sdkLogFile?.takeIf { it.length() > 0 }?.let { file ->
-            FileProvider.getUriForFile(context, "${BuildConfig.APPLICATION_ID}.provider", file)
+            FileProvider.getUriForFile(context, providerAuthority, file)
         }?.let { sdkUri ->
             fileUris.add(sdkUri)
         }
         firstAppLogFile?.takeIf { it.length() > 0 }?.let { file ->
-            FileProvider.getUriForFile(context, "${BuildConfig.APPLICATION_ID}.provider", file)
+            FileProvider.getUriForFile(context, providerAuthority, file)
         }?.let { appUri ->
             fileUris.add(appUri)
         }
         secondAppLogFile?.takeIf { it.length() > 0 }?.let { file ->
-            FileProvider.getUriForFile(context, "${BuildConfig.APPLICATION_ID}.provider", file)
+            FileProvider.getUriForFile(context, providerAuthority, file)
         }?.let { appUri ->
             fileUris.add(appUri)
         }

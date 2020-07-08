@@ -13,6 +13,7 @@ import com.phenixrts.suite.groups.common.extensions.*
 import com.phenixrts.suite.groups.databinding.FragmentMembersBinding
 import com.phenixrts.suite.groups.models.RoomMember
 import com.phenixrts.suite.groups.ui.adapters.MemberListAdapter
+import com.phenixrts.suite.phenixcommon.common.launchMain
 import timber.log.Timber
 
 class MemberFragment : BaseFragment(), MemberListAdapter.OnMemberListener {
