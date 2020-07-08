@@ -4,6 +4,7 @@
 
 package com.phenixrts.suite.groups.repository
 
+import android.media.AudioManager
 import androidx.lifecycle.MutableLiveData
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.environment.android.AndroidContext
@@ -35,6 +36,14 @@ class RepositoryProvider(
 
     private suspend fun initializeRoomExpress() {
         Timber.d("Creating Room Express with configuration: $expressConfiguration")
+
+        val audioManager = context.getSystemService(android.content.Context.AUDIO_SERVICE) as AudioManager
+
+        audioManager.mode = AudioManager.MODE_IN_COMMUNICATION
+        audioManager.isSpeakerphoneOn = true
+
+        val roomStatus = MutableLiveData<RoomStatus>()
+
         AndroidContext.setContext(context)
         val pcastExpressOptions = PCastExpressFactory.createPCastExpressOptionsBuilder()
             .withBackendUri(expressConfiguration.backend)

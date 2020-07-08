@@ -13,7 +13,7 @@ android {
         applicationId "com.phenixrts.suite.groups"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 3
+        versionCode 4
         versionName "2020.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField "String", "BACKEND_URL", "\"https://demo.phenixrts.com/pcast\""
