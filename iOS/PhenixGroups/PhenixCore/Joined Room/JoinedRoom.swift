@@ -19,6 +19,7 @@ public class JoinedRoom: CustomStringConvertible {
 
     internal weak var delegate: JoinedRoomDelegate?
 
+    public private(set) var currentMember: RoomMember!
     public private(set) var members = Set<RoomMember>()
     public let backend: URL
     public var alias: String? {
@@ -34,12 +35,15 @@ public class JoinedRoom: CustomStringConvertible {
         self.backend = backend
         self.roomService = roomService
         self.publisher = publisher
+
+        self.currentMember = RoomMember(roomService.getSelf(), isSelf: true, roomExpress: roomExpress)
     }
 
     public func leave() {
         os_log(.debug, log: .joinedRoom, "Leaving joined room %{PRIVATE}s", self.description)
         publisher?.stop()
         disposables.removeAll() // Disposables must be cleared so that they could not cause a memory leak.
+        currentMember = nil
         membersLeft(members)
         roomService.leaveRoom { [weak self] _, _ in
             guard let self = self else { return }
@@ -89,7 +93,16 @@ private extension JoinedRoom {
         let memberListChanged = processUpdatedMemberList(updatedMemberList, currentMemberList: members, membersJoined: membersJoined, membersLeft: membersLeft)
 
         if memberListChanged {
-            let memberList = Array(members).sorted()
+            let memberList = Array(members)
+                .sorted { lhs, rhs -> Bool in
+                    if lhs.isSelf {
+                        return true
+                    } else if rhs.isSelf {
+                        return false
+                    }
+
+                    return lhs > rhs
+                }
             membersDelegate?.memberListDidChange(memberList)
         }
     }
@@ -125,15 +138,11 @@ private extension JoinedRoom {
             throw JoinedRoomError.noRoomExpress
         }
 
-        let isSelf: Bool = {
-            guard let currentMember = roomService.getSelf() else {
-                return false
-            }
-
-            return currentMember.getSessionId() == member.getSessionId()
-        }()
-
-        return RoomMember(member, isSelf: isSelf, roomExpress: roomExpress)
+        if let currentMember = currentMember, member == currentMember {
+            return currentMember
+        } else {
+            return RoomMember(member, isSelf: false, roomExpress: roomExpress)
+        }
     }
 }
 

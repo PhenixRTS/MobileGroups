@@ -172,10 +172,10 @@ class ControlButton: UIButton {
 
 private extension ControlButton {
     func setup() {
+        setTitleShadowColor(.black, for: .normal)
+
         layer.borderColor = currentBorderColor
         layer.borderWidth = 1
-        setTitleShadowColor(.black, for: .normal)
-        layer.cornerRadius = frame.width / 2
-        clipsToBounds = true
+        layer.cornerRadius = bounds.width / 2
     }
 }

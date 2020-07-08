@@ -6,14 +6,27 @@ import os.log
 import PhenixCore
 import UIKit
 
+protocol ActiveMeetingPreview: AnyObject {
+    var focusedMember: RoomMember! { get }
+
+    func setFocus(on member: RoomMember)
+}
+
 class ActiveMeetingViewController: UIViewController, Storyboarded {
     private var membersListViewController: ActiveMeetingMemberListViewController!
+    var focusedMember: RoomMember! {
+        didSet {
+            if let member = oldValue, member != focusedMember {
+                membersListViewController.reloadVideoPreview(for: member)
+            }
+        }
+    }
 
     weak var coordinator: MeetingFinished?
     weak var media: UserMediaStreamController?
 
     var displayName: String!
-    var joinedRoom: JoinedRoom!
+    weak var joinedRoom: JoinedRoom!
 
     var activeMeetingView: ActiveMeetingView {
         view as! ActiveMeetingView
@@ -26,6 +39,9 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
         assert(displayName != nil, "Display name is necessary")
 
         configure()
+        setFocus(on: joinedRoom.currentMember)
+
+        assert(focusedMember != nil, "Focused member is necessary")
 
         joinedRoom.subscribeToMemberList(membersListViewController)
     }
@@ -38,6 +54,7 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
 
     func leave() {
         os_log(.debug, log: .activeMeetingScene, "Leaving meeting")
+        focusedMember = nil
         joinedRoom.leave()
 
         let meeting = Meeting(code: joinedRoom.alias ?? "N/A", leaveDate: .now, backendUrl: joinedRoom.backend)
@@ -59,24 +76,37 @@ private extension ActiveMeetingViewController {
     func configureControls() {
         activeMeetingView.microphoneHandler = { [weak self] enabled in
             self?.setAudio(enabled: enabled)
+            self?.joinedRoom.currentMember.isAudioAvailable = enabled
         }
 
         activeMeetingView.cameraHandler = { [weak self] enabled in
             self?.setVideo(enabled: enabled)
+            self?.joinedRoom.currentMember.isVideoAvailable = enabled
         }
     }
 
     func configureMedia() {
         guard let media = media else { return }
-        media.providePreview { layer in
-            self.activeMeetingView.setCameraLayer(layer)
-        }
 
         joinedRoom.setAudio(enabled: media.isAudioEnabled)
         joinedRoom.setVideo(enabled: media.isVideoEnabled)
 
-        activeMeetingView.setMicrophone(enabled: media.isAudioEnabled)
-        activeMeetingView.setCamera(enabled: media.isVideoEnabled)
+        joinedRoom.currentMember.previewLayer = media.cameraLayer
+        joinedRoom.currentMember.isVideoAvailable = media.isVideoEnabled
+        joinedRoom.currentMember.isAudioAvailable = media.isAudioEnabled
+
+        activeMeetingView.setCameraControl(enabled: media.isVideoEnabled)
+        activeMeetingView.setMicrophoneControl(enabled: media.isAudioEnabled)
+
+        configureMainPreview(for: joinedRoom.currentMember)
+    }
+
+    func configureMainPreview(for member: RoomMember) {
+        activeMeetingView.setCamera(placeholder: member.screenName)
+        activeMeetingView.setCamera(layer: member.previewLayer)
+        activeMeetingView.setCamera(enabled: member.isVideoAvailable)
+
+        member.delegate = activeMeetingView
     }
 
     func configurePageController() {
@@ -97,6 +127,7 @@ private extension ActiveMeetingViewController {
     func makeMembersViewController() -> UIViewController {
         let vc = ActiveMeetingMemberListViewController()
         membersListViewController = vc
+        vc.delegate = self
         return vc
     }
 
@@ -119,5 +150,16 @@ private extension ActiveMeetingViewController {
         os_log(.debug, log: .activeMeetingScene, "Set audio enabled - %{PUBLIC}d", enabled)
         joinedRoom.setAudio(enabled: enabled)
         media?.setAudio(enabled: enabled)
+    }
+
+    func focusedMemberChanged(_ member: RoomMember) {
+        configureMainPreview(for: member)
+    }
+}
+
+extension ActiveMeetingViewController: ActiveMeetingPreview {
+    func setFocus(on member: RoomMember) {
+        configureMainPreview(for: member)
+        focusedMember = member
     }
 }

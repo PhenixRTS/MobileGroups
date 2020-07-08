@@ -85,12 +85,10 @@ private extension NewMeetingViewController {
 
     func configureMedia() {
         guard let media = media else { return }
-        media.providePreview { layer in
-            self.newMeetingView.setCameraLayer(layer)
-        }
+        newMeetingView.setCamera(layer: media.cameraLayer)
+        newMeetingView.setCamera(enabled: media.isVideoEnabled)
 
         newMeetingView.setMicrophone(enabled: media.isAudioEnabled)
-        newMeetingView.setCamera(enabled: media.isVideoEnabled)
     }
 
     func setVideo(enabled: Bool) {

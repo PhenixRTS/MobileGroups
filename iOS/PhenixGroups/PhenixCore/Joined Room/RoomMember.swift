@@ -7,18 +7,9 @@ import os.log
 import PhenixSdk
 
 public class RoomMember {
-    public enum SubscriptionType: CustomStringConvertible {
+    public enum SubscriptionType {
         case audio
         case video
-
-        public var description: String {
-            switch self {
-            case .audio:
-                return "Audio"
-            case .video:
-                return "Video"
-            }
-        }
     }
 
     private weak var phenixRoomExpress: PhenixRoomExpress?
@@ -34,11 +25,11 @@ public class RoomMember {
 
     internal let phenixMember: PhenixMember
 
-    public private(set) var previewLayer: CALayer?
     public private(set) var subscriptionType: SubscriptionType?
-    public weak var delegate: RoomMemberDelegate?
+    public var previewLayer: VideoLayer?
     public let isSelf: Bool
     public let screenName: String
+    public weak var delegate: RoomMemberDelegate?
     public var isSubscribed: Bool = false
     public var isAudioAvailable = false {
         didSet {
@@ -65,8 +56,10 @@ public class RoomMember {
     internal func dispose() {
         disposables.removeAll()
         subscriber?.stop()
-        previewLayer?.removeFromSuperlayer()
-        previewLayer = nil
+        DispatchQueue.main.async { [weak self] in
+            self?.previewLayer?.removeFromSuperlayer()
+            self?.previewLayer = nil
+        }
     }
 
     public func subscribe(for type: SubscriptionType) {
@@ -88,33 +81,34 @@ public class RoomMember {
         isSubscribed = true
         subscriptionType = type
 
-        let options: PhenixSubscribeToMemberStreamOptions = {
-            switch type {
-            case .audio:
-                previewLayer = nil
-                return Self.audioOptions()
+        let preferences = makeStreamOptions(for: type)
+        previewLayer = preferences.layer
 
-            case .video:
-                let layer = CALayer()
-                previewLayer = layer
-                return Self.videoOptions(with: layer)
-            }
-        }()
-
-        phenixRoomExpress?.subscribe(toMemberStream: stream, options) { [weak self] status, subscriber, _ in
+        phenixRoomExpress?.subscribe(toMemberStream: stream, preferences.options) { [weak self] status, subscriber, _ in
             guard let self = self else { return }
             if status == .ok {
                 self.subscriber = subscriber
                 stream.getObservableAudioState()?.subscribe(self.audioStateDidChange)?.append(to: &self.disposables)
-                if type == .video {
-                    stream.getObservableVideoState()?.subscribe(self.videoStateDidChange)?.append(to: &self.disposables)
-                }
+                stream.getObservableVideoState()?.subscribe(self.videoStateDidChange)?.append(to: &self.disposables)
 
-                os_log(.debug, log: .roomMember, "Member (%{PRIVATE}s) successfully subscribed with %{PRIVATE}s", self.description, type.description)
+                os_log(.debug, log: .roomMember, "Member (%{PRIVATE}s) successfully subscribed with %{PRIVATE}s", self.description, String(describing: type))
             } else {
-                os_log(.debug, log: .roomMember, "Member (%{PRIVATE}s) failed to subscribe with %{PRIVATE}s", self.description, type.description)
+                os_log(.debug, log: .roomMember, "Member (%{PRIVATE}s) failed to subscribe with %{PRIVATE}s", self.description, String(describing: type))
                 self.isSubscribed = false
             }
+        }
+    }
+}
+
+internal extension RoomMember {
+    func makeStreamOptions(for type: SubscriptionType) -> (layer: VideoLayer?, options: PhenixSubscribeToMemberStreamOptions) {
+        switch type {
+        case .audio:
+            return (layer: nil, options: Self.audioOptions())
+
+        case .video:
+            let layer = VideoLayer()
+            return (layer: layer, options: Self.videoOptions(with: layer))
         }
     }
 }
@@ -148,13 +142,8 @@ extension RoomMember: Hashable {
 // MARK: - Comparable
 extension RoomMember: Comparable {
     public static func < (lhs: RoomMember, rhs: RoomMember) -> Bool {
-        if lhs.isSelf {
-            // In cases, when we need to order member lists, member object, who is Self needs to be first one.
-            return true
-        }
-
         guard let lhsLastUpdate = lhs.phenixMember.getObservableLastUpdate()?.getValue() as Date? else {
-            return false
+            return true
         }
 
         guard let rhsLastUpdate = rhs.phenixMember.getObservableLastUpdate()?.getValue() as Date? else {
@@ -165,47 +154,32 @@ extension RoomMember: Comparable {
     }
 }
 
-// MARK: - Private methods
+// MARK: - Observable callback methods
 private extension RoomMember {
     func memberStreamDidChange(_ changes: PhenixObservableChange<NSArray>?) {
-        guard let streams = changes?.value as? [PhenixStream] else {
-            return
-        }
-
-        guard let stream = streams.first else {
-            return
-        }
+        guard let streams = changes?.value as? [PhenixStream] else { return }
+        guard let stream = streams.first else { return }
 
         self.stream = stream
     }
 
     func audioStateDidChange(_ changes: PhenixObservableChange<NSNumber>?) {
-        guard let value = changes?.value else {
-            return
-        }
-
-        guard let state = PhenixTrackState(rawValue: Int(truncating: value)) else {
-            return
-        }
+        guard let value = changes?.value else { return }
+        guard let state = PhenixTrackState(rawValue: Int(truncating: value)) else { return }
 
         isAudioAvailable = state == .enabled
     }
 
     func videoStateDidChange(_ changes: PhenixObservableChange<NSNumber>?) {
-        guard let value = changes?.value else {
-            return
-        }
-
-        guard let state = PhenixTrackState(rawValue: Int(truncating: value)) else {
-            return
-        }
+        guard let value = changes?.value else { return }
+        guard let state = PhenixTrackState(rawValue: Int(truncating: value)) else { return }
 
         isVideoAvailable = state == .enabled
     }
 }
 
 // MARK: - Helper methods
-fileprivate extension RoomMember {
+private extension RoomMember {
     static func videoOptions(with layer: CALayer) -> PhenixSubscribeToMemberStreamOptions {
         PhenixRoomExpressFactory.createSubscribeToMemberStreamOptionsBuilder()
             .withRenderer(layer)

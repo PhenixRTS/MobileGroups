@@ -6,8 +6,14 @@ import Foundation
 import PhenixSdk
 
 public class UserMediaStreamController {
-    private var cameraLayer: CALayer!
     private var renderer: PhenixRenderer?
+
+    public private(set) lazy var cameraLayer: VideoLayer = {
+        let layer = VideoLayer()
+        renderer = makeRenderer()
+        renderer?.start(layer)
+        return layer
+    }()
 
     internal let userMediaStream: PhenixUserMediaStream
 
@@ -16,23 +22,6 @@ public class UserMediaStreamController {
 
     init(_ userMediaStream: PhenixUserMediaStream) {
         self.userMediaStream = userMediaStream
-    }
-
-    public func providePreview(addLayerToViewHandler: (CALayer) -> Void) {
-        if renderer == nil {
-            renderer = makeRenderer()
-        }
-
-        if let cameraLayer = cameraLayer {
-            addLayerToViewHandler(cameraLayer)
-        } else {
-            cameraLayer = CALayer()
-            cameraLayer.isOpaque = true
-
-            addLayerToViewHandler(cameraLayer)
-
-            renderer?.start(cameraLayer)
-        }
     }
 
     public func setCamera(facing mode: PhenixFacingMode) {

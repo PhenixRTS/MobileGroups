@@ -7,6 +7,17 @@ import UIKit
 
 class ActiveMeetingMemberListDataSource: NSObject, UITableViewDataSource {
     var members = [RoomMember]()
+    var pinnedMember: RoomMember?
+    var indexPathForSelectedRow: IndexPath?
+    var retrieveFocusedMember: (() -> RoomMember?)?
+
+    func indexPath(of member: RoomMember) -> IndexPath? {
+        if let index = members.firstIndex(of: member) {
+            return IndexPath(row: index, section: 0)
+        }
+
+        return nil
+    }
 
     // MARK: - Table view data source
 
@@ -17,9 +28,22 @@ class ActiveMeetingMemberListDataSource: NSObject, UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: ActiveMeetingMemberTableViewCell = tableView.dequeueReusableCell(for: indexPath)
         let member = members[indexPath.row]
-        member.delegate = cell
-        cell.configure(displayName: member.screenName, cameraEnabled: member.isVideoAvailable)
-        cell.setCamera(member.previewLayer)
+
+        cell.configure(member: member)
+        if member != retrieveFocusedMember?() {
+            cell.configureVideo()
+        }
+
         return cell
+    }
+
+    func pin(_ cell: ActiveMeetingMemberTableViewCell, at indexPath: IndexPath) {
+        pinnedMember = members[indexPath.row]
+        cell.pin()
+    }
+
+    func unpin(_ cell: ActiveMeetingMemberTableViewCell, at indexPath: IndexPath) {
+        pinnedMember = nil
+        cell.unpin()
     }
 }

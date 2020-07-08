@@ -13,6 +13,8 @@ extension UITextField {
         textField.adjustsFontForContentSizeCategory = true
         textField.returnKeyType = .done
         textField.borderStyle = .roundedRect
+        textField.autocapitalizationType = .none
+        textField.autocorrectionType = .no
 
         return textField
     }

@@ -7,7 +7,10 @@ import UIKit
 
 class ActiveMeetingMemberTableViewCell: UITableViewCell, CellIdentified {
     private var cameraView: CameraView!
+    private var pinView: CameraPinView!
     private var displayNameLabel: UILabel!
+
+    weak var member: RoomMember!
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -25,17 +28,31 @@ class ActiveMeetingMemberTableViewCell: UITableViewCell, CellIdentified {
         cameraView.removeCameraLayer()
     }
 
-    func configure(displayName: String, cameraEnabled: Bool) {
-        displayNameLabel.text = displayName
-        showCamera(cameraEnabled)
-    }
-
-    func setCamera(_ layer: CALayer?) {
+    func setCamera(layer: VideoLayer?) {
         if let layer = layer {
             cameraView.setCameraLayer(layer)
         } else {
             cameraView.removeCameraLayer()
         }
+    }
+
+    func pin() {
+        pinView.isHidden = false
+    }
+
+    func unpin() {
+        pinView.isHidden = true
+    }
+
+    func configure(member: RoomMember) {
+        self.member = member
+        displayNameLabel.text = member.screenName
+    }
+
+    func configureVideo() {
+        member.delegate = self
+        setCamera(layer: member.previewLayer)
+        showCamera(member.isVideoAvailable)
     }
 }
 
@@ -45,9 +62,13 @@ private extension ActiveMeetingMemberTableViewCell {
         cameraView.translatesAutoresizingMaskIntoConstraints = false
         cameraView.placeholderText = nil
 
+        pinView = makePinView()
+        pinView.isHidden = true
+
         displayNameLabel = makeDisplayNameLabel()
 
         contentView.addSubview(cameraView)
+        contentView.addSubview(pinView)
         contentView.addSubview(displayNameLabel)
 
         NSLayoutConstraint.activate([
@@ -55,7 +76,12 @@ private extension ActiveMeetingMemberTableViewCell {
             cameraView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             cameraView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
             cameraView.widthAnchor.constraint(equalToConstant: 120),
-            cameraView.heightAnchor.constraint(equalToConstant: 80),
+            cameraView.heightAnchor.constraint(greaterThanOrEqualToConstant: 80),
+
+            pinView.topAnchor.constraint(equalTo: cameraView.topAnchor),
+            pinView.leadingAnchor.constraint(equalTo: cameraView.leadingAnchor),
+            pinView.trailingAnchor.constraint(equalTo: cameraView.trailingAnchor),
+            pinView.bottomAnchor.constraint(equalTo: cameraView.bottomAnchor),
 
             displayNameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
             displayNameLabel.leadingAnchor.constraint(equalTo: cameraView.trailingAnchor, constant: 10)
@@ -65,7 +91,22 @@ private extension ActiveMeetingMemberTableViewCell {
     func showCamera(_ show: Bool) {
         cameraView.showCamera = show
     }
+}
 
+extension ActiveMeetingMemberTableViewCell: RoomMemberDelegate {
+    func roomMemberAudioStateDidChange(_ member: RoomMember, enabled: Bool) {
+        // Audio updated
+    }
+
+    func roomMemberVideoStateDidChange(_ member: RoomMember, enabled: Bool) {
+        DispatchQueue.main.async { [weak self] in
+            self?.showCamera(enabled)
+        }
+    }
+}
+
+// MARK: - Helper methods
+extension ActiveMeetingMemberTableViewCell {
     func makeDisplayNameLabel() -> UILabel {
         let label = UILabel()
 
@@ -79,16 +120,12 @@ private extension ActiveMeetingMemberTableViewCell {
 
         return label
     }
-}
 
-extension ActiveMeetingMemberTableViewCell: RoomMemberDelegate {
-    func roomMemberAudioStateDidChange(_ member: RoomMember, enabled: Bool) {
-        // Audio updated
-    }
+    func makePinView() -> CameraPinView {
+        let view = CameraPinView()
 
-    func roomMemberVideoStateDidChange(_ member: RoomMember, enabled: Bool) {
-        DispatchQueue.main.async { [weak self] in
-            self?.showCamera(enabled)
-        }
+        view.translatesAutoresizingMaskIntoConstraints = false
+
+        return view
     }
 }

@@ -48,9 +48,10 @@ private extension CameraPlaceholderView {
 
         NSLayoutConstraint.activate([
             stack.topAnchor.constraint(greaterThanOrEqualTo: topAnchor),
-            stack.leadingAnchor.constraint(equalTo: leadingAnchor),
-            stack.trailingAnchor.constraint(equalTo: trailingAnchor),
+            stack.leadingAnchor.constraint(greaterThanOrEqualTo: leadingAnchor),
+            stack.trailingAnchor.constraint(lessThanOrEqualTo: trailingAnchor),
             stack.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor),
+            stack.centerXAnchor.constraint(equalTo: centerXAnchor),
             stack.centerYAnchor.constraint(equalTo: centerYAnchor)
         ])
     }

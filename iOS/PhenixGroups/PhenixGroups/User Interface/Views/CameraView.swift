@@ -2,11 +2,15 @@
 //  Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
+import PhenixCore
 import UIKit
 
 class CameraView: UIView {
-    private var cameraLayer: CALayer?
     private var cameraPlaceholderView: CameraPlaceholderView!
+
+    var cameraLayer: CALayer? {
+        layer.sublayers?.first { $0 is VideoLayer }
+    }
 
     var showCamera: Bool = true {
         didSet {
@@ -35,16 +39,18 @@ class CameraView: UIView {
         cameraLayer?.resize(as: layer)
     }
 
-    func setCameraLayer(_ cameraLayer: CALayer) {
-        self.cameraLayer?.removeFromSuperlayer()
-
-        self.cameraLayer = cameraLayer
+    func setCameraLayer(_ cameraLayer: VideoLayer) {
+        removeCameraLayer()
         layer.add(cameraLayer)
+
+        // Hack to remove automatically added PhenixSdk layer animations.
+        // These animations are interrupting with the animation how we switch video layer from view to view.
+        cameraLayer.sublayers?.forEach { $0.removeAllAnimations() }
+        cameraLayer.removeAllAnimations()
     }
 
     func removeCameraLayer() {
         cameraLayer?.removeFromSuperlayer()
-        cameraLayer = nil
     }
 }
 

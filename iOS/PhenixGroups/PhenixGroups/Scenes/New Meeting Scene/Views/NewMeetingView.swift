@@ -2,6 +2,7 @@
 //  Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
+import PhenixCore
 import UIKit
 
 class NewMeetingView: UIView {
@@ -78,7 +79,7 @@ class NewMeetingView: UIView {
         controlView.delegate = delegate
     }
 
-    func setCameraLayer(_ layer: CALayer) {
+    func setCamera(layer: VideoLayer) {
         cameraView.setCameraLayer(layer)
     }
 

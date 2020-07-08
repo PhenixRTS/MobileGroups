@@ -59,7 +59,7 @@ private extension ActiveMeetingInformationViewController {
 
             shareButton.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 16),
             shareButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            shareButton.widthAnchor.constraint(equalToConstant: 44),
+            shareButton.widthAnchor.constraint(equalToConstant: 80),
             shareButton.heightAnchor.constraint(equalToConstant: 44)
         ])
     }
@@ -98,6 +98,10 @@ private extension ActiveMeetingInformationViewController {
 
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setImage(image, for: .normal)
+        button.setTitle("Share", for: .normal)
+        button.setTitleColor(.systemOrange, for: .normal)
+        button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
+        button.titleLabel?.font = .preferredFont(forTextStyle: .footnote)
         button.addTarget(self, action: #selector(shareButtonTapped), for: .touchUpInside)
 
         return button

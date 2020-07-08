@@ -2,6 +2,7 @@
 //  Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
+import PhenixCore
 import UIKit
 
 class ActiveMeetingView: UIView {
@@ -36,8 +37,6 @@ class ActiveMeetingView: UIView {
 
         let enabled = sender.controlState == .on
         cameraHandler?(enabled)
-
-        showCamera(enabled)
     }
 
     func configure(displayName: String) {
@@ -45,17 +44,28 @@ class ActiveMeetingView: UIView {
         cameraView.placeholderText = displayName
     }
 
-    func setMicrophone(enabled: Bool) {
+    func setMicrophoneControl(enabled: Bool) {
         setControl(microphoneButton, enabled: enabled)
     }
 
-    func setCamera(enabled: Bool) {
+    func setCameraControl(enabled: Bool) {
         setControl(cameraButton, enabled: enabled)
+    }
+
+    func setCamera(enabled: Bool) {
         showCamera(enabled)
     }
 
-    func setCameraLayer(_ layer: CALayer) {
-        cameraView.setCameraLayer(layer)
+    func setCamera(layer: VideoLayer?) {
+        if let layer = layer {
+            cameraView.setCameraLayer(layer)
+        } else {
+            cameraView.removeCameraLayer()
+        }
+    }
+
+    func setCamera(placeholder text: String) {
+        cameraView.placeholderText = text
     }
 
     func setPageView(_ pageView: UIView) {
@@ -152,5 +162,17 @@ private extension ActiveMeetingView {
 
     func showCamera(_ show: Bool) {
         cameraView.showCamera = show
+    }
+}
+
+extension ActiveMeetingView: RoomMemberDelegate {
+    func roomMemberAudioStateDidChange(_ member: RoomMember, enabled: Bool) {
+        // Audio updated
+    }
+
+    func roomMemberVideoStateDidChange(_ member: RoomMember, enabled: Bool) {
+        DispatchQueue.main.async { [weak self] in
+            self?.showCamera(enabled)
+        }
     }
 }

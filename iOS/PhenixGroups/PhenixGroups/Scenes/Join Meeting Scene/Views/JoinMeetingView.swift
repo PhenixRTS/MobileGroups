@@ -16,7 +16,7 @@ class JoinMeetingView: UIView {
     var closeHandler: CloseHandler?
 
     var meetingCode: String {
-        meetingCodeTextField.text ?? ""
+        meetingCodeTextField.text?.lowercased() ?? ""
     }
 
     override init(frame: CGRect) {
