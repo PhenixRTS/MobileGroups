@@ -6,18 +6,19 @@ import PhenixCore
 import UIKit
 
 class ActiveMeetingChatDataSource: NSObject, UITableViewDataSource {
-    var messages = [String]()
+    var messages = [RoomChatMessage]()
 
     // MARK: - Table view data source
 
     func numberOfSections(in tableView: UITableView) -> Int { 1 }
 
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int { 20 }
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int { messages.count }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: ActiveMeetingChatTableViewCell = tableView.dequeueReusableCell(for: indexPath)
+        let message = messages[indexPath.row]
 
-        cell.configure(author: "You", message: "Test\(indexPath.row)", date: Date().addingTimeInterval(TimeInterval(indexPath.row * -30)))
+        cell.configure(message: message)
 
         return cell
     }

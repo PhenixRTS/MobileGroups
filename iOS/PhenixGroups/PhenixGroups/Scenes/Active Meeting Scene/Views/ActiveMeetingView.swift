@@ -208,15 +208,3 @@ extension ActiveMeetingView: RoomMemberDelegate {
         }
     }
 }
-
-extension ActiveMeetingView: RoomMemberDelegate {
-    func roomMemberAudioStateDidChange(_ member: RoomMember, enabled: Bool) {
-        // Audio updated
-    }
-
-    func roomMemberVideoStateDidChange(_ member: RoomMember, enabled: Bool) {
-        DispatchQueue.main.async { [weak self] in
-            self?.showCamera(enabled)
-        }
-    }
-}

@@ -151,7 +151,6 @@ private extension PageViewController {
         } else {
             button.tintColor = .black
         }
-
         button.setTitle(title, for: .normal)
         button.addTarget(self, action: #selector(tabButtonTapped), for: .touchUpInside)
         button.tag = tag
@@ -179,7 +178,6 @@ private extension PageViewController {
         view.showsHorizontalScrollIndicator = false
         view.showsVerticalScrollIndicator = false
         view.keyboardDismissMode = .onDrag
-
 
         return view
     }

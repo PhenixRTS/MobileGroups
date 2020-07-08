@@ -20,10 +20,10 @@ class ActiveMeetingChatTableViewCell: UITableViewCell, CellIdentified {
         setup()
     }
 
-    func configure(author: String, message: String, date: Date) {
-        displayNameLabel.text = author
-        dateLabel.text = date.localizedRelativeDateTime
-        messageTextView.text = message
+    func configure(message: RoomChatMessage) {
+        displayNameLabel.text = message.authorName
+        dateLabel.text = message.date.localizedRelativeDateTime
+        messageTextView.text = message.text
     }
 }
 
@@ -64,7 +64,13 @@ extension ActiveMeetingChatTableViewCell {
         let label = UILabel()
 
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = .preferredFont(forTextStyle: .footnote)
+        if #available(iOS 13.0, *) {
+            label.font = .preferredFont(forTextStyle: .footnote, compatibleWith: .init(legibilityWeight: .bold))
+        } else {
+            let font = UIFont.preferredFont(forTextStyle: .footnote)
+            let descriptor = font.fontDescriptor.withSymbolicTraits(.traitBold) ?? font.fontDescriptor
+            label.font = UIFont(descriptor: descriptor, size: 0)
+        }
         if #available(iOS 13.0, *) {
             label.textColor = .label
         } else {

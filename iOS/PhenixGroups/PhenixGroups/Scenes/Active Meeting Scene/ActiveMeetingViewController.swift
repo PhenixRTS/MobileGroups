@@ -13,11 +13,13 @@ protocol ActiveMeetingPreview: AnyObject {
 }
 
 class ActiveMeetingViewController: UIViewController, Storyboarded {
-    private var membersListViewController: ActiveMeetingMemberListViewController!
+    private var membersViewController: ActiveMeetingMemberListViewController!
+    private var chatViewController: ActiveMeetingChatViewController!
+
     var focusedMember: RoomMember! {
         didSet {
             if let member = oldValue, member != focusedMember {
-                membersListViewController.reloadVideoPreview(for: member)
+                membersViewController.reloadVideoPreview(for: member)
             }
         }
     }
@@ -43,7 +45,8 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
 
         assert(focusedMember != nil, "Focused member is necessary")
 
-        joinedRoom.subscribeToMemberList(membersListViewController)
+        joinedRoom.subscribeToMemberList(membersViewController)
+        joinedRoom.subscribeToChatMessages(chatViewController)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -126,13 +129,14 @@ private extension ActiveMeetingViewController {
 
     func makeMembersViewController() -> UIViewController {
         let vc = ActiveMeetingMemberListViewController()
-        membersListViewController = vc
+        membersViewController = vc
         vc.delegate = self
         return vc
     }
 
     func makeChatViewController() -> UIViewController {
         let vc = ActiveMeetingChatViewController()
+        chatViewController = vc
         return vc
     }
 
@@ -157,6 +161,7 @@ private extension ActiveMeetingViewController {
     }
 }
 
+// MARK: - ActiveMeetingPreview
 extension ActiveMeetingViewController: ActiveMeetingPreview {
     func setFocus(on member: RoomMember) {
         configureMainPreview(for: member)

@@ -13,7 +13,10 @@ public class JoinedRoom: CustomStringConvertible {
 
     private weak var roomExpress: PhenixRoomExpress?
     private weak var membersDelegate: JoinedRoomMembersDelegate?
+    private weak var chatDelegate: JoinedRoomChatDelegate?
+
     private let roomService: PhenixRoomService
+    private let chatService: PhenixRoomChatService
     private let publisher: PhenixExpressPublisher?
     private var disposables = [PhenixDisposable]()
 
@@ -33,9 +36,9 @@ public class JoinedRoom: CustomStringConvertible {
     init(roomExpress: PhenixRoomExpress, backend: URL, roomService: PhenixRoomService, publisher: PhenixExpressPublisher? = nil) {
         self.roomExpress = roomExpress
         self.backend = backend
-        self.roomService = roomService
         self.publisher = publisher
-
+        self.roomService = roomService
+        self.chatService = PhenixRoomChatServiceFactory.createRoomChatService(roomService)
         self.currentMember = RoomMember(roomService.getSelf(), isSelf: true, roomExpress: roomExpress)
     }
 
@@ -79,6 +82,12 @@ public class JoinedRoom: CustomStringConvertible {
             members.subscribe(memberListDidChange)?.append(to: &disposables)
             os_log(.debug, log: .joinedRoom, "Successfully subscribed to member list updates")
         }
+    }
+
+    public func subscribeToChatMessages(_ delegate: JoinedRoomChatDelegate) {
+        os_log(.debug, log: .joinedRoom, "Subscribe to chat messages")
+        chatDelegate = delegate
+        chatService.getObservableChatMessages()?.subscribe(chatMessagesDidChange)?.append(to: &disposables)
     }
 }
 
@@ -143,6 +152,20 @@ private extension JoinedRoom {
         } else {
             return RoomMember(member, isSelf: false, roomExpress: roomExpress)
         }
+    }
+
+    func chatMessagesDidChange(_ changes: PhenixObservableChange<NSArray>?) {
+        guard let chatMessages = changes?.value as? [PhenixChatMessage] else {
+            return
+        }
+
+        var messages = chatMessages.compactMap(RoomChatMessage.init)
+
+        for (index, message) in messages.enumerated() where message.authorId == currentMember.identifier {
+            messages[index].maskAsYourself()
+        }
+
+        chatDelegate?.chatMessagesDidChange(messages)
     }
 }
 

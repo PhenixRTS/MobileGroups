@@ -88,6 +88,8 @@
 		B5E4EA7424741B8400F48B38 /* CameraPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E4EA7324741B8400F48B38 /* CameraPlaceholderView.swift */; };
 		B5E4EA7E2475379100F48B38 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E4EA7D2475379100F48B38 /* CameraView.swift */; };
 		B5EB976024AE058400F458B0 /* PlaceholderTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5EB975F24AE058400F458B0 /* PlaceholderTextView.swift */; };
+		B5EB976724AF422100F458B0 /* RoomChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5EB976624AF422100F458B0 /* RoomChatMessage.swift */; };
+		B5EB976924AF46EC00F458B0 /* JoinedRoomChatDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5EB976824AF46EC00F458B0 /* JoinedRoomChatDelegate.swift */; };
 		E5615D68AA3F078E666D2911 /* Pods_PhenixGroups.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2FBDD988943A994D0336EC /* Pods_PhenixGroups.framework */; };
 		E670063F4541A24DBF7C86E2 /* Pods_PhenixCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFA941014B5CCB73D1134E8F /* Pods_PhenixCore.framework */; };
 /* End PBXBuildFile section */
@@ -242,6 +244,8 @@
 		B5E4EA7324741B8400F48B38 /* CameraPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPlaceholderView.swift; sourceTree = "<group>"; };
 		B5E4EA7D2475379100F48B38 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		B5EB975F24AE058400F458B0 /* PlaceholderTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderTextView.swift; sourceTree = "<group>"; };
+		B5EB976624AF422100F458B0 /* RoomChatMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomChatMessage.swift; sourceTree = "<group>"; };
+		B5EB976824AF46EC00F458B0 /* JoinedRoomChatDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinedRoomChatDelegate.swift; sourceTree = "<group>"; };
 		C14018589F0F82A57D4D0B42 /* Pods-PhenixGroups.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixGroups.release.xcconfig"; path = "Target Support Files/Pods-PhenixGroups/Pods-PhenixGroups.release.xcconfig"; sourceTree = "<group>"; };
 		D8BC44E9C5B4596C131E7876 /* Pods-PhenixCoreIntegrationTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixCoreIntegrationTests.debug.xcconfig"; path = "Target Support Files/Pods-PhenixCoreIntegrationTests/Pods-PhenixCoreIntegrationTests.debug.xcconfig"; sourceTree = "<group>"; };
 		EF50CA9C0F0DB5BDECAE00C7 /* Pods-PhenixCoreIntegrationTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixCoreIntegrationTests.release.xcconfig"; path = "Target Support Files/Pods-PhenixCoreIntegrationTests/Pods-PhenixCoreIntegrationTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -606,8 +610,7 @@
 			isa = PBXGroup;
 			children = (
 				B5E4EA712473F17C00F48B38 /* JoinedRoom.swift */,
-				B579360B2486AD59001044C2 /* RoomMember.swift */,
-				B510D0832489430D003FAEC0 /* RoomMemberDelegate.swift */,
+				B5EB976A24AF482300F458B0 /* Models */,
 				B5793606248549B2001044C2 /* Protocols */,
 			);
 			path = "Joined Room";
@@ -616,8 +619,10 @@
 		B5793606248549B2001044C2 /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
-				B5793607248549C5001044C2 /* JoinedRoomMembersDelegate.swift */,
+				B5EB976824AF46EC00F458B0 /* JoinedRoomChatDelegate.swift */,
 				B5793609248549F2001044C2 /* JoinedRoomDelegate.swift */,
+				B5793607248549C5001044C2 /* JoinedRoomMembersDelegate.swift */,
+				B510D0832489430D003FAEC0 /* RoomMemberDelegate.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -735,6 +740,15 @@
 				B5619D2A2497A3100072669D /* Views */,
 			);
 			path = PageViewController;
+			sourceTree = "<group>";
+		};
+		B5EB976A24AF482300F458B0 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				B5EB976624AF422100F458B0 /* RoomChatMessage.swift */,
+				B579360B2486AD59001044C2 /* RoomMember.swift */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1205,6 +1219,7 @@
 			files = (
 				B54D599524507D4200454066 /* PhenixRoomJoining.swift in Sources */,
 				B5E4EA722473F17C00F48B38 /* JoinedRoom.swift in Sources */,
+				B5EB976724AF422100F458B0 /* RoomChatMessage.swift in Sources */,
 				B54D598B2450626C00454066 /* PhenixManager.swift in Sources */,
 				B54D599824519E9000454066 /* OSLog.swift in Sources */,
 				B579360C2486AD59001044C2 /* RoomMember.swift in Sources */,
@@ -1218,6 +1233,7 @@
 				B54D59A72451D78100454066 /* RoomAlias.swift in Sources */,
 				B594ABBB2499F52A0042ED1F /* VideoLayer.swift in Sources */,
 				B510D0D0248E65AD003FAEC0 /* PhenixDisposables.swift in Sources */,
+				B5EB976924AF46EC00F458B0 /* JoinedRoomChatDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

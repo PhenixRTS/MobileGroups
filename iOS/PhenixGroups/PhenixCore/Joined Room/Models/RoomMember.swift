@@ -16,7 +16,7 @@ public class RoomMember {
     private var disposables = [PhenixDisposable]()
     private var subscriber: PhenixExpressSubscriber?
     private var stream: PhenixStream?
-    private var identifier: String {
+    internal var identifier: String {
         guard let id = phenixMember.getSessionId() else {
             fatalError("Session ID must always be available")
         }

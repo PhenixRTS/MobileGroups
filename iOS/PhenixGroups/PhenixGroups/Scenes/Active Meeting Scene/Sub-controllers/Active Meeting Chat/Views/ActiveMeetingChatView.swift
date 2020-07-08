@@ -41,6 +41,11 @@ class ActiveMeetingChatView: UIView {
         textView.text = ""
         resizeTextView()
     }
+
+    func reloadData() {
+        tableView.reloadData()
+        tableView.scrollToBottom(animated: true)
+    }
 }
 
 private extension ActiveMeetingChatView {

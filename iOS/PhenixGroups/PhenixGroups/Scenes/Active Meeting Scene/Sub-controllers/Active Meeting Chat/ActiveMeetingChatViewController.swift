@@ -2,6 +2,7 @@
 //  Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
+import PhenixCore
 import UIKit
 
 class ActiveMeetingChatViewController: UIViewController, PageContainerMember {
@@ -40,5 +41,14 @@ private extension ActiveMeetingChatViewController {
         activeMeetingChatView.chatTableView.separatorStyle = .none
         activeMeetingChatView.chatTableView.keyboardDismissMode = .onDrag
         activeMeetingChatView.chatTableView.tableFooterView = UIView()
+    }
+}
+
+extension ActiveMeetingChatViewController: JoinedRoomChatDelegate {
+    func chatMessagesDidChange(_ messages: [RoomChatMessage]) {
+        dataSource.messages = messages.sorted { $0.date < $1.date }
+        DispatchQueue.main.async { [weak self] in
+            self?.activeMeetingChatView.reloadData()
+        }
     }
 }
