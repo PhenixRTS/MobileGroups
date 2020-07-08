@@ -18,8 +18,8 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
 
     var focusedMember: RoomMember! {
         didSet {
-            if let member = oldValue, member != focusedMember {
-                membersViewController.reloadVideoPreview(for: member)
+            if let previousMember = oldValue, previousMember != focusedMember {
+                membersViewController.reloadVideoPreview(for: previousMember)
             }
         }
     }
@@ -169,6 +169,10 @@ private extension ActiveMeetingViewController {
 // MARK: - ActiveMeetingPreview
 extension ActiveMeetingViewController: ActiveMeetingPreview {
     func setFocus(on member: RoomMember) {
+        guard focusedMember != member else {
+            return
+        }
+
         configureMainPreview(for: member)
         focusedMember = member
     }

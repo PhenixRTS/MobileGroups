@@ -9,7 +9,6 @@ class ActiveMeetingMemberListDataSource: NSObject, UITableViewDataSource {
     var members = [RoomMember]()
     var pinnedMember: RoomMember?
     var indexPathForSelectedRow: IndexPath?
-    var retrieveFocusedMember: (() -> RoomMember?)?
 
     func indexPath(of member: RoomMember) -> IndexPath? {
         if let index = members.firstIndex(of: member) {
@@ -30,8 +29,9 @@ class ActiveMeetingMemberListDataSource: NSObject, UITableViewDataSource {
         let member = members[indexPath.row]
 
         cell.configure(member: member)
-        if member != retrieveFocusedMember?() {
-            cell.configureVideo()
+
+        if member == pinnedMember {
+            cell.pin()
         }
 
         return cell

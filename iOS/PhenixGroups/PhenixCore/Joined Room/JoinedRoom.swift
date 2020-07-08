@@ -39,7 +39,7 @@ public class JoinedRoom: CustomStringConvertible {
         self.publisher = publisher
         self.roomService = roomService
         self.chatService = PhenixRoomChatServiceFactory.createRoomChatService(roomService)
-      
+
         self.currentMember = RoomMember(roomService.getSelf(), isSelf: true, roomExpress: roomExpress)
     }
 

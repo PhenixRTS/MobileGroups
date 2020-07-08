@@ -26,6 +26,7 @@ class ActiveMeetingMemberTableViewCell: UITableViewCell, CellIdentified {
         super.prepareForReuse()
 
         cameraView.removeCameraLayer()
+        unpin()
     }
 
     func setCamera(layer: VideoLayer?) {
@@ -47,18 +48,21 @@ class ActiveMeetingMemberTableViewCell: UITableViewCell, CellIdentified {
     func configure(member: RoomMember) {
         self.member = member
         displayNameLabel.text = member.screenName
+        showCamera(false)
     }
 
     func configureVideo() {
-        member.delegate = self
         setCamera(layer: member.previewLayer)
         showCamera(member.isVideoAvailable)
+
+        member.delegate = self
     }
 }
 
 private extension ActiveMeetingMemberTableViewCell {
     func setup() {
-        cameraView = CameraView()
+        // CameraView must have preferred size (before AutoLayout updates its size) so that VideoLayer could work properly without any assertions of source view size being zero.
+        cameraView = CameraView(frame: CGRect(x: 0, y: 0, width: 100, height: 100))
         cameraView.translatesAutoresizingMaskIntoConstraints = false
         cameraView.placeholderText = nil
 

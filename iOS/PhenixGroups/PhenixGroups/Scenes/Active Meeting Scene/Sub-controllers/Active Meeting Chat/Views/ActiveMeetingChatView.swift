@@ -8,6 +8,7 @@ class ActiveMeetingChatView: UIView {
     private let textViewHeightInitialHeight: CGFloat = 50
 
     var notificationCenter: NotificationCenter = .default
+
     var tableView: UITableView!
 
     private var textView: PlaceholderTextView!
@@ -15,7 +16,6 @@ class ActiveMeetingChatView: UIView {
     private var sendButton: UIButton!
 
     var sendMessageHandler: ActiveMeetingChatViewController.SendMessageHandler?
-
 
     override init(frame: CGRect) {
          super.init(frame: frame)

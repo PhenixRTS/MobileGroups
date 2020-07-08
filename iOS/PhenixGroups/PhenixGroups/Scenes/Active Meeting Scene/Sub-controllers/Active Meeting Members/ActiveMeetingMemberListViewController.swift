@@ -7,6 +7,7 @@ import UIKit
 
 class ActiveMeetingMemberListViewController: UITableViewController, PageContainerMember {
     private static let maxVideoSubscriptions = 3
+
     lazy var dataSource = ActiveMeetingMemberListDataSource()
     lazy var pageIcon = UIImage(named: "meeting_members_icon")
 
@@ -23,20 +24,40 @@ class ActiveMeetingMemberListViewController: UITableViewController, PageContaine
             tableView.deselectRow(at: indexPath, animated: true)
         }
 
+        // Crete a copy of previously selected row
         let pinnedIndexPath = dataSource.indexPathForSelectedRow
 
+        // Check if previously selected row exists (case when user first time selects a row, there will not be previously selected row)
         if let oldIndexPath = pinnedIndexPath {
-            unpinCell(at: oldIndexPath)
+            unpin(cellAt: oldIndexPath)
         }
 
-        if indexPath != pinnedIndexPath { // No previously pinned row or new pinned row selected
-            pinCell(at: indexPath)
+        // Check if currently selected row is not the same as previously selected row
+        if indexPath != pinnedIndexPath {
+            pin(cellAt: indexPath)
 
+            // Set focus (move member's previewLayer from the cell to the main preview at the top of the view)
             let member = dataSource.members[indexPath.row]
             delegate?.setFocus(on: member)
         }
     }
 
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        guard let cell = cell as? ActiveMeetingMemberTableViewCell else {
+            return
+        }
+
+        let member = dataSource.members[indexPath.row]
+
+        guard member != delegate?.focusedMember else {
+            return
+        }
+
+        cell.configureVideo()
+    }
+
+    /// Reconfigures member previewLayer to be shown inside the member's cell.
+    /// - Parameter member: Specific member, which previewLayer must be set to be visible inside the cell
     func reloadVideoPreview(for member: RoomMember) {
         if let indexPath = dataSource.indexPath(of: member) {
             if let cell = tableView.cellForRow(at: indexPath) as? ActiveMeetingMemberTableViewCell {
@@ -51,7 +72,7 @@ private extension ActiveMeetingMemberListViewController {
         case memberRemoved(oldIndexPath: IndexPath)
         case memberRelocated(oldIndexPath: IndexPath, newIndexPath: IndexPath)
         case memberNotMoved
-        case noSelectedMember
+        case noPinnedMember
     }
 
     func configureTableView() {
@@ -68,18 +89,20 @@ private extension ActiveMeetingMemberListViewController {
         }
     }
 
-    func unpinCell(at indexPath: IndexPath) {
+    func pin(cellAt indexPath: IndexPath) {
         if let cell = tableView.cellForRow(at: indexPath) as? ActiveMeetingMemberTableViewCell {
-            dataSource.unpin(cell, at: indexPath)
+            cell.pin()
         }
-        dataSource.indexPathForSelectedRow = nil
+        dataSource.pinnedMember = dataSource.members[indexPath.row]
+        dataSource.indexPathForSelectedRow = indexPath
     }
 
-    func pinCell(at indexPath: IndexPath) {
+    func unpin(cellAt indexPath: IndexPath) {
         if let cell = tableView.cellForRow(at: indexPath) as? ActiveMeetingMemberTableViewCell {
-            dataSource.pin(cell, at: indexPath)
+            cell.unpin()
         }
-        dataSource.indexPathForSelectedRow = indexPath
+        dataSource.pinnedMember = nil
+        dataSource.indexPathForSelectedRow = nil
     }
 
     func subscribe(to list: [RoomMember]) {
@@ -107,19 +130,19 @@ private extension ActiveMeetingMemberListViewController {
 
             switch position {
             case .memberRelocated(let oldIndexPath, let newIndexPath):
-                self.unpinCell(at: oldIndexPath)
+                self.unpin(cellAt: oldIndexPath)
                 self.tableView.reloadData()
-                self.pinCell(at: newIndexPath)
+                self.pin(cellAt: newIndexPath)
 
             case .memberRemoved(let oldIndexPath):
-                self.unpinCell(at: oldIndexPath)
+                self.unpin(cellAt: oldIndexPath)
                 self.tableView.reloadData()
                 // Members are ordered by their activity timestamp, and also first member always is current device user
                 let member = self.dataSource.members.count > 1 ? self.dataSource.members[1] : self.dataSource.members[0]
                 self.delegate?.setFocus(on: member)
 
             case .memberNotMoved,
-                 .noSelectedMember:
+                 .noPinnedMember:
                 self.tableView.reloadData()
                 // Members are ordered by their activity timestamp, and also first member always is current device user
                 let member = self.dataSource.members.count > 1 ? self.dataSource.members[1] : self.dataSource.members[0]
@@ -139,21 +162,29 @@ extension ActiveMeetingMemberListViewController: JoinedRoomMembersDelegate {
 
         // Update currently pinned member in the list
 
-        guard let pinnedMember = dataSource.pinnedMember, let previousPinnedMemberIndex = self.dataSource.indexPathForSelectedRow?.row else {
-            reloadMemberList(position: .noSelectedMember)
+        // Check if a member has been pinned
+        guard let pinnedMember = dataSource.pinnedMember, let previousPinnedMemberIndex = dataSource.indexPathForSelectedRow?.row else {
+            reloadMemberList(position: .noPinnedMember)
             return
         }
 
+        // Check if pinned member still exists in the member list
         guard let currentPinnedMemberIndex = list.firstIndex(where: { $0 == pinnedMember }) else {
             reloadMemberList(position: .memberRemoved(oldIndexPath: IndexPath(row: previousPinnedMemberIndex, section: 0)))
             return
         }
 
-        // Selected member still exists in the room
+        // Check if pinned member row index has changed after the member list update
         if currentPinnedMemberIndex != previousPinnedMemberIndex {
-            reloadMemberList(position: .memberRelocated(oldIndexPath: IndexPath(row: previousPinnedMemberIndex, section: 0), newIndexPath: IndexPath(row: currentPinnedMemberIndex, section: 0)))
+            reloadMemberList(position: .memberRelocated(oldIndexPath: .for(rowIndex: previousPinnedMemberIndex), newIndexPath: .for(rowIndex: currentPinnedMemberIndex)))
         } else {
             reloadMemberList(position: .memberNotMoved)
         }
+    }
+}
+
+fileprivate extension IndexPath {
+    static func `for`(rowIndex index: Int) -> IndexPath {
+        IndexPath(row: index, section: 0)
     }
 }
