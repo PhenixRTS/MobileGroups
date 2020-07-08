@@ -31,6 +31,7 @@ class JoinMeetingView: UIView {
 
     @objc
     func closeButtonTapped(_ sender: Any) {
+        endEditing(true)
         closeHandler?()
     }
 
@@ -70,7 +71,7 @@ private extension JoinMeetingView {
         addSubview(button)
 
         NSLayoutConstraint.activate([
-            button.topAnchor.constraint(equalTo: topAnchor, constant: 16),
+            button.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 16),
             button.leadingAnchor.constraint(equalTo: safeAreaLayoutGuide.leadingAnchor, constant: 8),
             button.widthAnchor.constraint(equalToConstant: 44),
             button.heightAnchor.constraint(equalToConstant: 44)

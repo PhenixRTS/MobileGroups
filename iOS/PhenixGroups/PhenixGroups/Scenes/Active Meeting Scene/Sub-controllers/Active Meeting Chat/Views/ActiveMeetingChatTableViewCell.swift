@@ -9,6 +9,8 @@ class ActiveMeetingChatTableViewCell: UITableViewCell, CellIdentified {
     private var displayNameLabel: UILabel!
     private var dateLabel: UILabel!
     private var messageTextView: UITextView!
+    private var message: RoomChatMessage?
+
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -21,9 +23,15 @@ class ActiveMeetingChatTableViewCell: UITableViewCell, CellIdentified {
     }
 
     func configure(message: RoomChatMessage) {
+        self.message = message
+      
         displayNameLabel.text = message.authorName
         dateLabel.text = message.date.localizedRelativeDateTime
         messageTextView.text = message.text
+    }
+
+    func refreshDateRepresentation() {
+        dateLabel.text = message?.date.localizedRelativeDateTime
     }
 }
 
@@ -114,8 +122,18 @@ extension ActiveMeetingChatTableViewCell {
 
 fileprivate extension Date {
     var localizedRelativeDateTime: String {
+        let currentDate = Date()
+        guard currentDate.timeIntervalSinceNow - self.timeIntervalSinceNow > 60 else {
+            return "Now"
+        }
+
         if #available(iOS 13.0, *) {
-            return RelativeDateTimeFormatter().localizedString(for: self, relativeTo: Date())
+            let formatter = RelativeDateTimeFormatter()
+
+            formatter.dateTimeStyle = .named
+            formatter.formattingContext = .listItem
+
+            return formatter.localizedString(for: self, relativeTo: currentDate)
         } else {
             let formatter = DateComponentsFormatter()
 
@@ -124,7 +142,7 @@ fileprivate extension Date {
             formatter.zeroFormattingBehavior = .dropAll
             formatter.maximumUnitCount = 1
 
-            return String(format: formatter.string(from: self, to: Date()) ?? "", locale: .current)
+            return String(format: formatter.string(from: self, to: currentDate) ?? "", locale: .current)
         }
     }
 }

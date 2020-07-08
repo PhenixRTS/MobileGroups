@@ -6,6 +6,8 @@ import PhenixCore
 import UIKit
 
 class ActiveMeetingChatViewController: UIViewController, PageContainerMember {
+    private var timer: Timer?
+
     lazy var dataSource = ActiveMeetingChatDataSource()
     lazy var pageIcon = UIImage(named: "meeting_chat_icon")
 
@@ -24,23 +26,40 @@ class ActiveMeetingChatViewController: UIViewController, PageContainerMember {
         activeMeetingChatView.sendMessageHandler = { [weak self] message in
             self?.send(message: message)
         }
+
+        let timer = Timer(timeInterval: 1.0, target: self, selector: #selector(refreshDates), userInfo: nil, repeats: true)
+        self.timer = timer
+        timer.tolerance = 0.2
+        RunLoop.current.add(timer, forMode: .common) // So that timer would get fired even if user is interacting with UI at the current moment.
+    }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        timer?.invalidate()
     }
 
     func send(message: String) {
-        // TODO: Implement message sending
+        // TODO: Implement message sending.
     }
 }
 
 private extension ActiveMeetingChatViewController {
     func configureTableView() {
-        activeMeetingChatView.chatTableView.dataSource = dataSource
-        activeMeetingChatView.chatTableView.register(ActiveMeetingChatTableViewCell.self, forCellReuseIdentifier: ActiveMeetingChatTableViewCell.identifier)
-        activeMeetingChatView.chatTableView.estimatedRowHeight = 20
-        activeMeetingChatView.chatTableView.rowHeight = UITableView.automaticDimension
-        activeMeetingChatView.chatTableView.allowsSelection = false
-        activeMeetingChatView.chatTableView.separatorStyle = .none
-        activeMeetingChatView.chatTableView.keyboardDismissMode = .onDrag
-        activeMeetingChatView.chatTableView.tableFooterView = UIView()
+        activeMeetingChatView.tableView.dataSource = dataSource
+        activeMeetingChatView.tableView.register(ActiveMeetingChatTableViewCell.self, forCellReuseIdentifier: ActiveMeetingChatTableViewCell.identifier)
+        activeMeetingChatView.tableView.estimatedRowHeight = 20
+        activeMeetingChatView.tableView.rowHeight = UITableView.automaticDimension
+        activeMeetingChatView.tableView.allowsSelection = false
+        activeMeetingChatView.tableView.separatorStyle = .none
+        activeMeetingChatView.tableView.keyboardDismissMode = .onDrag
+        activeMeetingChatView.tableView.tableFooterView = UIView()
+    }
+
+    @objc
+    func refreshDates() {
+        activeMeetingChatView.tableView.visibleCells
+            .compactMap { $0 as? ActiveMeetingChatTableViewCell }
+            .forEach { $0.refreshDateRepresentation() }
     }
 }
 

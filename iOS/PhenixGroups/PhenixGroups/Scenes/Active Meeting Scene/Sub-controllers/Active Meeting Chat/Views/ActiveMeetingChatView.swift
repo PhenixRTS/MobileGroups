@@ -7,16 +7,13 @@ import UIKit
 class ActiveMeetingChatView: UIView {
     private let textViewHeightInitialHeight: CGFloat = 50
 
-    private var tableView: UITableView!
+    var tableView: UITableView!
+
     private var textView: PlaceholderTextView!
     private var textViewHeightConstraint: NSLayoutConstraint!
     private var sendButton: UIButton!
 
     var sendMessageHandler: ((String) -> Void)?
-
-    var chatTableView: UITableView {
-        tableView
-    }
 
     override init(frame: CGRect) {
          super.init(frame: frame)
