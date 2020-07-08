@@ -58,15 +58,16 @@ class ActiveMeetingView: UIView {
         cameraView.setCameraLayer(layer)
     }
 
-    func setPageView(_ view: UIView) {
-        containerView.addSubview(view)
-        view.translatesAutoresizingMaskIntoConstraints = false
+    func setPageView(_ pageView: UIView) {
+        containerView.addSubview(pageView)
+
+        pageView.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
-            view.topAnchor.constraint(equalTo: containerView.topAnchor),
-            view.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
-            view.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
-            view.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
+            pageView.topAnchor.constraint(equalTo: containerView.topAnchor),
+            pageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            pageView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            pageView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor)
         ])
     }
 }

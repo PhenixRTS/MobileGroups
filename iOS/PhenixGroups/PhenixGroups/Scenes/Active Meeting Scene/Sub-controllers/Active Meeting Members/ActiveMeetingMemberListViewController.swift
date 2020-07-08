@@ -5,9 +5,11 @@
 import PhenixCore
 import UIKit
 
-class ActiveMeetingMemberListViewController: UITableViewController {
+class ActiveMeetingMemberListViewController: UITableViewController, PageContainerMember {
     private static let maxVideoSubscriptions = 3
     private let dataSource = ActiveMeetingMemberListDataSource()
+
+    lazy var pageIcon = UIImage(named: "meeting_members_icon")
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,6 +33,7 @@ private extension ActiveMeetingMemberListViewController {
 extension ActiveMeetingMemberListViewController: JoinedRoomMembersDelegate {
     func memberListDidChange(_ list: [RoomMember]) {
         dataSource.members = list
+        title = "(\(list.count))"
 
         // Calculate how many of members have video subscriptions at the moment.
         var videoSubscriptions = list.reduce(into: 0) { result, member in

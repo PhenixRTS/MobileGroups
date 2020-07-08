@@ -44,6 +44,9 @@
 		B54D59A72451D78100454066 /* RoomAlias.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59A62451D78100454066 /* RoomAlias.swift */; };
 		B54D59AD2453040100454066 /* PhenixConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59AC2453040100454066 /* PhenixConfiguration.swift */; };
 		B54D59B2245307F600454066 /* ActiveMeetingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59B1245307F600454066 /* ActiveMeetingViewController.swift */; };
+		B5619D25249776F00072669D /* PageContainerMember.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5619D24249776F00072669D /* PageContainerMember.swift */; };
+		B5619D2724977CA60072669D /* ActiveMeetingChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5619D2624977CA60072669D /* ActiveMeetingChatViewController.swift */; };
+		B5619D292497A0EF0072669D /* TabBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5619D282497A0EF0072669D /* TabBarButton.swift */; };
 		B563A4B6247D51FF007101C7 /* ActiveMeetingInformationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B563A4B5247D51FF007101C7 /* ActiveMeetingInformationViewController.swift */; };
 		B566BF702481412900A2DE75 /* ActiveMeetingMemberListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B566BF6F2481412900A2DE75 /* ActiveMeetingMemberListViewController.swift */; };
 		B566BF722481431A00A2DE75 /* ActiveMeetingMemberListDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = B566BF712481431A00A2DE75 /* ActiveMeetingMemberListDataSource.swift */; };
@@ -74,6 +77,7 @@
 		B5BB0838244F28E80094F254 /* Storyboarded.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BB0837244F28E80094F254 /* Storyboarded.swift */; };
 		B5C25EF5245B010600542E1C /* ControlButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C25EF4245B010600542E1C /* ControlButton.swift */; };
 		B5C25EFD245B33D900542E1C /* NewMeetingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C25EFC245B33D900542E1C /* NewMeetingView.swift */; };
+		B5D4F99F249353BE002FDCB6 /* PageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D4F99E249353BE002FDCB6 /* PageViewController.swift */; };
 		B5E4EA48246EC12200F48B38 /* PhenixRoomPublishing.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E4EA47246EC12200F48B38 /* PhenixRoomPublishing.swift */; };
 		B5E4EA722473F17C00F48B38 /* JoinedRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E4EA712473F17C00F48B38 /* JoinedRoom.swift */; };
 		B5E4EA7424741B8400F48B38 /* CameraPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E4EA7324741B8400F48B38 /* CameraPlaceholderView.swift */; };
@@ -186,6 +190,9 @@
 		B54D59A62451D78100454066 /* RoomAlias.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomAlias.swift; sourceTree = "<group>"; };
 		B54D59AC2453040100454066 /* PhenixConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixConfiguration.swift; sourceTree = "<group>"; };
 		B54D59B1245307F600454066 /* ActiveMeetingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingViewController.swift; sourceTree = "<group>"; };
+		B5619D24249776F00072669D /* PageContainerMember.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageContainerMember.swift; sourceTree = "<group>"; };
+		B5619D2624977CA60072669D /* ActiveMeetingChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingChatViewController.swift; sourceTree = "<group>"; };
+		B5619D282497A0EF0072669D /* TabBarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarButton.swift; sourceTree = "<group>"; };
 		B563A4B5247D51FF007101C7 /* ActiveMeetingInformationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingInformationViewController.swift; sourceTree = "<group>"; };
 		B566BF6F2481412900A2DE75 /* ActiveMeetingMemberListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingMemberListViewController.swift; sourceTree = "<group>"; };
 		B566BF712481431A00A2DE75 /* ActiveMeetingMemberListDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingMemberListDataSource.swift; sourceTree = "<group>"; };
@@ -218,6 +225,7 @@
 		B5BB0837244F28E80094F254 /* Storyboarded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storyboarded.swift; sourceTree = "<group>"; };
 		B5C25EF4245B010600542E1C /* ControlButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlButton.swift; sourceTree = "<group>"; };
 		B5C25EFC245B33D900542E1C /* NewMeetingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMeetingView.swift; sourceTree = "<group>"; };
+		B5D4F99E249353BE002FDCB6 /* PageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageViewController.swift; sourceTree = "<group>"; };
 		B5E4EA47246EC12200F48B38 /* PhenixRoomPublishing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixRoomPublishing.swift; sourceTree = "<group>"; };
 		B5E4EA712473F17C00F48B38 /* JoinedRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinedRoom.swift; sourceTree = "<group>"; };
 		B5E4EA7324741B8400F48B38 /* CameraPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPlaceholderView.swift; sourceTree = "<group>"; };
@@ -477,10 +485,19 @@
 			isa = PBXGroup;
 			children = (
 				B54D59B1245307F600454066 /* ActiveMeetingViewController.swift */,
+				B5D4F99D2493538C002FDCB6 /* PageViewController */,
 				B566BF77248152B100A2DE75 /* Sub-controllers */,
 				B5704D662465366D00D9703A /* Views */,
 			);
 			path = "Active Meeting Scene";
+			sourceTree = "<group>";
+		};
+		B5619D2A2497A3100072669D /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				B5619D282497A0EF0072669D /* TabBarButton.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		B563A4B2247D496C007101C7 /* Active Meeting Members */ = {
@@ -496,6 +513,7 @@
 		B563A4B3247D4996007101C7 /* Active Meeting Chat */ = {
 			isa = PBXGroup;
 			children = (
+				B5619D2624977CA60072669D /* ActiveMeetingChatViewController.swift */,
 			);
 			path = "Active Meeting Chat";
 			sourceTree = "<group>";
@@ -681,6 +699,16 @@
 				B5C25EF4245B010600542E1C /* ControlButton.swift */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		B5D4F99D2493538C002FDCB6 /* PageViewController */ = {
+			isa = PBXGroup;
+			children = (
+				B5619D24249776F00072669D /* PageContainerMember.swift */,
+				B5D4F99E249353BE002FDCB6 /* PageViewController.swift */,
+				B5619D2A2497A3100072669D /* Views */,
+			);
+			path = PageViewController;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1093,6 +1121,7 @@
 				B5BB0832244F281F0094F254 /* Coordinator.swift in Sources */,
 				B5C25EF5245B010600542E1C /* ControlButton.swift in Sources */,
 				B59D19EE2462E038008E2C2D /* MeetingFinished.swift in Sources */,
+				B5D4F99F249353BE002FDCB6 /* PageViewController.swift in Sources */,
 				B54D59A02451B7C900454066 /* Launcher.swift in Sources */,
 				B566BF702481412900A2DE75 /* ActiveMeetingMemberListViewController.swift in Sources */,
 				B5704D362464436F00D9703A /* ViewControllerAlerts.swift in Sources */,
@@ -1101,6 +1130,8 @@
 				B54D59A52451C13400454066 /* NewMeetingControlView.swift in Sources */,
 				B5704D682465369000D9703A /* ActiveMeetingView.swift in Sources */,
 				B5E4EA7424741B8400F48B38 /* CameraPlaceholderView.swift in Sources */,
+				B5619D25249776F00072669D /* PageContainerMember.swift in Sources */,
+				B5619D292497A0EF0072669D /* TabBarButton.swift in Sources */,
 				B566BF722481431A00A2DE75 /* ActiveMeetingMemberListDataSource.swift in Sources */,
 				B5E4EA7E2475379100F48B38 /* CameraView.swift in Sources */,
 				B53D8F50244DCBA30055CE66 /* AppDelegate.swift in Sources */,
@@ -1118,6 +1149,7 @@
 				B59D19DD24629F69008E2C2D /* JoinMeetingViewController.swift in Sources */,
 				B53D8F52244DCBA30055CE66 /* SceneDelegate.swift in Sources */,
 				B566BF76248143F700A2DE75 /* ActiveMeetingMemberTableViewCell.swift in Sources */,
+				B5619D2724977CA60072669D /* ActiveMeetingChatViewController.swift in Sources */,
 				B510D0E6248FC258003FAEC0 /* ActivityIndicatorController.swift in Sources */,
 				B5019602245AAD9B00DDF6AB /* ChildController.swift in Sources */,
 				B54D599E2451B5D100454066 /* DependencyContainer.swift in Sources */,

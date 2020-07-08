@@ -65,7 +65,7 @@ private extension JoinMeetingView {
         closeButton = button
         button.translatesAutoresizingMaskIntoConstraints = false
         button.tintColor = UIColor(named: "Button Inverted Color")
-        button.setImage(UIImage(named: "Close Button"), for: .normal)
+        button.setImage(UIImage(named: "close_button"), for: .normal)
         button.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         addSubview(button)
 

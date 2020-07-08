@@ -4,7 +4,9 @@
 
 import UIKit
 
-class ActiveMeetingInformationViewController: UIViewController {
+class ActiveMeetingInformationViewController: UIViewController, PageContainerMember {
+    lazy var pageIcon = UIImage(named: "meeting_information_icon")
+
     private var titleLabel: UILabel!
     private var codeLabel: UILabel!
     private var shareButton: UIButton!
