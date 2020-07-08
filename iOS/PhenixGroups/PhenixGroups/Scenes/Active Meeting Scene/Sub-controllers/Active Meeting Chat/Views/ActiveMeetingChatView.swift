@@ -10,7 +10,6 @@ class ActiveMeetingChatView: UIView {
     var notificationCenter: NotificationCenter = .default
 
     var tableView: UITableView!
-
     private var textView: PlaceholderTextView!
     private var textViewHeightConstraint: NSLayoutConstraint!
     private var sendButton: UIButton!

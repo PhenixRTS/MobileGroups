@@ -24,7 +24,6 @@ class ActiveMeetingChatTableViewCell: UITableViewCell, CellIdentified {
 
     func configure(message: RoomChatMessage) {
         self.message = message
-
         displayNameLabel.text = message.authorName
         dateLabel.text = message.date.localizedRelativeDateTime
         messageTextView.text = message.text
@@ -113,7 +112,6 @@ extension ActiveMeetingChatTableViewCell {
         textView.isScrollEnabled = false
         textView.isEditable = false
         textView.dataDetectorTypes = .all
-
         if #available(iOS 13.0, *) {
             textView.textColor = .label
         } else {

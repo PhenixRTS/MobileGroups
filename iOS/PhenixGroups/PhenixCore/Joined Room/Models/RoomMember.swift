@@ -24,21 +24,22 @@ public class RoomMember {
     }
 
     internal let phenixMember: PhenixMember
+    internal var audioObservations = [ObjectIdentifier: AudioObservation]()
+    internal var videoObservations = [ObjectIdentifier: VideoObservation]()
 
     public private(set) var subscriptionType: SubscriptionType?
     public var previewLayer: VideoLayer?
     public let isSelf: Bool
     public let screenName: String
-    public weak var delegate: RoomMemberDelegate?
     public var isSubscribed: Bool = false
     public var isAudioAvailable = false {
         didSet {
-            delegate?.roomMemberAudioStateDidChange(self, enabled: isAudioAvailable)
+            audioStateDidChange(enabled: isAudioAvailable)
         }
     }
     public var isVideoAvailable = false {
         didSet {
-            delegate?.roomMemberVideoStateDidChange(self, enabled: isVideoAvailable)
+            videoStateDidChange(enabled: isVideoAvailable)
         }
     }
 

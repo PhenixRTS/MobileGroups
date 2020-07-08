@@ -18,7 +18,6 @@
 		B50195FE245AAB4300DDF6AB /* MeetingHistoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50195FD245AAB4300DDF6AB /* MeetingHistoryTableViewController.swift */; };
 		B5019600245AABA600DDF6AB /* MeetingHistoryTableDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50195FF245AABA600DDF6AB /* MeetingHistoryTableDataSource.swift */; };
 		B5019602245AAD9B00DDF6AB /* ChildController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5019601245AAD9B00DDF6AB /* ChildController.swift */; };
-		B510D0842489430E003FAEC0 /* RoomMemberDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B510D0832489430D003FAEC0 /* RoomMemberDelegate.swift */; };
 		B510D0D0248E65AD003FAEC0 /* PhenixDisposables.swift in Sources */ = {isa = PBXBuildFile; fileRef = B510D0CF248E65AD003FAEC0 /* PhenixDisposables.swift */; };
 		B510D0E6248FC258003FAEC0 /* ActivityIndicatorController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B510D0E5248FC258003FAEC0 /* ActivityIndicatorController.swift */; };
 		B510D0E8248FCA63003FAEC0 /* ActivityIndicatorProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B510D0E7248FCA63003FAEC0 /* ActivityIndicatorProvider.swift */; };
@@ -83,6 +82,8 @@
 		B5C25EF5245B010600542E1C /* ControlButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C25EF4245B010600542E1C /* ControlButton.swift */; };
 		B5C25EFD245B33D900542E1C /* NewMeetingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C25EFC245B33D900542E1C /* NewMeetingView.swift */; };
 		B5D4F99F249353BE002FDCB6 /* PageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D4F99E249353BE002FDCB6 /* PageViewController.swift */; };
+		B5DDA24B24B49FB900809648 /* RoomMemberAudioObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DDA24A24B49FB900809648 /* RoomMemberAudioObserver.swift */; };
+		B5DDA24D24B4B11B00809648 /* RoomMemberVideoObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DDA24C24B4B11B00809648 /* RoomMemberVideoObserver.swift */; };
 		B5E4EA48246EC12200F48B38 /* PhenixRoomPublishing.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E4EA47246EC12200F48B38 /* PhenixRoomPublishing.swift */; };
 		B5E4EA722473F17C00F48B38 /* JoinedRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E4EA712473F17C00F48B38 /* JoinedRoom.swift */; };
 		B5E4EA7424741B8400F48B38 /* CameraPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E4EA7324741B8400F48B38 /* CameraPlaceholderView.swift */; };
@@ -169,7 +170,6 @@
 		B50195FD245AAB4300DDF6AB /* MeetingHistoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingHistoryTableViewController.swift; sourceTree = "<group>"; };
 		B50195FF245AABA600DDF6AB /* MeetingHistoryTableDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingHistoryTableDataSource.swift; sourceTree = "<group>"; };
 		B5019601245AAD9B00DDF6AB /* ChildController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildController.swift; sourceTree = "<group>"; };
-		B510D0832489430D003FAEC0 /* RoomMemberDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberDelegate.swift; sourceTree = "<group>"; };
 		B510D0CF248E65AD003FAEC0 /* PhenixDisposables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixDisposables.swift; sourceTree = "<group>"; };
 		B510D0E5248FC258003FAEC0 /* ActivityIndicatorController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicatorController.swift; sourceTree = "<group>"; };
 		B510D0E7248FCA63003FAEC0 /* ActivityIndicatorProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicatorProvider.swift; sourceTree = "<group>"; };
@@ -239,6 +239,8 @@
 		B5C25EF4245B010600542E1C /* ControlButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlButton.swift; sourceTree = "<group>"; };
 		B5C25EFC245B33D900542E1C /* NewMeetingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMeetingView.swift; sourceTree = "<group>"; };
 		B5D4F99E249353BE002FDCB6 /* PageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageViewController.swift; sourceTree = "<group>"; };
+		B5DDA24A24B49FB900809648 /* RoomMemberAudioObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberAudioObserver.swift; sourceTree = "<group>"; };
+		B5DDA24C24B4B11B00809648 /* RoomMemberVideoObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberVideoObserver.swift; sourceTree = "<group>"; };
 		B5E4EA47246EC12200F48B38 /* PhenixRoomPublishing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixRoomPublishing.swift; sourceTree = "<group>"; };
 		B5E4EA712473F17C00F48B38 /* JoinedRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinedRoom.swift; sourceTree = "<group>"; };
 		B5E4EA7324741B8400F48B38 /* CameraPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPlaceholderView.swift; sourceTree = "<group>"; };
@@ -622,7 +624,6 @@
 				B5EB976824AF46EC00F458B0 /* JoinedRoomChatDelegate.swift */,
 				B5793609248549F2001044C2 /* JoinedRoomDelegate.swift */,
 				B5793607248549C5001044C2 /* JoinedRoomMembersDelegate.swift */,
-				B510D0832489430D003FAEC0 /* RoomMemberDelegate.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -747,6 +748,8 @@
 			children = (
 				B5EB976624AF422100F458B0 /* RoomChatMessage.swift */,
 				B579360B2486AD59001044C2 /* RoomMember.swift */,
+				B5DDA24A24B49FB900809648 /* RoomMemberAudioObserver.swift */,
+				B5DDA24C24B4B11B00809648 /* RoomMemberVideoObserver.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -1218,6 +1221,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B54D599524507D4200454066 /* PhenixRoomJoining.swift in Sources */,
+				B5DDA24B24B49FB900809648 /* RoomMemberAudioObserver.swift in Sources */,
 				B5E4EA722473F17C00F48B38 /* JoinedRoom.swift in Sources */,
 				B5EB976724AF422100F458B0 /* RoomChatMessage.swift in Sources */,
 				B54D598B2450626C00454066 /* PhenixManager.swift in Sources */,
@@ -1227,10 +1231,10 @@
 				B579360A248549F2001044C2 /* JoinedRoomDelegate.swift in Sources */,
 				B54D59AD2453040100454066 /* PhenixConfiguration.swift in Sources */,
 				B5777E72246D6015000B4CA9 /* UserMediaStreamController.swift in Sources */,
-				B510D0842489430E003FAEC0 /* RoomMemberDelegate.swift in Sources */,
 				B5E4EA48246EC12200F48B38 /* PhenixRoomPublishing.swift in Sources */,
 				B54D599324507D3700454066 /* PhenixRoomCreation.swift in Sources */,
 				B54D59A72451D78100454066 /* RoomAlias.swift in Sources */,
+				B5DDA24D24B4B11B00809648 /* RoomMemberVideoObserver.swift in Sources */,
 				B594ABBB2499F52A0042ED1F /* VideoLayer.swift in Sources */,
 				B510D0D0248E65AD003FAEC0 /* PhenixDisposables.swift in Sources */,
 				B5EB976924AF46EC00F458B0 /* JoinedRoomChatDelegate.swift in Sources */,

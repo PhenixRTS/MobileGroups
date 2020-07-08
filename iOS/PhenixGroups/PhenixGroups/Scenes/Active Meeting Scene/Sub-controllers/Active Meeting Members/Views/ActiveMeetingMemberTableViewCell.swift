@@ -10,7 +10,11 @@ class ActiveMeetingMemberTableViewCell: UITableViewCell, CellIdentified {
     private var pinView: CameraPinView!
     private var displayNameLabel: UILabel!
 
-    weak var member: RoomMember!
+    weak var member: RoomMember! {
+        didSet {
+            oldValue?.removeVideoObserver(self)
+        }
+    }
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -54,8 +58,7 @@ class ActiveMeetingMemberTableViewCell: UITableViewCell, CellIdentified {
     func configureVideo() {
         setCamera(layer: member.previewLayer)
         showCamera(member.isVideoAvailable)
-
-        member.delegate = self
+        member.addVideoObserver(self)
     }
 }
 
@@ -97,11 +100,7 @@ private extension ActiveMeetingMemberTableViewCell {
     }
 }
 
-extension ActiveMeetingMemberTableViewCell: RoomMemberDelegate {
-    func roomMemberAudioStateDidChange(_ member: RoomMember, enabled: Bool) {
-        // Audio updated
-    }
-
+extension ActiveMeetingMemberTableViewCell: RoomMemberVideoObserver {
     func roomMemberVideoStateDidChange(_ member: RoomMember, enabled: Bool) {
         DispatchQueue.main.async { [weak self] in
             self?.showCamera(enabled)

@@ -19,6 +19,7 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
     var focusedMember: RoomMember! {
         didSet {
             if let previousMember = oldValue, previousMember != focusedMember {
+                previousMember.removeVideoObserver(activeMeetingView)
                 membersViewController.reloadVideoPreview(for: previousMember)
             }
         }
@@ -109,7 +110,7 @@ private extension ActiveMeetingViewController {
         activeMeetingView.setCamera(layer: member.previewLayer)
         activeMeetingView.setCamera(enabled: member.isVideoAvailable)
 
-        member.delegate = activeMeetingView
+        member.addVideoObserver(activeMeetingView)
     }
 
     func configurePageController() {
@@ -172,7 +173,6 @@ extension ActiveMeetingViewController: ActiveMeetingPreview {
         guard focusedMember != member else {
             return
         }
-
         configureMainPreview(for: member)
         focusedMember = member
     }

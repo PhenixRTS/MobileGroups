@@ -123,7 +123,6 @@ extension PhenixManager: JoinedRoomDelegate {
 }
 
 // MARK: - Helper methods
-
 internal extension PhenixManager {
     func makeRoomOptions(with alias: String) -> PhenixRoomOptions {
         PhenixRoomServiceFactory.createRoomOptionsBuilder()
