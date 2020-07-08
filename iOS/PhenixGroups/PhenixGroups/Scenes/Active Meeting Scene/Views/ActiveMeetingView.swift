@@ -9,9 +9,7 @@ class ActiveMeetingView: UIView {
     typealias ControlButtonHandler = (_ enabled: Bool) -> Void
 
     var notificationCenter: NotificationCenter = .default
-
     var leaveMeetingHandler: (() -> Void)?
-
     var microphoneHandler: ControlButtonHandler?
     var cameraHandler: ControlButtonHandler?
 
@@ -73,9 +71,9 @@ class ActiveMeetingView: UIView {
     }
 
     func setPageView(_ pageView: UIView) {
-        containerView.addSubview(pageView)
-
         pageView.translatesAutoresizingMaskIntoConstraints = false
+
+        containerView.addSubview(pageView)
 
         NSLayoutConstraint.activate([
             pageView.topAnchor.constraint(equalTo: containerView.topAnchor),
@@ -94,13 +92,13 @@ private extension ActiveMeetingView {
     }
 
     func configureMicrophoneButton() {
-        let borderColor: UIColor
-
-        if #available(iOS 13.0, *) {
-            borderColor = UIColor(named: "Button Border Color") ?? UIColor.systemBackground
-        } else {
-            borderColor = .white
-        }
+        let borderColor: UIColor = {
+            if #available(iOS 13.0, *) {
+                return UIColor(named: "Button Border Color") ?? .systemBackground
+            } else {
+                return .white
+            }
+        }()
 
         microphoneButton.setImage(UIImage(named: "mic"), for: .on)
         microphoneButton.setImage(UIImage(named: "mic_off"), for: .off)
@@ -119,13 +117,13 @@ private extension ActiveMeetingView {
     }
 
     func configureCameraButton() {
-        let borderColor: UIColor
-
-        if #available(iOS 13.0, *) {
-            borderColor = UIColor(named: "Button Border Color") ?? UIColor.systemBackground
-        } else {
-            borderColor = .white
-        }
+        let borderColor: UIColor = {
+            if #available(iOS 13.0, *) {
+                return UIColor(named: "Button Border Color") ?? UIColor.systemBackground
+            } else {
+                return .white
+            }
+        }()
 
         cameraButton.setImage(UIImage(named: "camera"), for: .on)
         cameraButton.setImage(UIImage(named: "camera_off"), for: .off)
@@ -176,9 +174,7 @@ private extension ActiveMeetingView {
     @objc
     func adjustForKeyboard(notification: Notification) {
         guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
-        guard let keyboardAnimationDuration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber else {
-            return
-        }
+        guard let keyboardAnimationDuration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber else { return }
 
         let keyboardScreenEndFrame = keyboardValue.cgRectValue
         let keyboardAnimation = keyboardAnimationDuration.doubleValue

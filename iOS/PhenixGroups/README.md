@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- Xcode (11.4)
+- Xcode (11.5)
 - Swift 5.2
 - iOS 12.0 and above
 

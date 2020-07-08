@@ -8,7 +8,6 @@ class PageViewController: UIViewController {
     private var indicator: UIView!
     private var tabStackView: UIStackView!
     private var scrollView: UIScrollView!
-
     private(set) var selectedTabIndex = 0
     private(set) var controllers = [UIViewController]()
 
@@ -38,9 +37,8 @@ class PageViewController: UIViewController {
     }
 
     func setControllers(_ controllers: [UIViewController]) {
-        for controller in controllers {
-            controller.view.removeFromSuperview()
-        }
+        // Remove old controller views if there are some from the parent view
+        controllers.forEach { $0.view.removeFromSuperview() }
 
         self.controllers = controllers
 
@@ -54,7 +52,6 @@ class PageViewController: UIViewController {
             if controller is ActiveMeetingMemberListViewController {
                 button.observe(titleChangesOf: controller)
             }
-
             tabStackView.addArrangedSubview(button)
             tag += 1
         }
@@ -192,9 +189,7 @@ extension PageViewController: UIScrollViewDelegate {
 }
 
 fileprivate extension UIScrollView {
-    var pageCount: Int {
-        Int(contentSize.width / bounds.width)
-    }
+    var pageCount: Int { Int(contentSize.width / bounds.width) }
 
     /// Current page begins with index 0
     var currentPage: Int {

@@ -83,10 +83,6 @@ private extension ActiveMeetingMemberListViewController {
         tableView.delaysContentTouches = false
         tableView.allowsSelection = true
         tableView.tableFooterView = UIView()
-
-        dataSource.retrieveFocusedMember = { [weak self] in
-            self?.delegate?.focusedMember
-        }
     }
 
     func pin(cellAt indexPath: IndexPath) {
