@@ -44,6 +44,9 @@
 		B54D59A72451D78100454066 /* RoomAlias.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59A62451D78100454066 /* RoomAlias.swift */; };
 		B54D59AD2453040100454066 /* PhenixConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59AC2453040100454066 /* PhenixConfiguration.swift */; };
 		B54D59B2245307F600454066 /* ActiveMeetingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59B1245307F600454066 /* ActiveMeetingViewController.swift */; };
+		B560170C24AB4DDB0091692A /* ActiveMeetingChatDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = B560170B24AB4DDB0091692A /* ActiveMeetingChatDataSource.swift */; };
+		B560170F24AB4E420091692A /* ActiveMeetingChatTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B560170E24AB4E420091692A /* ActiveMeetingChatTableViewCell.swift */; };
+		B560171124AB6B140091692A /* ActiveMeetingChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B560171024AB6B140091692A /* ActiveMeetingChatView.swift */; };
 		B5619D25249776F00072669D /* PageContainerMember.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5619D24249776F00072669D /* PageContainerMember.swift */; };
 		B5619D2724977CA60072669D /* ActiveMeetingChatViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5619D2624977CA60072669D /* ActiveMeetingChatViewController.swift */; };
 		B5619D292497A0EF0072669D /* TabBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5619D282497A0EF0072669D /* TabBarButton.swift */; };
@@ -84,6 +87,7 @@
 		B5E4EA722473F17C00F48B38 /* JoinedRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E4EA712473F17C00F48B38 /* JoinedRoom.swift */; };
 		B5E4EA7424741B8400F48B38 /* CameraPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E4EA7324741B8400F48B38 /* CameraPlaceholderView.swift */; };
 		B5E4EA7E2475379100F48B38 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E4EA7D2475379100F48B38 /* CameraView.swift */; };
+		B5EB976024AE058400F458B0 /* PlaceholderTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5EB975F24AE058400F458B0 /* PlaceholderTextView.swift */; };
 		E5615D68AA3F078E666D2911 /* Pods_PhenixGroups.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2FBDD988943A994D0336EC /* Pods_PhenixGroups.framework */; };
 		E670063F4541A24DBF7C86E2 /* Pods_PhenixCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFA941014B5CCB73D1134E8F /* Pods_PhenixCore.framework */; };
 /* End PBXBuildFile section */
@@ -192,6 +196,9 @@
 		B54D59A62451D78100454066 /* RoomAlias.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomAlias.swift; sourceTree = "<group>"; };
 		B54D59AC2453040100454066 /* PhenixConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixConfiguration.swift; sourceTree = "<group>"; };
 		B54D59B1245307F600454066 /* ActiveMeetingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingViewController.swift; sourceTree = "<group>"; };
+		B560170B24AB4DDB0091692A /* ActiveMeetingChatDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingChatDataSource.swift; sourceTree = "<group>"; };
+		B560170E24AB4E420091692A /* ActiveMeetingChatTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingChatTableViewCell.swift; sourceTree = "<group>"; };
+		B560171024AB6B140091692A /* ActiveMeetingChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingChatView.swift; sourceTree = "<group>"; };
 		B5619D24249776F00072669D /* PageContainerMember.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageContainerMember.swift; sourceTree = "<group>"; };
 		B5619D2624977CA60072669D /* ActiveMeetingChatViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingChatViewController.swift; sourceTree = "<group>"; };
 		B5619D282497A0EF0072669D /* TabBarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarButton.swift; sourceTree = "<group>"; };
@@ -234,6 +241,7 @@
 		B5E4EA712473F17C00F48B38 /* JoinedRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinedRoom.swift; sourceTree = "<group>"; };
 		B5E4EA7324741B8400F48B38 /* CameraPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPlaceholderView.swift; sourceTree = "<group>"; };
 		B5E4EA7D2475379100F48B38 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
+		B5EB975F24AE058400F458B0 /* PlaceholderTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderTextView.swift; sourceTree = "<group>"; };
 		C14018589F0F82A57D4D0B42 /* Pods-PhenixGroups.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixGroups.release.xcconfig"; path = "Target Support Files/Pods-PhenixGroups/Pods-PhenixGroups.release.xcconfig"; sourceTree = "<group>"; };
 		D8BC44E9C5B4596C131E7876 /* Pods-PhenixCoreIntegrationTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixCoreIntegrationTests.debug.xcconfig"; path = "Target Support Files/Pods-PhenixCoreIntegrationTests/Pods-PhenixCoreIntegrationTests.debug.xcconfig"; sourceTree = "<group>"; };
 		EF50CA9C0F0DB5BDECAE00C7 /* Pods-PhenixCoreIntegrationTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixCoreIntegrationTests.release.xcconfig"; path = "Target Support Files/Pods-PhenixCoreIntegrationTests/Pods-PhenixCoreIntegrationTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -497,6 +505,16 @@
 			path = "Active Meeting Scene";
 			sourceTree = "<group>";
 		};
+		B560170D24AB4E270091692A /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				B560170E24AB4E420091692A /* ActiveMeetingChatTableViewCell.swift */,
+				B560171024AB6B140091692A /* ActiveMeetingChatView.swift */,
+				B5EB975F24AE058400F458B0 /* PlaceholderTextView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
 		B5619D2A2497A3100072669D /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -518,7 +536,9 @@
 		B563A4B3247D4996007101C7 /* Active Meeting Chat */ = {
 			isa = PBXGroup;
 			children = (
+				B560170B24AB4DDB0091692A /* ActiveMeetingChatDataSource.swift */,
 				B5619D2624977CA60072669D /* ActiveMeetingChatViewController.swift */,
+				B560170D24AB4E270091692A /* Views */,
 			);
 			path = "Active Meeting Chat";
 			sourceTree = "<group>";
@@ -1133,7 +1153,9 @@
 				B5704D362464436F00D9703A /* ViewControllerAlerts.swift in Sources */,
 				B59D19E72462DFDF008E2C2D /* JoinMeeting.swift in Sources */,
 				B59D19E024629FAE008E2C2D /* JoinMeetingView.swift in Sources */,
+				B560170F24AB4E420091692A /* ActiveMeetingChatTableViewCell.swift in Sources */,
 				B54D59A52451C13400454066 /* NewMeetingControlView.swift in Sources */,
+				B5EB976024AE058400F458B0 /* PlaceholderTextView.swift in Sources */,
 				B5704D682465369000D9703A /* ActiveMeetingView.swift in Sources */,
 				B5E4EA7424741B8400F48B38 /* CameraPlaceholderView.swift in Sources */,
 				B5619D25249776F00072669D /* PageContainerMember.swift in Sources */,
@@ -1167,9 +1189,11 @@
 				B59D19E52462DFCB008E2C2D /* ShowMeeting.swift in Sources */,
 				B594ABBD2499FF4F0042ED1F /* CameraPinView.swift in Sources */,
 				B54D59B2245307F600454066 /* ActiveMeetingViewController.swift in Sources */,
+				B560170C24AB4DDB0091692A /* ActiveMeetingChatDataSource.swift in Sources */,
 				B5BB0838244F28E80094F254 /* Storyboarded.swift in Sources */,
 				B54D59A32451BCDD00454066 /* NewMeetingViewController.swift in Sources */,
 				B5704D3224642DBA00D9703A /* Encode.swift in Sources */,
+				B560171124AB6B140091692A /* ActiveMeetingChatView.swift in Sources */,
 				B510D0E8248FCA63003FAEC0 /* ActivityIndicatorProvider.swift in Sources */,
 				B50195E0245717DC00DDF6AB /* UITextField.swift in Sources */,
 			);

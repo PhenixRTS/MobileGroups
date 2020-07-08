@@ -8,6 +8,8 @@ import UIKit
 class ActiveMeetingView: UIView {
     typealias ControlButtonHandler = (_ enabled: Bool) -> Void
 
+    var notificationCenter: NotificationCenter = .default
+
     var leaveMeetingHandler: (() -> Void)?
 
     var microphoneHandler: ControlButtonHandler?
@@ -19,6 +21,7 @@ class ActiveMeetingView: UIView {
     @IBOutlet private var leaveMeetingButton: ControlButton!
     @IBOutlet private var cameraButton: ControlButton!
     @IBOutlet private var containerView: UIView!
+    @IBOutlet private var containerViewBottomConstraint: NSLayoutConstraint!
 
     @IBAction
     private func leaveMeetingTapped(_ sender: ControlButton) {
@@ -42,6 +45,7 @@ class ActiveMeetingView: UIView {
     func configure(displayName: String) {
         configureButtons()
         cameraView.placeholderText = displayName
+        subscribeToNotifications()
     }
 
     func setMicrophoneControl(enabled: Bool) {
@@ -162,6 +166,46 @@ private extension ActiveMeetingView {
 
     func showCamera(_ show: Bool) {
         cameraView.showCamera = show
+    }
+
+    func subscribeToNotifications() {
+        notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
+        notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+    }
+
+    @objc
+    func adjustForKeyboard(notification: Notification) {
+        guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
+        guard let keyboardAnimationDuration = notification.userInfo?[UIResponder.keyboardAnimationDurationUserInfoKey] as? NSNumber else {
+            return
+        }
+
+        let keyboardScreenEndFrame = keyboardValue.cgRectValue
+        let keyboardAnimation = keyboardAnimationDuration.doubleValue
+
+        let keyboardViewEndFrame = convert(keyboardScreenEndFrame, from: window)
+
+        if notification.name == UIResponder.keyboardWillHideNotification {
+            containerViewBottomConstraint.constant = 0
+        } else {
+            containerViewBottomConstraint.constant = keyboardViewEndFrame.height - safeAreaInsets.bottom
+        }
+
+        UIView.animate(withDuration: keyboardAnimation) {
+            self.window?.layoutIfNeeded()
+        }
+    }
+}
+
+extension ActiveMeetingView: RoomMemberDelegate {
+    func roomMemberAudioStateDidChange(_ member: RoomMember, enabled: Bool) {
+        // Audio updated
+    }
+
+    func roomMemberVideoStateDidChange(_ member: RoomMember, enabled: Bool) {
+        DispatchQueue.main.async { [weak self] in
+            self?.showCamera(enabled)
+        }
     }
 }
 

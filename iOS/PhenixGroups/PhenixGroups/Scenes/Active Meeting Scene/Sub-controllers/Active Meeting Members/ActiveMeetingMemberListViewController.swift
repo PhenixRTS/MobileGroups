@@ -12,8 +12,6 @@ class ActiveMeetingMemberListViewController: UITableViewController, PageContaine
 
     weak var delegate: ActiveMeetingPreview?
 
-    lazy var pageIcon = UIImage(named: "meeting_members_icon")
-
     override func viewDidLoad() {
         super.viewDidLoad()
 

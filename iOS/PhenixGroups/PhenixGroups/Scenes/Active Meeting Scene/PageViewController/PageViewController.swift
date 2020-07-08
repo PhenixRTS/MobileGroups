@@ -28,6 +28,7 @@ class PageViewController: UIViewController {
     }
 
     func selectTab(_ index: Int) {
+        view.endEditing(true)
         move(toPage: index)
     }
 
@@ -144,7 +145,13 @@ private extension PageViewController {
     func makeTabButton(icon: UIImage?, title: String, tag: Int) -> TabBarButton {
         let button = TabBarButton(type: .system)
 
-        button.setImage(icon?.withRenderingMode(.alwaysOriginal), for: .normal)
+        button.setImage(icon, for: .normal)
+        if #available(iOS 13.0, *) {
+            button.tintColor = .label
+        } else {
+            button.tintColor = .black
+        }
+
         button.setTitle(title, for: .normal)
         button.addTarget(self, action: #selector(tabButtonTapped), for: .touchUpInside)
         button.tag = tag
@@ -171,6 +178,8 @@ private extension PageViewController {
         view.isPagingEnabled = true
         view.showsHorizontalScrollIndicator = false
         view.showsVerticalScrollIndicator = false
+        view.keyboardDismissMode = .onDrag
+
 
         return view
     }

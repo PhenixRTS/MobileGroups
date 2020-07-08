@@ -5,11 +5,40 @@
 import UIKit
 
 class ActiveMeetingChatViewController: UIViewController, PageContainerMember {
+    lazy var dataSource = ActiveMeetingChatDataSource()
     lazy var pageIcon = UIImage(named: "meeting_chat_icon")
+
+    var activeMeetingChatView: ActiveMeetingChatView {
+        view as! ActiveMeetingChatView
+    }
+
+    override func loadView() {
+        view = ActiveMeetingChatView()
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        view.backgroundColor = .gray
+        configureTableView()
+        activeMeetingChatView.sendMessageHandler = { [weak self] message in
+            self?.send(message: message)
+        }
+    }
+
+    func send(message: String) {
+        // TODO: Implement message sending
+    }
+}
+
+private extension ActiveMeetingChatViewController {
+    func configureTableView() {
+        activeMeetingChatView.chatTableView.dataSource = dataSource
+        activeMeetingChatView.chatTableView.register(ActiveMeetingChatTableViewCell.self, forCellReuseIdentifier: ActiveMeetingChatTableViewCell.identifier)
+        activeMeetingChatView.chatTableView.estimatedRowHeight = 20
+        activeMeetingChatView.chatTableView.rowHeight = UITableView.automaticDimension
+        activeMeetingChatView.chatTableView.allowsSelection = false
+        activeMeetingChatView.chatTableView.separatorStyle = .none
+        activeMeetingChatView.chatTableView.keyboardDismissMode = .onDrag
+        activeMeetingChatView.chatTableView.tableFooterView = UIView()
     }
 }
