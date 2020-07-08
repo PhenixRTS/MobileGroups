@@ -52,7 +52,7 @@ data class RoomMember(
     var isMuted = false
     var isOffscreen = false
 
-    private fun observeMember(){
+    private fun observeMember() {
         try {
             if (!isObserved) {
                 Timber.d("Observing member: ${toString()}")
@@ -120,7 +120,7 @@ data class RoomMember(
     }
 
     private fun readFrame(frame: FrameNotification) = synchronized(audioBuffer) {
-        frame.read(object: AndroidReadAudioFrameCallback() {
+        frame.read(object : AndroidReadAudioFrameCallback() {
             override fun onAudioFrameEvent(audioFrame: AndroidAudioFrame?) {
                 audioFrame?.audioSamples?.let { samples ->
                     val now = System.currentTimeMillis()
@@ -164,7 +164,11 @@ data class RoomMember(
         }
     }
 
-    fun setSelfRenderer(renderer: Renderer?, videoRenderSurface: AndroidVideoRenderSurface, audioTrack: MediaStreamTrack?) {
+    fun setSelfRenderer(
+        renderer: Renderer?,
+        videoRenderSurface: AndroidVideoRenderSurface,
+        audioTrack: MediaStreamTrack?
+    ) {
         this.renderer = renderer
         this.videoRenderSurface = videoRenderSurface
         this.audioTrack = audioTrack
@@ -172,7 +176,10 @@ data class RoomMember(
 
     fun startMemberRenderer(): RendererStartStatus {
         if (renderer == null) {
-            renderer = subscriber?.createRenderer()
+            var renderOptions = RendererOptions()
+            renderOptions.audioEchoCancelationMode = AudioEchoCancelationMode.ON
+
+            renderer = subscriber?.createRenderer(renderOptions)
         }
         if (audioTrack == null) {
             audioTrack = subscriber?.audioTracks?.getOrNull(0)
@@ -186,7 +193,8 @@ data class RoomMember(
         Timber.d("Set surface holder called: ${toString()}")
         videoRenderSurface.setSurfaceHolder(if (isActiveRenderer) mainSurface else previewSurface)
         if (!isRendererStarted && !isSelf) {
-            val rendererStartStatus = renderer?.start(videoRenderSurface) ?: RendererStartStatus.FAILED
+            val rendererStartStatus =
+                renderer?.start(videoRenderSurface) ?: RendererStartStatus.FAILED
             isRendererStarted = rendererStartStatus == RendererStartStatus.OK
             status = if (canShowPreview) rendererStartStatus else status
             Timber.d("Started video renderer: $status : ${toString()}")

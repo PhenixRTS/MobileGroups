@@ -5,26 +5,28 @@
 package com.phenixrts.suite.groups.viewmodels
 
 import android.view.SurfaceHolder
-import androidx.lifecycle.*
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.express.SubscribeToMemberStreamOptions
-import com.phenixrts.pcast.MediaStreamTrack
-import com.phenixrts.pcast.Renderer
-import com.phenixrts.pcast.RendererStartStatus
+import com.phenixrts.pcast.*
 import com.phenixrts.pcast.android.AndroidVideoRenderSurface
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
 import com.phenixrts.suite.groups.cache.entities.RoomInfoItem
 import com.phenixrts.suite.groups.common.extensions.expirationDate
 import com.phenixrts.suite.groups.common.extensions.isTrue
-import com.phenixrts.suite.groups.models.RoomMessage
+import com.phenixrts.suite.groups.common.extensions.launchIO
+import com.phenixrts.suite.groups.common.extensions.launchMain
 import com.phenixrts.suite.groups.models.JoinedRoomStatus
 import com.phenixrts.suite.groups.models.RoomMember
+import com.phenixrts.suite.groups.models.RoomMessage
 import com.phenixrts.suite.groups.models.RoomStatus
-import com.phenixrts.suite.groups.repository.*
-import com.phenixrts.suite.phenixcommon.common.launchIO
-import com.phenixrts.suite.phenixcommon.common.launchMain
+import com.phenixrts.suite.groups.repository.JoinedRoomRepository
+import com.phenixrts.suite.groups.repository.RepositoryProvider
+import com.phenixrts.suite.groups.repository.RoomMemberRepository
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -178,7 +180,10 @@ class GroupsViewModel(
             getUserMediaStream()?.let { userMediaStream ->
                 status = RequestStatus.OK
                 if (userMediaRenderer == null) {
-                    userMediaRenderer = userMediaStream.mediaStream?.createRenderer()
+                    var renderOptions = RendererOptions()
+                    renderOptions.audioEchoCancelationMode = AudioEchoCancelationMode.ON
+
+                    userMediaRenderer = userMediaStream.mediaStream?.createRenderer(renderOptions)
                     userAudioTrack = userMediaStream.mediaStream?.audioTracks?.getOrNull(0)
                     val renderStatus = userMediaRenderer?.start(mainRendererSurface)
                     if (renderStatus != RendererStartStatus.OK) {
