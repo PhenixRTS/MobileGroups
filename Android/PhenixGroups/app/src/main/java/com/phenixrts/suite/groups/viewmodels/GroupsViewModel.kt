@@ -18,8 +18,7 @@ import com.phenixrts.suite.groups.cache.PreferenceProvider
 import com.phenixrts.suite.groups.cache.entities.RoomInfoItem
 import com.phenixrts.suite.groups.common.extensions.expirationDate
 import com.phenixrts.suite.groups.common.extensions.isTrue
-import com.phenixrts.suite.groups.common.extensions.launchIO
-import com.phenixrts.suite.groups.common.extensions.launchMain
+import com.phenixrts.suite.groups.common.getRendererOptions
 import com.phenixrts.suite.groups.models.JoinedRoomStatus
 import com.phenixrts.suite.groups.models.RoomMember
 import com.phenixrts.suite.groups.models.RoomMessage
@@ -27,6 +26,8 @@ import com.phenixrts.suite.groups.models.RoomStatus
 import com.phenixrts.suite.groups.repository.JoinedRoomRepository
 import com.phenixrts.suite.groups.repository.RepositoryProvider
 import com.phenixrts.suite.groups.repository.RoomMemberRepository
+import com.phenixrts.suite.phenixcommon.common.launchIO
+import com.phenixrts.suite.phenixcommon.common.launchMain
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -180,10 +181,7 @@ class GroupsViewModel(
             getUserMediaStream()?.let { userMediaStream ->
                 status = RequestStatus.OK
                 if (userMediaRenderer == null) {
-                    var renderOptions = RendererOptions()
-                    renderOptions.audioEchoCancelationMode = AudioEchoCancelationMode.ON
-
-                    userMediaRenderer = userMediaStream.mediaStream?.createRenderer(renderOptions)
+                    userMediaRenderer = userMediaStream.mediaStream?.createRenderer(getRendererOptions())
                     userAudioTrack = userMediaStream.mediaStream?.audioTracks?.getOrNull(0)
                     val renderStatus = userMediaRenderer?.start(mainRendererSurface)
                     if (renderStatus != RendererStartStatus.OK) {

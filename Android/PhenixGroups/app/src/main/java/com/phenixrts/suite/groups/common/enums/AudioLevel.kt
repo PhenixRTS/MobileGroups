@@ -6,6 +6,7 @@ package com.phenixrts.suite.groups.common.enums
 
 import com.phenixrts.suite.groups.R
 
+@Suppress("unused")
 enum class AudioLevel(private val range: IntRange, val icon: Int) {
     VOLUME_0(Short.MIN_VALUE .. -70, R.drawable.ic_volume_0),
     VOLUME_1(-70 .. -60, R.drawable.ic_volume_1),

@@ -52,3 +52,7 @@ fun getUserMediaOptions(facingMode: FacingMode = FacingMode.USER): UserMediaOpti
     audioOptions.capabilityConstraints[DeviceCapability.AUDIO_ECHO_CANCELATION_MODE] =
         listOf(DeviceConstraint(AudioEchoCancelationMode.ON))
 }
+
+fun getRendererOptions(): RendererOptions = RendererOptions().apply {
+    audioEchoCancelationMode = AudioEchoCancelationMode.ON
+}

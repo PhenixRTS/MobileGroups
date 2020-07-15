@@ -2,6 +2,8 @@
  * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
+@file:Suppress("RemoveToStringInStringTemplate")
+
 package com.phenixrts.suite.groups.models
 
 import android.view.SurfaceHolder
@@ -18,6 +20,7 @@ import com.phenixrts.room.MemberState
 import com.phenixrts.room.TrackState
 import com.phenixrts.suite.groups.common.enums.AudioLevel
 import com.phenixrts.suite.groups.common.extensions.call
+import com.phenixrts.suite.groups.common.getRendererOptions
 import com.phenixrts.suite.phenixcommon.common.launchMain
 import timber.log.Timber
 import kotlin.math.abs
@@ -42,8 +45,8 @@ data class RoomMember(
     private var mainSurface: SurfaceHolder? = null
     private var previewSurface: SurfaceHolder? = null
 
-    val onUpdate: MutableLiveData<RoomMember> = MutableLiveData<RoomMember>()
-    var audioLevel: MutableLiveData<AudioLevel> = MutableLiveData<AudioLevel>()
+    val onUpdate: MutableLiveData<RoomMember> = MutableLiveData()
+    var audioLevel: MutableLiveData<AudioLevel> = MutableLiveData()
     var previewSurfaceView: SurfaceView? = null
     var canRenderVideo = false
     var canShowPreview = false
@@ -176,10 +179,7 @@ data class RoomMember(
 
     fun startMemberRenderer(): RendererStartStatus {
         if (renderer == null) {
-            var renderOptions = RendererOptions()
-            renderOptions.audioEchoCancelationMode = AudioEchoCancelationMode.ON
-
-            renderer = subscriber?.createRenderer(renderOptions)
+            renderer = subscriber?.createRenderer(getRendererOptions())
         }
         if (audioTrack == null) {
             audioTrack = subscriber?.audioTracks?.getOrNull(0)

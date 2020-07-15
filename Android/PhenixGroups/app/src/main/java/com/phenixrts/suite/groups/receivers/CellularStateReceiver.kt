@@ -35,6 +35,7 @@ class CellularStateReceiver(context: Context) : PhoneStateListener() {
             when (state) {
                 TelephonyManager.CALL_STATE_OFFHOOK -> callback?.onAnswered()
                 TelephonyManager.CALL_STATE_IDLE -> callback?.onHungUp()
+                TelephonyManager.CALL_STATE_RINGING -> { /* Ignored */ }
             }
         }
     }
