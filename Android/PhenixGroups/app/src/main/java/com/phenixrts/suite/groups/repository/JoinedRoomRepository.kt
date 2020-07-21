@@ -5,7 +5,7 @@
 package com.phenixrts.suite.groups.repository
 
 import androidx.lifecycle.MutableLiveData
-import com.phenixrts.chat.RoomChatServiceFactory
+import com.phenixrts.chat.RoomChatService
 import com.phenixrts.common.Disposable
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.express.ExpressPublisher
@@ -24,11 +24,11 @@ import kotlin.coroutines.suspendCoroutine
 
 class JoinedRoomRepository(
     private val roomService: RoomService,
+    private val chatService: RoomChatService,
     private val publisher: ExpressPublisher,
     private val dateRoomLeft: Date
 ) {
 
-    private val chatService = RoomChatServiceFactory.createRoomChatService(roomService)
     private val disposables: MutableList<Disposable?> = mutableListOf()
     private val chatHistory = MutableLiveData<List<RoomMessage>>()
     private var isViewingChat = false
@@ -72,7 +72,7 @@ class JoinedRoomRepository(
 
     fun sendChatMessage(message: String, continuation: Continuation<RoomStatus>) {
         Timber.d("Sending message: $message")
-        chatService?.sendMessageToRoom(message) { status, errorMessage ->
+        chatService.sendMessageToRoom(message) { status, errorMessage ->
             if (status == RequestStatus.OK) {
                 Timber.d("Message sent: $message $chatService")
                 continuation.resume(RoomStatus(status))
@@ -80,7 +80,7 @@ class JoinedRoomRepository(
                 Timber.w("Message is not sent: $errorMessage")
                 continuation.resume(RoomStatus(status, errorMessage))
             }
-        } ?: continuation.resume(RoomStatus(RequestStatus.NOT_INITIALIZED, "Chat Service is not initialized"))
+        }
     }
 
     fun switchVideoStreamState(enabled: Boolean) = launchIO {

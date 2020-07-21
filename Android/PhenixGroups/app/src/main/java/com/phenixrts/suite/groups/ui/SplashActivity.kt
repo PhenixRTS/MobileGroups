@@ -8,7 +8,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import androidx.appcompat.app.AlertDialog
-import androidx.fragment.app.FragmentActivity
 import com.phenixrts.suite.groups.BuildConfig
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.R
@@ -20,7 +19,7 @@ import com.phenixrts.suite.phenixcommon.common.launchMain
 import timber.log.Timber
 import javax.inject.Inject
 
-class SplashActivity : FragmentActivity() {
+class SplashActivity : EasyPermissionActivity() {
 
     @Inject lateinit var repositoryProvider: RepositoryProvider
     @Inject lateinit var preferenceProvider: PreferenceProvider
@@ -78,7 +77,18 @@ class SplashActivity : FragmentActivity() {
         }
         preferenceProvider.saveConfiguration(null)
         preferenceProvider.saveRoomAlias(null)
-        showLandingScreen(deepLinkModel)
+
+        if (arePermissionsGranted()) {
+            showLandingScreen(deepLinkModel)
+        } else {
+            askForPermissions { granted ->
+                if (granted) {
+                    showLandingScreen(deepLinkModel)
+                } else {
+                    checkDeepLink(intent)
+                }
+            }
+        }
     }
 
     private fun reloadConfiguration(configuration: RoomExpressConfiguration) {

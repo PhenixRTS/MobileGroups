@@ -26,8 +26,9 @@ class RoomListAdapter(private val callback: OnRoomJoin) : RecyclerView.Adapter<R
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.binding.room = data[position]
+        holder.binding.roomRejoinButton.tag = data[position].roomId
         holder.binding.roomRejoinButton.setOnClickListener {
-            callback.onRoomJoinClicked(data[position].roomId)
+            callback.onRoomJoinClicked(it.tag as String)
         }
     }
 

@@ -4,7 +4,6 @@
 
 package com.phenixrts.suite.groups.ui
 
-import android.Manifest
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
@@ -330,23 +329,19 @@ class MainActivity : EasyPermissionActivity() {
 
     private suspend fun setCameraPreviewEnabled(enabled: Boolean): Unit = suspendCoroutine { continuation ->
         Timber.d("Camera preview enabled: $enabled")
-        askForPermission(Manifest.permission.CAMERA) { granted ->
-            launchMain {
-                viewModel.isVideoEnabled.value = granted && enabled
-                Timber.d("Camera state changed: $enabled $granted")
-                continuation.resume(Unit)
-            }
+        launchMain {
+            viewModel.isVideoEnabled.value = enabled
+            Timber.d("Camera state changed: $enabled")
+            continuation.resume(Unit)
         }
     }
 
     private suspend fun setMicrophoneEnabled(enabled: Boolean): Unit = suspendCoroutine { continuation ->
         Timber.d("Microphone enabled: $enabled")
-        askForPermission(Manifest.permission.RECORD_AUDIO) { granted ->
-            launchMain {
-                viewModel.isMicrophoneEnabled.value = granted && enabled
-                Timber.d("Microphone state changed: $enabled $granted")
-                continuation.resume(Unit)
-            }
+        launchMain {
+            viewModel.isMicrophoneEnabled.value = enabled
+            Timber.d("Microphone state changed: $enabled")
+            continuation.resume(Unit)
         }
     }
 

@@ -12,4 +12,7 @@ data class JoinedRoomStatus(
     val status: RequestStatus,
     val roomService: RoomService? = null,
     val publisher: ExpressPublisher? = null
-)
+) {
+
+    fun isConnected() = status == RequestStatus.OK && roomService != null && publisher != null
+}

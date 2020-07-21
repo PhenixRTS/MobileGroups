@@ -15,11 +15,7 @@ import com.phenixrts.suite.phenixcommon.common.launchMain
 import com.phenixrts.suite.groups.common.extensions.showToast
 import com.phenixrts.suite.groups.databinding.FragmentChatBinding
 import com.phenixrts.suite.groups.ui.adapters.ChatListAdapter
-import kotlinx.coroutines.delay
 import timber.log.Timber
-
-// Delay before observing chat messages - SDK bug
-private const val CHAT_SUBSCRIPTION_DELAY = 2000L
 
 class ChatFragment : BaseFragment() {
 
@@ -43,7 +39,6 @@ class ChatFragment : BaseFragment() {
     }
 
     private fun observeMessages() = launchMain {
-        delay(CHAT_SUBSCRIPTION_DELAY)
         if (isAdded) {
             viewModel.getChatMessages().observe(viewLifecycleOwner, Observer { messages ->
                 launchMain {

@@ -9,6 +9,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
+import com.phenixrts.chat.RoomChatServiceFactory
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.express.SubscribeToMemberStreamOptions
 import com.phenixrts.pcast.*
@@ -28,13 +29,17 @@ import com.phenixrts.suite.groups.repository.RepositoryProvider
 import com.phenixrts.suite.groups.repository.RoomMemberRepository
 import com.phenixrts.suite.phenixcommon.common.launchIO
 import com.phenixrts.suite.phenixcommon.common.launchMain
+import kotlinx.coroutines.CancellableContinuation
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
 import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+
+// Delay before observing chat messages - SDK bug
+private const val CHAT_SUBSCRIPTION_DELAY = 2000L
 
 class GroupsViewModel(
     private val cacheProvider: CacheProvider,
@@ -81,22 +86,26 @@ class GroupsViewModel(
         }
     }
 
-    private fun handleJoinedRoom(joinedRoomStatus: JoinedRoomStatus) {
-        if (joinedRoomStatus.status == RequestStatus.OK) {
-            joinedRoomStatus.roomService?.let { roomService ->
-                joinedRoomStatus.publisher?.let { publisher ->
-                    runBlocking {
-                        val selfMember = RoomMember(roomService.self, true)
-                        selfMember.setSelfRenderer(userMediaRenderer, mainRendererSurface, userAudioTrack)
-                        val roomAlias = roomService.observableActiveRoom.value.observableAlias.value
-                        currentRoomAlias.value = roomAlias
-                        val dateRoomLeft = getRoomDateLeft(roomAlias)
-                        Timber.d("Joined room repository created: $roomAlias $dateRoomLeft")
-                        joinedRoomRepository = JoinedRoomRepository(roomService, publisher, dateRoomLeft)
-                        roomMemberRepository = RoomMemberRepository(repositoryProvider.roomExpress!!, roomService, selfMember)
-                        // Update audio / video state
-                        joinedRoomRepository?.switchAudioStreamState(isMicrophoneEnabled.isTrue())
-                        joinedRoomRepository?.switchVideoStreamState(isVideoEnabled.isTrue())
+    private fun handleJoinedRoom(joinedRoomStatus: JoinedRoomStatus,
+                                 continuation: CancellableContinuation<JoinedRoomStatus>) {
+        joinedRoomStatus.roomService?.let { roomService ->
+            joinedRoomStatus.publisher?.let { publisher ->
+                launchMain {
+                    delay(CHAT_SUBSCRIPTION_DELAY)
+                    val selfMember = RoomMember(roomService.self, true)
+                    selfMember.setSelfRenderer(userMediaRenderer, mainRendererSurface, userAudioTrack)
+                    val roomAlias = roomService.observableActiveRoom.value.observableAlias.value
+                    currentRoomAlias.value = roomAlias
+                    val dateRoomLeft = getRoomDateLeft(roomAlias)
+                    Timber.d("Joined room repository created: $roomAlias $dateRoomLeft")
+                    val chatService = RoomChatServiceFactory.createRoomChatService(roomService)
+                    joinedRoomRepository = JoinedRoomRepository(roomService, chatService, publisher, dateRoomLeft)
+                    roomMemberRepository = RoomMemberRepository(repositoryProvider.roomExpress!!, roomService, selfMember)
+                    // Update audio / video state
+                    joinedRoomRepository?.switchAudioStreamState(isMicrophoneEnabled.isTrue())
+                    joinedRoomRepository?.switchVideoStreamState(isVideoEnabled.isTrue())
+                    if (continuation.isActive) {
+                        continuation.resume(joinedRoomStatus)
                     }
                 }
             }
@@ -135,9 +144,8 @@ class GroupsViewModel(
             launchMain {
                 val joinedRoomStatus = getRoomRepository()?.joinRoomById(roomId, userScreenName, userMediaStream)
                     ?: JoinedRoomStatus(RequestStatus.FAILED)
-                handleJoinedRoom(joinedRoomStatus)
-                if (continuation.isActive) {
-                    continuation.resume(joinedRoomStatus)
+                if (joinedRoomStatus.isConnected()) {
+                    handleJoinedRoom(joinedRoomStatus, continuation)
                 }
             }
         }
@@ -151,9 +159,8 @@ class GroupsViewModel(
                 Timber.d("Joining room by alias: $roomAlias")
                 val joinedRoomStatus = getRoomRepository()?.joinRoomByAlias(roomAlias, userScreenName, userMediaStream)
                     ?: JoinedRoomStatus(RequestStatus.FAILED)
-                handleJoinedRoom(joinedRoomStatus)
-                if (continuation.isActive) {
-                    continuation.resume(joinedRoomStatus)
+                if (joinedRoomStatus.isConnected()) {
+                    handleJoinedRoom(joinedRoomStatus, continuation)
                 }
             }
         }

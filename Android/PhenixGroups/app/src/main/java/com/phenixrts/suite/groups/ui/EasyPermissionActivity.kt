@@ -26,13 +26,21 @@ open class EasyPermissionActivity : FragmentActivity() {
     fun hasRecordAudioPermission(): Boolean =
         ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PERMISSION_GRANTED
 
-    fun askForPermission(permission: String, callback: (granted: Boolean) -> Unit) {
+    fun arePermissionsGranted(): Boolean = hasCameraPermission() && hasRecordAudioPermission()
+
+    fun askForPermissions(callback: (granted: Boolean) -> Unit) {
         run {
-            if (ContextCompat.checkSelfPermission(this, permission) != PERMISSION_GRANTED) {
-                // RequestCode supports only low 16 bits of int
+            val permissions = arrayListOf<String>()
+            if (!hasRecordAudioPermission()) {
+                permissions.add(Manifest.permission.RECORD_AUDIO)
+            }
+            if (!hasCameraPermission()) {
+                permissions.add(Manifest.permission.CAMERA)
+            }
+            if (permissions.isNotEmpty()) {
                 val requestCode = Date().time.toInt().low16bits()
                 permissionRequestHistory[requestCode] = callback
-                ActivityCompat.requestPermissions(this, arrayOf(permission), requestCode)
+                ActivityCompat.requestPermissions(this, permissions.toTypedArray(), requestCode)
             } else {
                 callback(true)
             }
