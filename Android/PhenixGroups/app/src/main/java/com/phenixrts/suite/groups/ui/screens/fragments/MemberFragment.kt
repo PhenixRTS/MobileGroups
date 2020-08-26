@@ -8,8 +8,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
-import com.phenixrts.suite.groups.common.extensions.*
+import com.phenixrts.suite.groups.common.extensions.getMicIcon
+import com.phenixrts.suite.groups.common.extensions.getSurfaceView
 import com.phenixrts.suite.groups.databinding.FragmentMembersBinding
 import com.phenixrts.suite.groups.models.RoomMember
 import com.phenixrts.suite.groups.ui.adapters.MemberListAdapter
@@ -31,7 +31,7 @@ class MemberFragment : BaseFragment(), MemberListAdapter.OnMemberListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.getRoomMembers().observe(viewLifecycleOwner, Observer { roomMembers ->
+        viewModel.getRoomMembers().observe(viewLifecycleOwner, { roomMembers ->
             roomMembers?.let { members ->
                 Timber.d("Member adapter updated ${members.size} $members")
                 viewModel.memberCount.value = members.size

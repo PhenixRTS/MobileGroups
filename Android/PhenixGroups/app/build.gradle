@@ -8,11 +8,11 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: "kotlin-kapt"
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     defaultConfig {
         applicationId "com.phenixrts.suite.groups"
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 4
         versionName "2020.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -61,24 +61,24 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinx_coroutines_version"
 
     // Android
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'androidx.core:core-ktx:1.3.0'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.core:core-ktx:1.3.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.0'
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
     implementation 'com.google.code.gson:gson:2.8.6'
 
     // Material
-    implementation 'com.google.android.material:material:1.1.0'
+    implementation 'com.google.android.material:material:1.2.0'
 
     // Phenix
     implementation "com.phenixrts.android:phenix-sdk-android:$phenix_version"
 
     // Dagger
-    kapt 'com.google.dagger:dagger-compiler:2.28.1'
-    kapt 'com.google.dagger:dagger-android-processor:2.28.1'
-    implementation 'com.google.dagger:dagger-android-support:2.28.1'
+    kapt 'com.google.dagger:dagger-compiler:2.28.3'
+    kapt 'com.google.dagger:dagger-android-processor:2.28.3'
+    implementation 'com.google.dagger:dagger-android-support:2.28.3'
 
     // Timber
     implementation 'com.jakewharton.timber:timber:4.7.1'
@@ -92,6 +92,6 @@ dependencies {
     testImplementation 'junit:junit:4.13'
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlinx_coroutines_version"
     testImplementation 'org.robolectric:robolectric:4.3.1'
-    testImplementation 'androidx.test:core:1.2.0'
+    testImplementation 'androidx.test:core:1.3.0'
 
 }

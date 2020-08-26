@@ -7,7 +7,6 @@ package com.phenixrts.suite.groups.ui.adapters
 import android.view.*
 import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.phenixrts.suite.groups.common.extensions.isFalse
 import com.phenixrts.suite.groups.common.extensions.isTrue
@@ -54,7 +53,7 @@ class MemberListAdapter(
         roomMember.setSurfaces(mainSurface.holder, holder.binding.memberSurface)
         holder.binding.lifecycleOwner?.let { owner ->
             holder.binding.member?.onUpdate?.removeObservers(owner)
-            holder.binding.member?.onUpdate?.observe(owner, Observer { member ->
+            holder.binding.member?.onUpdate?.observe(owner, { member ->
                 Timber.d("Member updated: $member")
                 holder.binding.refresh()
                 updateMemberStream(member)
@@ -62,7 +61,7 @@ class MemberListAdapter(
         }
         holder.binding.lifecycleOwner?.let { owner ->
             holder.binding.member?.audioLevel?.removeObservers(owner)
-            holder.binding.member?.audioLevel?.observe(owner, Observer { volume ->
+            holder.binding.member?.audioLevel?.observe(owner, { volume ->
                 holder.binding.memberVolumeIndicator.setImageResource(volume.icon)
                 holder.binding.refresh()
             })
@@ -125,7 +124,7 @@ class MemberListAdapter(
         notifyDataSetChanged()
     }
 
-    inner class ViewHolder(val binding: RowMemberItemBinding) : RecyclerView.ViewHolder(binding.root)
+    class ViewHolder(val binding: RowMemberItemBinding) : RecyclerView.ViewHolder(binding.root)
 
     interface OnMemberListener {
         fun onMemberClicked(roomMember: RoomMember)

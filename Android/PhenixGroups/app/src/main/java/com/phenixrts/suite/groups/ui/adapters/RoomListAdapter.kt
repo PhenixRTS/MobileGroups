@@ -32,9 +32,9 @@ class RoomListAdapter(private val callback: OnRoomJoin) : RecyclerView.Adapter<R
         }
     }
 
-    inner class ViewHolder(val binding: RowRoomItemBinding) : RecyclerView.ViewHolder(binding.root)
+    class ViewHolder(val binding: RowRoomItemBinding) : RecyclerView.ViewHolder(binding.root)
 
-    inner class RoomInfoDiff(private val oldItems: List<RoomInfoItem>,
+    class RoomInfoDiff(private val oldItems: List<RoomInfoItem>,
                              private val newItems: List<RoomInfoItem>
     ) : DiffUtil.Callback() {
 

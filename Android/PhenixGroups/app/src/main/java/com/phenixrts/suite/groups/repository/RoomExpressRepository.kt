@@ -103,15 +103,9 @@ class RoomExpressRepository(
         joinRoom(publishToRoomOptions, continuation)
     }
 
-    fun dispose() = try {
+    fun dispose() {
         isDisposed = true
-        // TODO: Neither of these can be disposed without breaking UserMediaStream
-        //roomExpress.pCastExpress.pCast.dispose()
-        //roomExpress.pCastExpress.dispose()
-        //roomExpress.dispose()
         Timber.d("Room express repository disposed")
-    } catch (e: Exception) {
-        Timber.d("Failed to dispose room express repository")
     }
 
 }

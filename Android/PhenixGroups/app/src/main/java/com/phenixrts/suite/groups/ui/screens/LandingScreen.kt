@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.Observer
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.common.extensions.*
@@ -55,7 +54,7 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
         viewModel.displayName.value = preferenceProvider.getDisplayName()
         viewModel.isControlsEnabled.value = true
         viewModel.isInRoom.value = false
-        viewModel.roomList.observe(viewLifecycleOwner, Observer {
+        viewModel.roomList.observe(viewLifecycleOwner, {
             Timber.d("Room list data changed $it")
             roomAdapter.data = it
         })

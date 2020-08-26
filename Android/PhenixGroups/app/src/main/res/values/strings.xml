@@ -51,8 +51,6 @@
     <string name="err_chat_message_failed">Failed to send chat message: %1$s</string>
     <string name="err_create_room_failed">Failed to create new meeting</string>
     <string name="err_join_room_failed">Failed to join meeting</string>
-    <string name="err_camera_lost">Phenix Groups has lost access to camera</string>
-    <string name="err_microphone_lost">Phenix Groups has lost access to microphone</string>
     <string name="err_network_problems">Experiencing problems connecting to Phenix. Check your network status.</string>
     <string name="err_enter_valid_room_code">Please enter a valid room code</string>
     <string name="err_configuration_changed">Configuration has changed. Please start the app again to apply the changes.</string>

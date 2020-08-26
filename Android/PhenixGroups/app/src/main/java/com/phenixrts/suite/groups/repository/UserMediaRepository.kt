@@ -5,6 +5,7 @@
 package com.phenixrts.suite.groups.repository
 
 import android.os.Handler
+import android.os.Looper
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.express.*
 import com.phenixrts.pcast.*
@@ -21,20 +22,24 @@ class UserMediaRepository(private val roomExpress: RoomExpress) {
     private var mediaStateCallback: OnMediaStateChange? = null
     private var isDisposed = false
 
-    private val audioFailureHandler = Handler()
-    private val videoFailureHandler = Handler()
-    private val audioFailureRunnable = Runnable {
+    private val microphoneFailureHandler = Handler(Looper.getMainLooper())
+    private val cameraFailureHandler = Handler(Looper.getMainLooper())
+    private val microphoneFailureRunnable = Runnable {
         if (!isDisposed) {
             Timber.d("Audio recording has stopped")
-            mediaStateCallback?.onMicrophoneLost()
+            mediaStateCallback?.onMicrophoneStateChanged(false)
+            isMicrophoneAvailable = false
         }
     }
     private val videoFailureRunnable = Runnable {
         if (!isDisposed) {
             Timber.d("Video recording is stopped")
-            mediaStateCallback?.onCameraLost()
+            mediaStateCallback?.onCameraStateChanged(false)
+            isCameraAvailable = false
         }
     }
+    private var isMicrophoneAvailable = false
+    private var isCameraAvailable = false
 
     var userMediaStream: UserMediaStream? = null
 
@@ -42,14 +47,22 @@ class UserMediaRepository(private val roomExpress: RoomExpress) {
         userMediaStream?.apply {
             mediaStream.videoTracks.getOrNull(0)?.let { videoTrack ->
                 setFrameReadyCallback(videoTrack) {
-                    videoFailureHandler.removeCallbacks(videoFailureRunnable)
-                    videoFailureHandler.postDelayed(videoFailureRunnable, FAILURE_TIMEOUT)
+                    if (!isCameraAvailable) {
+                        mediaStateCallback?.onCameraStateChanged(true)
+                        isCameraAvailable = true
+                    }
+                    cameraFailureHandler.removeCallbacks(videoFailureRunnable)
+                    cameraFailureHandler.postDelayed(videoFailureRunnable, FAILURE_TIMEOUT)
                 }
             }
             mediaStream.audioTracks.getOrNull(0)?.let { audioTrack ->
                 setFrameReadyCallback(audioTrack) {
-                    audioFailureHandler.removeCallbacks(audioFailureRunnable)
-                    audioFailureHandler.postDelayed(audioFailureRunnable, FAILURE_TIMEOUT)
+                    if (!isMicrophoneAvailable) {
+                        mediaStateCallback?.onMicrophoneStateChanged(true)
+                        isMicrophoneAvailable = true
+                    }
+                    microphoneFailureHandler.removeCallbacks(microphoneFailureRunnable)
+                    microphoneFailureHandler.postDelayed(microphoneFailureRunnable, FAILURE_TIMEOUT)
                 }
             }
         }
@@ -92,18 +105,14 @@ class UserMediaRepository(private val roomExpress: RoomExpress) {
         mediaStateCallback = callback
     }
 
-    fun dispose() = try {
+    fun dispose() {
         isDisposed = true
-        // TODO: User media cannot be disposed without breaking the rendering and streaming
-        //userMediaStream?.dispose()
         Timber.d("User media repository disposed")
-    } catch (e: Exception) {
-        Timber.d("Failed to dispose user media repository")
     }
 
     interface OnMediaStateChange {
-        fun onMicrophoneLost()
-        fun onCameraLost()
+        fun onMicrophoneStateChanged(available: Boolean)
+        fun onCameraStateChanged(available: Boolean)
     }
 
     private companion object {

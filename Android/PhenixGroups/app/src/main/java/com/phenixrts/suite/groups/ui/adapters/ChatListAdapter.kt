@@ -31,10 +31,11 @@ class ChatListAdapter : RecyclerView.Adapter<ChatListAdapter.ViewHolder>() {
         holder.binding.chatMessage = data[position]
     }
 
-    inner class ViewHolder(val binding: RowChatMessageItemBinding) : RecyclerView.ViewHolder(binding.root)
+    class ViewHolder(val binding: RowChatMessageItemBinding) : RecyclerView.ViewHolder(binding.root)
 
-    inner class ChatMessageDiff(private val oldItems: List<RoomMessage>,
-                                private val newItems: List<RoomMessage>
+    class ChatMessageDiff(
+        private val oldItems: List<RoomMessage>,
+        private val newItems: List<RoomMessage>
     ) : DiffUtil.Callback() {
 
         override fun getOldListSize() = oldItems.size

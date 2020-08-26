@@ -5,6 +5,7 @@
 package com.phenixrts.suite.groups.repository
 
 import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.MutableLiveData
 import com.phenixrts.common.Disposable
 import com.phenixrts.common.RequestStatus
@@ -32,7 +33,7 @@ class RoomMemberRepository(
 
     private val disposables: MutableList<Disposable?> = mutableListOf()
     private val roomMembers = MutableLiveData<List<RoomMember>>()
-    private val memberPickerHandler = Handler()
+    private val memberPickerHandler = Handler(Looper.getMainLooper())
     private val memberPickerRunnable = Runnable {
         pickLoudestMember()
     }
@@ -126,7 +127,7 @@ class RoomMemberRepository(
             if (members.find { it.isPinned } == null) {
                 members
                     .filter { !it.isSelf && it.canRenderVideo }
-                    .maxBy { it.audioLevel.value?.ordinal ?: AudioLevel.VOLUME_0.ordinal }
+                    .maxByOrNull { it.audioLevel.value?.ordinal ?: AudioLevel.VOLUME_0.ordinal }
                     ?.run {
                         // Update if not active already
                         if (!isActiveRenderer) {

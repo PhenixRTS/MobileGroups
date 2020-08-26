@@ -6,6 +6,8 @@ package com.phenixrts.suite.groups
 
 import android.app.Application
 import android.content.res.Resources
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
 import com.phenixrts.suite.phenixcommon.common.FileWriterDebugTree
 import com.phenixrts.suite.groups.injection.DaggerInjectionComponent
 import com.phenixrts.suite.groups.injection.InjectionComponent
@@ -13,7 +15,11 @@ import com.phenixrts.suite.groups.injection.InjectionModule
 import timber.log.Timber
 import javax.inject.Inject
 
-class GroupsApplication: Application() {
+class GroupsApplication: Application(), ViewModelStoreOwner {
+
+    private val appViewModelStore: ViewModelStore by lazy {
+        ViewModelStore()
+    }
 
     @Inject
     lateinit var fileWriterTree: FileWriterDebugTree
@@ -31,6 +37,8 @@ class GroupsApplication: Application() {
         }
         resourceContext = resources
     }
+
+    override fun getViewModelStore() = appViewModelStore
 
     companion object {
         lateinit var component: InjectionComponent

@@ -7,7 +7,6 @@ package com.phenixrts.suite.groups.viewmodels
 import android.view.SurfaceHolder
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.phenixrts.chat.RoomChatServiceFactory
 import com.phenixrts.common.RequestStatus
@@ -125,12 +124,12 @@ class GroupsViewModel(
 
     fun initObservers(lifecycleOwner: LifecycleOwner) = launchMain {
         displayName.value = preferenceProvider.getDisplayName()
-        isMicrophoneEnabled.observe(lifecycleOwner, Observer { enabled ->
+        isMicrophoneEnabled.observe(lifecycleOwner, { enabled ->
             getMediaRepository()?.switchAudioStreamState(enabled)
             joinedRoomRepository?.switchAudioStreamState(enabled)
             roomMemberRepository?.switchAudioStreamState(enabled)
         })
-        isVideoEnabled.observe(lifecycleOwner, Observer { enabled ->
+        isVideoEnabled.observe(lifecycleOwner, { enabled ->
             getMediaRepository()?.switchVideoStreamState(enabled)
             joinedRoomRepository?.switchVideoStreamState(enabled)
             roomMemberRepository?.switchVideoStreamState(enabled)

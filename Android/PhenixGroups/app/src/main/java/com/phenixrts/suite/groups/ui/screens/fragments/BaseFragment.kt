@@ -6,6 +6,7 @@ package com.phenixrts.suite.groups.ui.screens.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
+import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
 import com.phenixrts.suite.groups.common.extensions.*
@@ -19,9 +20,9 @@ abstract class BaseFragment : Fragment() {
     @Inject lateinit var cacheProvider: CacheProvider
     @Inject lateinit var preferenceProvider: PreferenceProvider
 
-    val viewModel: GroupsViewModel by lazyViewModel {
+    val viewModel: GroupsViewModel by lazyViewModel({ requireActivity().application as GroupsApplication }, {
         GroupsViewModel(cacheProvider, preferenceProvider, repositoryProvider)
-    }
+    })
 
     open fun onBackPressed() {}
 

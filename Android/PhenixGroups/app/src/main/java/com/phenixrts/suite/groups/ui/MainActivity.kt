@@ -9,17 +9,16 @@ import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.suite.groups.BuildConfig
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
-import com.phenixrts.suite.phenixcommon.common.FileWriterDebugTree
 import com.phenixrts.suite.groups.common.extensions.*
 import com.phenixrts.suite.groups.databinding.ActivityMainBinding
 import com.phenixrts.suite.groups.models.DeepLinkModel
@@ -31,9 +30,11 @@ import com.phenixrts.suite.groups.ui.screens.RoomScreen
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
 import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
 import com.phenixrts.suite.phenixcommon.DebugMenu
+import com.phenixrts.suite.phenixcommon.common.FileWriterDebugTree
 import com.phenixrts.suite.phenixcommon.common.launchMain
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Runnable
+import kotlinx.coroutines.delay
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.resume
@@ -49,9 +50,9 @@ class MainActivity : EasyPermissionActivity() {
     @Inject lateinit var cellularStateReceiver: CellularStateReceiver
     @Inject lateinit var fileWriterTree: FileWriterDebugTree
 
-    private val viewModel: GroupsViewModel by lazyViewModel {
+    private val viewModel: GroupsViewModel by lazyViewModel({ application as GroupsApplication }, {
         GroupsViewModel(cacheProvider, preferenceProvider, repositoryProvider)
-    }
+    })
 
     private val debugMenu: DebugMenu by lazy {
         DebugMenu(fileWriterTree, repositoryProvider.roomExpress, main_root, { files ->
@@ -62,7 +63,7 @@ class MainActivity : EasyPermissionActivity() {
     }
     val menuHandler: MenuHandler by lazy { MenuHandler(this, viewModel) }
 
-    private val timerHandler = Handler()
+    private val timerHandler = Handler(Looper.getMainLooper())
     private val timerRunnable = Runnable {
         launchMain {
             if (viewModel.isInRoom.isTrue()) {
@@ -192,7 +193,7 @@ class MainActivity : EasyPermissionActivity() {
             launchFragment(LandingScreen(), false)
         }
         viewModel.initObservers(this)
-        viewModel.isMicrophoneEnabled.observe(this, Observer { enabled ->
+        viewModel.isMicrophoneEnabled.observe(this, { enabled ->
             val color = ContextCompat.getColor(this, if (enabled) R.color.accentGrayColor else R.color.accentColor)
             microphone_button.setImageResource(if (enabled) R.drawable.ic_mic_on else R.drawable.ic_mic_off)
             microphone_button.backgroundTintList = ColorStateList.valueOf(color)
@@ -200,23 +201,23 @@ class MainActivity : EasyPermissionActivity() {
                 active_member_mic.visibility = if (enabled) View.GONE else View.VISIBLE
             }
         })
-        viewModel.isVideoEnabled.observe(this, Observer { enabled ->
+        viewModel.isVideoEnabled.observe(this, { enabled ->
             val color = ContextCompat.getColor(this, if (enabled) R.color.accentGrayColor else R.color.accentColor)
             camera_button.setImageResource(if (enabled) R.drawable.ic_camera_on else R.drawable.ic_camera_off)
             camera_button.backgroundTintList = ColorStateList.valueOf(color)
             showUserVideoPreview(enabled)
         })
-        viewModel.memberCount.observe(this, Observer { memberCount ->
+        viewModel.memberCount.observe(this, { memberCount ->
             val label =  if (memberCount > 0) getString(R.string.tab_members_count, memberCount) else " "
             main_landscape_member_count.visibility = if (memberCount > 0) View.VISIBLE else View.GONE
             main_landscape_member_count.text = label
         })
-        viewModel.unreadMessageCount.observe(this, Observer { messageCount ->
+        viewModel.unreadMessageCount.observe(this, { messageCount ->
             val label = if (messageCount < 100) "$messageCount" else getString(R.string.tab_message_count)
             main_landscape_message_count.visibility = if (messageCount > 0) View.VISIBLE else View.GONE
             main_landscape_message_count.text = label
         })
-        viewModel.isControlsEnabled.observe(this, Observer { enabled ->
+        viewModel.isControlsEnabled.observe(this, { enabled ->
             if (viewModel.isInRoom.isTrue()) {
                 if (enabled) {
                     menuHandler.showTopMenu()
@@ -225,7 +226,7 @@ class MainActivity : EasyPermissionActivity() {
                 }
             }
         })
-        viewModel.onPermissionRequested.observe(this, Observer {
+        viewModel.onPermissionRequested.observe(this, {
             initMediaButtons()
         })
         initMediaButtons()
@@ -262,19 +263,24 @@ class MainActivity : EasyPermissionActivity() {
     }
 
     private fun handleExceptions() {
-        repositoryProvider.onRoomStatusChanged.observe(this, Observer {
+        repositoryProvider.onRoomStatusChanged.observe(this, {
             if (it.status != RequestStatus.OK) {
                 closeApp(it.message)
             }
         })
         repositoryProvider.getUserMediaRepository()?.observeMediaState(object: UserMediaRepository.OnMediaStateChange {
-            override fun onMicrophoneLost() {
-                showToast(getString(R.string.err_microphone_lost))
-                viewModel.isMicrophoneEnabled.value = false
+            override fun onMicrophoneStateChanged(available: Boolean) {
+                launchMain {
+                    Timber.d("Microphone available: $available")
+                    viewModel.isMicrophoneEnabled.value = available
+                }
             }
 
-            override fun onCameraLost() {
-                closeApp(getString(R.string.err_camera_lost))
+            override fun onCameraStateChanged(available: Boolean) {
+                launchMain {
+                    Timber.d("Camera available: $available")
+                    viewModel.isVideoEnabled.value = available
+                }
             }
         })
     }

@@ -12,7 +12,6 @@ import android.view.animation.Animation
 import android.view.animation.OvershootInterpolator
 import android.view.animation.Transformation
 import android.widget.FrameLayout
-import androidx.lifecycle.Observer
 import androidx.viewpager.widget.ViewPager
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.common.extensions.hideKeyboard
@@ -53,11 +52,11 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
         viewModel.isControlsEnabled.value = false
         viewModel.isInRoom.value = true
 
-        viewModel.memberCount.observe(viewLifecycleOwner, Observer { count ->
+        viewModel.memberCount.observe(viewLifecycleOwner, { count ->
             Timber.d("Member count changed: $count")
             setMemberCount(count)
         })
-        viewModel.unreadMessageCount.observe(viewLifecycleOwner, Observer { count ->
+        viewModel.unreadMessageCount.observe(viewLifecycleOwner, { count ->
             Timber.d("Unread message count changed: $count")
             setMessageCount(count)
         })

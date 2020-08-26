@@ -7,6 +7,7 @@ package com.phenixrts.suite.groups.ui
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import androidx.appcompat.app.AlertDialog
 import com.phenixrts.suite.groups.BuildConfig
 import com.phenixrts.suite.groups.GroupsApplication
@@ -24,7 +25,7 @@ class SplashActivity : EasyPermissionActivity() {
     @Inject lateinit var repositoryProvider: RepositoryProvider
     @Inject lateinit var preferenceProvider: PreferenceProvider
 
-    private val timeoutHandler = Handler()
+    private val timeoutHandler = Handler(Looper.getMainLooper())
     private val timeoutRunnable = Runnable {
         launchMain {
             showSnackBar(getString(R.string.err_network_problems))
@@ -45,55 +46,52 @@ class SplashActivity : EasyPermissionActivity() {
     }
 
     private fun checkDeepLink(intent: Intent?) {
-        val savedConfiguration = preferenceProvider.getConfiguration()
-        val savedRoomAlias = preferenceProvider.getRoomAlias()
-        Timber.d("Checking deep link: ${intent?.data} $savedConfiguration $savedRoomAlias")
-        var deepLinkModel: DeepLinkModel? = null
-        savedRoomAlias?.let { alias ->
-            deepLinkModel = DeepLinkModel(alias)
-        }
-        if (intent?.data != null) {
-            intent.data?.let { data ->
-                val roomCode = data.toString().takeIf { it.contains(ROOM_CODE_DELIMITER) }?.substringAfterLast(ROOM_CODE_DELIMITER)
-                deepLinkModel = DeepLinkModel(roomCode)
-                val uri = data.getQueryParameter(QUERY_URI) ?: BuildConfig.PCAST_URL
-                val backend = data.getQueryParameter(QUERY_BACKEND) ?: BuildConfig.BACKEND_URL
-                val configuration = RoomExpressConfiguration(uri, backend)
-                Timber.d("Checking deep link: $roomCode $uri $backend")
-                if (repositoryProvider.hasConfigurationChanged(configuration)) {
-                    if (repositoryProvider.isRoomExpressInitialized()) {
-                        preferenceProvider.saveConfiguration(configuration)
-                        preferenceProvider.saveRoomAlias(roomCode)
-                        showAppRestartRequired()
-                        return
+        launchMain {
+            val savedConfiguration = preferenceProvider.getConfiguration()
+            val savedRoomAlias = preferenceProvider.getRoomAlias()
+            Timber.d("Checking deep link: ${intent?.data} $savedConfiguration $savedRoomAlias")
+            var deepLinkModel: DeepLinkModel? = null
+            savedRoomAlias?.let { alias ->
+                deepLinkModel = DeepLinkModel(alias)
+            }
+            if (intent?.data != null) {
+                intent.data?.let { data ->
+                    val roomCode = data.toString().takeIf { it.contains(ROOM_CODE_DELIMITER) }
+                        ?.substringAfterLast(ROOM_CODE_DELIMITER)
+                    deepLinkModel = DeepLinkModel(roomCode)
+                    val uri = data.getQueryParameter(QUERY_URI) ?: BuildConfig.PCAST_URL
+                    val backend = data.getQueryParameter(QUERY_BACKEND) ?: BuildConfig.BACKEND_URL
+                    val configuration = RoomExpressConfiguration(uri, backend)
+                    Timber.d("Checking deep link: $roomCode $uri $backend")
+                    if (repositoryProvider.hasConfigurationChanged(configuration)) {
+                        if (repositoryProvider.isRoomExpressInitialized()) {
+                            preferenceProvider.saveConfiguration(configuration)
+                            preferenceProvider.saveRoomAlias(roomCode)
+                            showAppRestartRequired()
+                            return@launchMain
+                        }
+                        Timber.d("Repository not yet initialized")
+                        repositoryProvider.reinitializeRoomExpress(configuration)
+                        deepLinkModel?.hasConfigurationChanged = true
                     }
-                    Timber.d("Repository not yet initialized")
-                    reloadConfiguration(configuration)
-                    deepLinkModel?.hasConfigurationChanged = true
+                }
+            } else if (savedConfiguration != null) {
+                repositoryProvider.reinitializeRoomExpress(savedConfiguration)
+            }
+            preferenceProvider.saveConfiguration(null)
+            preferenceProvider.saveRoomAlias(null)
+
+            if (arePermissionsGranted()) {
+                showLandingScreen(deepLinkModel)
+            } else {
+                askForPermissions { granted ->
+                    if (granted) {
+                        showLandingScreen(deepLinkModel)
+                    } else {
+                        checkDeepLink(intent)
+                    }
                 }
             }
-        } else if (savedConfiguration != null) {
-            reloadConfiguration(savedConfiguration)
-        }
-        preferenceProvider.saveConfiguration(null)
-        preferenceProvider.saveRoomAlias(null)
-
-        if (arePermissionsGranted()) {
-            showLandingScreen(deepLinkModel)
-        } else {
-            askForPermissions { granted ->
-                if (granted) {
-                    showLandingScreen(deepLinkModel)
-                } else {
-                    checkDeepLink(intent)
-                }
-            }
-        }
-    }
-
-    private fun reloadConfiguration(configuration: RoomExpressConfiguration) {
-        launchMain{
-            repositoryProvider.reinitializeRoomExpress(configuration)
         }
     }
 
