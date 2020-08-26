@@ -38,13 +38,13 @@ private extension JoinMeetingViewController {
     }
 
     func joinMeeting(code: String, displayName: String) {
-        os_log(.debug, log: .joinMeetingScene, "Join meeting with alias %{PUBLIC}@", code)
+        os_log(.debug, log: .joinMeetingScene, "Join meeting with alias %{PUBLIC}s", code)
         presentActivityIndicator()
         phenix?.publishRoom(withAlias: code, displayName: displayName) { [weak self] result in
             guard let self = self else { return }
             switch result {
             case .success(let joinedRoom):
-                os_log(.debug, log: .joinMeetingScene, "Joined meeting with alias %{PUBLIC}@", code)
+                os_log(.debug, log: .joinMeetingScene, "Joined meeting with alias %{PUBLIC}s", code)
 
                 DispatchQueue.main.async {
                     self.dismissActivityIndicator {
@@ -53,7 +53,7 @@ private extension JoinMeetingViewController {
                 }
 
             case .failure(.failureStatus(let status)):
-                os_log(.debug, log: .joinMeetingScene, "Failed to join a meeting with alias: %{PUBLIC}@, status code: %{PUBLIC}d", code, status.rawValue)
+                os_log(.debug, log: .joinMeetingScene, "Failed to join a meeting with alias: %{PUBLIC}s, status code: %{PUBLIC}d", code, status.rawValue)
 
                 DispatchQueue.main.async {
                     self.dismissActivityIndicator {

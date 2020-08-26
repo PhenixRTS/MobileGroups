@@ -38,7 +38,7 @@ public protocol PhenixRoomJoining: AnyObject {
 extension PhenixManager: PhenixRoomJoining {
     public func joinRoom(with type: RoomIdentifierType, displayName: String, completion: @escaping JoinRoomHandler) {
         privateQueue.async { [weak self] in
-            os_log(.debug, log: .phenixManager, "Joining a room with %{PUBLIC}@, display name: %{PUBLIC}@", type.description, displayName)
+            os_log(.debug, log: .phenixManager, "Joining a room with %{PUBLIC}s, display name: %{PUBLIC}s", type.description, displayName)
             guard let self = self else { return }
             let options: PhenixJoinRoomOptions
 
@@ -74,11 +74,14 @@ extension PhenixManager {
                     fatalError("Could not get RoomService parameter")
                 }
 
-                let joinedRoom = JoinedRoom(roomExpress: self.roomExpress, backend: self.backend, roomService: roomService)
-                joinedRoom.delegate = self
-                self.add(joinedRoom)
-
-                completion(.success(joinedRoom))
+                // Chat service must be created with a small delay after the Room service was created.
+                // There is a possibility that if they are created shortly one after another - chat history may not be found.
+                // Therefore JoinedRoom creation is done after a small delay.
+                self.privateQueue.asyncAfter(deadline: .now() + .seconds(1)) {
+                    let joinedRoom = self.makeJoinedRoom(from: roomService, roomExpress: self.roomExpress, backend: self.backend)
+                    self.add(joinedRoom)
+                    completion(.success(joinedRoom))
+                }
 
             default:
                 completion(.failure(.failureStatus(status)))

@@ -26,9 +26,30 @@ class PageViewController: UIViewController {
         indicator.frame.size.width = view.frame.width / CGFloat(controllers.count)
     }
 
-    func selectTab(_ index: Int) {
+    override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.willTransition(to: newCollection, with: coordinator)
+        // Scroll view has a different position for portrait mode and landscape mode and when device rotates,
+        // scroll view automatically scrolls, so we need to disable delegate method capturing to prevent of having
+        // an incorrect scroll position saved by the `scrollViewDidScroll(_:)` delegate method.
+        scrollView.delegate = nil
+    }
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        // Select the previously selected tab
+        selectTab(selectedTabIndex, withAnimation: false)
+        // Manually call the scroll view delegate method to update the tab indicator position.
+        scrollViewDidScroll(scrollView)
+        // Set the delegate method back, because the device rotation has finished.
+        scrollView.delegate = self
+    }
+
+    func selectTab(_ index: Int, withAnimation animated: Bool = true) {
         view.endEditing(true)
-        move(toPage: index)
+        // Need to refresh the scroll view layout so that the scroll position would be calculated correctly.
+        // Layout calculation is necessary, for example, if user rotate the device.
+        scrollView.layoutIfNeeded()
+        move(toPage: index, animated: animated)
     }
 
     @objc
@@ -40,15 +61,13 @@ class PageViewController: UIViewController {
         // Remove old controller views if there are some from the parent view
         controllers.forEach { $0.view.removeFromSuperview() }
 
-        self.controllers = controllers
-
-        configureChildControllers(controllers)
+        set(childControllers: controllers)
 
         var tag = 0
         controllers.forEach { controller in
             guard let properties = controller as? PageContainerMember else { return }
 
-            let button = makeTabButton(icon: properties.pageIcon, title: controller.title ?? "", tag: tag)
+            let button = makeTabButton(icon: properties.pageIcon, title: properties.title ?? "", tag: tag)
             if controller is ActiveMeetingMemberListViewController {
                 button.observe(titleChangesOf: controller)
             }
@@ -60,6 +79,14 @@ class PageViewController: UIViewController {
 
 private extension PageViewController {
     func setup() {
+        view.isOpaque = true
+
+        if #available(iOS 13.0, *) {
+            view.backgroundColor = .systemBackground
+        } else {
+            view.backgroundColor = .white
+        }
+
         scrollView = makeScrollView()
         scrollView.delegate = self
 
@@ -88,41 +115,57 @@ private extension PageViewController {
         indicator.frame.origin.x = point
     }
 
-    func move(toPage index: Int) {
+    func move(toPage index: Int, animated: Bool = true) {
         let point = CGPoint(x: scrollView.bounds.width * CGFloat(index), y: 0)
-        scrollView.setContentOffset(point, animated: true)
+        scrollView.setContentOffset(point, animated: animated)
     }
 
-    func configureChildControllers(_ controllers: [UIViewController]) {
+    /// Adds view controllers to the current controller as child view controllers and positions them horizontally next to each other in the scroll view
+    /// - Parameter controllers: List with the child UIViewController's
+    func set(childControllers controllers: [UIViewController]) {
+        if self.controllers.isEmpty == false {
+            self.controllers.forEach { $0.remove() }
+        }
+
+        self.controllers = controllers
+
         for (index, controller) in controllers.enumerated() {
             controller.view.translatesAutoresizingMaskIntoConstraints = false
 
-            addChild(controller)
-            scrollView.addSubview(controller.view)
-            controller.didMove(toParent: self)
+            add(controller, into: scrollView)
 
-            NSLayoutConstraint.activate([
+            var constraints = [
                 controller.view.topAnchor.constraint(equalTo: scrollView.topAnchor),
                 controller.view.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
                 controller.view.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
                 controller.view.heightAnchor.constraint(equalTo: scrollView.heightAnchor)
-            ])
+            ]
 
             if controllers.count == 1 {
                 // If there is only one page
-                controller.view.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
-                controller.view.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
+                constraints += [
+                    controller.view.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+                    controller.view.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor)
+                ]
             } else if index == 0 {
                 // First page
-                controller.view.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor).isActive = true
+                constraints += [
+                    controller.view.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor)
+                ]
             } else if index + 1 == controllers.count {
                 // Last page
-                controller.view.leadingAnchor.constraint(equalTo: controllers[index - 1].view.trailingAnchor).isActive = true
-                controller.view.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor).isActive = true
+                constraints += [
+                    controller.view.leadingAnchor.constraint(equalTo: controllers[index - 1].view.trailingAnchor),
+                    controller.view.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor)
+                ]
             } else {
                 // Middle pages
-                controller.view.leadingAnchor.constraint(equalTo: controllers[index - 1].view.trailingAnchor).isActive = true
+                constraints += [
+                    controller.view.leadingAnchor.constraint(equalTo: controllers[index - 1].view.trailingAnchor)
+                ]
             }
+
+            NSLayoutConstraint.activate(constraints)
         }
     }
 }

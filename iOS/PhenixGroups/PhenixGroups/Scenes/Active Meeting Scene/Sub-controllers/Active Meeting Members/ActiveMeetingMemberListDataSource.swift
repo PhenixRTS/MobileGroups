@@ -2,12 +2,17 @@
 //  Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
+import os.log
 import PhenixCore
 import UIKit
 
 class ActiveMeetingMemberListDataSource: NSObject, UITableViewDataSource {
     var members = [RoomMember]()
-    var pinnedMember: RoomMember?
+    var pinnedMember: RoomMember? {
+        didSet {
+            os_log(.debug, log: .activeMeetingScene, "Pinned member changed \n- from: %{PRIVATE}s, \n- to: %{PRIVATE}s", oldValue?.description ?? "None", pinnedMember?.description ?? "None")
+        }
+    }
     var indexPathForSelectedRow: IndexPath?
 
     func indexPath(of member: RoomMember) -> IndexPath? {

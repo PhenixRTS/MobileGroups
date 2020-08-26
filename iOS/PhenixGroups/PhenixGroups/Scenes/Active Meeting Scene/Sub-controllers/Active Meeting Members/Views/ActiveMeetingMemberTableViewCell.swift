@@ -9,9 +9,12 @@ class ActiveMeetingMemberTableViewCell: UITableViewCell, CellIdentified {
     private var cameraView: CameraView!
     private var pinView: CameraPinView!
     private var displayNameLabel: UILabel!
+    private var muteImage: UIImageView!
+    private var muteImageBackground: UIView!
 
     weak var member: RoomMember! {
         didSet {
+            oldValue?.removeAudioObserver(self)
             oldValue?.removeVideoObserver(self)
         }
     }
@@ -31,6 +34,12 @@ class ActiveMeetingMemberTableViewCell: UITableViewCell, CellIdentified {
 
         cameraView.removeCameraLayer()
         unpin()
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+
+        muteImageBackground.layer.cornerRadius = muteImageBackground.frame.width / 2
     }
 
     func setCamera(layer: VideoLayer?) {
@@ -53,6 +62,8 @@ class ActiveMeetingMemberTableViewCell: UITableViewCell, CellIdentified {
         self.member = member
         displayNameLabel.text = member.screenName
         showCamera(false)
+        showMuteIcon(member.isAudioAvailable == false)
+        member.addAudioObserver(self)
     }
 
     func configureVideo() {
@@ -74,9 +85,20 @@ private extension ActiveMeetingMemberTableViewCell {
 
         displayNameLabel = makeDisplayNameLabel()
 
+        muteImage = UIImageView.makeMuteImageView()
+        muteImage.clipsToBounds = false
+        muteImage.tintColor = .white
+        muteImage.contentMode = .scaleAspectFill
+
+        muteImageBackground = UIView()
+        muteImageBackground.translatesAutoresizingMaskIntoConstraints = false
+        muteImageBackground.backgroundColor = .systemRed
+
         contentView.addSubview(cameraView)
         contentView.addSubview(pinView)
         contentView.addSubview(displayNameLabel)
+        contentView.addSubview(muteImage)
+        contentView.insertSubview(muteImageBackground, belowSubview: muteImage)
 
         NSLayoutConstraint.activate([
             cameraView.topAnchor.constraint(equalTo: contentView.topAnchor),
@@ -90,9 +112,28 @@ private extension ActiveMeetingMemberTableViewCell {
             pinView.trailingAnchor.constraint(equalTo: cameraView.trailingAnchor),
             pinView.bottomAnchor.constraint(equalTo: cameraView.bottomAnchor),
 
+            displayNameLabel.topAnchor.constraint(greaterThanOrEqualTo: contentView.topAnchor),
+            displayNameLabel.leadingAnchor.constraint(equalTo: cameraView.trailingAnchor, constant: 10),
+            displayNameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
+            displayNameLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor),
             displayNameLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            displayNameLabel.leadingAnchor.constraint(equalTo: cameraView.trailingAnchor, constant: 10)
+
+            muteImage.trailingAnchor.constraint(equalTo: cameraView.trailingAnchor, constant: -6),
+            muteImage.bottomAnchor.constraint(equalTo: cameraView.bottomAnchor, constant: -6),
+            muteImage.widthAnchor.constraint(equalToConstant: 18),
+            muteImage.heightAnchor.constraint(equalToConstant: 18),
+
+            muteImageBackground.topAnchor.constraint(equalTo: muteImage.topAnchor, constant: -2),
+            muteImageBackground.leadingAnchor.constraint(equalTo: muteImage.leadingAnchor, constant: -2),
+            muteImageBackground.trailingAnchor.constraint(equalTo: muteImage.trailingAnchor, constant: 2),
+            muteImageBackground.bottomAnchor.constraint(equalTo: muteImage.bottomAnchor, constant: 2)
         ])
+    }
+
+    func showMuteIcon(_ show: Bool) {
+        let isHidden = show == false
+        muteImage.isHidden = isHidden
+        muteImageBackground.isHidden = isHidden
     }
 
     func showCamera(_ show: Bool) {
@@ -100,6 +141,16 @@ private extension ActiveMeetingMemberTableViewCell {
     }
 }
 
+// MARK: - RoomMemberAudioObserver
+extension ActiveMeetingMemberTableViewCell: RoomMemberAudioObserver {
+    func roomMemberAudioStateDidChange(_ member: RoomMember, enabled: Bool) {
+        DispatchQueue.main.async { [weak self] in
+            self?.showMuteIcon(enabled == false)
+        }
+    }
+}
+
+// MARK: - RoomMemberVideoObserver
 extension ActiveMeetingMemberTableViewCell: RoomMemberVideoObserver {
     func roomMemberVideoStateDidChange(_ member: RoomMember, enabled: Bool) {
         DispatchQueue.main.async { [weak self] in
@@ -108,7 +159,7 @@ extension ActiveMeetingMemberTableViewCell: RoomMemberVideoObserver {
     }
 }
 
-// MARK: - Helper methods
+// MARK: - UI Element Factory methods
 extension ActiveMeetingMemberTableViewCell {
     func makeDisplayNameLabel() -> UILabel {
         let label = UILabel()
@@ -120,6 +171,9 @@ extension ActiveMeetingMemberTableViewCell {
         } else {
             label.textColor = .gray
         }
+        label.numberOfLines = 3
+        label.lineBreakMode = .byWordWrapping
+        label.adjustsFontSizeToFitWidth = true
 
         return label
     }

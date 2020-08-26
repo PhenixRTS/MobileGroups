@@ -5,5 +5,6 @@
 import UIKit
 
 protocol PageContainerMember: AnyObject {
+    var title: String? { get }
     var pageIcon: UIImage? { get set }
 }

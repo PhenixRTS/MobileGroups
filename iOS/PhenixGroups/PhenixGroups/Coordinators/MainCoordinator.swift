@@ -38,7 +38,7 @@ class MainCoordinator: Coordinator {
         vc.historyController = hvc
         hvc.delegate = vc
         hvc.viewDelegate = vc.newMeetingView
-        hvc.loadMeetings = { [weak self] in
+        hvc.loadMeetingsHandler = { [weak self] in
             self?.preferences.meetings.sorted { $0.leaveDate > $1.leaveDate } ?? []
         }
 

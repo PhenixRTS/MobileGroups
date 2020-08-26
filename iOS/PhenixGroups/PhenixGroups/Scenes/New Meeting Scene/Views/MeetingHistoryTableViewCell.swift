@@ -16,12 +16,12 @@ class MeetingHistoryTableViewCell: UITableViewCell, CellIdentified {
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
-        commonInit()
+        setup()
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        commonInit()
+        setup()
     }
 
     func configure(with model: Meeting, rejoin: RejoinHandler?) {
@@ -43,29 +43,18 @@ class MeetingHistoryTableViewCell: UITableViewCell, CellIdentified {
 }
 
 private extension MeetingHistoryTableViewCell {
-    func commonInit() {
-        setupLabels()
-        setupButton()
-        setupConstraints()
-    }
-
-    func setupLabels() {
-        codeLabel = UILabel.mainLabel
+    func setup() {
+        codeLabel = UILabel.primaryLabel
         leaveTimeLabel = UILabel.secondaryLabel
+        rejoinButton = UIButton.makePrimaryButton(withTitle: "Rejoin")
+        rejoinButton.addTarget(self, action: #selector(rejoinButtonTapped), for: .touchUpInside)
+        rejoinButton.setContentHuggingPriority(.required, for: .horizontal)
+        rejoinButton.setContentCompressionResistancePriority(.required, for: .horizontal)
 
         contentView.addSubview(codeLabel)
         contentView.addSubview(leaveTimeLabel)
-    }
-
-    func setupButton() {
-        rejoinButton = UIButton.mainButton(title: "Rejoin")
-        rejoinButton.addTarget(self, action: #selector(rejoinButtonTapped), for: .touchUpInside)
-        rejoinButton.setContentHuggingPriority(.defaultLow, for: .horizontal)
-
         contentView.addSubview(rejoinButton)
-    }
 
-    func setupConstraints() {
         NSLayoutConstraint.activate([
             codeLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 10),
             codeLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),

@@ -5,11 +5,11 @@
 import UIKit
 
 extension UILabel {
-    static var mainLabel: UILabel {
+    static var primaryLabel: UILabel {
         let label = UILabel()
+
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = .preferredFont(forTextStyle: .body)
-        label.adjustsFontForContentSizeCategory = true
         if #available(iOS 13.0, *) {
             label.textColor = .label
         } else {
@@ -21,9 +21,9 @@ extension UILabel {
 
     static var secondaryLabel: UILabel {
         let label = UILabel()
+
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = .preferredFont(forTextStyle: .footnote)
-        label.adjustsFontForContentSizeCategory = true
         if #available(iOS 13.0, *) {
             label.textColor = .secondaryLabel
         } else {
@@ -33,8 +33,9 @@ extension UILabel {
         return label
     }
 
-    static func textFieldCaptionLabel(_ text: String) -> UILabel {
+    static func makeTextFieldCaptionLabel(text: String) -> UILabel {
         let label = UILabel()
+
         label.translatesAutoresizingMaskIntoConstraints = false
         label.text = text
         label.font = .preferredFont(forTextStyle: .caption1)

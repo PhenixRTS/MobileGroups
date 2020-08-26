@@ -44,6 +44,9 @@ private extension NewMeetingViewController {
     func configure() {
         newMeetingView.configure(displayName: preferences?.displayName ?? device.name)
         newMeetingView.setDisplayNameDelegate(self)
+        newMeetingView.openMenuHandler = { [weak self] in
+            self?.openMenu()
+        }
 
         configureHistoryView()
         configureInteractions()
@@ -107,7 +110,7 @@ private extension NewMeetingViewController {
             guard let self = self else { return }
             switch result {
             case .success(let joinedRoom):
-                os_log(.debug, log: .newMeetingScene, "Meeting created/joined, alias: %{PUBLIC}@", code)
+                os_log(.debug, log: .newMeetingScene, "Meeting created/joined, alias: %{PUBLIC}s", code)
 
                 DispatchQueue.main.async {
                     self.dismissActivityIndicator {
@@ -116,7 +119,7 @@ private extension NewMeetingViewController {
                 }
 
             case .failure(.failureStatus(let status)):
-                os_log(.debug, log: .newMeetingScene, "Failed to create/join a meeting with alias: %{PUBLIC}@, status code: %{PUBLIC}d", code, status.rawValue)
+                os_log(.debug, log: .newMeetingScene, "Failed to create/join a meeting with alias: %{PUBLIC}s, status code: %{PUBLIC}d", code, status.rawValue)
 
                 DispatchQueue.main.async {
                     self.dismissActivityIndicator {
@@ -126,8 +129,20 @@ private extension NewMeetingViewController {
             }
         }
     }
+
+    func openMenu() {
+        let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+
+        actionSheet.addAction(UIAlertAction(title: "Switch camera", style: .default) { [weak self] _ in
+            self?.media?.switchCamera()
+        })
+        actionSheet.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+
+        present(actionSheet, animated: true)
+    }
 }
 
+// MARK: - DisplayNameDelegate
 extension NewMeetingViewController: DisplayNameDelegate {
     func saveDisplayName(_ displayName: String) {
         preferences?.displayName = displayName
@@ -135,9 +150,10 @@ extension NewMeetingViewController: DisplayNameDelegate {
     }
 }
 
+// MARK: - MeetingHistoryDelegate
 extension NewMeetingViewController: MeetingHistoryDelegate {
     func rejoin(_ meeting: Meeting) {
-        os_log(.debug, log: .newMeetingScene, "Rejoin meeting %{PUBLIC}@ (%{PRIVATE}@)", meeting.code, meeting.backendUrl.absoluteString)
+        os_log(.debug, log: .newMeetingScene, "Rejoin meeting %{PUBLIC}s (%{PRIVATE}s)", meeting.code, meeting.backendUrl.absoluteString)
         publishMeeting(with: meeting.code, displayName: displayName)
     }
 }

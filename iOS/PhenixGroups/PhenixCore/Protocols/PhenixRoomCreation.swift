@@ -24,7 +24,7 @@ public protocol PhenixRoomCreation: AnyObject {
 extension PhenixManager: PhenixRoomCreation {
     public func createRoom(withAlias alias: String = .randomRoomAlias, completion: @escaping RoomCreationHandler) {
         privateQueue.async { [weak self] in
-            os_log(.debug, log: .phenixManager, "Creating a room with alias: %{PUBLIC}@", alias)
+            os_log(.debug, log: .phenixManager, "Creating a room with alias: %{PUBLIC}s", alias)
 
             guard let self = self else { return }
             let options = self.makeRoomOptions(with: alias)

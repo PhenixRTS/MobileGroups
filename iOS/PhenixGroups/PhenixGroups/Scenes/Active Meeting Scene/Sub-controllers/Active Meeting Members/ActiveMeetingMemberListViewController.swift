@@ -2,6 +2,7 @@
 //  Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
+import os.log
 import PhenixCore
 import UIKit
 
@@ -23,6 +24,8 @@ class ActiveMeetingMemberListViewController: UITableViewController, PageContaine
         defer {
             tableView.deselectRow(at: indexPath, animated: true)
         }
+
+        os_log(.debug, log: .activeMeetingScene, "Member row selected (%{PRIVATE}s)", indexPath.description)
 
         // Crete a copy of previously selected row
         let pinnedIndexPath = dataSource.indexPathForSelectedRow
@@ -101,7 +104,9 @@ private extension ActiveMeetingMemberListViewController {
         dataSource.indexPathForSelectedRow = nil
     }
 
-    /// Subscribe to provided member list. Subscription type depends of the specific logic, it can be video & audio, or audio-only.
+    /// Subscribe to provided member list.
+    ///
+    /// Subscription type depends of the specific logic, it can be video & audio, or audio-only.
     /// - Parameter list: RoomMember objects currently in the room
     func subscribe(to list: [RoomMember]) {
         // Calculate, how many of members have video subscription at the moment.
@@ -112,7 +117,7 @@ private extension ActiveMeetingMemberListViewController {
         // Subscribe to members
         list.forEach { member in
             if member.isSubscribed == false {
-                if member.isSelf == false && videoSubscriptions + 1 <= Self.maxVideoSubscriptions {
+                if videoSubscriptions + 1 <= Self.maxVideoSubscriptions {
                     videoSubscriptions += 1 // Parameter must be increased because we still need to keep track of how many new members gets video subscription.
                     member.subscribe(for: .video)
                 } else {
@@ -123,9 +128,24 @@ private extension ActiveMeetingMemberListViewController {
     }
 
     /// Sets focused member for the main view video preview layer
-    func setDefaultFocusedMember() {
-        // Members are ordered by their activity timestamp, and also first member always is current device user
-        let member = self.dataSource.members.count > 1 ? self.dataSource.members[1] : self.dataSource.members[0]
+    func setDefaultFocusedMemberIfPossible() {
+        guard dataSource.pinnedMember == nil else {
+            os_log(.debug, log: .activeMeetingScene, "Pinned member already exist, focus isn't changed.")
+            return
+        }
+
+        let memberCount = self.dataSource.members.count
+
+        guard memberCount > 0 else {
+            os_log(.error, log: .activeMeetingScene, "No members available for the currently joined meeting.")
+            return
+        }
+
+        // Members are ordered by their activity timestamp.
+        // Notes:
+        // 1. first member always is the current device user
+        // 2. second member has the latest activity timestamp (ordered by newest timestamp first )
+        let member = memberCount > 1 ? self.dataSource.members[1] : self.dataSource.members[0]
         self.delegate?.setFocus(on: member)
     }
 
@@ -146,18 +166,18 @@ private extension ActiveMeetingMemberListViewController {
             case .memberRemoved(let oldIndexPath):
                 self.unpin(cellAt: oldIndexPath)
                 self.tableView.reloadData()
-                self.setDefaultFocusedMember()
+                self.setDefaultFocusedMemberIfPossible()
 
             case .memberNotMoved,
                  .noPinnedMember:
                 self.tableView.reloadData()
-                self.setDefaultFocusedMember()
+                self.setDefaultFocusedMemberIfPossible()
             }
         }
     }
 }
 
-// - MARK: JoinedRoomMembersDelegate
+// MARK: - JoinedRoomMembersDelegate
 extension ActiveMeetingMemberListViewController: JoinedRoomMembersDelegate {
     func memberListDidChange(_ list: [RoomMember]) {
         dataSource.members = list
@@ -188,7 +208,7 @@ extension ActiveMeetingMemberListViewController: JoinedRoomMembersDelegate {
     }
 }
 
-// - MARK: Helper methods
+// MARK: - Helper methods
 fileprivate extension IndexPath {
     static func `for`(rowIndex index: Int) -> IndexPath {
         IndexPath(row: index, section: 0)

@@ -6,7 +6,14 @@ import Foundation
 import PhenixSdk
 
 public class UserMediaStreamController {
-    private var renderer: PhenixRenderer?
+    public typealias AudioFrameNotificationHandler = () -> Void
+    public typealias VideoFrameNotificationHandler = () -> Void
+
+    private var renderer: PhenixRenderer? {
+        didSet {
+            subscribeForMediaFrameNotification()
+        }
+    }
 
     public private(set) lazy var cameraLayer: VideoLayer = {
         let layer = VideoLayer()
@@ -16,20 +23,24 @@ public class UserMediaStreamController {
     }()
 
     internal let userMediaStream: PhenixUserMediaStream
+    internal var cameraMode: PhenixFacingMode = .user {
+        didSet {
+            setCamera(facing: cameraMode)
+        }
+    }
 
+    /// Indicates current device audio state
     public private(set) var isAudioEnabled: Bool = true
+    /// Indicates current device video state
     public private(set) var isVideoEnabled: Bool = true
+
+    /// Handler for audio frame notifications
+    public var audioFrameReadHandler: AudioFrameNotificationHandler?
+    /// Handler for video frame notifications
+    public var videoFrameReadHandler: VideoFrameNotificationHandler?
 
     init(_ userMediaStream: PhenixUserMediaStream) {
         self.userMediaStream = userMediaStream
-    }
-
-    public func setCamera(facing mode: PhenixFacingMode) {
-        let options = PhenixUserMediaOptions
-            .makeUserMediaOptions()
-            .setCamera(facing: mode)
-
-        userMediaStream.apply(options)
     }
 
     public func setAudio(enabled: Bool) {
@@ -41,11 +52,47 @@ public class UserMediaStreamController {
         isVideoEnabled = enabled
         userMediaStream.mediaStream.getVideoTracks()?.forEach { $0.setEnabled(enabled) }
     }
+
+    public func switchCamera() {
+        cameraMode = cameraMode == .user ? .environment : .user
+    }
 }
 
 private extension UserMediaStreamController {
     func makeRenderer() -> PhenixRenderer {
         userMediaStream.mediaStream.createRenderer()
+    }
+
+    func setCamera(facing mode: PhenixFacingMode) {
+        let options = PhenixUserMediaOptions
+            .makeUserMediaOptions()
+            .setCamera(facing: mode)
+
+        userMediaStream.apply(options)
+    }
+
+    func subscribeForMediaFrameNotification() {
+        guard let renderer = renderer else {
+            return
+        }
+
+        // Get the current device audio track.
+        if let audioTrack = userMediaStream.mediaStream.getAudioTracks()?.first {
+            renderer.setFrameReadyCallback(audioTrack, audioFrameNotificationReceived)
+        }
+
+        // Get the current device video track.
+        if let videoTrack = userMediaStream.mediaStream.getVideoTracks()?.first {
+            renderer.setFrameReadyCallback(videoTrack, videoFrameNotificationReceived)
+        }
+    }
+
+    func audioFrameNotificationReceived(_ notification: PhenixFrameNotification?) {
+        audioFrameReadHandler?()
+    }
+
+    func videoFrameNotificationReceived(_ notification: PhenixFrameNotification?) {
+        videoFrameReadHandler?()
     }
 }
 

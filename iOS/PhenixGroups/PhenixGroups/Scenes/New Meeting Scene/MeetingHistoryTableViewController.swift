@@ -21,8 +21,7 @@ class MeetingHistoryTableViewController: UITableViewController, Storyboarded {
     weak var delegate: MeetingHistoryDelegate?
     weak var viewDelegate: MeetingHistoryViewDelegate?
 
-    var rejoinHandler: RejoinHandler?
-    var loadMeetings: LoadMeetings!
+    var loadMeetingsHandler: LoadMeetings!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -37,7 +36,7 @@ class MeetingHistoryTableViewController: UITableViewController, Storyboarded {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        dataSource.meetings = loadMeetings()
+        dataSource.meetings = loadMeetingsHandler()
         tableView.reloadData()
 
         viewDelegate?.tableContentSizeDidChange(tableView.contentSize)

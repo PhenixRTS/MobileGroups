@@ -26,6 +26,11 @@ class ActiveMeetingChatView: UIView {
          setup()
     }
 
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        tableView.scrollToBottom(animated: false)
+    }
+
     func resizeTextView() {
         let contentSize = textView.sizeThatFits(CGSize(width: textView.frame.width, height: .infinity))
         textViewHeightConstraint.constant = contentSize.height
@@ -103,6 +108,7 @@ private extension ActiveMeetingChatView {
     }
 }
 
+// MARK: - UI Element Factory methods
 private extension ActiveMeetingChatView {
     func makeTableView() -> UITableView {
         let view = UITableView()
@@ -156,6 +162,7 @@ private extension ActiveMeetingChatView {
     }
 }
 
+// MARK: - UITextViewDelegate
 extension ActiveMeetingChatView: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
         sendButton.isEnabled = textView.text.isEmpty == false

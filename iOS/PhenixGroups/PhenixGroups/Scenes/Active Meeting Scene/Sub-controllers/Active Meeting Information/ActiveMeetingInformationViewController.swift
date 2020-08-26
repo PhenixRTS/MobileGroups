@@ -63,7 +63,10 @@ private extension ActiveMeetingInformationViewController {
             shareButton.heightAnchor.constraint(equalToConstant: 44)
         ])
     }
+}
 
+// MARK: - UI Element Factory methods
+private extension ActiveMeetingInformationViewController {
     func makeTitleLabel() -> UILabel {
         let label = UILabel()
 

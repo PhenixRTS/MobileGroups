@@ -177,5 +177,11 @@ private extension ControlButton {
         layer.borderColor = currentBorderColor
         layer.borderWidth = 1
         layer.cornerRadius = bounds.width / 2
+
+        layer.shadowOffset = CGSize(width: 0, height: 0)
+        layer.shadowColor = UIColor.gray.cgColor
+        layer.shadowOpacity = 0.5
+        layer.shadowRadius = 1
+        layer.masksToBounds = false
     }
 }

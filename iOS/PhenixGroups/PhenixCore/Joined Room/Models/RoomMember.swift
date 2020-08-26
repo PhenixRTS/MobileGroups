@@ -16,28 +16,28 @@ public class RoomMember {
     private var disposables = [PhenixDisposable]()
     private var subscriber: PhenixExpressSubscriber?
     private var stream: PhenixStream?
+
     internal var identifier: String {
         guard let id = phenixMember.getSessionId() else {
             fatalError("Session ID must always be available")
         }
         return id
     }
-
     internal let phenixMember: PhenixMember
     internal var audioObservations = [ObjectIdentifier: AudioObservation]()
     internal var videoObservations = [ObjectIdentifier: VideoObservation]()
 
-    public private(set) var subscriptionType: SubscriptionType?
-    public var previewLayer: VideoLayer?
     public let isSelf: Bool
     public let screenName: String
-    public var isSubscribed: Bool = false
-    public var isAudioAvailable = false {
+    public var previewLayer: VideoLayer?
+    public private(set) var subscriptionType: SubscriptionType?
+    public private(set) var isSubscribed: Bool = false
+    public private(set) var isAudioAvailable = false {
         didSet {
             audioStateDidChange(enabled: isAudioAvailable)
         }
     }
-    public var isVideoAvailable = false {
+    public private(set) var isVideoAvailable = false {
         didSet {
             videoStateDidChange(enabled: isVideoAvailable)
         }
@@ -70,20 +70,36 @@ public class RoomMember {
         }
 
         guard isSubscribed == false else {
+            // If member is already subscribed, no need to re-subscribe.
             os_log(.debug, log: .roomMember, "Member (%{PRIVATE}s) is already subscribed", self.description)
             return
         }
 
-        guard isSelf == false else {
-            os_log(.debug, log: .roomMember, "Member (%{PRIVATE}s) is Self", self.description)
+        isSubscribed = true
+
+        if isSelf {
+            /*
+             There is no need to subscribe for media for Self object, because we can use media straight from the
+             device via the UserMediaStreamController.
+             We only need to subscribe for the media state changes (audio and video state changes) for Self object,
+             to receive the updates if media gets enabled/disabled.
+             */
+            os_log(.debug, log: .roomMember, "Member (%{PRIVATE}s) is Self, only subscribing for media state changes", self.description)
+
+            stream.getObservableAudioState()?.subscribe(audioStateDidChange)?.append(to: &disposables)
+            stream.getObservableVideoState()?.subscribe(videoStateDidChange)?.append(to: &disposables)
+
             return
         }
 
-        isSubscribed = true
+        // Save subscription type.
+        // For "self" member we do not need to save this, because it is using local media
         subscriptionType = type
 
         let preferences = makeStreamOptions(for: type)
         previewLayer = preferences.layer
+
+        os_log(.debug, log: .roomMember, "Subscribing with %{PRIVATE}s for member %{PRIVATE}s", String(describing: type), self.description)
 
         phenixRoomExpress?.subscribe(toMemberStream: stream, preferences.options) { [weak self] status, subscriber, _ in
             guard let self = self else { return }

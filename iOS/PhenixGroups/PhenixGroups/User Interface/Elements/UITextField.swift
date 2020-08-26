@@ -5,8 +5,9 @@
 import UIKit
 
 extension UITextField {
-    static func mainTextField(placeholder: String) -> UITextField {
+    static func makePrimaryTextField(placeholder: String) -> UITextField {
         let textField = UITextField()
+
         textField.translatesAutoresizingMaskIntoConstraints = false
         textField.placeholder = placeholder
         textField.font = .preferredFont(forTextStyle: .body)

@@ -74,7 +74,7 @@ private extension PhenixManager {
         let pcastExpressOptions = PhenixPCastExpressFactory.createPCastExpressOptionsBuilder()
             .withBackendUri(backend.absoluteString)
             .withUnrecoverableErrorCallback { _, description in
-                os_log(.error, log: .phenixManager, "Unrecoverable Error: %{PUBLIC}@", String(describing: description))
+                os_log(.error, log: .phenixManager, "Unrecoverable Error: %{PUBLIC}s", String(describing: description))
                 unrecoverableErrorCompletion?(description)
             }
             .buildPCastExpressOptions()
@@ -130,5 +130,16 @@ internal extension PhenixManager {
             .withAlias(alias)
             .withType(.multiPartyChat)
             .buildRoomOptions()
+    }
+
+    func makeJoinedRoom(from roomService: PhenixRoomService, roomExpress: PhenixRoomExpress, backend: URL, publisher: PhenixExpressPublisher? = nil) -> JoinedRoom {
+        guard let chatService = PhenixRoomChatServiceFactory.createRoomChatService(roomService) else {
+            fatalError("Could not create PhenixRoomChatService parameter")
+        }
+
+        let joinedRoom = JoinedRoom(roomExpress: roomExpress, backend: backend, roomService: roomService, chatService: chatService, publisher: publisher)
+        joinedRoom.delegate = self
+
+        return joinedRoom
     }
 }

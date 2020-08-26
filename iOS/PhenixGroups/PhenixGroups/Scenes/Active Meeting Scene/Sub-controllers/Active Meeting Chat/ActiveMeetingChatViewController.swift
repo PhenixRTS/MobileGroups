@@ -61,6 +61,7 @@ private extension ActiveMeetingChatViewController {
     }
 }
 
+// MARK: - JoinedRoomChatDelegate
 extension ActiveMeetingChatViewController: JoinedRoomChatDelegate {
     func chatMessagesDidChange(_ messages: [RoomChatMessage]) {
         dataSource.messages = messages.sorted { $0.date < $1.date }

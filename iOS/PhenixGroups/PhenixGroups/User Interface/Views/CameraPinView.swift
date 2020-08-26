@@ -37,7 +37,10 @@ private extension CameraPinView {
             imageView.centerYAnchor.constraint(equalTo: centerYAnchor)
         ])
     }
+}
 
+// MARK: - UI Element Factory methods
+private extension CameraPinView {
     func makeImageView() -> UIImageView {
         let image = UIImage(named: "pin")
         let imageView = UIImageView(image: image)

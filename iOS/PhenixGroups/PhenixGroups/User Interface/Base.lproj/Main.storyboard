@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina6_1" orientation="portrait" appearance="light"/>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina5_9" orientation="landscape" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
@@ -14,33 +14,45 @@
             <objects>
                 <viewController storyboardIdentifier="NewMeetingViewController" id="BYZ-38-t0r" customClass="NewMeetingViewController" customModule="Phenix_Groups" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC" customClass="NewMeetingView" customModule="Phenix_Groups" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="812" height="375"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kPC-iH-iC5" customClass="CameraView" customModule="Phenix_Groups" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="600" height="330"/>
+                                <rect key="frame" x="0.0" y="0.0" width="568" height="375"/>
                                 <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
                             <view opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cJO-GY-Ejx">
-                                <rect key="frame" x="0.0" y="180" width="600" height="150"/>
+                                <rect key="frame" x="0.0" y="255" width="568" height="150"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DXQ-6c-J4t">
-                                <rect key="frame" x="0.0" y="300" width="600" height="300"/>
+                                <rect key="frame" x="568" y="0.0" width="200" height="354"/>
                                 <subviews>
-                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JCi-MA-itN" customClass="NewMeetingControlView" customModule="Phenix_Groups" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="600" height="200"/>
+                                    <view contentMode="scaleToFill" verticalHuggingPriority="1000" placeholderIntrinsicWidth="200" placeholderIntrinsicHeight="100" translatesAutoresizingMaskIntoConstraints="NO" id="JCi-MA-itN" customClass="NewMeetingControlView" customModule="Phenix_Groups" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="0.0" width="200" height="100"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
-                                        <constraints>
-                                            <constraint firstAttribute="height" constant="200" placeholder="YES" id="PGQ-mZ-P6u"/>
-                                        </constraints>
                                     </view>
                                     <containerView clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pst-6j-HmE">
-                                        <rect key="frame" x="0.0" y="200" width="600" height="100"/>
+                                        <rect key="frame" x="0.0" y="100" width="200" height="254"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="100" id="LnP-i1-eoS"/>
                                         </constraints>
+                                        <variation key="default">
+                                            <mask key="constraints">
+                                                <exclude reference="LnP-i1-eoS"/>
+                                            </mask>
+                                        </variation>
+                                        <variation key="heightClass=compact">
+                                            <mask key="constraints">
+                                                <exclude reference="LnP-i1-eoS"/>
+                                            </mask>
+                                        </variation>
+                                        <variation key="heightClass=regular">
+                                            <mask key="constraints">
+                                                <include reference="LnP-i1-eoS"/>
+                                            </mask>
+                                        </variation>
                                     </containerView>
                                 </subviews>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -55,7 +67,7 @@
                                 </constraints>
                             </view>
                             <stackView opaque="NO" contentMode="scaleToFill" spacing="50" translatesAutoresizingMaskIntoConstraints="NO" id="a9t-KK-F5G">
-                                <rect key="frame" x="215" y="220" width="170" height="60"/>
+                                <rect key="frame" x="199" y="285" width="170" height="60"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1wP-da-RBs" customClass="ControlButton" customModule="Phenix_Groups" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="60" height="60"/>
@@ -82,21 +94,62 @@
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
-                            <constraint firstItem="cJO-GY-Ejx" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="3j3-Xf-57l"/>
+                            <constraint firstItem="DXQ-6c-J4t" firstAttribute="leading" secondItem="kPC-iH-iC5" secondAttribute="trailing" id="6PJ-qL-MBZ"/>
+                            <constraint firstItem="DXQ-6c-J4t" firstAttribute="width" relation="lessThanOrEqual" secondItem="kPC-iH-iC5" secondAttribute="width" multiplier="1.5" id="6cu-jK-qvn"/>
+                            <constraint firstItem="cJO-GY-Ejx" firstAttribute="leading" secondItem="kPC-iH-iC5" secondAttribute="leading" id="94i-Bc-mgj"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="DXQ-6c-J4t" secondAttribute="trailing" id="D2T-qN-KiT"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="DXQ-6c-J4t" secondAttribute="bottom" id="JbR-Ax-Bvy"/>
-                            <constraint firstItem="kPC-iH-iC5" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="Lzv-v1-Huf"/>
+                            <constraint firstItem="kPC-iH-iC5" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="Lzv-v1-Huf"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="kPC-iH-iC5" secondAttribute="trailing" id="NmT-wI-65A"/>
                             <constraint firstItem="DXQ-6c-J4t" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="Up4-Rk-ZZI"/>
-                            <constraint firstItem="a9t-KK-F5G" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="Vh5-8H-fgx"/>
-                            <constraint firstItem="DXQ-6c-J4t" firstAttribute="top" secondItem="a9t-KK-F5G" secondAttribute="bottom" constant="20" id="aQt-ve-Rrz"/>
+                            <constraint firstItem="DXQ-6c-J4t" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="Vjp-4t-NdO"/>
+                            <constraint firstItem="cJO-GY-Ejx" firstAttribute="trailing" secondItem="kPC-iH-iC5" secondAttribute="trailing" id="WeC-89-dHT"/>
                             <constraint firstAttribute="top" secondItem="kPC-iH-iC5" secondAttribute="top" id="bF0-md-kM7"/>
                             <constraint firstItem="DXQ-6c-J4t" firstAttribute="top" secondItem="kPC-iH-iC5" secondAttribute="bottom" constant="-30" id="dgA-Ip-zQT"/>
-                            <constraint firstItem="DXQ-6c-J4t" firstAttribute="top" secondItem="cJO-GY-Ejx" secondAttribute="bottom" constant="-30" id="lkb-PB-TOq"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="cJO-GY-Ejx" secondAttribute="trailing" id="rO3-WS-GtY"/>
+                            <constraint firstItem="a9t-KK-F5G" firstAttribute="centerX" secondItem="kPC-iH-iC5" secondAttribute="centerX" id="mPI-1w-sJ8"/>
+                            <constraint firstItem="kPC-iH-iC5" firstAttribute="bottom" secondItem="8bC-Xf-vdC" secondAttribute="bottom" id="scu-cO-Xph"/>
+                            <constraint firstItem="kPC-iH-iC5" firstAttribute="bottom" secondItem="a9t-KK-F5G" secondAttribute="bottom" constant="60" id="vo5-yx-NnS">
+                                <variation key="heightClass=compact" constant="30"/>
+                            </constraint>
+                            <constraint firstItem="kPC-iH-iC5" firstAttribute="bottom" secondItem="cJO-GY-Ejx" secondAttribute="bottom" id="x4s-Nr-dEO">
+                                <variation key="heightClass=compact" constant="-30"/>
+                            </constraint>
                             <constraint firstItem="cJO-GY-Ejx" firstAttribute="height" secondItem="a9t-KK-F5G" secondAttribute="height" multiplier="2.5" id="zuO-g5-C7S"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="NmT-wI-65A"/>
+                                <exclude reference="scu-cO-Xph"/>
+                                <exclude reference="6PJ-qL-MBZ"/>
+                                <exclude reference="6cu-jK-qvn"/>
+                                <exclude reference="Up4-Rk-ZZI"/>
+                                <exclude reference="Vjp-4t-NdO"/>
+                                <exclude reference="dgA-Ip-zQT"/>
+                            </mask>
+                        </variation>
+                        <variation key="heightClass=compact">
+                            <mask key="constraints">
+                                <exclude reference="NmT-wI-65A"/>
+                                <include reference="scu-cO-Xph"/>
+                                <include reference="6PJ-qL-MBZ"/>
+                                <include reference="6cu-jK-qvn"/>
+                                <exclude reference="Up4-Rk-ZZI"/>
+                                <include reference="Vjp-4t-NdO"/>
+                                <exclude reference="dgA-Ip-zQT"/>
+                            </mask>
+                        </variation>
+                        <variation key="heightClass=regular">
+                            <mask key="constraints">
+                                <include reference="NmT-wI-65A"/>
+                                <exclude reference="scu-cO-Xph"/>
+                                <exclude reference="6PJ-qL-MBZ"/>
+                                <exclude reference="6cu-jK-qvn"/>
+                                <include reference="Up4-Rk-ZZI"/>
+                                <exclude reference="Vjp-4t-NdO"/>
+                                <include reference="dgA-Ip-zQT"/>
+                            </mask>
+                        </variation>
                         <connections>
                             <outlet property="buttonShadowView" destination="cJO-GY-Ejx" id="9BB-bp-9Dg"/>
                             <outlet property="cameraButton" destination="eyV-Hz-BOe" id="K2j-ct-1OY"/>
@@ -118,7 +171,7 @@
             <objects>
                 <tableViewController storyboardIdentifier="MeetingHistoryTableViewController" id="9rI-ph-Wfa" customClass="MeetingHistoryTableViewController" customModule="Phenix_Groups" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="NHH-Nw-cTc">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="812" height="375"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <connections>
@@ -136,7 +189,7 @@
             <objects>
                 <viewController storyboardIdentifier="JoinMeetingViewController" id="qLZ-cv-lH4" customClass="JoinMeetingViewController" customModule="Phenix_Groups" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="9Vh-6I-7iR" customClass="JoinMeetingView" customModule="Phenix_Groups" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="812" height="375"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <viewLayoutGuide key="safeArea" id="Hva-fu-fqh"/>
@@ -151,23 +204,19 @@
             <objects>
                 <viewController storyboardIdentifier="ActiveMeetingViewController" id="eaH-mH-wJg" customClass="ActiveMeetingViewController" customModule="Phenix_Groups" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="DeJ-7H-C7N" customClass="ActiveMeetingView" customModule="Phenix_Groups" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="812" height="375"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="9Xo-Pu-n5a" customClass="CameraView" customModule="Phenix_Groups" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="-44" width="600" height="292.5"/>
+                                <rect key="frame" x="0.0" y="0.0" width="812" height="375"/>
                                 <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
                             <view opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ad1-Bv-DUc">
-                                <rect key="frame" x="0.0" y="128.5" width="600" height="150"/>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            </view>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="too-zG-rch" userLabel="Container view">
-                                <rect key="frame" x="0.0" y="248.5" width="600" height="351.5"/>
+                                <rect key="frame" x="0.0" y="255" width="812" height="150"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
                             <stackView opaque="NO" contentMode="scaleToFill" spacing="30" translatesAutoresizingMaskIntoConstraints="NO" id="bfA-qW-Uno">
-                                <rect key="frame" x="180" y="168.5" width="240" height="60"/>
+                                <rect key="frame" x="286" y="285" width="240" height="60"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="X1C-54-M6Q" customClass="ControlButton" customModule="Phenix_Groups" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="60" height="60"/>
@@ -201,31 +250,92 @@
                                     </button>
                                 </subviews>
                             </stackView>
+                            <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="too-zG-rch" userLabel="Container view">
+                                <rect key="frame" x="812" y="0.0" width="649.66666666666652" height="354"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
+                            <constraint firstItem="too-zG-rch" firstAttribute="leading" secondItem="9Xo-Pu-n5a" secondAttribute="trailing" id="2wc-2Y-UpU"/>
                             <constraint firstItem="too-zG-rch" firstAttribute="height" secondItem="9Xo-Pu-n5a" secondAttribute="height" multiplier="1.2" id="3iq-jq-TQU"/>
-                            <constraint firstItem="9Xo-Pu-n5a" firstAttribute="leading" secondItem="xSR-HS-McD" secondAttribute="leading" id="ARq-nZ-XaI"/>
-                            <constraint firstItem="too-zG-rch" firstAttribute="top" secondItem="ad1-Bv-DUc" secondAttribute="bottom" constant="-30" id="Db6-bg-QFK"/>
+                            <constraint firstAttribute="bottom" secondItem="9Xo-Pu-n5a" secondAttribute="bottom" id="6ds-MO-cBl"/>
+                            <constraint firstItem="ad1-Bv-DUc" firstAttribute="trailing" secondItem="9Xo-Pu-n5a" secondAttribute="trailing" id="6oA-3c-fle"/>
+                            <constraint firstItem="bfA-qW-Uno" firstAttribute="centerX" secondItem="9Xo-Pu-n5a" secondAttribute="centerX" id="9Z6-Ib-g7E"/>
+                            <constraint firstItem="9Xo-Pu-n5a" firstAttribute="leading" secondItem="DeJ-7H-C7N" secondAttribute="leading" id="ARq-nZ-XaI"/>
                             <constraint firstItem="xSR-HS-McD" firstAttribute="bottom" secondItem="too-zG-rch" secondAttribute="bottom" id="EUo-zo-2uM"/>
-                            <constraint firstItem="ad1-Bv-DUc" firstAttribute="leading" secondItem="xSR-HS-McD" secondAttribute="leading" id="K8q-wq-Mx4"/>
+                            <constraint firstAttribute="trailing" secondItem="too-zG-rch" secondAttribute="leading" id="Hes-0k-ivo"/>
                             <constraint firstItem="xSR-HS-McD" firstAttribute="trailing" secondItem="too-zG-rch" secondAttribute="trailing" id="OxY-Ub-6fe"/>
-                            <constraint firstItem="bfA-qW-Uno" firstAttribute="centerX" secondItem="xSR-HS-McD" secondAttribute="centerX" id="R0i-yC-0bG"/>
+                            <constraint firstItem="9Xo-Pu-n5a" firstAttribute="bottom" secondItem="bfA-qW-Uno" secondAttribute="bottom" constant="20" id="P6V-bi-Csq">
+                                <variation key="heightClass=compact" constant="30"/>
+                            </constraint>
+                            <constraint firstItem="too-zG-rch" firstAttribute="top" secondItem="xSR-HS-McD" secondAttribute="top" id="Vsk-1b-ODn"/>
+                            <constraint firstItem="ad1-Bv-DUc" firstAttribute="leading" secondItem="9Xo-Pu-n5a" secondAttribute="leading" id="WIo-yT-15F"/>
                             <constraint firstItem="too-zG-rch" firstAttribute="top" secondItem="9Xo-Pu-n5a" secondAttribute="bottom" id="YrX-Wx-NTD"/>
-                            <constraint firstItem="xSR-HS-McD" firstAttribute="trailing" secondItem="9Xo-Pu-n5a" secondAttribute="trailing" id="Z9a-MC-1yp"/>
-                            <constraint firstItem="xSR-HS-McD" firstAttribute="trailing" secondItem="ad1-Bv-DUc" secondAttribute="trailing" id="eCY-oU-bzk"/>
-                            <constraint firstItem="too-zG-rch" firstAttribute="top" secondItem="bfA-qW-Uno" secondAttribute="bottom" constant="20" id="ghd-mQ-wfb"/>
+                            <constraint firstAttribute="trailing" secondItem="9Xo-Pu-n5a" secondAttribute="trailing" id="Z9a-MC-1yp"/>
+                            <constraint firstItem="xSR-HS-McD" firstAttribute="trailing" secondItem="too-zG-rch" secondAttribute="trailing" priority="750" id="fLs-ss-GIm"/>
                             <constraint firstItem="ad1-Bv-DUc" firstAttribute="height" secondItem="bfA-qW-Uno" secondAttribute="height" multiplier="2.5" id="hwe-MF-wZz"/>
+                            <constraint firstItem="9Xo-Pu-n5a" firstAttribute="bottom" secondItem="ad1-Bv-DUc" secondAttribute="bottom" constant="-30" id="ivj-zx-fGF"/>
                             <constraint firstItem="too-zG-rch" firstAttribute="leading" secondItem="xSR-HS-McD" secondAttribute="leading" id="ox0-ud-Dh8"/>
-                            <constraint firstItem="xSR-HS-McD" firstAttribute="top" secondItem="9Xo-Pu-n5a" secondAttribute="top" constant="44" id="yv4-NJ-A8t"/>
+                            <constraint firstItem="too-zG-rch" firstAttribute="width" secondItem="9Xo-Pu-n5a" secondAttribute="width" multiplier="0.8" id="pEW-up-YhU"/>
+                            <constraint firstItem="9Xo-Pu-n5a" firstAttribute="width" secondItem="too-zG-rch" secondAttribute="width" multiplier="1.5" id="q2G-8b-ENZ"/>
+                            <constraint firstAttribute="top" secondItem="9Xo-Pu-n5a" secondAttribute="top" id="yv4-NJ-A8t"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="xSR-HS-McD"/>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="6ds-MO-cBl"/>
+                                <exclude reference="Z9a-MC-1yp"/>
+                                <exclude reference="q2G-8b-ENZ"/>
+                                <exclude reference="Hes-0k-ivo"/>
+                                <exclude reference="OxY-Ub-6fe"/>
+                                <exclude reference="fLs-ss-GIm"/>
+                                <exclude reference="2wc-2Y-UpU"/>
+                                <exclude reference="3iq-jq-TQU"/>
+                                <exclude reference="Vsk-1b-ODn"/>
+                                <exclude reference="YrX-Wx-NTD"/>
+                                <exclude reference="ox0-ud-Dh8"/>
+                                <exclude reference="pEW-up-YhU"/>
+                            </mask>
+                        </variation>
+                        <variation key="heightClass=compact">
+                            <mask key="constraints">
+                                <include reference="6ds-MO-cBl"/>
+                                <exclude reference="Z9a-MC-1yp"/>
+                                <exclude reference="q2G-8b-ENZ"/>
+                                <include reference="Hes-0k-ivo"/>
+                                <exclude reference="OxY-Ub-6fe"/>
+                                <include reference="fLs-ss-GIm"/>
+                                <include reference="2wc-2Y-UpU"/>
+                                <exclude reference="3iq-jq-TQU"/>
+                                <include reference="Vsk-1b-ODn"/>
+                                <exclude reference="YrX-Wx-NTD"/>
+                                <exclude reference="ox0-ud-Dh8"/>
+                                <include reference="pEW-up-YhU"/>
+                            </mask>
+                        </variation>
+                        <variation key="heightClass=regular">
+                            <mask key="constraints">
+                                <exclude reference="6ds-MO-cBl"/>
+                                <include reference="Z9a-MC-1yp"/>
+                                <exclude reference="q2G-8b-ENZ"/>
+                                <include reference="OxY-Ub-6fe"/>
+                                <exclude reference="fLs-ss-GIm"/>
+                                <exclude reference="2wc-2Y-UpU"/>
+                                <include reference="3iq-jq-TQU"/>
+                                <exclude reference="Vsk-1b-ODn"/>
+                                <include reference="YrX-Wx-NTD"/>
+                                <include reference="ox0-ud-Dh8"/>
+                            </mask>
+                        </variation>
                         <connections>
                             <outlet property="buttonShadowView" destination="ad1-Bv-DUc" id="Tpe-5G-D2X"/>
                             <outlet property="cameraButton" destination="9Nv-v2-RlB" id="3e4-st-OgJ"/>
                             <outlet property="cameraView" destination="9Xo-Pu-n5a" id="EBI-a1-Hu0"/>
                             <outlet property="containerView" destination="too-zG-rch" id="22p-WK-3KT"/>
                             <outlet property="containerViewBottomConstraint" destination="EUo-zo-2uM" id="3Q2-QM-X6X"/>
+                            <outlet property="containerViewLandscapeLeadingSuperviewConstraint" destination="Hes-0k-ivo" id="VSc-Al-vPJ"/>
+                            <outlet property="controlButtonStackView" destination="bfA-qW-Uno" id="xDi-35-2Ev"/>
                             <outlet property="leaveMeetingButton" destination="c0c-T1-zbt" id="ShS-Co-fuN"/>
                             <outlet property="microphoneButton" destination="X1C-54-M6Q" id="agv-ad-8L3"/>
                         </connections>
@@ -240,11 +350,11 @@
             <objects>
                 <viewController storyboardIdentifier="LaunchViewController" id="bG7-Th-KYz" customClass="LaunchViewController" customModule="Phenix_Groups" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="D4T-zh-EYX">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="812" height="375"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="40" translatesAutoresizingMaskIntoConstraints="NO" id="yqc-dw-D6F">
-                                <rect key="frame" x="178" y="213.5" width="244" height="183"/>
+                                <rect key="frame" x="284" y="101" width="244" height="183"/>
                                 <subviews>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo_phenix" translatesAutoresizingMaskIntoConstraints="NO" id="R1s-WR-7gq">
                                         <rect key="frame" x="72" y="0.0" width="100" height="100"/>
@@ -262,11 +372,11 @@
                                 </subviews>
                             </stackView>
                             <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="jHo-7U-tOc">
-                                <rect key="frame" x="290" y="436.5" width="20" height="20"/>
+                                <rect key="frame" x="396" y="324" width="20" height="20"/>
                                 <color key="color" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </activityIndicatorView>
                         </subviews>
-                        <color key="backgroundColor" name="Launchscreen Background Color"/>
+                        <color key="backgroundColor" name="launchscreen_background"/>
                         <constraints>
                             <constraint firstItem="yqc-dw-D6F" firstAttribute="centerX" secondItem="D4T-zh-EYX" secondAttribute="centerX" id="31s-up-hg0"/>
                             <constraint firstItem="yqc-dw-D6F" firstAttribute="centerY" secondItem="D4T-zh-EYX" secondAttribute="centerY" constant="5" id="3MP-KN-Jzi"/>
@@ -284,7 +394,7 @@
     </scenes>
     <resources>
         <image name="logo_phenix" width="100" height="100"/>
-        <namedColor name="Launchscreen Background Color">
+        <namedColor name="launchscreen_background">
             <color red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
     </resources>

@@ -65,7 +65,7 @@ private extension ActiveMeetingChatTableViewCell {
     }
 }
 
-// MARK: - Helper methods
+// MARK: - UI Element Factory methods
 extension ActiveMeetingChatTableViewCell {
     func makeDisplayNameLabel() -> UILabel {
         let label = UILabel()
@@ -122,6 +122,7 @@ extension ActiveMeetingChatTableViewCell {
     }
 }
 
+// MARK: - Date private extensions
 fileprivate extension Date {
     var localizedRelativeDateTime: String {
         let currentDate = Date()

@@ -26,7 +26,7 @@ extension PhenixManager: PhenixRoomPublishing {
         privateQueue.async { [weak self] in
             guard let self = self else { return }
 
-            os_log(.debug, log: .phenixManager, "Publishing to a room with alias: %{PUBLIC}@, display name: %{PUBLIC}@", alias, displayName)
+            os_log(.debug, log: .phenixManager, "Publishing to a room with alias: %{PUBLIC}s, display name: %{PUBLIC}s", alias, displayName)
             let roomOptions = self.makeRoomOptions(with: alias)
             let publishOptions = self.makePublishOptions()
             let localPublishToRoomOptions = self.makeLocalPublishToRoomOptions(displayName: displayName, roomOptions: roomOptions, publishOptions: publishOptions)
@@ -44,11 +44,14 @@ extension PhenixManager: PhenixRoomPublishing {
                         fatalError("Could not get Publisher parameter")
                     }
 
-                    let joinedRoom = JoinedRoom(roomExpress: self.roomExpress, backend: self.backend, roomService: roomService, publisher: publisher)
-                    joinedRoom.delegate = self
-                    self.add(joinedRoom)
-
-                    completion(.success(joinedRoom))
+                    // Chat service must be created with a small delay after the Room service was created.
+                    // There is a possibility that if they are created shortly one after another - chat history may not be found.
+                    // Therefore JoinedRoom creation is done after a small delay.
+                    self.privateQueue.asyncAfter(deadline: .now() + .seconds(1)) {
+                        let joinedRoom = self.makeJoinedRoom(from: roomService, roomExpress: self.roomExpress, backend: self.backend, publisher: publisher)
+                        self.add(joinedRoom)
+                        completion(.success(joinedRoom))
+                    }
 
                 default:
                     completion(.failure(.failureStatus(status)))

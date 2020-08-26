@@ -17,7 +17,9 @@ class NewMeetingView: UIView {
 
     var microphoneHandler: ControlButtonHandler?
     var cameraHandler: ControlButtonHandler?
+    var openMenuHandler: (() -> Void)?
 
+    private var muteImage: UIImageView!
     @IBOutlet private var cameraView: CameraView!
     @IBOutlet private var controlView: NewMeetingControlView!
     @IBOutlet private var controlViewContainer: UIView!
@@ -30,7 +32,11 @@ class NewMeetingView: UIView {
     @IBAction
     private func microphoneButtonTapped(_ sender: ControlButton) {
         sender.controlState.toggle()
-        microphoneHandler?(sender.controlState == .on)
+
+        let enabled = sender.controlState == .on
+        microphoneHandler?(enabled)
+
+        showMuteIcon(enabled == false)
     }
 
     @IBAction
@@ -56,6 +62,26 @@ class NewMeetingView: UIView {
         configureButtons()
 
         cameraView.placeholderText = displayName
+
+        muteImage = UIImageView.makeMuteImageView()
+
+        let menu = UIButton.makeMenuButton()
+        menu.addTarget(self, action: #selector(openMenu), for: .touchUpInside)
+
+        addSubview(muteImage)
+        addSubview(menu)
+
+        NSLayoutConstraint.activate([
+            muteImage.trailingAnchor.constraint(equalTo: cameraView.trailingAnchor, constant: -8),
+            muteImage.centerYAnchor.constraint(equalTo: microphoneButton.centerYAnchor),
+            muteImage.widthAnchor.constraint(equalToConstant: 44),
+            muteImage.heightAnchor.constraint(equalToConstant: 44),
+
+            menu.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: 8),
+            menu.trailingAnchor.constraint(equalTo: cameraView.trailingAnchor, constant: -8),
+            menu.widthAnchor.constraint(equalToConstant: 44),
+            menu.heightAnchor.constraint(equalToConstant: 44)
+        ])
     }
 
     func setNewMeetingHandler(_ completion: @escaping NewMeetingControlView.ButtonTapHandler) {
@@ -68,6 +94,7 @@ class NewMeetingView: UIView {
 
     func setMicrophone(enabled: Bool) {
         setControl(microphoneButton, enabled: enabled)
+        showMuteIcon(enabled == false)
     }
 
     func setCamera(enabled: Bool) {
@@ -113,7 +140,7 @@ private extension NewMeetingView {
         let borderColor: UIColor
 
         if #available(iOS 13.0, *) {
-            borderColor = UIColor(named: "Button Border Color") ?? UIColor.systemBackground
+            borderColor = UIColor(named: "button_border") ?? UIColor.systemBackground
         } else {
             borderColor = .white
         }
@@ -153,11 +180,21 @@ private extension NewMeetingView {
         control.controlState = enabled == true ? .on : .off
     }
 
+    func showMuteIcon(_ show: Bool) {
+        muteImage.isHidden = show == false
+    }
+
     func showCamera(_ show: Bool) {
         cameraView.showCamera = show
     }
+
+    @objc
+    func openMenu() {
+        openMenuHandler?()
+    }
 }
 
+// MARK: - MeetingHistoryViewDelegate
 extension NewMeetingView: MeetingHistoryViewDelegate {
     func tableContentSizeDidChange(_ size: CGSize) {
         guard size.height <= Self.maxHistoryHeight else { return }

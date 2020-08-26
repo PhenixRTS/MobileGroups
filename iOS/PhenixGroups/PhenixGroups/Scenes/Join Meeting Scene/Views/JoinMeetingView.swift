@@ -21,12 +21,12 @@ class JoinMeetingView: UIView {
 
     override init(frame: CGRect) {
          super.init(frame: frame)
-         commonInit()
+         setup()
     }
 
     required init?(coder aDecoder: NSCoder) {
          super.init(coder: aDecoder)
-         commonInit()
+         setup()
     }
 
     @objc
@@ -56,7 +56,7 @@ class JoinMeetingView: UIView {
 }
 
 private extension JoinMeetingView {
-    func commonInit() {
+    func setup() {
         makeCloseButton()
         setupUserInterfaceElements()
     }
@@ -65,7 +65,11 @@ private extension JoinMeetingView {
         let button = UIButton(type: .system)
         closeButton = button
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.tintColor = UIColor(named: "Button Inverted Color")
+        if #available(iOS 13.0, *) {
+            button.tintColor = .label
+        } else {
+            button.tintColor = .black
+        }
         button.setImage(UIImage(named: "close_button"), for: .normal)
         button.addTarget(self, action: #selector(closeButtonTapped), for: .touchUpInside)
         addSubview(button)
@@ -79,10 +83,7 @@ private extension JoinMeetingView {
     }
 
     func setupUserInterfaceElements() {
-        let stack = UIStackView(arrangedSubviews: [
-            makeTextField(),
-            makeJoinButton()
-        ])
+        let stack = UIStackView(arrangedSubviews: [makeTextField(), makeJoinButton()])
 
         addSubview(stack)
 
@@ -97,13 +98,16 @@ private extension JoinMeetingView {
             stack.bottomAnchor.constraint(lessThanOrEqualTo: bottomAnchor, constant: -16)
         ])
     }
+}
 
+// MARK: - UI Element Factory methods
+private extension JoinMeetingView {
     func makeTextField() -> UIView {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
 
         // Display name label
-        let label = UILabel.textFieldCaptionLabel("Enter a meeting code")
+        let label = UILabel.makeTextFieldCaptionLabel(text: "Enter a meeting code")
         view.addSubview(label)
 
         NSLayoutConstraint.activate([
@@ -112,7 +116,7 @@ private extension JoinMeetingView {
             label.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
 
-        let textField = UITextField.mainTextField(placeholder: "Meeting code")
+        let textField = UITextField.makePrimaryTextField(placeholder: "Meeting code")
         meetingCodeTextField = textField
         textField.delegate = self
         textField.addTarget(self, action: #selector(textFieldDidChange), for: .editingChanged)
@@ -133,7 +137,7 @@ private extension JoinMeetingView {
         let view = UIView()
         view.translatesAutoresizingMaskIntoConstraints = false
 
-        let button = UIButton.mainButton(title: "Join meeting")
+        let button = UIButton.makePrimaryButton(withTitle: "Join meeting")
         joinButton = button
         button.translatesAutoresizingMaskIntoConstraints = false
         button.isEnabled = false
@@ -151,6 +155,7 @@ private extension JoinMeetingView {
     }
 }
 
+// MARK: - UITextFieldDelegate
 extension JoinMeetingView: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()

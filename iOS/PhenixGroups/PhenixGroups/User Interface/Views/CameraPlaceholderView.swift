@@ -55,7 +55,10 @@ private extension CameraPlaceholderView {
             stack.centerYAnchor.constraint(equalTo: centerYAnchor)
         ])
     }
+}
 
+// MARK: - UI Element Factory methods
+private extension CameraPlaceholderView {
     func makeImageView() -> UIImageView {
         let image = UIImage(named: "camera_placeholder")
         let imageView = UIImageView(image: image)

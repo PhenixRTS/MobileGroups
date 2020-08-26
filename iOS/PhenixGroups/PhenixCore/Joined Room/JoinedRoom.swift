@@ -33,12 +33,12 @@ public class JoinedRoom: CustomStringConvertible {
         "Joined Room, backend: \(backend.absoluteURL), alias: \(String(describing: alias))"
     }
 
-    init(roomExpress: PhenixRoomExpress, backend: URL, roomService: PhenixRoomService, publisher: PhenixExpressPublisher? = nil) {
+    init(roomExpress: PhenixRoomExpress, backend: URL, roomService: PhenixRoomService, chatService: PhenixRoomChatService, publisher: PhenixExpressPublisher? = nil) {
         self.roomExpress = roomExpress
         self.backend = backend
         self.publisher = publisher
         self.roomService = roomService
-        self.chatService = PhenixRoomChatServiceFactory.createRoomChatService(roomService)
+        self.chatService = chatService
 
         self.currentMember = RoomMember(roomService.getSelf(), isSelf: true, roomExpress: roomExpress)
     }
@@ -57,7 +57,7 @@ public class JoinedRoom: CustomStringConvertible {
     }
 
     public func setAudio(enabled: Bool) {
-        os_log(.debug, log: .joinedRoom, "Set Publisher audio enabled - %{PUBLIC}d", enabled)
+        os_log(.debug, log: .joinedRoom, "Set user media publisher audio enabled - %{PUBLIC}d", enabled)
 
         if enabled {
             publisher?.enableAudio()
@@ -67,7 +67,7 @@ public class JoinedRoom: CustomStringConvertible {
     }
 
     public func setVideo(enabled: Bool) {
-        os_log(.debug, log: .joinedRoom, "Set Publisher video enabled - %{PUBLIC}d", enabled)
+        os_log(.debug, log: .joinedRoom, "Set user media publisher video enabled - %{PUBLIC}d", enabled)
 
         if enabled {
             publisher?.enableVideo()
@@ -134,15 +134,15 @@ private extension JoinedRoom {
 
     func membersJoined(_ newMembers: Set<RoomMember>) {
         guard newMembers.isEmpty == false else { return }
-        os_log(.debug, log: .joinedRoom, "Members joined: %{PRIVATE}s", newMembers.description)
         members.formUnion(newMembers)
+        os_log(.debug, log: .joinedRoom, "Members joined: %{PRIVATE}s", newMembers.description)
         newMembers.forEach { $0.observe() }
     }
 
     func membersLeft(_ oldMembers: Set<RoomMember>) {
         guard oldMembers.isEmpty == false else { return }
-        os_log(.debug, log: .joinedRoom, "Members left: %{PRIVATE}s", oldMembers.description)
         members.subtract(oldMembers)
+        os_log(.debug, log: .joinedRoom, "Members left: %{PRIVATE}s", oldMembers.description)
         oldMembers.forEach { $0.dispose() }
     }
 
@@ -165,7 +165,7 @@ private extension JoinedRoom {
 
         var messages = chatMessages.compactMap(RoomChatMessage.init)
 
-        for (index, message) in messages.enumerated() where message.authorId == currentMember.identifier {
+        for (index, message) in messages.enumerated() where message.authorName == currentMember.screenName {
             messages[index].maskAsYourself()
         }
 
@@ -173,6 +173,7 @@ private extension JoinedRoom {
     }
 }
 
+// MARK: - Hashable
 extension JoinedRoom: Hashable {
     public static func == (lhs: JoinedRoom, rhs: JoinedRoom) -> Bool {
         lhs === rhs

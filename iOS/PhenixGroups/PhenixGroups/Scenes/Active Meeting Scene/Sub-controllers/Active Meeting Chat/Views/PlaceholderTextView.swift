@@ -56,6 +56,7 @@ class PlaceholderTextView: UITextView {
     }
 }
 
+// MARK: - UI Element Factory methods
 private extension PlaceholderTextView {
     func makePlaceholderLabel() -> UILabel {
         let label = UILabel()
