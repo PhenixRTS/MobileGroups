@@ -2,27 +2,34 @@
  * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
-@file:Suppress("RemoveToStringInStringTemplate")
-
 package com.phenixrts.suite.groups.models
 
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import androidx.lifecycle.MutableLiveData
 import com.phenixrts.common.Disposable
+import com.phenixrts.common.RequestStatus
 import com.phenixrts.express.ExpressSubscriber
+import com.phenixrts.express.RoomExpress
+import com.phenixrts.express.SubscribeToMemberStreamOptions
 import com.phenixrts.media.audio.android.AndroidAudioFrame
 import com.phenixrts.pcast.*
 import com.phenixrts.pcast.android.AndroidReadAudioFrameCallback
 import com.phenixrts.pcast.android.AndroidVideoRenderSurface
 import com.phenixrts.room.Member
 import com.phenixrts.room.MemberState
+import com.phenixrts.room.Stream
 import com.phenixrts.room.TrackState
 import com.phenixrts.suite.groups.common.enums.AudioLevel
+import com.phenixrts.suite.groups.common.extensions.asString
 import com.phenixrts.suite.groups.common.extensions.call
 import com.phenixrts.suite.groups.common.getRendererOptions
+import com.phenixrts.suite.phenixcommon.common.launchIO
 import com.phenixrts.suite.phenixcommon.common.launchMain
+import kotlinx.coroutines.CancellableContinuation
+import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
+import kotlin.coroutines.resume
 import kotlin.math.abs
 import kotlin.math.log10
 
@@ -33,6 +40,7 @@ data class RoomMember(
 
     private val disposables: MutableList<Disposable> = mutableListOf()
     private var videoRenderSurface = AndroidVideoRenderSurface()
+    private var subscriptionDisposable: Disposable? = null
     private var subscriber: ExpressSubscriber? = null
     private var renderer: Renderer? = null
     private var audioTrack: MediaStreamTrack? = null
@@ -44,6 +52,7 @@ data class RoomMember(
     private var audioBuffer = arrayListOf<Double>()
     private var mainSurface: SurfaceHolder? = null
     private var previewSurface: SurfaceHolder? = null
+    private var currentStreamIndex = 0
 
     val onUpdate: MutableLiveData<RoomMember> = MutableLiveData()
     var audioLevel: MutableLiveData<AudioLevel> = MutableLiveData()
@@ -54,17 +63,20 @@ data class RoomMember(
     var isPinned = false
     var isMuted = false
     var isOffscreen = false
+    var isSubscribed = false
 
     private fun observeMember() {
         try {
-            if (!isObserved) {
+            if (!isObserved && !isSelf) {
                 Timber.d("Observing member: ${toString()}")
                 isObserved = true
+                disposables.forEach { it.dispose() }
+                disposables.clear()
                 val memberStream = member.observableStreams?.value?.getOrNull(0)
                 member.observableState?.subscribe {
                     launchMain {
                         if (canRenderVideo && canShowPreview != (it == MemberState.ACTIVE)) {
-                            Timber.d("Active state changed: ${this@RoomMember.toString()} state: $it")
+                            Timber.d("Active state changed: ${this@RoomMember.asString()} state: $it")
                             canShowPreview = it == MemberState.ACTIVE
                             onUpdate.call(this@RoomMember)
                         }
@@ -74,7 +86,7 @@ data class RoomMember(
                 memberStream?.observableVideoState?.subscribe {
                     launchMain {
                         if (canRenderVideo && canShowPreview != (it == TrackState.ENABLED)) {
-                            Timber.d("Video state changed: ${this@RoomMember.toString()} state: $it")
+                            Timber.d("Video state changed: ${this@RoomMember.asString()} state: $it")
                             canShowPreview = it == TrackState.ENABLED
                             onUpdate.call(this@RoomMember)
                         }
@@ -84,7 +96,7 @@ data class RoomMember(
                 memberStream?.observableAudioState?.subscribe {
                     launchMain {
                         if (isMuted != (it == TrackState.DISABLED)) {
-                            Timber.d("Audio state changed: ${this@RoomMember.toString()} state: $it")
+                            Timber.d("Audio state changed: ${this@RoomMember.asString()} state: $it")
                             isMuted = it == TrackState.DISABLED
                             onUpdate.call(this@RoomMember)
                         }
@@ -113,7 +125,7 @@ data class RoomMember(
             renderer?.setDataQualityChangedCallback { _, status, _ ->
                 launchMain {
                     if (canShowPreview && status != DataQualityStatus.ALL) {
-                        Timber.d("Render quality status changed: $status Can show video: $canShowPreview : ${this@RoomMember.toString()}")
+                        Timber.d("Render quality status changed: $status Can show video: $canShowPreview : ${this@RoomMember.asString()}")
                         canShowPreview = false
                         onUpdate.call(this@RoomMember)
                     }
@@ -145,33 +157,66 @@ data class RoomMember(
         }
     }
 
+    private fun updateSubscription(subscriber: ExpressSubscriber? = null, renderer: Renderer? = null) {
+        // Dispose old subscription and renderer
+        reset()
+        this.subscriber?.stop()
+        this.subscriber?.dispose()
+        this.renderer?.stop()
+        this.renderer?.dispose()
+
+        // Assign new values
+        this.subscriber = subscriber
+        this.renderer = renderer
+    }
+
     fun isThisMember(sessionId: String?) = member.sessionId == sessionId
 
     fun getScreenName(): String = member.observableScreenName.value
 
-    fun isSubscribed() = subscriber != null
-
     fun canRenderThumbnail() = canRenderVideo && canShowPreview && !isActiveRenderer
 
-    fun onSubscribed(subscriber: ExpressSubscriber, renderer: Renderer?) {
-        this.subscriber = subscriber
-        this.renderer = renderer
+    suspend fun subscribe(roomExpress: RoomExpress?, options: SubscribeToMemberStreamOptions) = suspendCancellableCoroutine<Unit> { continuation ->
+        if (roomExpress == null || isSelf) {
+            if (continuation.isActive) continuation.resume(Unit)
+            return@suspendCancellableCoroutine
+        }
+        subscriptionDisposable?.dispose()
+        subscriptionDisposable = null
+        member.observableStreams.subscribe { streams ->
+            Timber.d("Subscribing to member media: ${toString()}")
+            subscribeToStream(roomExpress, options, streams.toList(), continuation)
+        }.run { subscriptionDisposable = this }
+    }
+
+    private fun subscribeToStream(roomExpress: RoomExpress, options: SubscribeToMemberStreamOptions,
+                                          streams: List<Stream>, continuation: CancellableContinuation<Unit>){
+        streams.getOrNull(currentStreamIndex)?.let { stream ->
+            roomExpress.subscribeToMemberStream(stream, options) { status, subscriber, renderer ->
+                Timber.d("Subscribed to member media: $status ${toString()}")
+                if (status == RequestStatus.OK) {
+                    updateSubscription(subscriber, renderer)
+                    startMemberRenderer()
+                    isSubscribed = true
+                    if (continuation.isActive) continuation.resume(Unit)
+                } else if (currentStreamIndex + 1 < streams.size) {
+                    launchIO {
+                        currentStreamIndex++
+                        Timber.d("Trying a different stream: $currentStreamIndex")
+                        subscribeToStream(roomExpress, options, streams, continuation)
+                    }
+                } else if (continuation.isActive) continuation.resume(Unit)
+            }
+        }
     }
 
     fun setSurfaces(mainSurface: SurfaceHolder, previewSurface: SurfaceView) {
         this.mainSurface = mainSurface
         this.previewSurface = previewSurface.holder
         this.previewSurfaceView = previewSurface
-        if (!isSelf) {
-            observeMember()
-        }
     }
 
-    fun setSelfRenderer(
-        renderer: Renderer?,
-        videoRenderSurface: AndroidVideoRenderSurface,
-        audioTrack: MediaStreamTrack?
-    ) {
+    fun setSelfRenderer(renderer: Renderer?, videoRenderSurface: AndroidVideoRenderSurface, audioTrack: MediaStreamTrack?) {
         this.renderer = renderer
         this.videoRenderSurface = videoRenderSurface
         this.audioTrack = audioTrack
@@ -184,6 +229,7 @@ data class RoomMember(
         if (audioTrack == null) {
             audioTrack = subscriber?.audioTracks?.getOrNull(0)
         }
+        observeMember()
         observeDataQuality()
         audioTrack?.let { audioTrack ->
             observeAudioTrack(audioTrack)
@@ -202,20 +248,25 @@ data class RoomMember(
         return status
     }
 
-    fun dispose() = try {
+    private fun reset() {
+        currentStreamIndex = 0
         isObserved = false
+        isAudioObserved = false
+        isSubscribed = false
+        isRendererStarted = false
+    }
+
+    fun dispose() = try {
+        reset()
         disposables.forEach { it.dispose() }
         disposables.clear()
+        subscriptionDisposable?.dispose()
+        subscriptionDisposable = null
         mainSurface = null
         previewSurface = null
         if (!isSelf) {
             videoRenderSurface.setSurfaceHolder(null)
-            subscriber?.stop()
-            subscriber?.dispose()
-            subscriber = null
-            renderer?.stop()
-            renderer?.dispose()
-            renderer = null
+            updateSubscription()
         }
         Timber.d("Room member disposed: ${toString()}")
     } catch (e: Exception) {
@@ -230,7 +281,7 @@ data class RoomMember(
                 "\"isPinned\":\"$isPinned\"," +
                 "\"isMuted\":\"$isMuted\"," +
                 "\"isSelf\":\"$isSelf\"," +
-                "\"isSubscribed\":\"${isSubscribed()}\"}"
+                "\"isSubscribed\":\"$isSubscribed\"}"
     }
 
     private companion object {

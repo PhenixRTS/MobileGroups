@@ -29,45 +29,52 @@ class JoinedRoomRepository(
     private val dateRoomLeft: Date
 ) {
 
-    private val disposables: MutableList<Disposable?> = mutableListOf()
-    private val chatHistory = MutableLiveData<List<RoomMessage>>()
+    private val disposables: MutableList<Disposable> = mutableListOf()
     private var isViewingChat = false
+    val chatMessages = MutableLiveData<List<RoomMessage>>()
 
-    private fun dispose() = launchIO {
+    init {
         launchMain {
-            chatHistory.value = mutableListOf()
+            observeChatMessages()
         }
+    }
 
-        disposables.forEach { it?.dispose() }
-        disposables.clear()
-
+    private fun dispose() {
+        launchMain {
+            chatMessages.value = mutableListOf()
+        }
+        clearDisposables()
         roomService.dispose()
         chatService.dispose()
         publisher.dispose()
         Timber.d("Joined room disposed")
     }
 
-    fun setViewingChat(viewingChat: Boolean) {
-        isViewingChat = viewingChat
-        if (viewingChat) {
-            chatHistory.value?.filter { !it.isRead }?.takeIf { it.isNotEmpty() }?.let { messages ->
-                messages.forEach { it.isRead = true }
-                chatHistory.refresh()
-            }
-        }
-    }
-
-    fun getObservableChatMessages(): MutableLiveData<List<RoomMessage>> {
+    private fun observeChatMessages() {
+        clearDisposables()
         chatService.observableChatMessages.subscribe { messages ->
             Timber.d("Message list updated ${messages.size}")
             launchMain {
-                Timber.d("Message list updated")
-                val history = chatHistory.value?.toMutableList() ?: mutableListOf()
+                val history = chatMessages.value?.toMutableList() ?: mutableListOf()
                 history.addUnique(messages, roomService.self.observableScreenName.value, dateRoomLeft, isViewingChat)
-                chatHistory.value = history
+                chatMessages.value = history
             }
         }.run { disposables.add(this) }
-        return chatHistory
+    }
+
+    fun clearDisposables() {
+        disposables.forEach { it.dispose() }
+        disposables.clear()
+    }
+
+    fun setViewingChat(viewingChat: Boolean) {
+        isViewingChat = viewingChat
+        if (viewingChat) {
+            chatMessages.value?.filter { !it.isRead }?.takeIf { it.isNotEmpty() }?.let { messages ->
+                messages.forEach { it.isRead = true }
+                chatMessages.refresh()
+            }
+        }
     }
 
     fun sendChatMessage(message: String, continuation: Continuation<RoomStatus>) {

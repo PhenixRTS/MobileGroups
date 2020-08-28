@@ -60,7 +60,7 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
             Timber.d("Unread message count changed: $count")
             setMessageCount(count)
         })
-        Timber.d("Room screen created: ${viewModel.currentRoomAlias.value}")
+        Timber.d("Room screen created: ${viewModel.currentRoomAlias}")
     }
 
     override fun onBackPressed() {
@@ -84,7 +84,7 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
     private fun getInfoFragment(): InfoFragment {
         val fragment = InfoFragment()
         val bundle = Bundle()
-        bundle.putString(EXTRA_ROOM_ALIAS, viewModel.currentRoomAlias.value ?: "")
+        bundle.putString(EXTRA_ROOM_ALIAS, viewModel.currentRoomAlias)
         fragment.arguments = bundle
         return fragment
     }

@@ -4,13 +4,13 @@
 
 package com.phenixrts.suite.groups.models
 
-import android.os.Handler
 import androidx.lifecycle.MutableLiveData
 import com.phenixrts.chat.ChatMessage
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.common.extensions.elapsedTime
 import com.phenixrts.suite.phenixcommon.common.launchMain
+import kotlinx.coroutines.delay
 
 data class RoomMessage(
     val message: ChatMessage,
@@ -37,9 +37,8 @@ data class RoomMessage(
             }
             observableMessageBody.value = message.observableMessage.value
 
-            Handler().postDelayed({
-                refreshMessage()
-            }, MESSAGE_TIME_UPDATE_DELAY)
+            delay(MESSAGE_TIME_UPDATE_DELAY)
+            refreshMessage()
         }
     }
 

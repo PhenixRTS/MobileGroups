@@ -4,6 +4,9 @@
 
 package com.phenixrts.suite.groups.repository
 
+import androidx.lifecycle.MutableLiveData
+import com.phenixrts.chat.RoomChatService
+import com.phenixrts.chat.RoomChatServiceFactory
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.express.*
 import com.phenixrts.pcast.UserMediaStream
@@ -14,12 +17,12 @@ import com.phenixrts.suite.groups.cache.entities.RoomInfoItem
 import com.phenixrts.suite.groups.common.getPublishOptions
 import com.phenixrts.suite.groups.common.getPublishToRoomOptions
 import com.phenixrts.suite.groups.common.getRoomOptions
-import com.phenixrts.suite.groups.models.JoinedRoomStatus
+import com.phenixrts.suite.groups.models.CHAT_SUBSCRIPTION_DELAY
 import com.phenixrts.suite.groups.models.RoomExpressConfiguration
 import com.phenixrts.suite.groups.models.RoomStatus
 import com.phenixrts.suite.phenixcommon.common.launchIO
-import kotlinx.coroutines.CancellableContinuation
-import kotlinx.coroutines.suspendCancellableCoroutine
+import com.phenixrts.suite.phenixcommon.common.launchMain
+import kotlinx.coroutines.delay
 import timber.log.Timber
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -31,26 +34,40 @@ class RoomExpressRepository(
 ) {
 
     private var isDisposed = false
+    var roomService: RoomService? = null
+    var expressPublisher: ExpressPublisher? = null
+    var chatService: RoomChatService? = null
+    val onRoomJoined = MutableLiveData<RequestStatus>()
 
     /**
      * Try to join a room with given room options and block until executed
      */
-    private fun joinRoom(publishToRoomOptions: PublishToRoomOptions,
-                         continuation: CancellableContinuation<JoinedRoomStatus>) = launchIO {
-        roomExpress.publishToRoom(publishToRoomOptions) { status: RequestStatus, roomService: RoomService?,
-                                                          publisher: ExpressPublisher? ->
-            Timber.d("Room join completed with status: $status")
-            var requestStatus = status
-            if (status == RequestStatus.OK) {
-                roomService?.observableActiveRoom?.value?.let { room ->
-                    cacheProvider.cacheDao().insertRoom(RoomInfoItem(room.roomId, room.observableAlias.value, configuration.backend))
+    private fun joinRoom(publishToRoomOptions: PublishToRoomOptions) = launchIO {
+        roomExpress.publishToRoom(publishToRoomOptions) { status: RequestStatus, service: RoomService?, publisher: ExpressPublisher? ->
+            launchMain {
+                roomService = service
+                expressPublisher = publisher
+                delay(CHAT_SUBSCRIPTION_DELAY)
+                chatService = RoomChatServiceFactory.createRoomChatService(roomService)
+                var requestStatus = status
+                if (status == RequestStatus.OK) {
+                    service?.observableActiveRoom?.value?.let { room ->
+                        launchIO {
+                            cacheProvider.cacheDao().insertRoom(
+                                RoomInfoItem(
+                                    room.roomId,
+                                    room.observableAlias.value,
+                                    configuration.backend
+                                )
+                            )
+                        }
+                    }
                 }
-            }
-            if (roomService == null || publisher == null) {
-                requestStatus = RequestStatus.FAILED
-            }
-            if (continuation.isActive) {
-                continuation.resume(JoinedRoomStatus(requestStatus, roomService, publisher))
+                if (service == null || publisher == null) {
+                    requestStatus = RequestStatus.FAILED
+                }
+                Timber.d("Room join completed with status: $status")
+                onRoomJoined.value = requestStatus
             }
         }
     }
@@ -85,22 +102,20 @@ class RoomExpressRepository(
     /**
      * Join a room with given room ID and user screen name
      */
-    suspend fun joinRoomById(roomId: String, userScreenName: String, userMediaStream: UserMediaStream): JoinedRoomStatus
-            = suspendCancellableCoroutine { continuation ->
+    fun joinRoomById(roomId: String, userScreenName: String, userMediaStream: UserMediaStream) {
         val publishOptions = getPublishOptions(userMediaStream)
         val publishToRoomOptions = getPublishToRoomOptions(roomId, userScreenName, publishOptions)
-        joinRoom(publishToRoomOptions, continuation)
+        joinRoom(publishToRoomOptions)
     }
 
     /**
      * Join a room with given room alias and user screen name
      */
-    suspend fun joinRoomByAlias(roomAlias: String, userScreenName: String, userMediaStream: UserMediaStream): JoinedRoomStatus
-            = suspendCancellableCoroutine { continuation ->
+    fun joinRoomByAlias(roomAlias: String, userScreenName: String, userMediaStream: UserMediaStream) {
         val roomOptions = getRoomOptions(roomAlias)
         val publishOptions = getPublishOptions(userMediaStream)
         val publishToRoomOptions = getPublishToRoomOptions(userScreenName, roomOptions, publishOptions)
-        joinRoom(publishToRoomOptions, continuation)
+        joinRoom(publishToRoomOptions)
     }
 
     fun dispose() {

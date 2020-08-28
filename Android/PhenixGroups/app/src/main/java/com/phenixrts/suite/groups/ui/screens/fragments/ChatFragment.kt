@@ -8,10 +8,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.common.extensions.showToast
 import com.phenixrts.suite.groups.databinding.FragmentChatBinding
+import com.phenixrts.suite.groups.models.RoomMessage
 import com.phenixrts.suite.groups.ui.adapters.ChatListAdapter
 import com.phenixrts.suite.phenixcommon.common.launchMain
 import timber.log.Timber
@@ -21,6 +23,16 @@ class ChatFragment : BaseFragment() {
     private lateinit var binding: FragmentChatBinding
 
     private val adapter by lazy { ChatListAdapter() }
+
+    private val chatObserver = Observer<List<RoomMessage>> { messages ->
+        launchMain {
+            viewModel.unreadMessageCount.value = messages.count { !it.isRead }
+            adapter.data = messages
+            if (messages.isNotEmpty()) {
+                binding.chatHistory.scrollToPosition(messages.size - 1)
+            }
+        }
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentChatBinding.inflate(inflater)
@@ -39,15 +51,7 @@ class ChatFragment : BaseFragment() {
 
     private fun observeMessages() = launchMain {
         if (isAdded) {
-            viewModel.getChatMessages().observe(viewLifecycleOwner, { messages ->
-                launchMain {
-                    viewModel.unreadMessageCount.value = messages.count { !it.isRead }
-                    adapter.data = messages
-                    if (messages.isNotEmpty()) {
-                        binding.chatHistory.scrollToPosition(messages.size - 1)
-                    }
-                }
-            })
+            viewModel.chatMessages.observeForever(chatObserver)
         }
     }
 

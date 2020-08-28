@@ -229,6 +229,19 @@ class MainActivity : EasyPermissionActivity() {
         viewModel.onPermissionRequested.observe(this, {
             initMediaButtons()
         })
+        viewModel.onRoomJoined.observe(this, { status ->
+            launchMain {
+                if (viewModel.isInRoom.isFalse()) {
+                    Timber.d("Room joined with status: $status")
+                    hideLoadingScreen()
+                    if (status == RequestStatus.OK) {
+                        launchFragment(RoomScreen())
+                    } else if (status != RequestStatus.GONE) {
+                        showToast(getString(R.string.err_join_room_failed))
+                    }
+                }
+            }
+        })
         initMediaButtons()
         menuHandler.onStart()
         debugMenu.onStart(getString(R.string.debug_app_version,
@@ -241,7 +254,7 @@ class MainActivity : EasyPermissionActivity() {
     }
 
     private fun initMediaButtons() = launchMain {
-        Timber.d("Init user media: ${viewModel.isVideoEnabled.value} ${viewModel.isMicrophoneEnabled.value}")
+        Timber.d("Init user media buttons: ${viewModel.isVideoEnabled.value} ${viewModel.isMicrophoneEnabled.value}")
         setMicrophoneEnabled(viewModel.isMicrophoneEnabled.isTrue(true))
         setCameraPreviewEnabled(viewModel.isVideoEnabled.isTrue(true))
     }

@@ -59,6 +59,8 @@ fun Member.mapRoomMember(members: List<RoomMember>?, selfSessionId: String) =
         isSelf = this@mapRoomMember.sessionId == selfSessionId
     } ?: RoomMember(this, this@mapRoomMember.sessionId == selfSessionId)
 
+fun RoomMember.asString() = toString()
+
 fun Calendar.expirationDate(): Date {
     add(Calendar.DAY_OF_MONTH, - BuildConfig.EXPIRATION_DAYS)
     return time

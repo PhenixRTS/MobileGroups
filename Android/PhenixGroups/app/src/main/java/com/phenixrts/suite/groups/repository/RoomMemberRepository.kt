@@ -8,9 +8,6 @@ import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.MutableLiveData
 import com.phenixrts.common.Disposable
-import com.phenixrts.common.RequestStatus
-import com.phenixrts.express.RoomExpress
-import com.phenixrts.express.SubscribeToMemberStreamOptions
 import com.phenixrts.room.RoomService
 import com.phenixrts.room.TrackState
 import com.phenixrts.suite.groups.BuildConfig
@@ -18,33 +15,30 @@ import com.phenixrts.suite.groups.common.enums.AudioLevel
 import com.phenixrts.suite.groups.common.extensions.call
 import com.phenixrts.suite.phenixcommon.common.launchMain
 import com.phenixrts.suite.groups.common.extensions.mapRoomMember
-import com.phenixrts.suite.groups.models.RoomStatus
 import com.phenixrts.suite.groups.models.RoomMember
-import com.phenixrts.suite.phenixcommon.common.launchIO
 import timber.log.Timber
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class RoomMemberRepository(
-    private val roomExpress: RoomExpress,
     private val roomService: RoomService,
     private val selfMember: RoomMember
 ) {
 
-    private val disposables: MutableList<Disposable?> = mutableListOf()
-    private val roomMembers = MutableLiveData<List<RoomMember>>()
+    private val disposables: MutableList<Disposable> = mutableListOf()
     private val memberPickerHandler = Handler(Looper.getMainLooper())
     private val memberPickerRunnable = Runnable {
         pickLoudestMember()
     }
+    val roomMembers = MutableLiveData<List<RoomMember>>()
 
     init {
         launchMain {
-            roomMembers.value = listOf(selfMember)
+            observeRoomMembers()
         }
     }
 
-    fun getObservableRoomMembers(): MutableLiveData<List<RoomMember>> {
+    private fun observeRoomMembers() {
+        roomMembers.value = listOf(selfMember)
+        clearDisposables()
         roomService.observableActiveRoom.value.observableMembers.subscribe { members ->
             launchMain {
                 Timber.d("Received RAW members count: ${members.size}")
@@ -57,7 +51,11 @@ class RoomMemberRepository(
                 updateMemberList(mappedMembers)
             }
         }.run { disposables.add(this) }
-        return roomMembers
+    }
+
+    private fun clearDisposables() {
+        disposables.forEach { it.dispose() }
+        disposables.clear()
     }
 
     private fun updateMemberList(members: List<RoomMember>) = launchMain {
@@ -193,40 +191,9 @@ class RoomMemberRepository(
         }
     }
 
-    suspend fun subscribeToMemberMedia(roomMember: RoomMember, options: SubscribeToMemberStreamOptions): RoomStatus
-            = suspendCoroutine { continuation ->
-        val members = roomMembers.value ?: mutableListOf()
-        members.find { it.isThisMember(roomMember.member.sessionId) }?.let { member ->
-            member.member.observableStreams.subscribe { streams ->
-                val stream = streams.getOrNull(0)
-                if (stream != null && !member.isSubscribed()) {
-                    roomExpress.subscribeToMemberStream(stream, options) { status, subscriber, renderer ->
-                        launchMain {
-                            var message = ""
-                            if (status == RequestStatus.OK) {
-                                member.onSubscribed(subscriber, renderer)
-                                Timber.d("Subscribed to member media: $status $member")
-                                continuation.resume(RoomStatus(status, message))
-                            } else {
-                                message = "Failed to subscribe to member media"
-                                member.canShowPreview = false
-                                continuation.resume(RoomStatus(status, message))
-                            }
-                        }
-                    }
-                }
-            }.run { disposables.add(this) }
-        }
-    }
-
-    fun dispose() = launchIO {
-        disposables.forEach { it?.dispose() }
-        disposables.clear()
-
-        launchMain{
-            roomMembers.value?.forEach { it.dispose() }
-            roomMembers.value = null
-        }
+    fun dispose() {
+        clearDisposables()
+        roomMembers.value?.forEach { it.dispose() }
     }
 
     private companion object {

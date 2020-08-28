@@ -4,7 +4,6 @@
 
 package com.phenixrts.suite.groups.common.extensions
 
-import android.os.Handler
 import android.view.SurfaceView
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
@@ -13,19 +12,18 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.snackbar.Snackbar
-import com.phenixrts.common.RequestStatus
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.ui.MainActivity
 import com.phenixrts.suite.groups.ui.SplashActivity
 import com.phenixrts.suite.groups.ui.screens.JoinScreen
 import com.phenixrts.suite.groups.ui.screens.LoadingScreen
-import com.phenixrts.suite.groups.ui.screens.RoomScreen
 import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
 import com.phenixrts.suite.phenixcommon.common.launchMain
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_splash.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import kotlin.system.exitProcess
@@ -50,11 +48,12 @@ fun FragmentActivity.showToast(message: String) {
 
 fun FragmentActivity.closeApp(message: String? = null) {
     message?.let { showToast(it) }
-    Handler().postDelayed({
+    launchMain {
+        delay(QUIT_DELAY)
         finishAffinity()
         finishAndRemoveTask()
         exitProcess(0)
-    }, QUIT_DELAY)
+    }
 }
 
 fun FragmentActivity.hideKeyboard() {
@@ -112,12 +111,5 @@ fun MainActivity.joinRoom(viewModel: GroupsViewModel, roomAlias: String, display
     }
     hideKeyboard()
     showLoadingScreen()
-    val joinedRoomStatus = viewModel.joinRoomByAlias(roomAlias, displayName)
-    Timber.d("Room joined with status: $joinedRoomStatus $roomAlias")
-    hideLoadingScreen()
-    if (joinedRoomStatus.status == RequestStatus.OK) {
-        launchFragment(RoomScreen())
-    } else {
-        showToast(getString(R.string.err_join_room_failed))
-    }
+    viewModel.joinRoomByAlias(roomAlias, displayName)
 }

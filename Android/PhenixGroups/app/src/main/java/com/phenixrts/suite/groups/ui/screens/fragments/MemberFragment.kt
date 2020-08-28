@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Observer
 import com.phenixrts.suite.groups.common.extensions.getMicIcon
 import com.phenixrts.suite.groups.common.extensions.getSurfaceView
 import com.phenixrts.suite.groups.databinding.FragmentMembersBinding
@@ -22,6 +23,14 @@ class MemberFragment : BaseFragment(), MemberListAdapter.OnMemberListener {
 
     private val adapter by lazy { MemberListAdapter(viewModel, getSurfaceView(), getMicIcon(), this) }
 
+    private val memberObserver = Observer<List<RoomMember>> { roomMembers ->
+        roomMembers?.let { members ->
+            Timber.d("Member adapter updated ${members.size} $members")
+            viewModel.memberCount.value = members.size
+            adapter.members = members
+        }
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentMembersBinding.inflate(inflater)
         binding.lifecycleOwner = this
@@ -31,13 +40,7 @@ class MemberFragment : BaseFragment(), MemberListAdapter.OnMemberListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.getRoomMembers().observe(viewLifecycleOwner, { roomMembers ->
-            roomMembers?.let { members ->
-                Timber.d("Member adapter updated ${members.size} $members")
-                viewModel.memberCount.value = members.size
-                adapter.members = members
-            }
-        })
+        viewModel.roomMembers.observeForever(memberObserver)
     }
 
     override fun onMemberClicked(roomMember: RoomMember) {
