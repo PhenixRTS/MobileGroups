@@ -4,4 +4,5 @@
   -->
 <resources>
     <dimen name="room_pager_offset_gone">-330dp</dimen>
+    <dimen name="room_item_height">64dp</dimen>
 </resources>

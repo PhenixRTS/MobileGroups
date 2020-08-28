@@ -6,6 +6,7 @@ package com.phenixrts.suite.groups.ui.screens.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
+import androidx.transition.Fade
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
@@ -29,6 +30,14 @@ abstract class BaseFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         injectDependencies()
+    }
+
+    override fun getEnterTransition(): Any = Fade(Fade.MODE_IN).apply {
+        duration = DEFAULT_ANIMATION_DURATION
+    }
+
+    override fun getReturnTransition(): Any = Fade(Fade.MODE_OUT).apply {
+        duration = DEFAULT_ANIMATION_DURATION
     }
 
 }

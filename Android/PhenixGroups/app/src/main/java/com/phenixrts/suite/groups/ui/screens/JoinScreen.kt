@@ -5,10 +5,13 @@
 package com.phenixrts.suite.groups.ui.screens
 
 import android.os.Bundle
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.transition.Slide
 import com.phenixrts.suite.groups.R
+import com.phenixrts.suite.groups.common.extensions.DEFAULT_ANIMATION_DURATION
 import com.phenixrts.suite.groups.common.extensions.dismissFragment
 import com.phenixrts.suite.groups.common.extensions.joinRoom
 import com.phenixrts.suite.groups.common.extensions.showToast
@@ -32,6 +35,14 @@ class JoinScreen : BaseFragment() {
                 joinRoom(viewModel, code, preferenceProvider.getDisplayName())
             } ?: showToast(getString(R.string.err_enter_valid_room_code))
         }
+    }
+
+    override fun getEnterTransition() = Slide(Gravity.BOTTOM).apply {
+        duration = DEFAULT_ANIMATION_DURATION
+    }
+
+    override fun getReturnTransition(): Any = Slide(Gravity.BOTTOM).apply {
+        duration = DEFAULT_ANIMATION_DURATION
     }
 
 }

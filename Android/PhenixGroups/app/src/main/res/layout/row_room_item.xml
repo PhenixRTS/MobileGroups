@@ -18,7 +18,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="64dp"
+        android:layout_height="@dimen/room_item_height"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         tools:background="@color/primaryBackgroundColor">

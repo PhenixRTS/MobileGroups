@@ -15,7 +15,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        tools:background="@color/primaryBackgroundDarkColor"
+        tools:background="@color/primaryBackgroundColor"
         tools:context=".ui.screens.LandingScreen">
 
         <androidx.cardview.widget.CardView
@@ -84,6 +84,8 @@
                     style="?android:attr/buttonBarStyle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:paddingStart="7dp"
+                    android:paddingEnd="7dp"
                     android:layout_gravity="center_horizontal"
                     android:orientation="horizontal">
 
@@ -111,7 +113,7 @@
 
         </androidx.cardview.widget.CardView>
 
-        <com.phenixrts.suite.groups.customViews.MaxHeightRecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/room_list"
             android:layout_width="0dp"
             android:layout_height="0dp"

@@ -14,10 +14,10 @@ import com.phenixrts.room.RoomService
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.common.getRoomCode
 import com.phenixrts.suite.groups.cache.entities.RoomInfoItem
+import com.phenixrts.suite.groups.common.extensions.CHAT_SUBSCRIPTION_DELAY
 import com.phenixrts.suite.groups.common.getPublishOptions
 import com.phenixrts.suite.groups.common.getPublishToRoomOptions
 import com.phenixrts.suite.groups.common.getRoomOptions
-import com.phenixrts.suite.groups.models.CHAT_SUBSCRIPTION_DELAY
 import com.phenixrts.suite.groups.models.RoomExpressConfiguration
 import com.phenixrts.suite.groups.models.RoomStatus
 import com.phenixrts.suite.phenixcommon.common.launchIO
@@ -47,8 +47,10 @@ class RoomExpressRepository(
             launchMain {
                 roomService = service
                 expressPublisher = publisher
-                delay(CHAT_SUBSCRIPTION_DELAY)
-                chatService = RoomChatServiceFactory.createRoomChatService(roomService)
+                if (chatService == null) {
+                    delay(CHAT_SUBSCRIPTION_DELAY)
+                    chatService = RoomChatServiceFactory.createRoomChatService(roomService)
+                }
                 var requestStatus = status
                 if (status == RequestStatus.OK) {
                     service?.observableActiveRoom?.value?.let { room ->
@@ -116,6 +118,13 @@ class RoomExpressRepository(
         val publishOptions = getPublishOptions(userMediaStream)
         val publishToRoomOptions = getPublishToRoomOptions(userScreenName, roomOptions, publishOptions)
         joinRoom(publishToRoomOptions)
+    }
+
+    fun leaveRoom() {
+        chatService = null
+        roomService = null
+        expressPublisher = null
+        Timber.d("Room left")
     }
 
     fun dispose() {

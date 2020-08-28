@@ -22,6 +22,10 @@ const val DAY_MILLIS = HOUR_MILLIS * 24L
 const val MONTH_MILLIS = DAY_MILLIS * 30L
 const val YEAR_MILLIS = MONTH_MILLIS * 12L
 
+// Delay before observing chat messages - SDK bug
+const val CHAT_SUBSCRIPTION_DELAY = 2000L
+const val DEFAULT_ANIMATION_DURATION = 200L
+
 fun MutableList<RoomMessage>.addUnique(messages: Array<ChatMessage>, selfName: String, dateRoomLeft: Date, isViewingChat: Boolean) {
     messages.forEach {message ->
         if (this.find { it.message.messageId == message.messageId } == null) {

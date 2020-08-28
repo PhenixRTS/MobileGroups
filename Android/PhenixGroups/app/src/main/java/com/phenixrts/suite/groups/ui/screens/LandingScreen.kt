@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.updateLayoutParams
 import androidx.core.widget.addTextChangedListener
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.suite.groups.R
@@ -24,6 +25,9 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
     private lateinit var binding: ScreenLandingBinding
 
     private val roomAdapter = RoomListAdapter(this)
+    private val isInLandscape by lazy {
+        resources.configuration.orientation != Configuration.ORIENTATION_PORTRAIT
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = ScreenLandingBinding.inflate(inflater)
@@ -35,7 +39,6 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.roomList.setHasFixedSize(true)
         binding.roomList.adapter = roomAdapter
         binding.newRoomButton.setOnClickListener {
             Timber.d("Create Room clicked")
@@ -55,7 +58,8 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
         viewModel.isControlsEnabled.value = true
         viewModel.isInRoom.value = false
         viewModel.roomList.observe(viewLifecycleOwner, {
-            Timber.d("Room list data changed $it")
+            Timber.d("Room list data changed: (Is portrait: $isInLandscape), $it")
+            updateRoomListHeight(it.size)
             roomAdapter.data = it
         })
         if (viewModel.isVideoEnabled.isTrue()) {
@@ -78,6 +82,14 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
     override fun onRoomJoinClicked(roomId: String) {
         Timber.d("Join clicked for: $roomId")
         joinRoomById(roomId)
+    }
+
+    private fun updateRoomListHeight(itemCount: Int) {
+        if (isInLandscape) return
+        val adapterHeight = resources.getDimension(R.dimen.room_item_height) * if (itemCount <= 3) itemCount else 3
+        binding.roomList.updateLayoutParams {
+            height = adapterHeight.toInt()
+        }
     }
 
     /**
