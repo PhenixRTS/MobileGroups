@@ -6,7 +6,7 @@ use_frameworks!
 inhibit_all_warnings!
 
 def phenix
-  pod 'PhenixSdk', '~> 2020.0.0'
+  pod 'PhenixSdk', '~> 2020.1.54-beta'
 end
 
 target 'PhenixGroups' do
