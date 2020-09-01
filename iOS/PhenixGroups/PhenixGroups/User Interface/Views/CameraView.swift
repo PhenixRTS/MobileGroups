@@ -42,11 +42,6 @@ class CameraView: UIView {
     func setCameraLayer(_ cameraLayer: VideoLayer) {
         removeCameraLayer()
         layer.add(cameraLayer)
-
-        // Hack to remove automatically added PhenixSdk layer animations.
-        // These animations are interrupting with the animation how we switch video layer from view to view.
-        cameraLayer.sublayers?.forEach { $0.removeAllAnimations() }
-        cameraLayer.removeAllAnimations()
     }
 
     func removeCameraLayer() {
@@ -75,7 +70,9 @@ private extension CameraView {
 
 fileprivate extension CALayer {
     func resize(as otherLayer: CALayer) {
-        frame = otherLayer.bounds
+        CATransaction.withoutAnimations {
+            self.frame = otherLayer.bounds
+        }
     }
 
     func add(_ layer: CALayer) {

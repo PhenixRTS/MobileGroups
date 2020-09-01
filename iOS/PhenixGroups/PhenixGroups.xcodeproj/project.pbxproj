@@ -21,6 +21,8 @@
 		B510D0D0248E65AD003FAEC0 /* PhenixDisposables.swift in Sources */ = {isa = PBXBuildFile; fileRef = B510D0CF248E65AD003FAEC0 /* PhenixDisposables.swift */; };
 		B510D0E6248FC258003FAEC0 /* ActivityIndicatorController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B510D0E5248FC258003FAEC0 /* ActivityIndicatorController.swift */; };
 		B510D0E8248FCA63003FAEC0 /* ActivityIndicatorProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B510D0E7248FCA63003FAEC0 /* ActivityIndicatorProvider.swift */; };
+		B51141C524FD18B0007584A1 /* RoomMemberDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51141C424FD18B0007584A1 /* RoomMemberDelegate.swift */; };
+		B51141C724FD2229007584A1 /* CATransaction+NoAnimations.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51141C624FD2229007584A1 /* CATransaction+NoAnimations.swift */; };
 		B51F3C012453202E00857D3E /* PhenixCoreIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51F3C002453202E00857D3E /* PhenixCoreIntegrationTests.swift */; };
 		B51F3C032453202E00857D3E /* PhenixCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B54D597E2450622A00454066 /* PhenixCore.framework */; };
 		B52FC75F24B850F800B98B46 /* UIImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FC75E24B850F800B98B46 /* UIImageView.swift */; };
@@ -85,6 +87,7 @@
 		B5D4F99F249353BE002FDCB6 /* PageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D4F99E249353BE002FDCB6 /* PageViewController.swift */; };
 		B5DDA24B24B49FB900809648 /* RoomMemberAudioObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DDA24A24B49FB900809648 /* RoomMemberAudioObserver.swift */; };
 		B5DDA24D24B4B11B00809648 /* RoomMemberVideoObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DDA24C24B4B11B00809648 /* RoomMemberVideoObserver.swift */; };
+		B5DE1DE724F7C9E400FE50A5 /* PhenixOptionBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DE1DE624F7C9E400FE50A5 /* PhenixOptionBuilder.swift */; };
 		B5E4EA48246EC12200F48B38 /* PhenixRoomPublishing.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E4EA47246EC12200F48B38 /* PhenixRoomPublishing.swift */; };
 		B5E4EA722473F17C00F48B38 /* JoinedRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E4EA712473F17C00F48B38 /* JoinedRoom.swift */; };
 		B5E4EA7424741B8400F48B38 /* CameraPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E4EA7324741B8400F48B38 /* CameraPlaceholderView.swift */; };
@@ -174,6 +177,8 @@
 		B510D0CF248E65AD003FAEC0 /* PhenixDisposables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixDisposables.swift; sourceTree = "<group>"; };
 		B510D0E5248FC258003FAEC0 /* ActivityIndicatorController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicatorController.swift; sourceTree = "<group>"; };
 		B510D0E7248FCA63003FAEC0 /* ActivityIndicatorProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicatorProvider.swift; sourceTree = "<group>"; };
+		B51141C424FD18B0007584A1 /* RoomMemberDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberDelegate.swift; sourceTree = "<group>"; };
+		B51141C624FD2229007584A1 /* CATransaction+NoAnimations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CATransaction+NoAnimations.swift"; sourceTree = "<group>"; };
 		B51F3BFE2453202E00857D3E /* PhenixCoreIntegrationTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PhenixCoreIntegrationTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B51F3C002453202E00857D3E /* PhenixCoreIntegrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixCoreIntegrationTests.swift; sourceTree = "<group>"; };
 		B51F3C022453202E00857D3E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -243,6 +248,7 @@
 		B5D4F99E249353BE002FDCB6 /* PageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageViewController.swift; sourceTree = "<group>"; };
 		B5DDA24A24B49FB900809648 /* RoomMemberAudioObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberAudioObserver.swift; sourceTree = "<group>"; };
 		B5DDA24C24B4B11B00809648 /* RoomMemberVideoObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberVideoObserver.swift; sourceTree = "<group>"; };
+		B5DE1DE624F7C9E400FE50A5 /* PhenixOptionBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhenixOptionBuilder.swift; sourceTree = "<group>"; };
 		B5E4EA47246EC12200F48B38 /* PhenixRoomPublishing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixRoomPublishing.swift; sourceTree = "<group>"; };
 		B5E4EA712473F17C00F48B38 /* JoinedRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinedRoom.swift; sourceTree = "<group>"; };
 		B5E4EA7324741B8400F48B38 /* CameraPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPlaceholderView.swift; sourceTree = "<group>"; };
@@ -442,6 +448,7 @@
 			children = (
 				B54D59AC2453040100454066 /* PhenixConfiguration.swift */,
 				B54D598A2450626C00454066 /* PhenixManager.swift */,
+				B5DE1DE624F7C9E400FE50A5 /* PhenixOptionBuilder.swift */,
 				B5777E71246D6015000B4CA9 /* UserMediaStreamController.swift */,
 				B594ABBA2499F52A0042ED1F /* VideoLayer.swift */,
 				B57936052485499A001044C2 /* Joined Room */,
@@ -475,8 +482,8 @@
 			isa = PBXGroup;
 			children = (
 				B54D599724519E9000454066 /* OSLog.swift */,
-				B54D59A62451D78100454066 /* RoomAlias.swift */,
 				B510D0CF248E65AD003FAEC0 /* PhenixDisposables.swift */,
+				B54D59A62451D78100454066 /* RoomAlias.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -626,6 +633,7 @@
 				B5EB976824AF46EC00F458B0 /* JoinedRoomChatDelegate.swift */,
 				B5793609248549F2001044C2 /* JoinedRoomDelegate.swift */,
 				B5793607248549C5001044C2 /* JoinedRoomMembersDelegate.swift */,
+				B51141C424FD18B0007584A1 /* RoomMemberDelegate.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -713,6 +721,7 @@
 			isa = PBXGroup;
 			children = (
 				B510D0E7248FCA63003FAEC0 /* ActivityIndicatorProvider.swift */,
+				B51141C624FD2229007584A1 /* CATransaction+NoAnimations.swift */,
 				B59D19F924631398008E2C2D /* CellIdentified.swift */,
 				B5019601245AAD9B00DDF6AB /* ChildController.swift */,
 				B5704D2F24642BEB00D9703A /* CurrentDate.swift */,
@@ -1206,6 +1215,7 @@
 				B52FC75F24B850F800B98B46 /* UIImageView.swift in Sources */,
 				B5777E5F246C25CB000B4CA9 /* LaunchViewController.swift in Sources */,
 				B59D19FA24631398008E2C2D /* CellIdentified.swift in Sources */,
+				B51141C724FD2229007584A1 /* CATransaction+NoAnimations.swift in Sources */,
 				B50195EE24585C6200DDF6AB /* Preferences.swift in Sources */,
 				B59D19E52462DFCB008E2C2D /* ShowMeeting.swift in Sources */,
 				B594ABBD2499FF4F0042ED1F /* CameraPinView.swift in Sources */,
@@ -1228,7 +1238,9 @@
 				B5DDA24B24B49FB900809648 /* RoomMemberAudioObserver.swift in Sources */,
 				B5E4EA722473F17C00F48B38 /* JoinedRoom.swift in Sources */,
 				B5EB976724AF422100F458B0 /* RoomChatMessage.swift in Sources */,
+				B5DE1DE724F7C9E400FE50A5 /* PhenixOptionBuilder.swift in Sources */,
 				B54D598B2450626C00454066 /* PhenixManager.swift in Sources */,
+				B51141C524FD18B0007584A1 /* RoomMemberDelegate.swift in Sources */,
 				B54D599824519E9000454066 /* OSLog.swift in Sources */,
 				B579360C2486AD59001044C2 /* RoomMember.swift in Sources */,
 				B5793608248549C5001044C2 /* JoinedRoomMembersDelegate.swift in Sources */,

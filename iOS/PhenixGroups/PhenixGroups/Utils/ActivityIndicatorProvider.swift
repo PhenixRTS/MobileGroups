@@ -23,6 +23,7 @@ extension UIViewController: ActivityIndicatorProvider {
 
     func dismissActivityIndicator(then: (() -> Void)?) {
         guard presentedViewController is ActivityIndicatorController else {
+            then?()
             return
         }
         dismiss(animated: true, completion: then)

@@ -17,7 +17,11 @@ class ActiveMeetingChatViewController: UIViewController, PageContainerMember {
         view as! ActiveMeetingChatView
     }
 
-    var sendMessageHandler: SendMessageHandler?
+    var sendMessageHandler: SendMessageHandler? {
+        didSet {
+            activeMeetingChatView.sendMessageHandler = sendMessageHandler
+        }
+    }
 
     override func loadView() {
         view = ActiveMeetingChatView()
@@ -27,7 +31,6 @@ class ActiveMeetingChatViewController: UIViewController, PageContainerMember {
         super.viewDidLoad()
 
         configureTableView()
-        activeMeetingChatView.sendMessageHandler = sendMessageHandler
 
         let timer = Timer(timeInterval: 1.0, target: self, selector: #selector(refreshDates), userInfo: nil, repeats: true)
         self.timer = timer

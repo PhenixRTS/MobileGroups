@@ -27,7 +27,7 @@ extension PhenixManager: PhenixRoomCreation {
             os_log(.debug, log: .phenixManager, "Creating a room with alias: %{PUBLIC}s", alias)
 
             guard let self = self else { return }
-            let options = self.makeRoomOptions(with: alias)
+            let options = PhenixOptionBuilder.createRoomOptions(alias: alias)
 
             precondition(self.roomExpress != nil, "Must call PhenixManager.start() before this method")
             self.roomExpress.createRoom(options) { status, immutableRoom in

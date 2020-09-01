@@ -7,8 +7,6 @@ import PhenixCore
 import UIKit
 
 class ActiveMeetingMemberListViewController: UITableViewController, PageContainerMember {
-    private static let maxVideoSubscriptions = 3
-
     lazy var dataSource = ActiveMeetingMemberListDataSource()
     lazy var pageIcon = UIImage(named: "meeting_members_icon")
 
@@ -104,29 +102,6 @@ private extension ActiveMeetingMemberListViewController {
         dataSource.indexPathForSelectedRow = nil
     }
 
-    /// Subscribe to provided member list.
-    ///
-    /// Subscription type depends of the specific logic, it can be video & audio, or audio-only.
-    /// - Parameter list: RoomMember objects currently in the room
-    func subscribe(to list: [RoomMember]) {
-        // Calculate, how many of members have video subscription at the moment.
-        var videoSubscriptions = list.reduce(into: 0) { result, member in
-            result += member.subscriptionType == .some(.video) ? 1 : 0
-        }
-
-        // Subscribe to members
-        list.forEach { member in
-            if member.isSubscribed == false {
-                if videoSubscriptions + 1 <= Self.maxVideoSubscriptions {
-                    videoSubscriptions += 1 // Parameter must be increased because we still need to keep track of how many new members gets video subscription.
-                    member.subscribe(for: .video)
-                } else {
-                    member.subscribe(for: .audio)
-                }
-            }
-        }
-    }
-
     /// Sets focused member for the main view video preview layer
     func setDefaultFocusedMemberIfPossible() {
         guard dataSource.pinnedMember == nil else {
@@ -153,7 +128,7 @@ private extension ActiveMeetingMemberListViewController {
     ///
     /// If user has a pinned member, it will make necessary updates to save new pinned row location or remove it if necessary.
     /// - Parameter pinnedMemberPosition: Pinned member position type
-    private func reloadMemberList(pinnedMemberPosition: PinnedMemberPosition) {
+    func reloadMemberList(pinnedMemberPosition: PinnedMemberPosition) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
 
@@ -180,10 +155,10 @@ private extension ActiveMeetingMemberListViewController {
 // MARK: - JoinedRoomMembersDelegate
 extension ActiveMeetingMemberListViewController: JoinedRoomMembersDelegate {
     func memberListDidChange(_ list: [RoomMember]) {
+        os_log(.debug, log: .activeMeetingScene, "Member list did change, %{PRIVATE}s", list.description)
+
         dataSource.members = list
         title = "(\(list.count))"
-
-        subscribe(to: list)
 
         // Update currently pinned member in the list
 

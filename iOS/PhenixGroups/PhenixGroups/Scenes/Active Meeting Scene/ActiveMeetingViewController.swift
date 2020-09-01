@@ -44,10 +44,10 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
         }
     }
 
+    var displayName: String!
+
     weak var coordinator: MeetingFinished?
     weak var media: UserMediaStreamController?
-
-    var displayName: String!
     weak var joinedRoom: JoinedRoom!
 
     var activeMeetingView: ActiveMeetingView {
@@ -65,8 +65,7 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
 
         assert(focusedMember != nil, "Focused member is necessary")
 
-        joinedRoom.subscribeToMemberList(membersViewController)
-        joinedRoom.subscribeToChatMessages(chatViewController)
+        observeRoom()
 
         media?.audioFrameReadHandler = { [weak self] in
             DispatchQueue.main.async {
@@ -95,7 +94,16 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
         activeMeetingView.refreshLandscapePosition()
     }
 
-    func leave() {
+    func observeRoom() {
+        joinedRoom.subscribeToMemberList(membersViewController)
+        joinedRoom.subscribeToChatMessages(chatViewController)
+
+        chatViewController.sendMessageHandler = { [weak self] message in
+            self?.joinedRoom.send(message: message)
+        }
+    }
+
+    func leaveRoom() {
         os_log(.debug, log: .activeMeetingScene, "Leaving meeting")
         audioDisablingWorker?.cancel()
         videoDisablingWorker?.cancel()
@@ -107,6 +115,20 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
         let meeting = Meeting(code: joinedRoom.alias ?? "N/A", leaveDate: .now, backendUrl: joinedRoom.backend)
         coordinator?.meetingFinished(meeting)
     }
+
+    /// Configure UI elements to represent the current media state for current user
+    func configureMedia() {
+        guard let media = media else { return }
+
+        // Set the preview layer from the local media for the "self" member, because "self" member does not subscribe
+        // for the media stream.
+        joinedRoom.currentMember.previewLayer = media.cameraLayer
+
+        activeMeetingView.setCameraControl(enabled: media.isVideoEnabled)
+        activeMeetingView.setMicrophoneControl(enabled: media.isAudioEnabled)
+
+        configureMainPreview(for: joinedRoom.currentMember)
+    }
 }
 
 private extension ActiveMeetingViewController {
@@ -115,7 +137,7 @@ private extension ActiveMeetingViewController {
         activeMeetingView.configure(displayName: displayName)
         activeMeetingView.leaveMeetingHandler = { [weak self] in
             guard let self = self else { return }
-            self.leave()
+            self.leaveRoom()
         }
         activeMeetingView.openMenuHandler = { [weak self] in
             self?.openMenu()
@@ -138,20 +160,6 @@ private extension ActiveMeetingViewController {
             }
             self?.setVideo(enabled: enabled)
         }
-    }
-
-    /// Configure UI elements to represent the current media state for current user
-    func configureMedia() {
-        guard let media = media else { return }
-
-        // Set the preview layer from the local media for the "self" member, because "self" member does not subscribe
-        // for the media stream.
-        joinedRoom.currentMember.previewLayer = media.cameraLayer
-
-        activeMeetingView.setCameraControl(enabled: media.isVideoEnabled)
-        activeMeetingView.setMicrophoneControl(enabled: media.isAudioEnabled)
-
-        configureMainPreview(for: joinedRoom.currentMember)
     }
 
     func configureMainPreview(for member: RoomMember) {
@@ -198,12 +206,7 @@ private extension ActiveMeetingViewController {
 
     func makeChatViewController() -> UIViewController {
         let vc = ActiveMeetingChatViewController()
-
         chatViewController = vc
-        vc.sendMessageHandler = { [weak self] message in
-            self?.joinedRoom.send(message: message)
-        }
-
         return vc
     }
 

@@ -9,12 +9,13 @@ import PhenixSdk
 public final class PhenixManager {
     public typealias UnrecoverableErrorHandler = (_ description: String?) -> Void
 
+    private var joinedRoom: JoinedRoom?
+    private var chatService: PhenixRoomChatService?
+
     /// Backend URL used by Phenix SDK to communicate
     internal let backend: URL
     internal let privateQueue: DispatchQueue
-
     internal private(set) var roomExpress: PhenixRoomExpress!
-    internal private(set) var joinedRooms = Set<JoinedRoom>()
 
     public private(set) var userMediaStreamController: UserMediaStreamController!
 
@@ -37,11 +38,11 @@ public final class PhenixManager {
     /// Creates necessary instances of PhenixSdk which provides connection and media streaming possibilities
     ///
     /// Method needs to be executed before trying to create or join rooms.
-    public func start(unrecoverableErrorCompletion: UnrecoverableErrorHandler?) {
+    public func start(unrecoverableErrorCompletion: @escaping UnrecoverableErrorHandler) {
         let group = DispatchGroup()
 
         group.enter()
-        os_log(.debug, log: .phenixManager, "Room Express setup started")
+        os_log(.debug, log: .phenixManager, "Start Room Express setup")
         setupRoomExpress(backend: backend, unrecoverableErrorCompletion) {
             os_log(.debug, log: .phenixManager, "Room Express setup completed")
             group.leave()
@@ -50,7 +51,7 @@ public final class PhenixManager {
         group.wait()
 
         group.enter()
-        os_log(.debug, log: .phenixManager, "User Media Stream setup started")
+        os_log(.debug, log: .phenixManager, "Start User Media Stream setup")
         setupMedia(unrecoverableErrorCompletion) {
             os_log(.debug, log: .phenixManager, "User Media Stream setup completed")
             group.leave()
@@ -59,29 +60,21 @@ public final class PhenixManager {
         group.wait()
     }
 
-    func add(_ room: JoinedRoom) {
-        privateQueue.async { [weak self] in
-            guard let self = self else { return }
-
-            self.joinedRooms.insert(room)
-            os_log(.debug, log: .phenixManager, "Joined room instance added")
-        }
+    func set(_ room: JoinedRoom) {
+//        privateQueue.async { [weak self] in
+//            guard let self = self else { return }
+            os_log(.debug, log: .phenixManager, "Add joined room instance")
+            self.joinedRoom?.dispose()
+            self.joinedRoom = room
+//        }
     }
 }
 
+// MARK: - Setup methods
 private extension PhenixManager {
-    func setupRoomExpress(backend: URL, _ unrecoverableErrorCompletion: UnrecoverableErrorHandler? = nil, completion: @escaping () -> Void) {
-        let pcastExpressOptions = PhenixPCastExpressFactory.createPCastExpressOptionsBuilder()
-            .withBackendUri(backend.absoluteString)
-            .withUnrecoverableErrorCallback { _, description in
-                os_log(.error, log: .phenixManager, "Unrecoverable Error: %{PUBLIC}s", String(describing: description))
-                unrecoverableErrorCompletion?(description)
-            }
-            .buildPCastExpressOptions()
-
-        let roomExpressOptions = PhenixRoomExpressFactory.createRoomExpressOptionsBuilder()
-            .withPCastExpressOptions(pcastExpressOptions)
-            .buildRoomExpressOptions()
+    func setupRoomExpress(backend: URL, _ unrecoverableErrorCompletion: @escaping UnrecoverableErrorHandler, completion: @escaping () -> Void) {
+        let pcastExpressOptions = PhenixOptionBuilder.createPCastExpressOptions(backend: backend, unrecoverableErrorCallback: unrecoverableErrorCompletion)
+        let roomExpressOptions = PhenixOptionBuilder.createRoomExpressOptions(with: pcastExpressOptions)
 
         #warning("Remove async quick-fix when Room Express will be thread safe.")
         DispatchQueue.main.async {
@@ -111,35 +104,25 @@ private extension PhenixManager {
     }
 }
 
-extension PhenixManager: JoinedRoomDelegate {
-    func roomLeft(_ room: JoinedRoom) {
-        privateQueue.async { [weak self] in
-            guard let self = self else { return }
-
-            self.joinedRooms.remove(room)
-            os_log(.debug, log: .phenixManager, "Joined room instance removed: %{PRIVATE}s", room.description)
-        }
-    }
-}
-
 // MARK: - Helper methods
 internal extension PhenixManager {
-    func makeRoomOptions(with alias: String) -> PhenixRoomOptions {
-        PhenixRoomServiceFactory.createRoomOptionsBuilder()
-            .withName(alias)
-            .withAlias(alias)
-            .withType(.multiPartyChat)
-            .buildRoomOptions()
-    }
-
     func makeJoinedRoom(from roomService: PhenixRoomService, roomExpress: PhenixRoomExpress, backend: URL, publisher: PhenixExpressPublisher? = nil) -> JoinedRoom {
-        guard let chatService = PhenixRoomChatServiceFactory.createRoomChatService(roomService) else {
-            fatalError("Could not create PhenixRoomChatService parameter")
-        }
-
+        // Re-use the same chat service or create a new one if the room was left previously.
+        let chatService: PhenixRoomChatService = self.chatService ?? PhenixRoomChatServiceFactory.createRoomChatService(roomService)
         let joinedRoom = JoinedRoom(roomExpress: roomExpress, backend: backend, roomService: roomService, chatService: chatService, publisher: publisher)
         joinedRoom.delegate = self
 
         return joinedRoom
+    }
+}
+
+// MARK: - JoinedRoomDelegate
+extension PhenixManager: JoinedRoomDelegate {
+    func roomLeft(_ room: JoinedRoom) {
+        privateQueue.async { [weak self] in
+            self?.chatService = nil
+            self?.joinedRoom = nil
+            os_log(.debug, log: .phenixManager, "Joined room instance removed: %{PRIVATE}s", room.description)
+        }
     }
 }

@@ -62,7 +62,7 @@
       </BuildableProductRunnable>
       <EnvironmentVariables>
          <EnvironmentVariable
-            key = "PHENIX_LOGGING_CONSOLE_LOG_LEVEL"
+            key = "PHENIX_LOG_CONSOLE"
             value = "Debug"
             isEnabled = "YES">
          </EnvironmentVariable>

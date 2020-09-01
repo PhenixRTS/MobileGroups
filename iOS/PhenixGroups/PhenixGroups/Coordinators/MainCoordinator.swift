@@ -48,8 +48,8 @@ class MainCoordinator: Coordinator {
     }
 }
 
-extension MainCoordinator: ShowMeeting {
-    func showMeeting(_ joinedRoom: JoinedRoom) {
+private extension MainCoordinator {
+    func moveToMeeting(_ joinedRoom: JoinedRoom) {
         if navigationController.presentedViewController is JoinMeetingViewController {
             navigationController.presentedViewController?.dismiss(animated: true)
         }
@@ -62,6 +62,27 @@ extension MainCoordinator: ShowMeeting {
 
         UIView.transition(with: navigationController.view) {
             self.navigationController.pushViewController(vc, animated: false)
+        }
+    }
+
+    func refreshMeeting(_ joinedRoom: JoinedRoom) {
+        guard let controller = navigationController.visibleViewController as? ActiveMeetingViewController else {
+            fatalError("Visible view controller is not ActiveMeetingViewController")
+        }
+
+        controller.joinedRoom = joinedRoom
+        controller.setFocus(on: joinedRoom.currentMember)
+        controller.observeRoom()
+        controller.configureMedia()
+    }
+}
+
+extension MainCoordinator: ShowMeeting {
+    func showMeeting(_ joinedRoom: JoinedRoom) {
+        if navigationController.visibleViewController is ActiveMeetingViewController {
+            refreshMeeting(joinedRoom)
+        } else {
+            moveToMeeting(joinedRoom)
         }
     }
 }

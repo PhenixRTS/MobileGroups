@@ -44,16 +44,10 @@ extension PhenixManager: PhenixRoomJoining {
 
             switch type {
             case .identifier(let id):
-                options = PhenixRoomExpressFactory.createJoinRoomOptionsBuilder()
-                    .withRoomId(id)
-                    .withScreenName(displayName)
-                    .buildJoinRoomOptions()
+                options = PhenixOptionBuilder.createJoinRoomOptions(id: id, displayName: displayName)
 
             case .alias(let alias):
-                options = PhenixRoomExpressFactory.createJoinRoomOptionsBuilder()
-                    .withRoomAlias(alias)
-                    .withScreenName(displayName)
-                    .buildJoinRoomOptions()
+                options = PhenixOptionBuilder.createJoinRoomOptions(alias: alias, displayName: displayName)
             }
 
             self.joinRoom(with: options, completion: completion)
@@ -79,7 +73,7 @@ extension PhenixManager {
                 // Therefore JoinedRoom creation is done after a small delay.
                 self.privateQueue.asyncAfter(deadline: .now() + .seconds(1)) {
                     let joinedRoom = self.makeJoinedRoom(from: roomService, roomExpress: self.roomExpress, backend: self.backend)
-                    self.add(joinedRoom)
+                    self.set(joinedRoom)
                     completion(.success(joinedRoom))
                 }
 
