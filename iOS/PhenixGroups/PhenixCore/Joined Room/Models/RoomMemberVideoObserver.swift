@@ -11,13 +11,17 @@ public protocol RoomMemberVideoObserver: AnyObject {
 // MARK: - Video observation
 public extension RoomMember {
     func addVideoObserver(_ observer: RoomMemberVideoObserver) {
-        let id = ObjectIdentifier(observer)
-        videoObservations[id] = VideoObservation(observer: observer)
+        queue.async { [weak self] in
+            let id = ObjectIdentifier(observer)
+            self?.videoObservations[id] = VideoObservation(observer: observer)
+        }
     }
 
     func removeVideoObserver(_ observer: RoomMemberVideoObserver) {
-        let id = ObjectIdentifier(observer)
-        videoObservations.removeValue(forKey: id)
+        queue.async { [weak self] in
+            let id = ObjectIdentifier(observer)
+            self?.videoObservations.removeValue(forKey: id)
+        }
     }
 }
 
@@ -27,10 +31,11 @@ internal extension RoomMember {
     }
 
     func videoStateDidChange(enabled: Bool) {
+        dispatchPrecondition(condition: .onQueue(queue))
         for (id, observation) in videoObservations {
             // If the observer is no longer in memory, we can clean up the observation for its ID
             guard let observer = observation.observer else {
-                audioObservations.removeValue(forKey: id)
+                videoObservations.removeValue(forKey: id)
                 continue
             }
 

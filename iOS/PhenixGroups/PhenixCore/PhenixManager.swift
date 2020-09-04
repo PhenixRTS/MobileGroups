@@ -61,12 +61,13 @@ public final class PhenixManager {
     }
 
     func set(_ room: JoinedRoom) {
-//        privateQueue.async { [weak self] in
-//            guard let self = self else { return }
-            os_log(.debug, log: .phenixManager, "Add joined room instance")
-            self.joinedRoom?.dispose()
+        privateQueue.async { [weak self] in
+            guard let self = self else { return }
+            os_log(.debug, log: .phenixManager, "Destroy previous joined room instance")
+            self.joinedRoom?.destroy()
+            os_log(.debug, log: .phenixManager, "Set new joined room instance")
             self.joinedRoom = room
-//        }
+        }
     }
 }
 
@@ -107,9 +108,11 @@ private extension PhenixManager {
 // MARK: - Helper methods
 internal extension PhenixManager {
     func makeJoinedRoom(from roomService: PhenixRoomService, roomExpress: PhenixRoomExpress, backend: URL, publisher: PhenixExpressPublisher? = nil) -> JoinedRoom {
+        dispatchPrecondition(condition: .notOnQueue(.main))
+        let queue = DispatchQueue(label: "com.phenixrts.suite.groups.core.JoinedRoom", qos: .userInitiated, target: privateQueue)
         // Re-use the same chat service or create a new one if the room was left previously.
         let chatService: PhenixRoomChatService = self.chatService ?? PhenixRoomChatServiceFactory.createRoomChatService(roomService)
-        let joinedRoom = JoinedRoom(roomExpress: roomExpress, backend: backend, roomService: roomService, chatService: chatService, publisher: publisher)
+        let joinedRoom = JoinedRoom(roomExpress: roomExpress, backend: backend, roomService: roomService, chatService: chatService, queue: queue, publisher: publisher)
         joinedRoom.delegate = self
 
         return joinedRoom

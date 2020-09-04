@@ -17,6 +17,7 @@ public class JoinedRoom: CustomStringConvertible {
     private weak var membersDelegate: JoinedRoomMembersDelegate?
     private weak var chatDelegate: JoinedRoomChatDelegate?
 
+    private let queue: DispatchQueue
     private let roomService: PhenixRoomService
     private let chatService: PhenixRoomChatService
     private let publisher: PhenixExpressPublisher?
@@ -35,97 +36,144 @@ public class JoinedRoom: CustomStringConvertible {
         "Joined Room, backend: \(backend.absoluteURL), alias: \(String(describing: alias))"
     }
 
-    init(roomExpress: PhenixRoomExpress, backend: URL, roomService: PhenixRoomService, chatService: PhenixRoomChatService, publisher: PhenixExpressPublisher? = nil) {
+    init(roomExpress: PhenixRoomExpress, backend: URL, roomService: PhenixRoomService, chatService: PhenixRoomChatService, queue: DispatchQueue, publisher: PhenixExpressPublisher? = nil) {
         self.roomExpress = roomExpress
         self.backend = backend
         self.publisher = publisher
         self.roomService = roomService
         self.chatService = chatService
+        self.queue = queue
 
-        self.currentMember = RoomMember(roomService.getSelf(), isSelf: true, roomExpress: roomExpress)
+        self.currentMember = RoomMember(roomService.getSelf(), isSelf: true, roomExpress: roomExpress, rootQueue: queue)
     }
 
-    internal func dispose() {
-        os_log(.debug, log: .joinedRoom, "Dispose joined room %{PRIVATE}s", self.description)
-        disposables.removeAll() // Disposables must be cleared so that they could not cause a memory leak.
-        membersDelegate = nil
-        chatDelegate = nil
-        membersLeft(members)
+    /// Clears all room disposables and all member subscriptions
+    ///
+    /// Must be called when SDK automatically re-publishes to the room, also if user didn't left the room manually.
+    internal func destroy() {
+        queue.async { [weak self] in
+            guard let self = self else {
+                return
+            }
+
+            os_log(.debug, log: .joinedRoom, "Destroy the joined room members, (%{PRIVATE}s)", self.description)
+
+            self.disposables.removeAll()
+            self.members.forEach { $0.dispose() }
+        }
     }
 
+    /// Clears all room disposables and all member subscriptions, stops publishing and leaves the room with SDK method
     public func leave() {
-        dispose()
-        publisher?.stop()
-        os_log(.debug, log: .joinedRoom, "Leave joined room %{PRIVATE}s", self.description)
-        roomService.leaveRoom { [weak self] _, _ in
-            guard let self = self else { return }
-            self.delegate?.roomLeft(self)
-            os_log(.debug, log: .joinedRoom, "Left joined room %{PRIVATE}s", self.description)
+        queue.sync { [weak self] in
+            guard let self = self else {
+                return
+            }
+
+            os_log(.debug, log: .joinedRoom, "Dispose joined room members, (%{PRIVATE}s)", self.description)
+
+            self.disposables.removeAll()
+            self.members.forEach { $0.dispose() }
+
+            self.publisher?.stop()
+
+            os_log(.debug, log: .joinedRoom, "Leave joined room, (%{PRIVATE}s)", self.description)
+            self.roomService.leaveRoom { _, _ in
+                self.delegate?.roomLeft(self)
+                os_log(.debug, log: .joinedRoom, "Joined room left, (%{PRIVATE}s)", self.description)
+            }
         }
     }
 
     public func setAudio(enabled: Bool) {
-        os_log(.debug, log: .joinedRoom, "Set user media publisher audio enabled - %{PUBLIC}d", enabled)
+        queue.async { [weak self] in
+            guard let self = self else {
+                return
+            }
 
-        if enabled {
-            publisher?.enableAudio()
-        } else {
-            publisher?.disableAudio()
+            os_log(.debug, log: .joinedRoom, "Set user media publisher audio enabled - %{PUBLIC}d", enabled)
+
+            if enabled {
+                self.publisher?.enableAudio()
+            } else {
+                self.publisher?.disableAudio()
+            }
         }
     }
 
     public func setVideo(enabled: Bool) {
-        os_log(.debug, log: .joinedRoom, "Set user media publisher video enabled - %{PUBLIC}d", enabled)
+        queue.async { [weak self] in
+            guard let self = self else {
+                return
+            }
 
-        if enabled {
-            publisher?.enableVideo()
-        } else {
-            publisher?.disableVideo()
+            os_log(.debug, log: .joinedRoom, "Set user media publisher video enabled - %{PUBLIC}d", enabled)
+
+            if enabled {
+                self.publisher?.enableVideo()
+            } else {
+                self.publisher?.disableVideo()
+            }
         }
     }
 
     public func send(message: String) {
-        chatService.sendMessage(toRoom: message)
+        queue.async { [weak self] in
+            self?.chatService.sendMessage(toRoom: message)
+        }
     }
 
     public func subscribeToMemberList(_ delegate: JoinedRoomMembersDelegate) {
-        os_log(.debug, log: .joinedRoom, "Subscribe to room member list updates")
-        membersDelegate = delegate
-        roomService.getObservableActiveRoom()?.getValue()?.getObservableMembers()?.subscribe(memberListDidChange)?.append(to: &disposables)
+        queue.async { [weak self] in
+            guard let self = self else { return }
+            os_log(.debug, log: .joinedRoom, "Subscribe to room member list updates")
+            self.membersDelegate = delegate
+            self.roomService.getObservableActiveRoom()?.getValue()?.getObservableMembers()?.subscribe(self.memberListDidChange)?.append(to: &self.disposables)
+        }
     }
 
     public func subscribeToChatMessages(_ delegate: JoinedRoomChatDelegate) {
-        os_log(.debug, log: .joinedRoom, "Subscribe to room chat message updates")
-        chatDelegate = delegate
-        chatService.getObservableChatMessages()?.subscribe(chatMessagesDidChange)?.append(to: &disposables)
+        queue.async { [weak self] in
+            guard let self = self else { return }
+            os_log(.debug, log: .joinedRoom, "Subscribe to room chat message updates")
+            self.chatDelegate = delegate
+            self.chatService.getObservableChatMessages()?.subscribe(self.chatMessagesDidChange)?.append(to: &self.disposables)
+        }
     }
 }
 
 private extension JoinedRoom {
     func memberListDidChange(_ changes: PhenixObservableChange<NSArray>?) {
-        guard let updatedList = changes?.value as? [PhenixMember] else {
-            return
-        }
-
-        let updatedMemberList = Set(updatedList.map { makeRoomMember($0) })
-
-        let memberListChanged = processUpdatedMemberList(updatedMemberList, currentMemberList: members, membersJoined: membersJoined, membersLeft: membersLeft)
-
-        if memberListChanged {
-            let memberList = Array(members).sorted { lhs, rhs -> Bool in
-                if lhs.isSelf {
-                    return true
-                } else if rhs.isSelf {
-                    return false
-                }
-
-                return lhs > rhs
+        queue.async { [weak self] in
+            guard let self = self else {
+                return
             }
-            membersDelegate?.memberListDidChange(memberList)
+
+            guard let updatedList = changes?.value as? [PhenixMember] else {
+                return
+            }
+
+            let updatedMemberList = Set(updatedList.map { self.makeRoomMember($0) })
+
+            let memberListChanged = self.processUpdatedMemberList(updatedMemberList, currentMemberList: self.members, membersJoined: self.membersJoined, membersLeft: self.membersLeft)
+
+            if memberListChanged {
+                let memberList = Array(self.members).sorted { lhs, rhs -> Bool in
+                    if lhs.isSelf {
+                        return true
+                    } else if rhs.isSelf {
+                        return false
+                    }
+
+                    return lhs > rhs
+                }
+                self.membersDelegate?.memberListDidChange(memberList)
+            }
         }
     }
 
     func processUpdatedMemberList(_ updatedMemberList: Set<RoomMember>, currentMemberList: Set<RoomMember>, membersJoined: (Set<RoomMember>) -> Void, membersLeft: (Set<RoomMember>) -> Void) -> Bool {
+        dispatchPrecondition(condition: .onQueue(queue))
         // Get list of elements which does not exist in updatedMemberList but exist in currentMemberList, in simple words, members who left
         let leftMembers = currentMemberList.subtracting(updatedMemberList)
         membersLeft(leftMembers)
@@ -138,6 +186,7 @@ private extension JoinedRoom {
     }
 
     func membersJoined(_ newMembers: Set<RoomMember>) {
+        dispatchPrecondition(condition: .onQueue(queue))
         guard newMembers.isEmpty == false else {
             return
         }
@@ -148,11 +197,12 @@ private extension JoinedRoom {
         for member in newMembers {
             // Observe new member stream and then automatically subscribe to it
             member.delegate = self
-            member.observeStream()
+            member.observeStreams()
         }
     }
 
     func membersLeft(_ oldMembers: Set<RoomMember>) {
+        dispatchPrecondition(condition: .onQueue(queue))
         guard oldMembers.isEmpty == false else { return }
         members.subtract(oldMembers)
         os_log(.debug, log: .joinedRoom, "Members left from the room: %{PRIVATE}s", oldMembers.description)
@@ -160,6 +210,7 @@ private extension JoinedRoom {
     }
 
     func makeRoomMember(_ member: PhenixMember) -> RoomMember {
+        dispatchPrecondition(condition: .onQueue(queue))
         guard let roomExpress = roomExpress else {
             fatalError("Room Express must be provided")
         }
@@ -167,26 +218,32 @@ private extension JoinedRoom {
         if let currentMember = currentMember, member == currentMember {
             return currentMember
         } else {
-            return RoomMember(member, isSelf: false, roomExpress: roomExpress)
+            return RoomMember(member, isSelf: false, roomExpress: roomExpress, rootQueue: queue)
         }
     }
 
     func chatMessagesDidChange(_ changes: PhenixObservableChange<NSArray>?) {
-        guard let chatMessages = changes?.value as? [PhenixChatMessage] else {
-            return
+        queue.async { [weak self] in
+            guard let self = self else {
+                return
+            }
+
+            guard let chatMessages = changes?.value as? [PhenixChatMessage] else {
+                return
+            }
+
+            var messages = chatMessages.compactMap(RoomChatMessage.init)
+
+            for (index, message) in messages.enumerated() where message.authorName == self.currentMember.screenName {
+                messages[index].maskAsYourself()
+            }
+
+            self.chatDelegate?.chatMessagesDidChange(messages)
         }
-
-        var messages = chatMessages.compactMap(RoomChatMessage.init)
-
-        for (index, message) in messages.enumerated() where message.authorName == currentMember.screenName {
-            messages[index].maskAsYourself()
-        }
-
-        chatDelegate?.chatMessagesDidChange(messages)
     }
 
     func subscribe(_ member: RoomMember, to streams: [PhenixStream]) {
-        dispatchPrecondition(condition: .notOnQueue(.main))
+        dispatchPrecondition(condition: .onQueue(queue))
 
         let subscriptionType: RoomMember.SubscriptionType
         if canMemberSubscribeWithVideo(members: members) {
@@ -195,29 +252,35 @@ private extension JoinedRoom {
             subscriptionType = .audio
         }
 
-        let group = DispatchGroup()
+        subscribe(member, to: streams, with: subscriptionType)
+    }
 
-        for stream in streams {
-            os_log(.debug, log: .joinedRoom, "Subscribe to member stream: %{PRIVATE}s with %{PRIVATE}s, (%{PRIVATE}s)", stream.description, String(describing: subscriptionType), member.description)
+    private func subscribe(_ member: RoomMember, to streams: [PhenixStream], with type: RoomMember.SubscriptionType) {
+        dispatchPrecondition(condition: .onQueue(queue))
 
-            group.enter()
-            var subscribed = false
-            member.subscribe(to: stream, with: subscriptionType) { succeeded in
-                subscribed = succeeded
-                group.leave()
-            }
-            group.wait()
+        guard streams.isEmpty == false else {
+            return
+        }
 
-            if subscribed {
-                os_log(.debug, log: .joinedRoom, "Successfully subscribed to member stream: %{PRIVATE}s, (%{PRIVATE}s)", stream.description, member.description)
-                break
-            } else {
-                os_log(.debug, log: .joinedRoom, "Failed to subscribe to member stream: %{PRIVATE}s, retrying with next stream if possible, (%{PRIVATE}s)", stream.description, member.description)
+        var streams = streams
+        let stream = streams.removeFirst()
+
+        os_log(.debug, log: .joinedRoom, "Subscribe to member stream: %{PRIVATE}s with %{PRIVATE}s, (%{PRIVATE}s)", stream.description, String(describing: type), member.description)
+
+        member.subscribe(to: stream, with: type) { [weak self] succeeded in
+            self?.queue.async {
+                if succeeded {
+                    os_log(.debug, log: .joinedRoom, "Successfully subscribed to member stream: %{PRIVATE}s, (%{PRIVATE}s)", stream.description, member.description)
+                } else {
+                    os_log(.debug, log: .joinedRoom, "Failed to subscribe to member stream: %{PRIVATE}s, retrying with next stream if possible, (%{PRIVATE}s)", stream.description, member.description)
+                    self?.subscribe(member, to: streams, with: type)
+                }
             }
         }
     }
 
     func canMemberSubscribeWithVideo(members: Set<RoomMember>) -> Bool {
+        dispatchPrecondition(condition: .onQueue(queue))
         // Calculate, how many of members have video subscription at the moment.
         let videoSubscriptions = members.reduce(into: 0) { result, member in
             result += member.subscriptionType == .some(.video) ? 1 : 0
@@ -245,7 +308,7 @@ extension JoinedRoom: Hashable {
 // MARK: - RoomMemberDelegate
 extension JoinedRoom: RoomMemberDelegate {
     func memberStreamDidChange(_ member: RoomMember, streams: [PhenixStream]) {
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+        queue.async { [weak self] in
             self?.subscribe(member, to: streams)
         }
     }

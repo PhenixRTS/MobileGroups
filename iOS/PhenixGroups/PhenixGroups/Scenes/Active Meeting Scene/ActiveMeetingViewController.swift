@@ -7,7 +7,7 @@ import PhenixCore
 import UIKit
 
 protocol ActiveMeetingPreview: AnyObject {
-    var focusedMember: RoomMember! { get }
+    var focusedMember: RoomMember? { get }
 
     func setFocus(on member: RoomMember)
 }
@@ -33,7 +33,7 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
     private var videoWasInterrupted = false
 
     /// Contains a reference to the *RoomMember* instance, which is currently displayed in the view's *cameraView* (the main preview).
-    var focusedMember: RoomMember! {
+    var focusedMember: RoomMember? {
         didSet {
             os_log(.debug, log: .activeMeetingScene, "Focused member changed \n- from: %{PRIVATE}s, \n- to: %{PRIVATE}s", oldValue?.description ?? "None", focusedMember?.description ?? "None")
             if let previousMember = oldValue, previousMember != focusedMember {
@@ -47,7 +47,7 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
     var displayName: String!
 
     weak var coordinator: MeetingFinished?
-    weak var media: UserMediaStreamController?
+    weak var media: UserMediaStreamController!
     weak var joinedRoom: JoinedRoom!
 
     var activeMeetingView: ActiveMeetingView {
@@ -59,32 +59,10 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
 
         assert(joinedRoom != nil, "Joined meeting instance is necessary")
         assert(displayName != nil, "Display name is necessary")
+        assert(media != nil, "Media is necessary")
 
         configure()
-        setFocus(on: joinedRoom.currentMember)
-
-        assert(focusedMember != nil, "Focused member is necessary")
-
         observeRoom()
-
-        media?.audioFrameReadHandler = { [weak self] in
-            DispatchQueue.main.async {
-                self?.enableAudioIfInterrupted()
-                self?.checkForAudioInterruption()
-            }
-        }
-
-        media?.videoFrameReadHandler = { [weak self] in
-            DispatchQueue.main.async {
-                self?.enableVideoIfInterrupted()
-                self?.checkForVideoInterruption()
-            }
-        }
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-
         configureMedia()
     }
 
@@ -103,31 +81,52 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
         }
     }
 
+    func resetFocusedMember() {
+        focusedMember = nil
+        membersViewController.resetPinnedMember()
+    }
+
     func leaveRoom() {
         os_log(.debug, log: .activeMeetingScene, "Leaving meeting")
+
+        let meeting = Meeting(code: joinedRoom.alias ?? "N/A", leaveDate: .now, backendUrl: joinedRoom.backend)
         audioDisablingWorker?.cancel()
         videoDisablingWorker?.cancel()
         audioDisablingWorker = nil
         videoDisablingWorker = nil
-        focusedMember = nil
         joinedRoom.leave()
-
-        let meeting = Meeting(code: joinedRoom.alias ?? "N/A", leaveDate: .now, backendUrl: joinedRoom.backend)
         coordinator?.meetingFinished(meeting)
+    }
+
+    /// Configure self member media
+    ///
+    /// Set up the camera preview from media not from the observed member stream
+    func configureCurrentMemberMedia() {
+        // Set the preview layer from the local media for the "self" member, because "self" member does not subscribe
+        // for the media stream.
+        joinedRoom.currentMember.previewLayer = media.cameraLayer
     }
 
     /// Configure UI elements to represent the current media state for current user
     func configureMedia() {
-        guard let media = media else { return }
-
-        // Set the preview layer from the local media for the "self" member, because "self" member does not subscribe
-        // for the media stream.
-        joinedRoom.currentMember.previewLayer = media.cameraLayer
+        configureCurrentMemberMedia()
 
         activeMeetingView.setCameraControl(enabled: media.isVideoEnabled)
         activeMeetingView.setMicrophoneControl(enabled: media.isAudioEnabled)
 
-        configureMainPreview(for: joinedRoom.currentMember)
+        media.audioFrameReadHandler = { [weak self] in
+            DispatchQueue.main.async {
+                self?.enableAudioIfInterrupted()
+                self?.checkForAudioInterruption()
+            }
+        }
+
+        media.videoFrameReadHandler = { [weak self] in
+            DispatchQueue.main.async {
+                self?.enableVideoIfInterrupted()
+                self?.checkForVideoInterruption()
+            }
+        }
     }
 }
 

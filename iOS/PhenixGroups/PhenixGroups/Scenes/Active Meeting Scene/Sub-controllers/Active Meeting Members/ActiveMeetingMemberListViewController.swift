@@ -66,6 +66,11 @@ class ActiveMeetingMemberListViewController: UITableViewController, PageContaine
             }
         }
     }
+
+    func resetPinnedMember() {
+        dataSource.pinnedMember = nil
+        dataSource.indexPathForSelectedRow = nil
+    }
 }
 
 private extension ActiveMeetingMemberListViewController {
@@ -98,8 +103,7 @@ private extension ActiveMeetingMemberListViewController {
         if let cell = tableView.cellForRow(at: indexPath) as? ActiveMeetingMemberTableViewCell {
             cell.unpin()
         }
-        dataSource.pinnedMember = nil
-        dataSource.indexPathForSelectedRow = nil
+        resetPinnedMember()
     }
 
     /// Sets focused member for the main view video preview layer

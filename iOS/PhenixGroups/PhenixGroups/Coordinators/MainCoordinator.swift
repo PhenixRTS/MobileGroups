@@ -71,9 +71,9 @@ private extension MainCoordinator {
         }
 
         controller.joinedRoom = joinedRoom
-        controller.setFocus(on: joinedRoom.currentMember)
         controller.observeRoom()
-        controller.configureMedia()
+        controller.configureCurrentMemberMedia()
+        controller.resetFocusedMember()
     }
 }
 
