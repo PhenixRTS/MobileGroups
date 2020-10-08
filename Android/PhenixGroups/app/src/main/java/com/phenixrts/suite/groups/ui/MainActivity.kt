@@ -25,6 +25,7 @@ import com.phenixrts.suite.groups.models.DeepLinkModel
 import com.phenixrts.suite.groups.receivers.CellularStateReceiver
 import com.phenixrts.suite.groups.repository.RepositoryProvider
 import com.phenixrts.suite.groups.repository.UserMediaRepository
+import com.phenixrts.suite.groups.services.CameraForegroundService
 import com.phenixrts.suite.groups.ui.screens.LandingScreen
 import com.phenixrts.suite.groups.ui.screens.RoomScreen
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
@@ -94,6 +95,7 @@ class MainActivity : EasyPermissionActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        switchCameraForegroundService(false)
         menuHandler.onStop()
         debugMenu.onStop()
         cellularStateReceiver.unregister()
@@ -206,6 +208,7 @@ class MainActivity : EasyPermissionActivity() {
             camera_button.setImageResource(if (enabled) R.drawable.ic_camera_on else R.drawable.ic_camera_off)
             camera_button.backgroundTintList = ColorStateList.valueOf(color)
             showUserVideoPreview(enabled)
+            switchCameraForegroundService(enabled)
         })
         viewModel.memberCount.observe(this, { memberCount ->
             val label =  if (memberCount > 0) getString(R.string.tab_members_count, memberCount) else " "
@@ -251,6 +254,15 @@ class MainActivity : EasyPermissionActivity() {
             com.phenixrts.sdk.BuildConfig.VERSION_NAME,
             com.phenixrts.sdk.BuildConfig.VERSION_CODE
         ))
+    }
+
+    private fun switchCameraForegroundService(enabled: Boolean) {
+        val cameraService = Intent(this, CameraForegroundService::class.java)
+        if (enabled) {
+            ContextCompat.startForegroundService(this, cameraService)
+        } else {
+            stopService(cameraService)
+        }
     }
 
     private fun initMediaButtons() = launchMain {

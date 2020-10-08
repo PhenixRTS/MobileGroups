@@ -68,5 +68,6 @@
     <string name="accessibility_chat_tab">Chat Tab</string>
     <string name="accessibility_info_tab">Info Tab</string>
     <string name="accessibility_menu_button">Menu Button</string>
+    <string name="camera_notification">Phenix Groups is using Camera</string>
 
 </resources>
