@@ -40,7 +40,7 @@
                 android:layout_height="72dp"
                 android:visibility="@{member.canRenderThumbnail() ? View.VISIBLE : View.GONE}" />
 
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/member_preview_icon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -51,9 +51,9 @@
                 android:visibility="@{member.canRenderThumbnail() ? View.GONE : View.VISIBLE}"
                 android:background="@color/primaryBackgroundLightColor"
                 android:src="@drawable/ic_member"
-                android:tint="@android:color/black" />
+                app:tint="@android:color/black" />
 
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/member_pinned_icon"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -63,10 +63,10 @@
                 android:visibility="@{member.pinned ? View.VISIBLE : View.GONE}"
                 android:background="@color/primaryBackgroundLightColor"
                 android:src="@drawable/ic_pin"
-                android:tint="@android:color/black"
-                tools:visibility="gone"/>
+                tools:visibility="gone"
+                app:tint="@android:color/black" />
 
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/member_mic_icon"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
@@ -77,11 +77,11 @@
                 android:background="@drawable/bg_circle"
                 android:contentDescription="@string/preview_mic_off_icon_content_description"
                 android:src="@drawable/ic_mic_off"
-                android:tint="@android:color/white"
                 android:visibility="@{member.muted ? View.VISIBLE : View.GONE }"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                tools:ignore="RtlHardcoded" />
+                tools:ignore="RtlHardcoded"
+                app:tint="@android:color/white" />
 
             <ImageView
                 android:id="@+id/member_volume_indicator"

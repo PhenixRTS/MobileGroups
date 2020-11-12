@@ -3,6 +3,7 @@
   ~ Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
   -->
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
@@ -38,7 +39,6 @@
         <TextView
             android:id="@+id/fragment_info_share"
             android:drawablePadding="8dp"
-            android:drawableStart="@drawable/ic_share"
             android:text="@string/info_share"
             android:gravity="center_vertical"
             android:textSize="14sp"
@@ -49,7 +49,8 @@
             android:textColor="@color/accentColor"
             android:fontFamily="sans-serif-medium"
             android:layout_width="wrap_content"
-            android:layout_height="48dp" />
+            android:layout_height="48dp"
+            app:drawableStartCompat="@drawable/ic_share" />
 
     </LinearLayout>
 

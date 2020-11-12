@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.databinding.FragmentInfoBinding
+import com.phenixrts.suite.phenixcommon.common.launchMain
 import kotlinx.android.synthetic.main.fragment_info.*
 
 
@@ -36,16 +37,13 @@ class InfoFragment : Fragment() {
         }
     }
 
-    private fun showIntentChooser() {
+    private fun showIntentChooser() = launchMain {
         val intent = Intent(Intent.ACTION_SEND).apply {
             putExtra(Intent.EXTRA_SUBJECT, R.string.info_meeting_subject)
             putExtra(Intent.EXTRA_TEXT, getString(R.string.info_meeting_url, roomCode))
             type = INTENT_CHOOSER_TYPE
         }
-        intent.resolveActivity(requireActivity().packageManager)?.run {
-            startActivity(Intent.createChooser(intent, getString(R.string.info_share)))
-        }
+        startActivity(Intent.createChooser(intent, getString(R.string.info_share)))
     }
 
 }
-

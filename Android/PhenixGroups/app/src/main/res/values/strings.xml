@@ -4,7 +4,7 @@
   -->
 <resources>
     <!--  General  -->
-    <string name="app_name">Phenix Groups</string>
+    <string name="app_name">Groups</string>
     <string name="popup_ok">OK</string>
 
     <!--  Call Settings screen  -->

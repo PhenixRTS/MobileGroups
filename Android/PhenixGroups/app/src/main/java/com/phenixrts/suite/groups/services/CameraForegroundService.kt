@@ -17,6 +17,7 @@ import timber.log.Timber
 
 private const val NOTIFICATION_ID = 1337
 private const val NOTIFICATION_CHANNEL = "phenix_notification"
+private var isServiceRunning = false
 
 class CameraForegroundService : Service() {
 
@@ -42,8 +43,9 @@ class CameraForegroundService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         createNotificationChannel()
-        Timber.d("Camera service started")
         startForeground(NOTIFICATION_ID, notification)
+        Timber.d("Camera service started")
+        isServiceRunning = true
         return START_STICKY
     }
 
@@ -56,5 +58,9 @@ class CameraForegroundService : Service() {
             )
             notificationManager.createNotificationChannel(notificationChannel)
         }
+    }
+
+    companion object {
+        fun isRunning() = isServiceRunning
     }
 }
