@@ -6,5 +6,5 @@ import Foundation
 import PhenixSdk
 
 internal protocol RoomMemberDelegate: AnyObject {
-    func memberStreamDidChange(_ member: RoomMember, streams: [PhenixStream])
+    func member(_ member: RoomMember, didChange streams: [PhenixStream])
 }

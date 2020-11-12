@@ -2,12 +2,11 @@
 //  Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
-import Foundation
 import PhenixSdk
 
-public struct RoomChatMessage {
-    var id: String
-    var authorId: String
+public struct PhenixRoomChatMessage {
+    public var id: String
+    public var authorId: String
     public var authorName: String
     public var text: String
     public var date: Date
@@ -25,7 +24,7 @@ public struct RoomChatMessage {
         self.date = date
     }
 
-    mutating func maskAsYourself() {
+    public mutating func maskAsYourself() {
         authorName = "You"
     }
 }

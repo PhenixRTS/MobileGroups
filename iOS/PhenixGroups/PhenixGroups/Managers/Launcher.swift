@@ -7,12 +7,12 @@ import PhenixCore
 import UIKit
 
 class Launcher {
-    // swiftlint:disable force_unwrapping
-    private let url = URL(string: "https://demo.phenixrts.com/pcast")!
+    private let deeplink: DeeplinkModel?
     private weak var window: UIWindow?
 
-    init(window: UIWindow) {
+    init(window: UIWindow, deeplink: DeeplinkModel? = nil) {
         self.window = window
+        self.deeplink = deeplink
     }
 
     /// Starts all necessary application processes
@@ -31,16 +31,21 @@ class Launcher {
         nc.isNavigationBarHidden = true
         nc.navigationBar.isTranslucent = false
 
+        // Display the navigation controller holding screen which looks the same as the launch screen.
         window?.rootViewController = nc
         window?.makeKeyAndVisible()
 
+        // Prepare all the necessary components on a background thread.
         DispatchQueue.global(qos: .userInitiated).async {
             // Keep a strong reference so that the Launcher would not be deallocated too quickly.
 
             // Configure necessary object instances
             os_log(.debug, log: .launcher, "Configure Phenix instance")
 
-            let manager = PhenixManager(backend: self.url)
+            let backend = self.deeplink?.backend ?? PhenixConfiguration.backend
+            let pcast = self.deeplink?.uri ?? PhenixConfiguration.pcast
+
+            let manager = PhenixManager(backend: backend, pcast: pcast)
             manager.start { [weak nc] description in
                 // Unrecoverable Error Completion
                 let reason = description ?? "N/A"
@@ -63,6 +68,7 @@ class Launcher {
 
             os_log(.debug, log: .launcher, "Start main coodinator")
             let coordinator = MainCoordinator(navigationController: nc, dependencyContainer: container)
+            coordinator.initialMeetingCode = self.deeplink?.alias
 
             DispatchQueue.main.async {
                 coordinator.start()

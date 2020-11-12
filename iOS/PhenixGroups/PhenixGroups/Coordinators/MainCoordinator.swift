@@ -15,6 +15,12 @@ class MainCoordinator: Coordinator {
     private var preferences: Preferences { dependencyContainer.preferences }
     private var phenixManager: PhenixManager { dependencyContainer.phenixManager }
 
+    var phenixBackend: URL { phenixManager.backend }
+    var phenixPcast: URL? { phenixManager.pcast }
+
+    /// If provided before `start()` is executed, will automatically join provided meeting code
+    var initialMeetingCode: String?
+
     init(navigationController: UINavigationController, dependencyContainer: DependencyContainer, device: UIDevice = .current) {
         self.navigationController = navigationController
         self.dependencyContainer = dependencyContainer
@@ -22,8 +28,42 @@ class MainCoordinator: Coordinator {
     }
 
     func start() {
-        os_log(.debug, log: .coordinator, "Main coordinator started")
+        os_log(.debug, log: .coordinator, "Start main coordinator")
 
+        let vc = setupNewMeetingScene(withInitialMeetingCode: initialMeetingCode)
+
+        UIView.transition(with: navigationController.view) {
+            self.navigationController.setViewControllers([vc], animated: false)
+        }
+    }
+
+    func join(meetingCode: String) {
+        os_log(.debug, log: .coordinator, "Restart main coordinator")
+
+        let nmvc = navigationController.viewControllers
+            .compactMap { $0 as? NewMeetingViewController }
+            .first
+
+        nmvc?.initialMeetingCode = meetingCode
+
+        if let amvc = navigationController.topViewController as? ActiveMeetingViewController {
+            amvc.leaveRoom()
+        }
+
+        self.navigationController.topViewController?.presentedViewController?.dismiss(animated: false)
+
+        if let vc = navigationController.topViewController as? NewMeetingViewController {
+            vc.publishInitialMeetingIfNeeded()
+        } else {
+            UIView.transition(with: navigationController.view) {
+                self.navigationController.popToRootViewController(animated: false)
+            }
+        }
+    }
+}
+
+private extension MainCoordinator {
+    func setupNewMeetingScene(withInitialMeetingCode meetingCode: String? = nil) -> NewMeetingViewController {
         if preferences.displayName == nil {
             preferences.displayName = device.name
         }
@@ -33,6 +73,7 @@ class MainCoordinator: Coordinator {
         vc.phenix = phenixManager
         vc.media = phenixManager.userMediaStreamController
         vc.preferences = preferences
+        vc.initialMeetingCode = meetingCode
 
         let hvc = MeetingHistoryTableViewController.instantiate()
         vc.historyController = hvc
@@ -42,13 +83,9 @@ class MainCoordinator: Coordinator {
             self?.preferences.meetings.sorted { $0.leaveDate > $1.leaveDate } ?? []
         }
 
-        UIView.transition(with: navigationController.view) {
-            self.navigationController.setViewControllers([vc], animated: false)
-        }
+        return vc
     }
-}
 
-private extension MainCoordinator {
     func moveToMeeting(_ joinedRoom: JoinedRoom) {
         if navigationController.presentedViewController is JoinMeetingViewController {
             navigationController.presentedViewController?.dismiss(animated: true)

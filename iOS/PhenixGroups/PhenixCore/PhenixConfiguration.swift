@@ -4,6 +4,10 @@
 
 import Foundation
 
-enum PhenixConfiguration {
+public enum PhenixConfiguration {
+    // swiftlint:disable force_unwrapping
+    public static var backend = URL(string: "https://demo.phenixrts.com/pcast")!
+    public static var pcast: URL?
+
     static let capabilities = ["ld", "multi-bitrate", "prefer-h264"]
 }

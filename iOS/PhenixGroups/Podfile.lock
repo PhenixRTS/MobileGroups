@@ -1,10 +1,10 @@
 PODS:
-  - PhenixSdk (2020.1.56-beta)
-  - SwiftLint (0.39.2)
+  - PhenixSdk (2020.1.64-beta)
+  - SwiftLint (0.40.3)
 
 DEPENDENCIES:
-  - PhenixSdk (~> 2020.1.56-beta)
-  - SwiftLint (~> 0.39.2)
+  - PhenixSdk (= 2020.1.64-beta)
+  - SwiftLint (~> 0.40.3)
 
 SPEC REPOS:
   "git@github.com:PhenixRTS/CocoaPodsSpecs.git":
@@ -13,9 +13,9 @@ SPEC REPOS:
     - SwiftLint
 
 SPEC CHECKSUMS:
-  PhenixSdk: 9d80eb9cb5bf98b06edc8c0defb484ca262ec03c
-  SwiftLint: 22ccbbe3b8008684be5955693bab135e0ed6a447
+  PhenixSdk: 9f367e7678afd21ba8ffacb5ac34cfb2208dbc97
+  SwiftLint: dfd554ff0dff17288ee574814ccdd5cea85d76f7
 
-PODFILE CHECKSUM: 809f4c4f5c1a9d0691bc7bd978c71cbb56ad3902
+PODFILE CHECKSUM: dafba22b0458cb8963106403803740955fb9b7c5
 
 COCOAPODS: 1.9.3

@@ -6,20 +6,30 @@ use_frameworks!
 inhibit_all_warnings!
 
 def phenix
-  pod 'PhenixSdk', '~> 2020.1.56-beta'
+  pod 'PhenixSdk', '2020.1.64-beta'
 end
 
 target 'PhenixGroups' do
   phenix
-  pod 'SwiftLint', '~> 0.39.2'
+  pod 'SwiftLint', '~> 0.40.3'
 end
 
 target 'PhenixCore' do
   phenix
 end
 
-target 'PhenixCoreIntegrationTests' do
+target 'PhenixChat' do
+  phenix
 end
 
 target 'PhenixCoreUnitTests' do
+end
+
+# Removes warnings of dependencies containing an old deployment target version.
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings.delete 'IPHONEOS_DEPLOYMENT_TARGET'
+    end
+  end
 end

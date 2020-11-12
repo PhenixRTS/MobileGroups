@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "B54D597D2450622A00454066"
-               BuildableName = "PhenixCore.framework"
-               BlueprintName = "PhenixCore"
+               BlueprintIdentifier = "B5C0C52C2526096A00D7543A"
+               BuildableName = "PhenixChat.framework"
+               BlueprintName = "PhenixChat"
                ReferencedContainer = "container:PhenixGroups.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -50,9 +50,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "B54D597D2450622A00454066"
-            BuildableName = "PhenixCore.framework"
-            BlueprintName = "PhenixCore"
+            BlueprintIdentifier = "B5C0C52C2526096A00D7543A"
+            BuildableName = "PhenixChat.framework"
+            BlueprintName = "PhenixChat"
             ReferencedContainer = "container:PhenixGroups.xcodeproj">
          </BuildableReference>
       </MacroExpansion>

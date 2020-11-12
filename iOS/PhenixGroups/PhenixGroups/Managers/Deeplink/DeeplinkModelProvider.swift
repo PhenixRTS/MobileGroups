@@ -4,6 +4,6 @@
 
 import Foundation
 
-public protocol JoinedRoomChatDelegate: AnyObject {
-    func chatMessagesDidChange(_ messages: [RoomChatMessage])
+public protocol DeeplinkModelProvider {
+    init?(components: URLComponents)
 }

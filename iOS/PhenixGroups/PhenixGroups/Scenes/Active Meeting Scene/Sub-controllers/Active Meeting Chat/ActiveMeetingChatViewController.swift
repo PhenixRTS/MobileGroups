@@ -2,6 +2,7 @@
 //  Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
+import PhenixChat
 import PhenixCore
 import UIKit
 
@@ -10,6 +11,7 @@ class ActiveMeetingChatViewController: UIViewController, PageContainerMember {
 
     private var timer: Timer?
 
+    var displayName: String!
     lazy var dataSource = ActiveMeetingChatDataSource()
     lazy var pageIcon = UIImage(named: "meeting_chat_icon")
 
@@ -29,6 +31,8 @@ class ActiveMeetingChatViewController: UIViewController, PageContainerMember {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        assert(displayName != nil, "Display name is required!")
 
         configureTableView()
 
@@ -65,9 +69,16 @@ private extension ActiveMeetingChatViewController {
 }
 
 // MARK: - JoinedRoomChatDelegate
-extension ActiveMeetingChatViewController: JoinedRoomChatDelegate {
-    func chatMessagesDidChange(_ messages: [RoomChatMessage]) {
+extension ActiveMeetingChatViewController: PhenixChatServiceDelegate {
+    func chatService(_ service: PhenixChatService, didReceive messages: [PhenixRoomChatMessage]) {
+        var messages = messages
+
+        for (index, message) in messages.enumerated() where message.authorName == displayName {
+            messages[index].maskAsYourself()
+        }
+
         dataSource.messages = messages.sorted { $0.date < $1.date }
+
         DispatchQueue.main.async { [weak self] in
             self?.activeMeetingChatView.reloadData()
         }

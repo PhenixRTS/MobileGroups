@@ -73,7 +73,8 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
     }
 
     func observeRoom() {
-        joinedRoom.subscribeToMemberList(membersViewController)
+        joinedRoom.memberController.delegate = membersViewController
+        joinedRoom.memberController.subscribeToMemberList()
         joinedRoom.subscribeToChatMessages(chatViewController)
 
         chatViewController.sendMessageHandler = { [weak self] message in
@@ -89,7 +90,7 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
     func leaveRoom() {
         os_log(.debug, log: .activeMeetingScene, "Leaving meeting")
 
-        let meeting = Meeting(code: joinedRoom.alias ?? "N/A", leaveDate: .now, backendUrl: joinedRoom.backend)
+        let meeting = Meeting(code: joinedRoom.alias, leaveDate: .now, backendUrl: joinedRoom.backend)
         audioDisablingWorker?.cancel()
         videoDisablingWorker?.cancel()
         audioDisablingWorker = nil
@@ -104,7 +105,7 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
     func configureCurrentMemberMedia() {
         // Set the preview layer from the local media for the "self" member, because "self" member does not subscribe
         // for the media stream.
-        joinedRoom.currentMember.previewLayer = media.cameraLayer
+        joinedRoom.memberController.currentMember.previewLayer = media.cameraLayer
     }
 
     /// Configure UI elements to represent the current media state for current user
@@ -175,7 +176,7 @@ private extension ActiveMeetingViewController {
         let controllers = [
             makeMembersViewController(),
             makeChatViewController(),
-            makeInformationViewController(code: joinedRoom.alias ?? "N/A")
+            makeInformationViewController(code: joinedRoom.alias)
         ]
 
         let pageController = PageViewController()
@@ -206,6 +207,7 @@ private extension ActiveMeetingViewController {
     func makeChatViewController() -> UIViewController {
         let vc = ActiveMeetingChatViewController()
         chatViewController = vc
+        vc.displayName = displayName
         return vc
     }
 
@@ -218,7 +220,7 @@ private extension ActiveMeetingViewController {
     func setAudio(enabled: Bool) {
         os_log(.debug, log: .activeMeetingScene, "Set audio enabled - %{PUBLIC}d", enabled)
         // Inform the joined room that the current audio state has changed
-        joinedRoom.setAudio(enabled: enabled)
+        joinedRoom.media?.setAudio(enabled: enabled)
         // Inform the local media stream that the current audio state has changed.
         // This is needed to inform other controllers (like Join Meeting scene controller) that user has enabled/disabled the audio.
         media?.setAudio(enabled: enabled)
@@ -227,7 +229,7 @@ private extension ActiveMeetingViewController {
     func setVideo(enabled: Bool) {
         os_log(.debug, log: .activeMeetingScene, "Set video enabled - %{PUBLIC}d", enabled)
         // Inform the joined room that the current video state has changed
-        joinedRoom.setVideo(enabled: enabled)
+        joinedRoom.media?.setVideo(enabled: enabled)
         // Inform the local media stream that the current video state has changed.
         // This is needed to inform other controllers (like Join Meeting scene controller) that user has enabled/disabled the video.
         media?.setVideo(enabled: enabled)

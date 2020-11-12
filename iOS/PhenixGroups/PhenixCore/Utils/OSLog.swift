@@ -13,4 +13,6 @@ extension OSLog {
     static let phenixManager = OSLog(subsystem: subsystem, category: "Phenix.Core.PhenixManager")
     static let joinedRoom = OSLog(subsystem: subsystem, category: "Phenix.Core.JoinedRoom")
     static let roomMember = OSLog(subsystem: subsystem, category: "Phenix.Core.RoomMember")
+    static let mediaController = OSLog(subsystem: subsystem, category: "Phenix.Core.MediaController")
+    static let memberController = OSLog(subsystem: subsystem, category: "Phenix.Core.MemberController")
 }

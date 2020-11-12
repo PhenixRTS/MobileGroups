@@ -2,7 +2,7 @@
 //  Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
-import PhenixCore
+import PhenixChat
 import UIKit
 
 class ActiveMeetingChatTableViewCell: UITableViewCell, CellIdentified {
@@ -10,7 +10,7 @@ class ActiveMeetingChatTableViewCell: UITableViewCell, CellIdentified {
     private var dateLabel: UILabel!
     private var messageTextView: UITextView!
 
-    private var message: RoomChatMessage?
+    private var message: PhenixRoomChatMessage?
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -22,7 +22,7 @@ class ActiveMeetingChatTableViewCell: UITableViewCell, CellIdentified {
         setup()
     }
 
-    func configure(message: RoomChatMessage) {
+    func configure(message: PhenixRoomChatMessage) {
         self.message = message
         displayNameLabel.text = message.authorName
         dateLabel.text = message.date.localizedRelativeDateTime

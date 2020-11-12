@@ -2,11 +2,11 @@
 //  Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
-import PhenixCore
+import PhenixChat
 import UIKit
 
 class ActiveMeetingChatDataSource: NSObject, UITableViewDataSource {
-    var messages = [RoomChatMessage]()
+    var messages = [PhenixRoomChatMessage]()
 
     // MARK: - Table view data source
 

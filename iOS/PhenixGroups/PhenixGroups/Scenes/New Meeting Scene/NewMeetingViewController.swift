@@ -18,6 +18,7 @@ class NewMeetingViewController: UIViewController, Storyboarded {
 
     var device: UIDevice = .current
     var historyController: MeetingHistoryTableViewController!
+    var initialMeetingCode: String?
 
     var newMeetingView: NewMeetingView {
         view as! NewMeetingView
@@ -37,6 +38,22 @@ class NewMeetingViewController: UIViewController, Storyboarded {
         super.viewWillAppear(animated)
 
         configureMedia()
+    }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        publishInitialMeetingIfNeeded()
+    }
+
+    func publishInitialMeetingIfNeeded() {
+        guard let code = initialMeetingCode else {
+            return
+        }
+
+        publishMeeting(with: code, displayName: displayName)
+        // Remove initial meeting code so that next time the view appears,
+        // it would not automatically start to join the meeting again.
+        initialMeetingCode = nil
     }
 }
 

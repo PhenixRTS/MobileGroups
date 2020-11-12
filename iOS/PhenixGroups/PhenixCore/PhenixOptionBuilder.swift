@@ -7,14 +7,19 @@ import os.log
 import PhenixSdk
 
 enum PhenixOptionBuilder {
-    static func createPCastExpressOptions(backend: URL, unrecoverableErrorCallback: @escaping (_ description: String?) -> Void) -> PhenixPCastExpressOptions {
-        PhenixPCastExpressFactory.createPCastExpressOptionsBuilder()
+    static func createPCastExpressOptions(backend: URL, pcast: URL?, unrecoverableErrorCallback: @escaping (_ description: String?) -> Void) -> PhenixPCastExpressOptions {
+        var builder: PhenixPCastExpressOptionsBuilder = PhenixPCastExpressFactory.createPCastExpressOptionsBuilder()
             .withBackendUri(backend.absoluteString)
             .withUnrecoverableErrorCallback { _, description in
                 os_log(.error, log: .phenixManager, "Unrecoverable Error: %{PRIVATE}s", String(describing: description))
                 unrecoverableErrorCallback(description)
             }
-            .buildPCastExpressOptions()
+
+        if let pcast = pcast {
+            builder = builder.withPCastUri(pcast.absoluteString)
+        }
+
+        return builder.buildPCastExpressOptions()
     }
 
     static func createRoomExpressOptions(with pcastExpressOptions: PhenixPCastExpressOptions) -> PhenixRoomExpressOptions {
