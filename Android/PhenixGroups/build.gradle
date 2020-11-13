@@ -10,7 +10,7 @@ buildscript {
     ext.arch_version = '2.1.0'
     ext.dagger_version = '2.29.1'
     ext.kotlinx_coroutines_version = '1.4.0'
-    ext.phenix_version = '2020.1.67'
+    ext.phenix_version = '2020.1.68'
 
     repositories {
         google()
