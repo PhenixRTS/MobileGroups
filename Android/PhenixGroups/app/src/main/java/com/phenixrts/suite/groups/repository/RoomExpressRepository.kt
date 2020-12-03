@@ -49,6 +49,7 @@ class RoomExpressRepository(
                 expressPublisher = publisher
                 if (chatService == null) {
                     delay(CHAT_SUBSCRIPTION_DELAY)
+                    if (roomService == null || isDisposed) return@launchMain
                     chatService = RoomChatServiceFactory.createRoomChatService(roomService)
                 }
                 var requestStatus = status

@@ -228,7 +228,6 @@ class GroupsViewModel(
     fun leaveRoom() = launchMain {
         Timber.d("Leaving room")
         isInRoom.value = false
-        onRoomJoined.value = RequestStatus.GONE
         getRoomRepository()?.leaveRoom()
         roomMemberRepository?.dispose()
         roomMemberRepository = null
