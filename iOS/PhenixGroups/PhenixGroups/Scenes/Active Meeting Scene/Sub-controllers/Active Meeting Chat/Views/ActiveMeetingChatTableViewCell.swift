@@ -111,7 +111,9 @@ extension ActiveMeetingChatTableViewCell {
         textView.textContainerInset = .zero
         textView.isScrollEnabled = false
         textView.isEditable = false
-        textView.dataDetectorTypes = .all
+        // Data detector takes a lot of time to evaluate the text, so it can result in application freeze for some time
+        // while the LLDB is attached for some reason.
+        textView.dataDetectorTypes = [.link, .phoneNumber]
         if #available(iOS 13.0, *) {
             textView.textColor = .label
         } else {

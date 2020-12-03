@@ -37,7 +37,7 @@ public class JoinedRoom: ChatProvider, RoomRepresentation {
             self.media = RoomMediaController(publisher: publisher)
         }
 
-        self.memberController = RoomMemberController(roomService: roomService, roomExpress: roomExpress)
+        self.memberController = RoomMemberController(roomService: roomService, roomExpress: roomExpress, queue: queue)
         self.memberController.roomRepresentation = self
 
         self.media?.roomRepresentation = self
@@ -47,16 +47,10 @@ public class JoinedRoom: ChatProvider, RoomRepresentation {
     ///
     /// Must be called when SDK automatically re-publishes to the room, also if user didn't left the room manually.
     internal func dispose() {
-        queue.async { [weak self] in
-            guard let self = self else {
-                return
-            }
+        os_log(.debug, log: .joinedRoom, "Dispose the joined room members, (%{PRIVATE}s)", self.description)
 
-            os_log(.debug, log: .joinedRoom, "Dispose the joined room members, (%{PRIVATE}s)", self.description)
-
-            self.chatService.dispose()
-            self.memberController.dispose()
-        }
+        self.chatService.dispose()
+        self.memberController.dispose()
     }
 
     /// Clears all room disposables and all member subscriptions, stops publishing and leaves the room with SDK method

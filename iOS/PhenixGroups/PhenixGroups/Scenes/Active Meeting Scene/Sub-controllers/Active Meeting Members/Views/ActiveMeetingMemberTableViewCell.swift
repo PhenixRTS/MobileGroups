@@ -100,6 +100,10 @@ private extension ActiveMeetingMemberTableViewCell {
         contentView.addSubview(muteImage)
         contentView.insertSubview(muteImageBackground, belowSubview: muteImage)
 
+        setupConstraints()
+    }
+
+    func setupConstraints() {
         NSLayoutConstraint.activate([
             cameraView.topAnchor.constraint(equalTo: contentView.topAnchor),
             cameraView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),

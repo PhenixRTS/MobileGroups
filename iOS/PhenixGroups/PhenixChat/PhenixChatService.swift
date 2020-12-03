@@ -7,11 +7,13 @@ import PhenixSdk
 
 public class PhenixChatService {
     private let chatService: PhenixRoomChatService
+    private let queue: DispatchQueue
     private var chatMessagesDisposable: PhenixDisposable?
 
     public weak var delegate: PhenixChatServiceDelegate?
 
     public init(roomService: PhenixRoomService) {
+        queue = DispatchQueue(label: "com.phenixrts.suite.groups.PhenixChatService", qos: .userInitiated)
         chatService = PhenixRoomChatServiceFactory.createRoomChatService(roomService)
     }
 
@@ -21,8 +23,10 @@ public class PhenixChatService {
     }
 
     public func send(_ message: String) {
-        os_log(.debug, log: .chatService, "Send chat message")
-        chatService.sendMessage(toRoom: message)
+        queue.async { [weak self] in
+            os_log(.debug, log: .chatService, "Send chat message")
+            self?.chatService.sendMessage(toRoom: message)
+        }
     }
 
     public func dispose() {
@@ -34,21 +38,25 @@ public class PhenixChatService {
 internal extension PhenixChatService {
     func deliver(_ messages: [PhenixRoomChatMessage]) {
         os_log(.debug, log: .chatService, "Deliver chat messages to the delegate")
-        delegate?.chatService(self, didReceive: messages)
+
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+            self.delegate?.chatService(self, didReceive: messages)
+        }
     }
 }
 
 // MARK: - Private methods
 private extension PhenixChatService {
     func chatMessagesDidChange(_ changes: PhenixObservableChange<NSArray>?) {
-        guard let chatMessages = changes?.value as? [PhenixChatMessage] else {
-            return
+        queue.async { [weak self] in
+            guard let chatMessages = changes?.value as? [PhenixChatMessage] else { return }
+
+            os_log(.debug, log: .chatService, "Did receive chat message update")
+
+            let messages = chatMessages.compactMap(PhenixRoomChatMessage.init)
+
+            self?.deliver(messages)
         }
-
-        os_log(.debug, log: .chatService, "Did receive chat message update")
-
-        let messages = chatMessages.compactMap(PhenixRoomChatMessage.init)
-
-        deliver(messages)
     }
 }

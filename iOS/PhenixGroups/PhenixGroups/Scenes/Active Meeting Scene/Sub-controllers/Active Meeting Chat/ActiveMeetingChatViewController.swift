@@ -71,16 +71,11 @@ private extension ActiveMeetingChatViewController {
 // MARK: - JoinedRoomChatDelegate
 extension ActiveMeetingChatViewController: PhenixChatServiceDelegate {
     func chatService(_ service: PhenixChatService, didReceive messages: [PhenixRoomChatMessage]) {
-        var messages = messages
-
-        for (index, message) in messages.enumerated() where message.authorName == displayName {
-            messages[index].maskAsYourself()
+        for message in messages where message.authorName == displayName {
+            message.maskAsYourself()
         }
 
         dataSource.messages = messages.sorted { $0.date < $1.date }
-
-        DispatchQueue.main.async { [weak self] in
-            self?.activeMeetingChatView.reloadData()
-        }
+        activeMeetingChatView.reloadData()
     }
 }

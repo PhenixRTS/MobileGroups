@@ -4,7 +4,7 @@
 
 import PhenixSdk
 
-public struct PhenixRoomChatMessage {
+public class PhenixRoomChatMessage {
     public var id: String
     public var authorId: String
     public var authorName: String
@@ -24,7 +24,7 @@ public struct PhenixRoomChatMessage {
         self.date = date
     }
 
-    public mutating func maskAsYourself() {
+    public func maskAsYourself() {
         authorName = "You"
     }
 }

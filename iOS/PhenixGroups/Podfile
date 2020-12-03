@@ -6,12 +6,12 @@ use_frameworks!
 inhibit_all_warnings!
 
 def phenix
-  pod 'PhenixSdk', '2020.1.64-beta'
+  pod 'PhenixSdk', '2020.1.73-beta'
 end
 
 target 'PhenixGroups' do
   phenix
-  pod 'SwiftLint', '~> 0.40.3'
+  pod 'SwiftLint', '~> 0.41.0'
 end
 
 target 'PhenixCore' do
