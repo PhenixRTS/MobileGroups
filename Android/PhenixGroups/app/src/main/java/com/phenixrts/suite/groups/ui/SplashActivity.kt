@@ -14,6 +14,7 @@ import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.cache.PreferenceProvider
 import com.phenixrts.suite.groups.common.extensions.*
+import com.phenixrts.suite.groups.databinding.ActivitySplashBinding
 import com.phenixrts.suite.groups.models.*
 import com.phenixrts.suite.groups.repository.RepositoryProvider
 import com.phenixrts.suite.phenixcommon.common.launchMain
@@ -24,18 +25,20 @@ class SplashActivity : EasyPermissionActivity() {
 
     @Inject lateinit var repositoryProvider: RepositoryProvider
     @Inject lateinit var preferenceProvider: PreferenceProvider
+    private lateinit var binding: ActivitySplashBinding
 
     private val timeoutHandler = Handler(Looper.getMainLooper())
     private val timeoutRunnable = Runnable {
         launchMain {
-            showSnackBar(getString(R.string.err_network_problems))
+            binding.root.showSnackBar(getString(R.string.err_network_problems))
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         GroupsApplication.component.inject(this)
-        setContentView(R.layout.activity_splash)
+        binding = ActivitySplashBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         checkDeepLink(intent)
     }
 

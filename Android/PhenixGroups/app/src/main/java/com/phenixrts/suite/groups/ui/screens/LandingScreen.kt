@@ -29,8 +29,8 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
         resources.configuration.orientation != Configuration.ORIENTATION_PORTRAIT
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = ScreenLandingBinding.inflate(inflater)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        binding = ScreenLandingBinding.inflate(inflater, container, false)
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
         return binding.root

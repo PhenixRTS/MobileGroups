@@ -31,8 +31,8 @@ class MemberFragment : BaseFragment(), MemberListAdapter.OnMemberListener {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentMembersBinding.inflate(inflater)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        binding = FragmentMembersBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = this
         binding.memberList.adapter = adapter
         return binding.root

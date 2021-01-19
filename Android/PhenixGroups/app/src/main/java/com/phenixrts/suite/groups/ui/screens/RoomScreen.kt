@@ -16,12 +16,14 @@ import androidx.viewpager.widget.ViewPager
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.common.extensions.hideKeyboard
 import com.phenixrts.suite.groups.common.extensions.showBottomMenu
+import com.phenixrts.suite.groups.databinding.ScreenRoomBinding
 import com.phenixrts.suite.groups.ui.adapters.RoomScreenPageAdapter
 import com.phenixrts.suite.groups.ui.screens.fragments.*
-import kotlinx.android.synthetic.main.screen_room.*
 import timber.log.Timber
 
 class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
+
+    private lateinit var binding: ScreenRoomBinding
 
     private val adapter by lazy {
         RoomScreenPageAdapter(
@@ -34,16 +36,18 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
         )
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
-        inflater.inflate(R.layout.screen_room, container, false)!!
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        binding = ScreenRoomBinding.inflate(inflater, container, false)
+        return binding.root
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        fragment_pager.addOnPageChangeListener(this)
-        fragment_pager.offscreenPageLimit = 2
-        fragment_pager?.adapter = adapter
-        fragment_tab_layout.setupWithViewPager(fragment_pager)
-        room_menu_button.setOnClickListener {
+        binding.fragmentPager.addOnPageChangeListener(this)
+        binding.fragmentPager.offscreenPageLimit = 2
+        binding.fragmentPager.adapter = adapter
+        binding.fragmentTabLayout.setupWithViewPager(binding.fragmentPager)
+        binding.roomMenuButton.setOnClickListener {
             showBottomMenu()
         }
         setMessageCount(0)
@@ -64,7 +68,7 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
     }
 
     override fun onBackPressed() {
-        fragment_pager.removeOnPageChangeListener(this)
+        binding.fragmentPager.removeOnPageChangeListener(this)
         viewModel.leaveRoom()
     }
 
@@ -75,7 +79,7 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
     override fun onPageSelected(position: Int) {
         // Hide member list surfaces when page scrolled
         (childFragmentManager.findFragmentByTag(
-            "android:switcher:${fragment_pager.id}:0"
+            "android:switcher:${binding.fragmentPager.id}:0"
         ) as? MemberFragment)?.hidePreviews(position != TAB_MEMBERS)
         viewModel.setViewingChat(position == TAB_CHAT)
         hideKeyboard()
@@ -91,12 +95,12 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
 
     private fun setMemberCount(memberCount: Int) {
         val label =  if (memberCount > 0) resources.getString(R.string.tab_members_count, memberCount) else " "
-        fragment_tab_layout.getTabAt(TAB_MEMBERS)?.text = label
+        binding.fragmentTabLayout.getTabAt(TAB_MEMBERS)?.text = label
         refreshTabs()
     }
 
     private fun setMessageCount(messageCount: Int) {
-        fragment_tab_layout.getTabAt(TAB_CHAT)?.orCreateBadge?.apply {
+        binding.fragmentTabLayout.getTabAt(TAB_CHAT)?.orCreateBadge?.apply {
             isVisible = messageCount > 0
             maxCharacterCount = 3
             number = messageCount
@@ -105,21 +109,21 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
     }
 
     private fun refreshTabs() {
-        fragment_tab_layout.getTabAt(TAB_MEMBERS)?.setIcon(R.drawable.ic_people)
-        fragment_tab_layout.getTabAt(TAB_CHAT)?.setIcon(R.drawable.ic_chat)
-        fragment_tab_layout.getTabAt(TAB_INFO)?.setIcon(R.drawable.ic_info)
-        fragment_tab_layout.getTabAt(TAB_MEMBERS)?.view?.id = R.id.tab_members
-        fragment_tab_layout.getTabAt(TAB_CHAT)?.view?.id = R.id.tab_chat
-        fragment_tab_layout.getTabAt(TAB_INFO)?.view?.id = R.id.tab_info
+        binding.fragmentTabLayout.getTabAt(TAB_MEMBERS)?.setIcon(R.drawable.ic_people)
+        binding.fragmentTabLayout.getTabAt(TAB_CHAT)?.setIcon(R.drawable.ic_chat)
+        binding.fragmentTabLayout.getTabAt(TAB_INFO)?.setIcon(R.drawable.ic_info)
+        binding.fragmentTabLayout.getTabAt(TAB_MEMBERS)?.view?.id = R.id.tab_members
+        binding.fragmentTabLayout.getTabAt(TAB_CHAT)?.view?.id = R.id.tab_chat
+        binding.fragmentTabLayout.getTabAt(TAB_INFO)?.view?.id = R.id.tab_info
     }
 
     fun selectTab(index: Int) {
         Timber.d("Selecting tab: $index")
-        fragment_pager.setCurrentItem(index, false)
+        binding.fragmentPager.setCurrentItem(index, false)
     }
 
     fun fadeIn() {
-        val params: FrameLayout.LayoutParams = fragment_room_root.layoutParams as FrameLayout.LayoutParams
+        val params: FrameLayout.LayoutParams = binding.fragmentRoomRoot.layoutParams as FrameLayout.LayoutParams
         val currentOffset = params.rightMargin
         val offset = resources.getDimension(R.dimen.room_pager_offset_gone).toInt()
         if (currentOffset < 0) {
@@ -127,17 +131,17 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
             val animation: Animation = object : Animation() {
                 override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
                     params.rightMargin = offset - (offset * interpolatedTime).toInt()
-                    fragment_room_root.layoutParams = params
+                    binding.fragmentRoomRoot.layoutParams = params
                 }
             }
             animation.duration = SCREEN_FADE_DELAY
             animation.interpolator = OvershootInterpolator()
-            fragment_room_root.startAnimation(animation)
+            binding.fragmentRoomRoot.startAnimation(animation)
         }
     }
 
     fun tryFadeOut(): Boolean {
-        val params: FrameLayout.LayoutParams = fragment_room_root.layoutParams as FrameLayout.LayoutParams
+        val params: FrameLayout.LayoutParams = binding.fragmentRoomRoot.layoutParams as FrameLayout.LayoutParams
         val currentOffset = params.rightMargin
         val offset = resources.getDimension(R.dimen.room_pager_offset_gone)
         if (currentOffset == 0) {
@@ -146,12 +150,12 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
             val animation: Animation = object : Animation() {
                 override fun applyTransformation(interpolatedTime: Float, t: Transformation?) {
                     params.rightMargin = (offset * interpolatedTime).toInt()
-                    fragment_room_root.layoutParams = params
+                    binding.fragmentRoomRoot.layoutParams = params
                 }
             }
             animation.duration = SCREEN_FADE_DELAY
             animation.interpolator = OvershootInterpolator()
-            fragment_room_root.startAnimation(animation)
+            binding.fragmentRoomRoot.startAnimation(animation)
             return true
         }
         return false

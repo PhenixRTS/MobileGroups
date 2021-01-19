@@ -12,7 +12,6 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import androidx.core.content.ContextCompat
-import androidx.databinding.DataBindingUtil
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.suite.groups.BuildConfig
 import com.phenixrts.suite.groups.GroupsApplication
@@ -33,7 +32,6 @@ import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
 import com.phenixrts.suite.phenixcommon.DebugMenu
 import com.phenixrts.suite.phenixcommon.common.FileWriterDebugTree
 import com.phenixrts.suite.phenixcommon.common.launchMain
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.delay
 import timber.log.Timber
@@ -50,19 +48,20 @@ class MainActivity : EasyPermissionActivity() {
     @Inject lateinit var preferenceProvider: PreferenceProvider
     @Inject lateinit var cellularStateReceiver: CellularStateReceiver
     @Inject lateinit var fileWriterTree: FileWriterDebugTree
+    lateinit var binding: ActivityMainBinding
 
     private val viewModel: GroupsViewModel by lazyViewModel({ application as GroupsApplication }, {
         GroupsViewModel(cacheProvider, preferenceProvider, repositoryProvider)
     })
 
     private val debugMenu: DebugMenu by lazy {
-        DebugMenu(fileWriterTree, repositoryProvider.roomExpress, main_root, { files ->
+        DebugMenu(fileWriterTree, repositoryProvider.roomExpress, binding.mainRoot, { files ->
             debugMenu.showAppChooser(this, files)
         }, { error ->
             showToast(getString(error))
         })
     }
-    val menuHandler: MenuHandler by lazy { MenuHandler(this, viewModel) }
+    val menuHandler: MenuHandler by lazy { MenuHandler(binding, viewModel) }
 
     private val timerHandler = Handler(Looper.getMainLooper())
     private val timerRunnable = Runnable {
@@ -77,10 +76,10 @@ class MainActivity : EasyPermissionActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         GroupsApplication.component.inject(this)
-        DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main).apply {
-            model = viewModel
-            lifecycleOwner = this@MainActivity
-        }
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        binding.model = viewModel
+        binding.lifecycleOwner = this@MainActivity
+        setContentView(binding.root)
         handleExceptions()
         observeCellularState()
         initViews(savedInstanceState == null)
@@ -138,7 +137,7 @@ class MainActivity : EasyPermissionActivity() {
     }
 
     private fun initViews(firstLaunch: Boolean) {
-        camera_button.setOnClickListener {
+        binding.cameraButton.setOnClickListener {
             launchMain {
                 restartTimer()
                 if (!cellularStateReceiver.isInCall()) {
@@ -147,7 +146,7 @@ class MainActivity : EasyPermissionActivity() {
                 }
             }
         }
-        microphone_button.setOnClickListener {
+        binding.microphoneButton.setOnClickListener {
             launchMain {
                 restartTimer()
                 if (!cellularStateReceiver.isInCall()) {
@@ -156,7 +155,7 @@ class MainActivity : EasyPermissionActivity() {
                 }
             }
         }
-        preview_container.setOnClickListener {
+        binding.previewContainer.setOnClickListener {
             launchMain {
                 debugMenu.onScreenTapped()
                 if (viewModel.isInRoom.isTrue()) {
@@ -171,22 +170,22 @@ class MainActivity : EasyPermissionActivity() {
                 }
             }
         }
-        end_call_button.setOnClickListener {
+        binding.endCallButton.setOnClickListener {
             hideKeyboard()
             onBackPressed()
         }
 
-        main_landscape_members_holder.setOnClickListener {
+        binding.mainLandscapeMembersHolder.setOnClickListener {
             restartTimer()
             showRoomScreen(0)
         }
 
-        main_landscape_chat.setOnClickListener {
+        binding.mainLandscapeChat.setOnClickListener {
             restartTimer()
             showRoomScreen(1)
         }
 
-        main_landscape_info.setOnClickListener {
+        binding.mainLandscapeInfo.setOnClickListener {
             restartTimer()
             showRoomScreen(2)
         }
@@ -197,27 +196,27 @@ class MainActivity : EasyPermissionActivity() {
         viewModel.initObservers(this)
         viewModel.isMicrophoneEnabled.observe(this, { enabled ->
             val color = ContextCompat.getColor(this, if (enabled) R.color.accentGrayColor else R.color.accentColor)
-            microphone_button.setImageResource(if (enabled) R.drawable.ic_mic_on else R.drawable.ic_mic_off)
-            microphone_button.backgroundTintList = ColorStateList.valueOf(color)
+            binding.microphoneButton.setImageResource(if (enabled) R.drawable.ic_mic_on else R.drawable.ic_mic_off)
+            binding.microphoneButton.backgroundTintList = ColorStateList.valueOf(color)
             if (viewModel.isInRoom.isFalse()) {
-                active_member_mic.visibility = if (enabled) View.GONE else View.VISIBLE
+                binding.activeMemberMic.visibility = if (enabled) View.GONE else View.VISIBLE
             }
         })
         viewModel.isVideoEnabled.observe(this, { enabled ->
             val color = ContextCompat.getColor(this, if (enabled) R.color.accentGrayColor else R.color.accentColor)
-            camera_button.setImageResource(if (enabled) R.drawable.ic_camera_on else R.drawable.ic_camera_off)
-            camera_button.backgroundTintList = ColorStateList.valueOf(color)
+            binding.cameraButton.setImageResource(if (enabled) R.drawable.ic_camera_on else R.drawable.ic_camera_off)
+            binding.cameraButton.backgroundTintList = ColorStateList.valueOf(color)
             showUserVideoPreview(enabled)
         })
         viewModel.memberCount.observe(this, { memberCount ->
             val label =  if (memberCount > 0) getString(R.string.tab_members_count, memberCount) else " "
-            main_landscape_member_count.visibility = if (memberCount > 0) View.VISIBLE else View.GONE
-            main_landscape_member_count.text = label
+            binding.mainLandscapeMemberCount.visibility = if (memberCount > 0) View.VISIBLE else View.GONE
+            binding.mainLandscapeMemberCount.text = label
         })
         viewModel.unreadMessageCount.observe(this, { messageCount ->
             val label = if (messageCount < 100) "$messageCount" else getString(R.string.tab_message_count)
-            main_landscape_message_count.visibility = if (messageCount > 0) View.VISIBLE else View.GONE
-            main_landscape_message_count.text = label
+            binding.mainLandscapeMessageCount.visibility = if (messageCount > 0) View.VISIBLE else View.GONE
+            binding.mainLandscapeMessageCount.text = label
         })
         viewModel.isControlsEnabled.observe(this, { enabled ->
             if (viewModel.isInRoom.isTrue()) {
@@ -342,10 +341,10 @@ class MainActivity : EasyPermissionActivity() {
     private fun showUserVideoPreview(enabled: Boolean) = launchMain {
         if (viewModel.isInRoom.isFalse() && hasCameraPermission()) {
             if (enabled) {
-                val response = viewModel.startUserMediaPreview(main_surface_view.holder)
+                val response = viewModel.startUserMediaPreview(binding.mainSurfaceView.holder)
                 Timber.d("Preview started: ${response.status}")
                 if (response.status == RequestStatus.OK) {
-                    main_surface_view.visibility = View.VISIBLE
+                    binding.mainSurfaceView.visibility = View.VISIBLE
                     if (viewModel.isVideoEnabled.isFalse()) {
                         viewModel.isVideoEnabled.value = hasCameraPermission()
                     }
@@ -356,7 +355,7 @@ class MainActivity : EasyPermissionActivity() {
                     }
                 }
             } else {
-                main_surface_view.visibility = View.GONE
+                binding.mainSurfaceView.visibility = View.GONE
             }
         }
     }

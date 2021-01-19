@@ -30,9 +30,9 @@ fun Fragment.hideKeyboard() {
     }
 }
 
-fun Fragment.getSurfaceView(): SurfaceView = requireActivity().getSurfaceView()
+fun Fragment.getSurfaceView(): SurfaceView = (requireActivity() as MainActivity).getSurfaceView()
 
-fun Fragment.getMicIcon(): ImageView = requireActivity().getMicIcon()
+fun Fragment.getMicIcon(): ImageView = (requireActivity() as MainActivity).getMicIcon()
 
 fun Fragment.joinRoom(viewModel: GroupsViewModel, roomAlias: String, displayName: String)
         = (requireActivity() as? MainActivity)?.joinRoom(viewModel, roomAlias, displayName)

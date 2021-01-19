@@ -6,30 +6,29 @@ package com.phenixrts.suite.groups.ui
 
 import android.view.View
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.phenixrts.suite.groups.databinding.ActivityMainBinding
 import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
 import com.phenixrts.suite.phenixcommon.common.*
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.view_bottom_menu.*
 import kotlinx.coroutines.delay
 import timber.log.Timber
 
 class MenuHandler(
-    private val activity: MainActivity,
+    private val binding: ActivityMainBinding,
     private val viewModel: GroupsViewModel
 ) {
 
-    private val bottomMenu by lazy { BottomSheetBehavior.from(activity.bottom_menu) }
+    private val bottomMenu by lazy { BottomSheetBehavior.from(binding.bottomMenu.root as View) }
 
     private val sheetListener = object : BottomSheetBehavior.BottomSheetCallback() {
         override fun onSlide(bottomSheet: View, slideOffset: Float) {
-            activity.menu_background.visibility = View.VISIBLE
-            activity.menu_background.alpha = slideOffset
+            binding.menuBackground.visibility = View.VISIBLE
+            binding.menuBackground.alpha = slideOffset
         }
 
         override fun onStateChanged(bottomSheet: View, newState: Int) {
             if (newState == BottomSheetBehavior.STATE_HIDDEN || newState == BottomSheetBehavior.STATE_COLLAPSED) {
-                activity.menu_background.visibility = View.GONE
-                activity.menu_background.alpha = 0f
+                binding.menuBackground.visibility = View.GONE
+                binding.menuBackground.alpha = 0f
             }
         }
     }
@@ -55,10 +54,10 @@ class MenuHandler(
     fun onStart() {
         bottomMenu.addBottomSheetCallback(sheetListener)
 
-        activity.menu_button.setOnClickListener { switchBottomMenu() }
-        activity.menu_background.setOnClickListener { hideBottomMenu() }
-        activity.menu_close.setOnClickListener { hideBottomMenu() }
-        activity.menu_switch_camera.setOnClickListener {
+        binding.menuButton.setOnClickListener { switchBottomMenu() }
+        binding.menuBackground.setOnClickListener { hideBottomMenu() }
+        binding.bottomMenu.menuClose.setOnClickListener { hideBottomMenu() }
+        binding.bottomMenu.menuSwitchCamera.setOnClickListener {
             launchMain {
                 hideBottomMenu()
                 delay(MENU_HIDE_DELAY)
@@ -82,29 +81,29 @@ class MenuHandler(
     }
 
     fun showTopMenu() {
-        if (activity.main_menu_holder.alpha == MENU_INVISIBLE) {
+        if (binding.mainMenuHolder.alpha == MENU_INVISIBLE) {
             Timber.d("Showing top menu")
-            activity.main_menu_holder.visibility = View.VISIBLE
-            activity.main_menu_holder.animate()
+            binding.mainMenuHolder.visibility = View.VISIBLE
+            binding.mainMenuHolder.animate()
                 .setStartDelay(MENU_FADE_DURATION)
                 .setDuration(MENU_FADE_DURATION)
                 .alpha(MENU_VISIBLE)
                 .withEndAction {
-                    activity.main_menu_holder.alpha = MENU_VISIBLE
+                    binding.mainMenuHolder.alpha = MENU_VISIBLE
                 }.start()
         }
     }
 
     fun hideTopMenu() {
-        if (activity.main_menu_holder.alpha == MENU_VISIBLE) {
+        if (binding.mainMenuHolder.alpha == MENU_VISIBLE) {
             Timber.d("Hiding top menu")
-            activity.main_menu_holder.animate()
+            binding.mainMenuHolder.animate()
                 .setStartDelay(0)
                 .setDuration(MENU_FADE_DURATION)
                 .alpha(MENU_INVISIBLE)
                 .withEndAction {
-                    activity.main_menu_holder.alpha = MENU_INVISIBLE
-                    activity.main_menu_holder.visibility = View.GONE
+                    binding.mainMenuHolder.alpha = MENU_INVISIBLE
+                    binding.mainMenuHolder.visibility = View.GONE
                 }.start()
         }
     }

@@ -34,8 +34,8 @@ class ChatFragment : BaseFragment() {
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentChatBinding.inflate(inflater)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        binding = FragmentChatBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = this
         binding.chatHistory.adapter = adapter
         binding.sendButton.setOnClickListener {

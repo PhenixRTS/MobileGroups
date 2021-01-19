@@ -6,9 +6,10 @@ package com.phenixrts.suite.groups.cache
 
 import android.content.Context
 import android.os.Build
-import com.google.gson.Gson
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.models.RoomExpressConfiguration
+import com.phenixrts.suite.groups.models.fromJson
+import com.phenixrts.suite.groups.models.toJson
 
 class PreferenceProvider(private val context: GroupsApplication) {
 
@@ -32,14 +33,14 @@ class PreferenceProvider(private val context: GroupsApplication) {
 
     fun saveConfiguration(configuration: RoomExpressConfiguration?) {
         context.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE).edit()
-            .putString(CONFIGURATION, Gson().toJson(configuration))
+            .putString(CONFIGURATION, configuration?.toJson())
             .apply()
     }
 
     fun getConfiguration(): RoomExpressConfiguration? {
         var configuration: RoomExpressConfiguration? = null
         context.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE).getString(CONFIGURATION, null)?.let { cache ->
-            configuration = Gson().fromJson(cache, RoomExpressConfiguration::class.java)
+            configuration = cache.fromJson()
         }
         return configuration
     }

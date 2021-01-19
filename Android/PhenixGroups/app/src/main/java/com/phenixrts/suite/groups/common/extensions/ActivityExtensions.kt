@@ -5,6 +5,7 @@
 package com.phenixrts.suite.groups.common.extensions
 
 import android.view.SurfaceView
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.Toast
@@ -14,13 +15,10 @@ import androidx.fragment.app.FragmentActivity
 import com.google.android.material.snackbar.Snackbar
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.ui.MainActivity
-import com.phenixrts.suite.groups.ui.SplashActivity
 import com.phenixrts.suite.groups.ui.screens.JoinScreen
 import com.phenixrts.suite.groups.ui.screens.LoadingScreen
 import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
 import com.phenixrts.suite.phenixcommon.common.launchMain
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_splash.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -30,10 +28,10 @@ import kotlin.system.exitProcess
 
 private const val QUIT_DELAY = 1000L
 
-fun SplashActivity.showSnackBar(message: String) {
+fun View.showSnackBar(message: String) {
     if (message.isNotBlank()) {
         GlobalScope.launch(Dispatchers.Main) {
-            Snackbar.make(splash_root, message, Snackbar.LENGTH_INDEFINITE).show()
+            Snackbar.make(this@showSnackBar, message, Snackbar.LENGTH_INDEFINITE).show()
         }
     }
 }
@@ -63,9 +61,9 @@ fun FragmentActivity.hideKeyboard() {
     ContextCompat.getSystemService(this, InputMethodManager::class.java)?.hideSoftInputFromWindow(token, 0)
 }
 
-fun FragmentActivity.getSurfaceView(): SurfaceView = main_surface_view
+fun MainActivity.getSurfaceView(): SurfaceView = binding.mainSurfaceView
 
-fun FragmentActivity.getMicIcon(): ImageView = active_member_mic
+fun MainActivity.getMicIcon(): ImageView = binding.activeMemberMic
 
 fun FragmentActivity.showLoadingScreen() = launchMain {
     Timber.d("Showing loading")
