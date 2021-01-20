@@ -1,5 +1,5 @@
 //
-// Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import Foundation
@@ -61,24 +61,21 @@ extension PhenixManager {
         precondition(self.roomExpress != nil, "Must call PhenixManager.start() before this method")
         self.roomExpress.joinRoom(options) { [weak self] status, roomService in
             guard let self = self else { return }
-            os_log(.debug, log: .phenixManager, "Joining a room completed with status: %{PUBLIC}d", status.rawValue)
-            switch status {
-            case .ok:
-                guard let roomService = roomService else {
-                    fatalError("Could not get RoomService parameter")
-                }
+            self.privateQueue.async {
+                os_log(.debug, log: .phenixManager, "Joining a room completed with status: %{PUBLIC}d", status.rawValue)
+                switch status {
+                case .ok:
+                    guard let roomService = roomService else {
+                        fatalError("Could not get RoomService parameter")
+                    }
 
-                // Chat service must be created with a small delay after the Room service was created.
-                // There is a possibility that if they are created shortly one after another - chat history may not be found.
-                // Therefore JoinedRoom creation is done after a small delay.
-                self.privateQueue.asyncAfter(deadline: .now() + .seconds(1)) {
                     let joinedRoom = self.makeJoinedRoom(from: roomService, roomExpress: self.roomExpress, backend: self.backend)
                     self.set(joinedRoom)
                     completion(.success(joinedRoom))
-                }
 
-            default:
-                completion(.failure(.failureStatus(status)))
+                default:
+                    completion(.failure(.failureStatus(status)))
+                }
             }
         }
     }

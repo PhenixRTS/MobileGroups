@@ -1,5 +1,5 @@
 //
-// Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import os.log
@@ -93,9 +93,9 @@ private extension MainCoordinator {
 
         let vc = ActiveMeetingViewController.instantiate()
         vc.coordinator = self
+        vc.displayName = preferences.displayName
         vc.media = phenixManager.userMediaStreamController
         vc.joinedRoom = joinedRoom
-        vc.displayName = preferences.displayName
 
         UIView.transition(with: navigationController.view) {
             self.navigationController.pushViewController(vc, animated: false)
@@ -108,8 +108,9 @@ private extension MainCoordinator {
         }
 
         controller.joinedRoom = joinedRoom
+
         controller.observeRoom()
-        controller.configureCurrentMemberMedia()
+        controller.configureMedia()
         controller.resetFocusedMember()
     }
 }
@@ -159,6 +160,14 @@ extension MainCoordinator: MeetingFinished {
                 self.navigationController.popViewController(animated: false)
             }
         }
+    }
+}
+
+extension MainCoordinator: ShowDebugMenu {
+    func showDebugMenu() {
+        let vc = DebugMenuViewController()
+        vc.phenix = self.phenixManager
+        navigationController.present(vc, animated: true)
     }
 }
 

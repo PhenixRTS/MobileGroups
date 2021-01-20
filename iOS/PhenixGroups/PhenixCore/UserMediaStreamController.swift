@@ -1,18 +1,26 @@
 //
-//  Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import Foundation
 import PhenixSdk
 
+internal protocol UserMediaProvider: AnyObject {
+    var renderer: PhenixRenderer? { get }
+    var audioTracks: [PhenixMediaStreamTrack] { get }
+}
+
 public class UserMediaStreamController {
     public typealias AudioFrameNotificationHandler = () -> Void
     public typealias VideoFrameNotificationHandler = () -> Void
 
-    private var renderer: PhenixRenderer? {
-        didSet {
-            subscribeForMediaFrameNotification()
-        }
+    internal private(set) var renderer: PhenixRenderer? {
+        didSet { subscribeForMediaFrameNotification() }
+    }
+
+    internal let userMediaStream: PhenixUserMediaStream
+    internal var cameraMode: PhenixFacingMode = .user {
+        didSet { setCamera(facing: cameraMode) }
     }
 
     public private(set) lazy var cameraLayer: VideoLayer = {
@@ -21,13 +29,6 @@ public class UserMediaStreamController {
         renderer?.start(layer)
         return layer
     }()
-
-    internal let userMediaStream: PhenixUserMediaStream
-    internal var cameraMode: PhenixFacingMode = .user {
-        didSet {
-            setCamera(facing: cameraMode)
-        }
-    }
 
     /// Indicates current device audio state
     public private(set) var isAudioEnabled: Bool = true
@@ -58,6 +59,7 @@ public class UserMediaStreamController {
     }
 }
 
+// MARK: - Private methods
 private extension UserMediaStreamController {
     func makeRenderer() -> PhenixRenderer {
         userMediaStream.mediaStream.createRenderer()
@@ -93,6 +95,13 @@ private extension UserMediaStreamController {
 
     func videoFrameNotificationReceived(_ notification: PhenixFrameNotification?) {
         videoFrameReadHandler?()
+    }
+}
+
+// MARK: - UserMediaProvider
+extension UserMediaStreamController: UserMediaProvider {
+    var audioTracks: [PhenixMediaStreamTrack] {
+        userMediaStream.mediaStream.getAudioTracks()
     }
 }
 

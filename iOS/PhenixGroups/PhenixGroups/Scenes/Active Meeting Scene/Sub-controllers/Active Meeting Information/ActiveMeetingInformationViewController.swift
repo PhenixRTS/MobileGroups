@@ -1,5 +1,5 @@
 //
-//  Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import UIKit
@@ -11,7 +11,9 @@ class ActiveMeetingInformationViewController: UIViewController, PageContainerMem
     private var codeLabel: UILabel!
     private var shareButton: UIButton!
 
-    let code: String
+    private let code: String
+    // swiftlint:disable force_unwrapping
+    private lazy var meetingUrl = URL(string: "https://phenixrts.com/group/#\(code)")!
 
     init(code: String) {
         self.code = code
@@ -32,7 +34,8 @@ class ActiveMeetingInformationViewController: UIViewController, PageContainerMem
 
     @objc
     func shareButtonTapped() {
-        let vc = UIActivityViewController(activityItems: [code], applicationActivities: nil)
+        let text = "Meeting URL: \(meetingUrl.absoluteString)"
+        let vc = UIActivityViewController(activityItems: [text], applicationActivities: nil)
         vc.popoverPresentationController?.sourceView = shareButton
         present(vc, animated: true)
     }
@@ -40,9 +43,10 @@ class ActiveMeetingInformationViewController: UIViewController, PageContainerMem
 
 private extension ActiveMeetingInformationViewController {
     func configure() {
-        titleLabel = makeTitleLabel()
-        codeLabel = makeCodeLabel(code)
-        shareButton = makeShareButton()
+        titleLabel = UILabel.makeTitleLabel()
+        codeLabel = UILabel.makeCodeLabel(code)
+        shareButton = UIButton.makeShareButton()
+        shareButton.addTarget(self, action: #selector(shareButtonTapped), for: .touchUpInside)
 
         view.addSubview(titleLabel)
         view.addSubview(codeLabel)
@@ -66,8 +70,8 @@ private extension ActiveMeetingInformationViewController {
 }
 
 // MARK: - UI Element Factory methods
-private extension ActiveMeetingInformationViewController {
-    func makeTitleLabel() -> UILabel {
+fileprivate extension UILabel {
+    static func makeTitleLabel() -> UILabel {
         let label = UILabel()
 
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -83,7 +87,7 @@ private extension ActiveMeetingInformationViewController {
         return label
     }
 
-    func makeCodeLabel(_ code: String) -> UILabel {
+    static func makeCodeLabel(_ code: String) -> UILabel {
         let label = UILabel()
 
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -94,18 +98,20 @@ private extension ActiveMeetingInformationViewController {
 
         return label
     }
+}
 
-    func makeShareButton() -> UIButton {
-        let image = UIImage(named: "share")?.withRenderingMode(.alwaysOriginal)
+fileprivate extension UIButton {
+    static func makeShareButton() -> UIButton {
+        let image = UIImage(named: "square.and.arrow.up")
         let button = UIButton(type: .system)
 
         button.translatesAutoresizingMaskIntoConstraints = false
         button.setImage(image, for: .normal)
         button.setTitle("Share", for: .normal)
         button.setTitleColor(.systemOrange, for: .normal)
-        button.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
+        button.titleEdgeInsets = UIEdgeInsets(top: 7, left: 10, bottom: 0, right: 0)
         button.titleLabel?.font = .preferredFont(forTextStyle: .footnote)
-        button.addTarget(self, action: #selector(shareButtonTapped), for: .touchUpInside)
+        button.tintColor = .systemOrange
 
         return button
     }

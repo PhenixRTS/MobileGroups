@@ -1,5 +1,5 @@
 //
-//  Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import PhenixCore
@@ -11,10 +11,12 @@ class ActiveMeetingMemberTableViewCell: UITableViewCell, CellIdentified {
     private var displayNameLabel: UILabel!
     private var muteImage: UIImageView!
     private var muteImageBackground: UIView!
+    private var audioLevelView: AudioLevelView!
 
     weak var member: RoomMember! {
         didSet {
             oldValue?.removeAudioObserver(self)
+            oldValue?.removeAudioLevelObserver(self)
             oldValue?.removeVideoObserver(self)
         }
     }
@@ -62,13 +64,14 @@ class ActiveMeetingMemberTableViewCell: UITableViewCell, CellIdentified {
         self.member = member
         displayNameLabel.text = member.screenName
         showCamera(false)
-        showMuteIcon(member.isAudioAvailable == false)
+        showMuteIcon(member.media?.isAudioAvailable == false)
         member.addAudioObserver(self)
+        member.addAudioLevelObserver(self)
     }
 
     func configureVideo() {
         setCamera(layer: member.previewLayer)
-        showCamera(member.isVideoAvailable)
+        showCamera(member.media?.isVideoAvailable ?? false)
         member.addVideoObserver(self)
     }
 }
@@ -94,11 +97,15 @@ private extension ActiveMeetingMemberTableViewCell {
         muteImageBackground.translatesAutoresizingMaskIntoConstraints = false
         muteImageBackground.backgroundColor = .systemRed
 
+        audioLevelView = AudioLevelView()
+        audioLevelView.translatesAutoresizingMaskIntoConstraints = false
+
         contentView.addSubview(cameraView)
         contentView.addSubview(pinView)
         contentView.addSubview(displayNameLabel)
         contentView.addSubview(muteImage)
         contentView.insertSubview(muteImageBackground, belowSubview: muteImage)
+        contentView.addSubview(audioLevelView)
 
         setupConstraints()
     }
@@ -130,7 +137,10 @@ private extension ActiveMeetingMemberTableViewCell {
             muteImageBackground.topAnchor.constraint(equalTo: muteImage.topAnchor, constant: -2),
             muteImageBackground.leadingAnchor.constraint(equalTo: muteImage.leadingAnchor, constant: -2),
             muteImageBackground.trailingAnchor.constraint(equalTo: muteImage.trailingAnchor, constant: 2),
-            muteImageBackground.bottomAnchor.constraint(equalTo: muteImage.bottomAnchor, constant: 2)
+            muteImageBackground.bottomAnchor.constraint(equalTo: muteImage.bottomAnchor, constant: 2),
+
+            audioLevelView.trailingAnchor.constraint(equalTo: cameraView.trailingAnchor, constant: -6),
+            audioLevelView.bottomAnchor.constraint(equalTo: cameraView.bottomAnchor, constant: -6)
         ])
     }
 
@@ -138,10 +148,25 @@ private extension ActiveMeetingMemberTableViewCell {
         let isHidden = show == false
         muteImage.isHidden = isHidden
         muteImageBackground.isHidden = isHidden
+
+        audioLevelView.isHidden = !isHidden
     }
 
     func showCamera(_ show: Bool) {
         cameraView.showCamera = show
+    }
+
+    func setAudioLevel(_ audioLevel: Double) {
+        switch audioLevel {
+        case -100 ..< -50:
+            audioLevelView.level = .low
+        case -50 ..< -25:
+            audioLevelView.level = .medium
+        case -25 ... 0:
+            audioLevelView.level = .high
+        default:
+            audioLevelView.level = .low
+        }
     }
 }
 
@@ -159,6 +184,14 @@ extension ActiveMeetingMemberTableViewCell: RoomMemberVideoObserver {
     func roomMemberVideoStateDidChange(_ member: RoomMember, enabled: Bool) {
         DispatchQueue.main.async { [weak self] in
             self?.showCamera(enabled)
+        }
+    }
+}
+
+extension ActiveMeetingMemberTableViewCell: RoomMemberAudioLevelObserver {
+    func roomMember(_ member: RoomMember, didChange audioLevel: Double) {
+        DispatchQueue.main.async { [weak self] in
+            self?.setAudioLevel(audioLevel)
         }
     }
 }

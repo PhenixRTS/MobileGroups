@@ -1,5 +1,5 @@
 //
-// Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import Foundation
@@ -64,13 +64,40 @@ public final class PhenixManager {
     }
 
     func set(_ room: JoinedRoom) {
-        privateQueue.async { [weak self] in
-            guard let self = self else { return }
-            os_log(.debug, log: .phenixManager, "Destroy previous joined room instance")
-            self.joinedRoom?.dispose()
-            os_log(.debug, log: .phenixManager, "Set new joined room instance")
-            self.joinedRoom = room
+        dispatchPrecondition(condition: .onQueue(privateQueue))
+
+        os_log(.debug, log: .phenixManager, "Set new joined room instance")
+        joinedRoom = room
+    }
+}
+
+// MARK: - Helper methods
+internal extension PhenixManager {
+    func makeJoinedRoom(from roomService: PhenixRoomService, roomExpress: PhenixRoomExpress, backend: URL, publisher: PhenixExpressPublisher? = nil, userMedia: UserMediaProvider? = nil) -> JoinedRoom {
+        dispatchPrecondition(condition: .onQueue(privateQueue))
+
+        let queue = DispatchQueue(label: "com.phenixrts.suite.groups.core.JoinedRoom", qos: .userInitiated)
+
+        // Re-use the same chat service or create a new one if the room was left previously.
+        let chatService: PhenixChatService = self.chatService ?? PhenixChatService(roomService: roomService)
+
+        // Save chat service if it don't exist already.
+        if self.chatService == nil {
+            self.chatService = chatService
         }
+
+        let joinedRoom = JoinedRoom(roomExpress: roomExpress, backend: backend, roomService: roomService, chatService: chatService, queue: queue, publisher: publisher, userMedia: userMedia)
+        joinedRoom.delegate = self
+
+        return joinedRoom
+    }
+
+    func disposeCurrentlyJoinedRoom() {
+        dispatchPrecondition(condition: .onQueue(privateQueue))
+
+        os_log(.debug, log: .phenixManager, "Destroy currently joined room instance, if exist")
+        joinedRoom?.dispose()
+        joinedRoom = nil
     }
 }
 
@@ -105,21 +132,6 @@ private extension PhenixManager {
 
             unrecoverableErrorCompletion?("Could not provide user media stream (\(status.rawValue)")
         }
-    }
-}
-
-// MARK: - Helper methods
-internal extension PhenixManager {
-    func makeJoinedRoom(from roomService: PhenixRoomService, roomExpress: PhenixRoomExpress, backend: URL, publisher: PhenixExpressPublisher? = nil) -> JoinedRoom {
-        dispatchPrecondition(condition: .notOnQueue(.main))
-        let queue = DispatchQueue(label: "com.phenixrts.suite.groups.core.JoinedRoom", qos: .userInitiated, target: privateQueue)
-
-        // Re-use the same chat service or create a new one if the room was left previously.
-        let chatService: PhenixChatService = self.chatService ?? PhenixChatService(roomService: roomService)
-        let joinedRoom = JoinedRoom(roomExpress: roomExpress, backend: backend, roomService: roomService, chatService: chatService, queue: queue, publisher: publisher)
-        joinedRoom.delegate = self
-
-        return joinedRoom
     }
 }
 

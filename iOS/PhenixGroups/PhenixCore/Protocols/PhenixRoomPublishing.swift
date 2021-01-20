@@ -1,5 +1,5 @@
 //
-//  Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import Foundation
@@ -33,28 +33,32 @@ extension PhenixManager: PhenixRoomPublishing {
 
             precondition(self.roomExpress != nil, "Must call PhenixManager.start() before this method")
             self.roomExpress.publish(toRoom: localPublishToRoomOptions) { status, roomService, publisher in
-                os_log(.debug, log: .phenixManager, "Room publishing completed with status: %{PUBLIC}d", status.rawValue)
-                switch status {
-                case .ok:
-                    guard let roomService = roomService else {
-                        fatalError("Could not get RoomService parameter")
-                    }
+                self.privateQueue.async {
+                    os_log(.debug, log: .phenixManager, "Room publishing completed with status: %{PUBLIC}d", status.rawValue)
+                    switch status {
+                    case .ok:
+                        guard let roomService = roomService else {
+                            fatalError("Could not get RoomService parameter")
+                        }
 
-                    guard let publisher = publisher else {
-                        fatalError("Could not get Publisher parameter")
-                    }
+                        guard let publisher = publisher else {
+                            fatalError("Could not get Publisher parameter")
+                        }
 
-                    // Chat service must be created with a small delay after the Room service was created.
-                    // There is a possibility that if they are created shortly one after another - chat history may not be found.
-                    // Therefore JoinedRoom creation is done after a small delay.
-                    self.privateQueue.asyncAfter(deadline: .now() + .seconds(1)) {
-                        let joinedRoom = self.makeJoinedRoom(from: roomService, roomExpress: self.roomExpress, backend: self.backend, publisher: publisher)
+                        // Clear existing room
+                        self.disposeCurrentlyJoinedRoom()
+
+                        // Make new room
+                        let joinedRoom = self.makeJoinedRoom(from: roomService, roomExpress: self.roomExpress, backend: self.backend, publisher: publisher, userMedia: self.userMediaStreamController)
+
+                        // Save new room
                         self.set(joinedRoom)
-                        completion(.success(joinedRoom))
-                    }
 
-                default:
-                    completion(.failure(.failureStatus(status)))
+                        completion(.success(joinedRoom))
+
+                    default:
+                        completion(.failure(.failureStatus(status)))
+                    }
                 }
             }
         }

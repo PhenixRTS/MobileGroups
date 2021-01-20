@@ -1,5 +1,5 @@
 //
-//  Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import os.log
@@ -18,8 +18,11 @@ public class PhenixChatService {
     }
 
     public func subscribe() {
-        os_log(.debug, log: .chatService, "Subscribe to chat updates")
-        chatMessagesDisposable = chatService.getObservableChatMessages()?.subscribe(chatMessagesDidChange)
+        queue.async { [weak self] in
+            guard let self = self else { return }
+            os_log(.debug, log: .chatService, "Subscribe to chat updates")
+            self.chatMessagesDisposable = self.chatService.getObservableChatMessages().subscribe(self.chatMessagesDidChange)
+        }
     }
 
     public func send(_ message: String) {

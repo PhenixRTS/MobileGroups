@@ -1,5 +1,5 @@
 //
-//  Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import PhenixCore
@@ -18,6 +18,7 @@ class NewMeetingView: UIView {
     var microphoneHandler: ControlButtonHandler?
     var cameraHandler: ControlButtonHandler?
     var openMenuHandler: (() -> Void)?
+    var cameraViewMultipleTapHandler: (() -> Void)?
 
     private var muteImage: UIImageView!
     @IBOutlet private var cameraView: CameraView!
@@ -62,6 +63,9 @@ class NewMeetingView: UIView {
         configureButtons()
 
         cameraView.placeholderText = displayName
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(cameraViewTappedMultipleTimes))
+        tapGesture.numberOfTapsRequired = 5
+        cameraView.addGestureRecognizer(tapGesture)
 
         muteImage = UIImageView.makeMuteImageView()
 
@@ -191,6 +195,11 @@ private extension NewMeetingView {
     @objc
     func openMenu() {
         openMenuHandler?()
+    }
+
+    @objc
+    func cameraViewTappedMultipleTimes() {
+        cameraViewMultipleTapHandler?()
     }
 }
 

@@ -1,5 +1,5 @@
 //
-// Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import os.log
@@ -35,6 +35,20 @@ class Launcher {
         window?.rootViewController = nc
         window?.makeKeyAndVisible()
 
+        let unrecoverableErrorCompletion: (String?) -> Void = { [weak nc] description in
+            // Unrecoverable Error Completion
+            let reason = description ?? "N/A"
+            let alert = UIAlertController(title: "Error", message: "Phenix SDK reached unrecoverable error: (\(reason))", preferredStyle: .alert)
+            alert.addAction(
+                UIAlertAction(title: "Close app", style: .default) { _ in
+                    fatalError("Unrecoverable error: \(String(describing: description))")
+                }
+            )
+
+            nc?.presentedViewController?.dismiss(animated: false)
+            nc?.present(alert, animated: true)
+        }
+
         // Prepare all the necessary components on a background thread.
         DispatchQueue.global(qos: .userInitiated).async {
             // Keep a strong reference so that the Launcher would not be deallocated too quickly.
@@ -46,19 +60,7 @@ class Launcher {
             let pcast = self.deeplink?.uri ?? PhenixConfiguration.pcast
 
             let manager = PhenixManager(backend: backend, pcast: pcast)
-            manager.start { [weak nc] description in
-                // Unrecoverable Error Completion
-                let reason = description ?? "N/A"
-                let alert = UIAlertController(title: "Error", message: "Phenix SDK reached unrecoverable error: (\(reason))", preferredStyle: .alert)
-                alert.addAction(
-                    UIAlertAction(title: "Close app", style: .default) { _ in
-                        fatalError("Unrecoverable error: \(String(describing: description))")
-                    }
-                )
-
-                nc?.presentedViewController?.dismiss(animated: false)
-                nc?.present(alert, animated: true)
-            }
+            manager.start(unrecoverableErrorCompletion: unrecoverableErrorCompletion)
 
             let preferences = Preferences()
 

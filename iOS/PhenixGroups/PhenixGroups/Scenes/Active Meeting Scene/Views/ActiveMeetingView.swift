@@ -1,5 +1,5 @@
 //
-//  Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import PhenixCore
@@ -14,6 +14,7 @@ class ActiveMeetingView: UIView {
     var cameraHandler: ControlButtonHandler?
     var openMenuHandler: (() -> Void)?
     var scrollToSection: ((Int) -> Void)?
+    var cameraViewMultipleTapHandler: (() -> Void)?
 
     private var isContainerVisibleInLandscape: Bool = false {
         didSet {
@@ -74,6 +75,9 @@ class ActiveMeetingView: UIView {
 
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(cameraViewTapped))
         cameraView.addGestureRecognizer(tapGesture)
+        let multiTapGesture = UITapGestureRecognizer(target: self, action: #selector(cameraViewTappedMultipleTimes))
+        multiTapGesture.numberOfTapsRequired = 5
+        cameraView.addGestureRecognizer(multiTapGesture)
 
         muteImage = UIImageView.makeMuteImageView()
 
@@ -157,6 +161,11 @@ class ActiveMeetingView: UIView {
         } else {
             isControlsVisible.toggle()
         }
+    }
+
+    @objc
+    func cameraViewTappedMultipleTimes() {
+        cameraViewMultipleTapHandler?()
     }
 
     func addTopControl(for page: PageContainerMember) {
@@ -344,6 +353,20 @@ private extension ActiveMeetingView {
             }
         }
     }
+
+    func makeTopControlButton(icon: UIImage?, title: String) -> TabBarButton {
+        let button = TabBarButton(type: .system)
+
+        button.setImage(icon, for: .normal)
+        if #available(iOS 13.0, *) {
+            button.tintColor = .systemBackground
+        } else {
+            button.tintColor = .white
+        }
+        button.setTitle(title, for: .normal)
+
+        return button
+    }
 }
 
 // MARK: - RoomMemberAudioObserver
@@ -361,22 +384,5 @@ extension ActiveMeetingView: RoomMemberVideoObserver {
         DispatchQueue.main.async { [weak self] in
             self?.showCamera(enabled)
         }
-    }
-}
-
-// MARK: -
-private extension ActiveMeetingView {
-    func makeTopControlButton(icon: UIImage?, title: String) -> TabBarButton {
-        let button = TabBarButton(type: .system)
-
-        button.setImage(icon, for: .normal)
-        if #available(iOS 13.0, *) {
-            button.tintColor = .systemBackground
-        } else {
-            button.tintColor = .white
-        }
-        button.setTitle(title, for: .normal)
-
-        return button
     }
 }

@@ -1,5 +1,5 @@
 //
-// Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import os.log
@@ -11,7 +11,7 @@ protocol DisplayNameDelegate: AnyObject {
 }
 
 class NewMeetingViewController: UIViewController, Storyboarded {
-    weak var coordinator: (ShowMeeting & JoinMeeting)?
+    weak var coordinator: (ShowMeeting & JoinMeeting & ShowDebugMenu)?
     weak var phenix: PhenixRoomPublishing?
     weak var media: UserMediaStreamController?
     weak var preferences: Preferences?
@@ -64,6 +64,9 @@ private extension NewMeetingViewController {
         newMeetingView.openMenuHandler = { [weak self] in
             self?.openMenu()
         }
+        newMeetingView.cameraViewMultipleTapHandler = { [weak self] in
+            self?.coordinator?.showDebugMenu()
+        }
 
         configureHistoryView()
         configureInteractions()
@@ -112,12 +115,12 @@ private extension NewMeetingViewController {
     }
 
     func setVideo(enabled: Bool) {
-         os_log(.debug, log: .newMeetingScene, "Set video enabled - %{PUBLIC}d", enabled)
+         os_log(.debug, log: .newMeetingScene, "Set video %{PUBLIC}s", enabled == true ? "enabled" : "disabled")
         media?.setVideo(enabled: enabled)
     }
 
     func setAudio(enabled: Bool) {
-         os_log(.debug, log: .newMeetingScene, "Set audio enabled - %{PUBLIC}d", enabled)
+         os_log(.debug, log: .newMeetingScene, "Set audio %{PUBLIC}s", enabled == true ? "enabled" : "disabled")
         media?.setAudio(enabled: enabled)
     }
 

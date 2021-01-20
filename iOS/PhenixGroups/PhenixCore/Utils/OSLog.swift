@@ -1,5 +1,5 @@
 //
-// Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import Foundation
@@ -15,4 +15,5 @@ extension OSLog {
     static let roomMember = OSLog(subsystem: subsystem, category: "Phenix.Core.RoomMember")
     static let mediaController = OSLog(subsystem: subsystem, category: "Phenix.Core.MediaController")
     static let memberController = OSLog(subsystem: subsystem, category: "Phenix.Core.MemberController")
+    static let roomMemberMediaController = OSLog(subsystem: subsystem, category: "Phenix.Core.RoomMemberMediaController")
 }

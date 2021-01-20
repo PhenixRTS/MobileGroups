@@ -1,5 +1,5 @@
 //
-//  Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import os.log
@@ -14,36 +14,54 @@ public class RoomMemberController {
 
     private weak var roomService: PhenixRoomService?
     private weak var roomExpress: PhenixRoomExpress?
+
     private let queue: DispatchQueue
     private var memberListDisposable: PhenixDisposable?
-    private var members: Set<RoomMember>
+    private var members: Set<RoomMember> {
+        didSet { membersListDidChange(members) }
+    }
 
     internal weak var roomRepresentation: RoomRepresentation?
 
     public let currentMember: RoomMember
     public weak var delegate: JoinedRoomMembersDelegate?
 
-    init(roomService: PhenixRoomService, roomExpress: PhenixRoomExpress, queue: DispatchQueue = .main, roomRepresentation: RoomRepresentation? = nil) {
+    init(roomService: PhenixRoomService, roomExpress: PhenixRoomExpress, queue: DispatchQueue = .main, userMedia: UserMediaProvider? = nil, roomRepresentation: RoomRepresentation? = nil) {
+        self.queue = queue
         self.roomService = roomService
         self.roomExpress = roomExpress
         self.roomRepresentation = roomRepresentation
-        self.queue = queue
 
-        self.currentMember = RoomMember(roomService.getSelf(), isSelf: true, roomExpress: roomExpress, queue: queue)
+        self.currentMember = RoomMember(roomService.getSelf(), isSelf: true, roomExpress: roomExpress, queue: queue, renderer: userMedia?.renderer, audioTracks: userMedia?.audioTracks)
         self.members = []
     }
 
     public func subscribeToMemberList() {
-        os_log(.debug, log: .memberController, "Subscribe to room member list updates, (%{PRIVATE}s)", roomDescription)
-        memberListDisposable = roomService?.getObservableActiveRoom()?.getValue()?.getObservableMembers()?.subscribe(memberListDidChange)
+        queue.async { [weak self] in
+            guard let self = self else { return }
+            os_log(.debug, log: .memberController, "Subscribe to room member list updates, (%{PRIVATE}s)", self.roomDescription)
+            self.memberListDisposable = self.roomService?.getObservableActiveRoom().getValue().getObservableMembers().subscribe(self.memberListDidChange)
+        }
+    }
+
+    public func recentlyLoudestMember() -> RoomMember? {
+        let minimumDecibel = AudioLevelProvider.minimumDecibel
+        return members
+            .filter { $0.media?.isAudioAvailable == true }
+            .max { $0.media?.recentAudioLevel() ?? minimumDecibel < $1.media?.recentAudioLevel() ?? minimumDecibel }
     }
 }
 
 // MARK: - Internal methods
 internal extension RoomMemberController {
     func dispose() {
-        memberListDisposable = nil
-        members.forEach { $0.dispose() }
+        dispatchPrecondition(condition: .onQueue(queue))
+
+        os_log(.debug, log: .joinedRoom, "Dispose room media controller, (%{PRIVATE}s)", self.roomDescription)
+
+        self.memberListDisposable = nil
+        self.members.forEach { $0.dispose() }
+        self.members.removeAll()
     }
 }
 
@@ -63,18 +81,8 @@ private extension RoomMemberController {
         let newMembers = Set(roomMembers)
 
         // Compare the new list of members with the old list of members.
-        let memberListDidChange = process(
-            newMembers: newMembers,
-            oldMembers: self.members,
-            connectedMemberHandler: membersConnected,
-            disconnectedMemberHandler: membersDisconnected
-        )
-
-        // If there are changes in the members array, notify the delegate about that.
-        if memberListDidChange {
-            let memberList = roomMembers.sorted()
-            delegate?.memberListDidChange(memberList)
-        }
+        // Also update the current member list.
+        process(newMembers: newMembers, oldMembers: self.members, connectedMemberHandler: membersConnected, disconnectedMemberHandler: membersDisconnected)
     }
 
     /// Find out, did the members list has changes inside it
@@ -85,8 +93,7 @@ private extension RoomMemberController {
     ///   - oldMembers: Current member list
     ///   - connectedMemberHandler: Closure for handling members, if there are any who just now connected.
     ///   - disconnectedMemberHandler: Closure for handling members, if there are any who just now disconnected.
-    /// - Returns: Provides `true` if there were some changes in the member list
-    func process(newMembers: Set<RoomMember>, oldMembers: Set<RoomMember>, connectedMemberHandler: (Set<RoomMember>) -> Void, disconnectedMemberHandler: (Set<RoomMember>) -> Void) -> Bool {
+    func process(newMembers: Set<RoomMember>, oldMembers: Set<RoomMember>, connectedMemberHandler: (Set<RoomMember>) -> Void, disconnectedMemberHandler: (Set<RoomMember>) -> Void) {
         dispatchPrecondition(condition: .onQueue(queue))
 
         // Get list of elements which does not exist in updatedMemberList but exist in currentMemberList, in simple words, members who left.
@@ -96,11 +103,6 @@ private extension RoomMemberController {
         // Get list of elements which does no.
         let connectedMembers = newMembers.subtracting(oldMembers)
         connectedMemberHandler(connectedMembers)
-
-        // Check if the member list did change at all.
-        let memberListDidChange = disconnectedMembers.isEmpty == false || connectedMembers.isEmpty == false
-
-        return memberListDidChange
     }
 
     func membersConnected(_ newMembers: Set<RoomMember>) {
@@ -131,6 +133,13 @@ private extension RoomMemberController {
         }
     }
 
+    func membersListDidChange(_ members: Set<RoomMember>) {
+        dispatchPrecondition(condition: .onQueue(queue))
+
+        let sortedMembers = members.sorted()
+        delegate?.memberListDidChange(sortedMembers)
+    }
+
     func makeRoomMember(_ member: PhenixMember) -> RoomMember {
         dispatchPrecondition(condition: .onQueue(queue))
 
@@ -149,6 +158,8 @@ private extension RoomMemberController {
 // MARK: - RoomMemberControllerDelegate
 extension RoomMemberController: RoomMemberControllerDelegate {
     func canSubscribeWithVideo() -> Bool {
+        dispatchPrecondition(condition: .onQueue(queue))
+
         // Calculate, how many of members have video subscription at the moment.
         let videoSubscriptions = members.reduce(into: 0) { result, member in
             result += member.subscriptionType == .some(.video) ? 1 : 0

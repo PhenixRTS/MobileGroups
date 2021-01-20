@@ -1,5 +1,5 @@
 //
-//  Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import Foundation
@@ -27,17 +27,17 @@ public class JoinedRoom: ChatProvider, RoomRepresentation {
         roomService.getObservableActiveRoom()?.getValue()?.getObservableAlias()?.getValue() as String? ?? "N/A"
     }
 
-    init(roomExpress: PhenixRoomExpress, backend: URL, roomService: PhenixRoomService, chatService: PhenixChatService, queue: DispatchQueue, publisher: PhenixExpressPublisher? = nil) {
+    init(roomExpress: PhenixRoomExpress, backend: URL, roomService: PhenixRoomService, chatService: PhenixChatService, queue: DispatchQueue, publisher: PhenixExpressPublisher? = nil, userMedia: UserMediaProvider? = nil) {
         self.backend = backend
         self.roomService = roomService
         self.chatService = chatService
         self.queue = queue
 
         if let publisher = publisher {
-            self.media = RoomMediaController(publisher: publisher)
+            self.media = RoomMediaController(publisher: publisher, queue: queue)
         }
 
-        self.memberController = RoomMemberController(roomService: roomService, roomExpress: roomExpress, queue: queue)
+        self.memberController = RoomMemberController(roomService: roomService, roomExpress: roomExpress, queue: queue, userMedia: userMedia)
         self.memberController.roomRepresentation = self
 
         self.media?.roomRepresentation = self
@@ -47,30 +47,29 @@ public class JoinedRoom: ChatProvider, RoomRepresentation {
     ///
     /// Must be called when SDK automatically re-publishes to the room, also if user didn't left the room manually.
     internal func dispose() {
-        os_log(.debug, log: .joinedRoom, "Dispose the joined room members, (%{PRIVATE}s)", self.description)
+        queue.sync { [weak self] in
+            guard let self = self else { return }
+            os_log(.debug, log: .joinedRoom, "Dispose, (%{PRIVATE}s)", self.description)
 
-        self.chatService.dispose()
-        self.memberController.dispose()
+            self.chatService.dispose()
+            self.memberController.dispose()
+        }
     }
 
     /// Clears all room disposables and all member subscriptions, stops publishing and leaves the room with SDK method
     public func leave() {
         queue.sync { [weak self] in
-            guard let self = self else {
-                return
-            }
-
-            os_log(.debug, log: .joinedRoom, "Dispose joined room members, (%{PRIVATE}s)", self.description)
+            guard let self = self else { return }
+            os_log(.debug, log: .joinedRoom, "Leave joined room, (%{PRIVATE}s)", self.description)
 
             self.chatService.dispose()
             self.memberController.dispose()
 
             self.media?.stop()
 
-            os_log(.debug, log: .joinedRoom, "Leave joined room, (%{PRIVATE}s)", self.description)
             self.roomService.leaveRoom { _, _ in
-                self.delegate?.roomLeft(self)
                 os_log(.debug, log: .joinedRoom, "Joined room left, (%{PRIVATE}s)", self.description)
+                self.delegate?.roomLeft(self)
             }
         }
     }

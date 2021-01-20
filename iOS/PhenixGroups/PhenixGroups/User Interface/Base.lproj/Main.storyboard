@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina5_9" orientation="landscape" appearance="light"/>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -14,27 +15,27 @@
             <objects>
                 <viewController storyboardIdentifier="NewMeetingViewController" id="BYZ-38-t0r" customClass="NewMeetingViewController" customModule="Phenix_Groups" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC" customClass="NewMeetingView" customModule="Phenix_Groups" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="812" height="375"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kPC-iH-iC5" customClass="CameraView" customModule="Phenix_Groups" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="568" height="375"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="608"/>
                                 <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
                             <view opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="cJO-GY-Ejx">
-                                <rect key="frame" x="0.0" y="255" width="568" height="150"/>
+                                <rect key="frame" x="0.0" y="458" width="375" height="150"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DXQ-6c-J4t">
-                                <rect key="frame" x="568" y="0.0" width="200" height="354"/>
+                                <rect key="frame" x="0.0" y="578" width="375" height="200"/>
                                 <subviews>
                                     <view contentMode="scaleToFill" verticalHuggingPriority="1000" placeholderIntrinsicWidth="200" placeholderIntrinsicHeight="100" translatesAutoresizingMaskIntoConstraints="NO" id="JCi-MA-itN" customClass="NewMeetingControlView" customModule="Phenix_Groups" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="0.0" width="200" height="100"/>
-                                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="100"/>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                     </view>
                                     <containerView clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pst-6j-HmE">
-                                        <rect key="frame" x="0.0" y="100" width="200" height="254"/>
-                                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                        <rect key="frame" x="0.0" y="100" width="375" height="100"/>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="100" id="LnP-i1-eoS"/>
                                         </constraints>
@@ -67,7 +68,7 @@
                                 </constraints>
                             </view>
                             <stackView opaque="NO" contentMode="scaleToFill" spacing="50" translatesAutoresizingMaskIntoConstraints="NO" id="a9t-KK-F5G">
-                                <rect key="frame" x="199" y="285" width="170" height="60"/>
+                                <rect key="frame" x="102.66666666666669" y="488" width="170" height="60"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1wP-da-RBs" customClass="ControlButton" customModule="Phenix_Groups" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="60" height="60"/>
@@ -92,7 +93,8 @@
                                 </subviews>
                             </stackView>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="DXQ-6c-J4t" firstAttribute="leading" secondItem="kPC-iH-iC5" secondAttribute="trailing" id="6PJ-qL-MBZ"/>
                             <constraint firstItem="DXQ-6c-J4t" firstAttribute="width" relation="lessThanOrEqual" secondItem="kPC-iH-iC5" secondAttribute="width" multiplier="1.5" id="6cu-jK-qvn"/>
@@ -116,7 +118,6 @@
                             </constraint>
                             <constraint firstItem="cJO-GY-Ejx" firstAttribute="height" secondItem="a9t-KK-F5G" secondAttribute="height" multiplier="2.5" id="zuO-g5-C7S"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <variation key="default">
                             <mask key="constraints">
                                 <exclude reference="NmT-wI-65A"/>
@@ -171,9 +172,9 @@
             <objects>
                 <tableViewController storyboardIdentifier="MeetingHistoryTableViewController" id="9rI-ph-Wfa" customClass="MeetingHistoryTableViewController" customModule="Phenix_Groups" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="NHH-Nw-cTc">
-                        <rect key="frame" x="0.0" y="0.0" width="812" height="375"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <connections>
                             <outlet property="dataSource" destination="9rI-ph-Wfa" id="UXI-CZ-GvK"/>
                             <outlet property="delegate" destination="9rI-ph-Wfa" id="kRs-L6-EJM"/>
@@ -189,10 +190,10 @@
             <objects>
                 <viewController storyboardIdentifier="JoinMeetingViewController" id="qLZ-cv-lH4" customClass="JoinMeetingViewController" customModule="Phenix_Groups" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="9Vh-6I-7iR" customClass="JoinMeetingView" customModule="Phenix_Groups" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="812" height="375"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <viewLayoutGuide key="safeArea" id="Hva-fu-fqh"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="BQj-6E-6IE" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -204,19 +205,19 @@
             <objects>
                 <viewController storyboardIdentifier="ActiveMeetingViewController" id="eaH-mH-wJg" customClass="ActiveMeetingViewController" customModule="Phenix_Groups" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="DeJ-7H-C7N" customClass="ActiveMeetingView" customModule="Phenix_Groups" customModuleProvider="target">
-                        <rect key="frame" x="0.0" y="0.0" width="812" height="375"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="9Xo-Pu-n5a" customClass="CameraView" customModule="Phenix_Groups" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="812" height="375"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="353.66666666666669"/>
                                 <color key="backgroundColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
                             <view opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ad1-Bv-DUc">
-                                <rect key="frame" x="0.0" y="255" width="812" height="150"/>
+                                <rect key="frame" x="0.0" y="233.66666666666663" width="375" height="150"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
                             <stackView opaque="NO" contentMode="scaleToFill" spacing="30" translatesAutoresizingMaskIntoConstraints="NO" id="bfA-qW-Uno">
-                                <rect key="frame" x="286" y="285" width="240" height="60"/>
+                                <rect key="frame" x="67.666666666666686" y="273.66666666666669" width="240" height="60"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="X1C-54-M6Q" customClass="ControlButton" customModule="Phenix_Groups" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="60" height="60"/>
@@ -229,7 +230,7 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" adjustsImageWhenHighlighted="NO" adjustsImageWhenDisabled="NO" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="c0c-T1-zbt" customClass="ControlButton" customModule="Phenix_Groups" customModuleProvider="target">
-                                        <rect key="frame" x="90" y="0.0" width="60" height="60"/>
+                                        <rect key="frame" x="89.999999999999986" y="0.0" width="60.000000000000014" height="60"/>
                                         <constraints>
                                             <constraint firstAttribute="width" constant="60" id="hfk-FW-6xz"/>
                                             <constraint firstAttribute="height" constant="60" id="t47-xn-Uw7"/>
@@ -251,11 +252,12 @@
                                 </subviews>
                             </stackView>
                             <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="too-zG-rch" userLabel="Container view">
-                                <rect key="frame" x="812" y="0.0" width="649.66666666666652" height="354"/>
+                                <rect key="frame" x="0.0" y="353.66666666666674" width="375" height="424.33333333333326"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
                         </subviews>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <viewLayoutGuide key="safeArea" id="xSR-HS-McD"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="too-zG-rch" firstAttribute="leading" secondItem="9Xo-Pu-n5a" secondAttribute="trailing" id="2wc-2Y-UpU"/>
                             <constraint firstItem="too-zG-rch" firstAttribute="height" secondItem="9Xo-Pu-n5a" secondAttribute="height" multiplier="1.2" id="3iq-jq-TQU"/>
@@ -281,17 +283,16 @@
                             <constraint firstItem="9Xo-Pu-n5a" firstAttribute="width" secondItem="too-zG-rch" secondAttribute="width" multiplier="1.5" id="q2G-8b-ENZ"/>
                             <constraint firstAttribute="top" secondItem="9Xo-Pu-n5a" secondAttribute="top" id="yv4-NJ-A8t"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="xSR-HS-McD"/>
                         <variation key="default">
                             <mask key="constraints">
                                 <exclude reference="6ds-MO-cBl"/>
                                 <exclude reference="Z9a-MC-1yp"/>
                                 <exclude reference="q2G-8b-ENZ"/>
-                                <exclude reference="Hes-0k-ivo"/>
                                 <exclude reference="OxY-Ub-6fe"/>
                                 <exclude reference="fLs-ss-GIm"/>
                                 <exclude reference="2wc-2Y-UpU"/>
                                 <exclude reference="3iq-jq-TQU"/>
+                                <exclude reference="Hes-0k-ivo"/>
                                 <exclude reference="Vsk-1b-ODn"/>
                                 <exclude reference="YrX-Wx-NTD"/>
                                 <exclude reference="ox0-ud-Dh8"/>
@@ -303,11 +304,11 @@
                                 <include reference="6ds-MO-cBl"/>
                                 <exclude reference="Z9a-MC-1yp"/>
                                 <exclude reference="q2G-8b-ENZ"/>
-                                <include reference="Hes-0k-ivo"/>
                                 <exclude reference="OxY-Ub-6fe"/>
                                 <include reference="fLs-ss-GIm"/>
                                 <include reference="2wc-2Y-UpU"/>
                                 <exclude reference="3iq-jq-TQU"/>
+                                <include reference="Hes-0k-ivo"/>
                                 <include reference="Vsk-1b-ODn"/>
                                 <exclude reference="YrX-Wx-NTD"/>
                                 <exclude reference="ox0-ud-Dh8"/>
@@ -350,21 +351,21 @@
             <objects>
                 <viewController storyboardIdentifier="LaunchViewController" id="bG7-Th-KYz" customClass="LaunchViewController" customModule="Phenix_Groups" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="D4T-zh-EYX">
-                        <rect key="frame" x="0.0" y="0.0" width="812" height="375"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="center" spacing="40" translatesAutoresizingMaskIntoConstraints="NO" id="yqc-dw-D6F">
-                                <rect key="frame" x="284" y="101" width="244" height="183"/>
+                                <rect key="frame" x="65.666666666666671" y="319.66666666666669" width="243.66666666666663" height="183"/>
                                 <subviews>
                                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="logo_phenix" translatesAutoresizingMaskIntoConstraints="NO" id="R1s-WR-7gq">
-                                        <rect key="frame" x="72" y="0.0" width="100" height="100"/>
+                                        <rect key="frame" x="71.999999999999986" y="0.0" width="100.00000000000001" height="100"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="100" id="6Jy-zp-Jco"/>
                                             <constraint firstAttribute="width" constant="100" id="xgq-PR-8eM"/>
                                         </constraints>
                                     </imageView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Phenix Groups" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DOr-nn-vtd">
-                                        <rect key="frame" x="0.0" y="140" width="244" height="43"/>
+                                        <rect key="frame" x="0.0" y="140" width="243.66666666666666" height="43"/>
                                         <fontDescription key="fontDescription" type="boldSystem" pointSize="36"/>
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
@@ -372,10 +373,11 @@
                                 </subviews>
                             </stackView>
                             <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="jHo-7U-tOc">
-                                <rect key="frame" x="396" y="324" width="20" height="20"/>
+                                <rect key="frame" x="177.66666666666666" y="542.66666666666663" width="20" height="20"/>
                                 <color key="color" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </activityIndicatorView>
                         </subviews>
+                        <viewLayoutGuide key="safeArea" id="SE6-cJ-gGc"/>
                         <color key="backgroundColor" name="launchscreen_background"/>
                         <constraints>
                             <constraint firstItem="yqc-dw-D6F" firstAttribute="centerX" secondItem="D4T-zh-EYX" secondAttribute="centerX" id="31s-up-hg0"/>
@@ -383,7 +385,6 @@
                             <constraint firstItem="jHo-7U-tOc" firstAttribute="centerX" secondItem="D4T-zh-EYX" secondAttribute="centerXWithinMargins" id="E1E-0u-E2p"/>
                             <constraint firstItem="jHo-7U-tOc" firstAttribute="top" secondItem="yqc-dw-D6F" secondAttribute="bottom" constant="40" id="ndz-zE-KYB"/>
                         </constraints>
-                        <viewLayoutGuide key="safeArea" id="SE6-cJ-gGc"/>
                     </view>
                     <nil key="simulatedTopBarMetrics"/>
                 </viewController>
@@ -397,5 +398,8 @@
         <namedColor name="launchscreen_background">
             <color red="0.20000000000000001" green="0.20000000000000001" blue="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
     </resources>
 </document>

@@ -1,5 +1,5 @@
 //
-//  Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import os.log
@@ -10,7 +10,7 @@ class ActiveMeetingMemberListDataSource: NSObject, UITableViewDataSource {
     var members = [RoomMember]()
     var pinnedMember: RoomMember? {
         didSet {
-            os_log(.debug, log: .activeMeetingScene, "Pinned member changed \n- from: %{PRIVATE}s, \n- to: %{PRIVATE}s", oldValue?.description ?? "None", pinnedMember?.description ?? "None")
+            os_log(.debug, log: .activeMeetingScene, "Pinned member changed. Previous: %{PRIVATE}s, Current: %{PRIVATE}s", oldValue?.description ?? "None", pinnedMember?.description ?? "None")
         }
     }
     var indexPathForSelectedRow: IndexPath?

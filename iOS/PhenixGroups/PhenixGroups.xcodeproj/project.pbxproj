@@ -22,9 +22,12 @@
 		B510D0E8248FCA63003FAEC0 /* ActivityIndicatorProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B510D0E7248FCA63003FAEC0 /* ActivityIndicatorProvider.swift */; };
 		B51141C524FD18B0007584A1 /* RoomMemberDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51141C424FD18B0007584A1 /* RoomMemberDelegate.swift */; };
 		B51141C724FD2229007584A1 /* CATransaction+NoAnimations.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51141C624FD2229007584A1 /* CATransaction+NoAnimations.swift */; };
+		B516172B2588E20D0099E56B /* RoomMemberMediaController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B516172A2588E20D0099E56B /* RoomMemberMediaController.swift */; };
 		B5170FC92559674100255FC0 /* RoomMediaController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5170FC82559674100255FC0 /* RoomMediaController.swift */; };
 		B5170FDD25596D7400255FC0 /* RoomMemberController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5170FDC25596D7400255FC0 /* RoomMemberController.swift */; };
 		B52FC75F24B850F800B98B46 /* UIImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FC75E24B850F800B98B46 /* UIImageView.swift */; };
+		B5385A24258B95E700DFBDE1 /* RoomMemberAudioLevelObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5385A23258B95E700DFBDE1 /* RoomMemberAudioLevelObserver.swift */; };
+		B5385A2E258BA03300DFBDE1 /* AudioLevelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5385A2D258BA03300DFBDE1 /* AudioLevelView.swift */; };
 		B53D8F50244DCBA30055CE66 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B53D8F4F244DCBA30055CE66 /* AppDelegate.swift */; };
 		B53D8F52244DCBA30055CE66 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B53D8F51244DCBA30055CE66 /* SceneDelegate.swift */; };
 		B53D8F57244DCBA30055CE66 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B53D8F55244DCBA30055CE66 /* Main.storyboard */; };
@@ -63,6 +66,14 @@
 		B5704D362464436F00D9703A /* ViewControllerAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D352464436F00D9703A /* ViewControllerAlerts.swift */; };
 		B5704D682465369000D9703A /* ActiveMeetingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D672465369000D9703A /* ActiveMeetingView.swift */; };
 		B5704D7B2465701400D9703A /* ControlButtonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D7A2465701400D9703A /* ControlButtonTests.swift */; };
+		B57508BA258A369B00056C8C /* AudioLevelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B57508B9258A369B00056C8C /* AudioLevelProvider.swift */; };
+		B5775DF125A701950015FE8E /* DebugMenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5775DF025A701950015FE8E /* DebugMenuViewController.swift */; };
+		B5775DF725A702A70015FE8E /* ShowDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5775DF625A702A70015FE8E /* ShowDebugMenu.swift */; };
+		B5775E0125A704ED0015FE8E /* PhenixDebugging.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5775E0025A704ED0015FE8E /* PhenixDebugging.swift */; };
+		B5775E0F25A72BC40015FE8E /* UIApplication+Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5775E0E25A72BC40015FE8E /* UIApplication+Version.swift */; };
+		B5775E1525A72C960015FE8E /* Bundle+Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5775E1425A72C960015FE8E /* Bundle+Version.swift */; };
+		B5775E1B25A72CCA0015FE8E /* Bundle+Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5775E1A25A72CCA0015FE8E /* Bundle+Version.swift */; };
+		B5775E2125A738EB0015FE8E /* PhenixLogs.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5775E2025A738EB0015FE8E /* PhenixLogs.swift */; };
 		B5777E5F246C25CB000B4CA9 /* LaunchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5777E5E246C25CB000B4CA9 /* LaunchViewController.swift */; };
 		B5777E72246D6015000B4CA9 /* UserMediaStreamController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5777E71246D6015000B4CA9 /* UserMediaStreamController.swift */; };
 		B5793608248549C5001044C2 /* JoinedRoomMembersDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5793607248549C5001044C2 /* JoinedRoomMembersDelegate.swift */; };
@@ -187,9 +198,12 @@
 		B510D0E7248FCA63003FAEC0 /* ActivityIndicatorProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicatorProvider.swift; sourceTree = "<group>"; };
 		B51141C424FD18B0007584A1 /* RoomMemberDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberDelegate.swift; sourceTree = "<group>"; };
 		B51141C624FD2229007584A1 /* CATransaction+NoAnimations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CATransaction+NoAnimations.swift"; sourceTree = "<group>"; };
+		B516172A2588E20D0099E56B /* RoomMemberMediaController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberMediaController.swift; sourceTree = "<group>"; };
 		B5170FC82559674100255FC0 /* RoomMediaController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RoomMediaController.swift; sourceTree = "<group>"; };
 		B5170FDC25596D7400255FC0 /* RoomMemberController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberController.swift; sourceTree = "<group>"; };
 		B52FC75E24B850F800B98B46 /* UIImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageView.swift; sourceTree = "<group>"; };
+		B5385A23258B95E700DFBDE1 /* RoomMemberAudioLevelObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberAudioLevelObserver.swift; sourceTree = "<group>"; };
+		B5385A2D258BA03300DFBDE1 /* AudioLevelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioLevelView.swift; sourceTree = "<group>"; };
 		B53D8F4C244DCBA30055CE66 /* Phenix Groups.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Phenix Groups.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B53D8F4F244DCBA30055CE66 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		B53D8F51244DCBA30055CE66 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -232,6 +246,14 @@
 		B5704D6F24656FBE00D9703A /* PhenixGroupsUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PhenixGroupsUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5704D7324656FBE00D9703A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B5704D7A2465701400D9703A /* ControlButtonTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlButtonTests.swift; sourceTree = "<group>"; };
+		B57508B9258A369B00056C8C /* AudioLevelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioLevelProvider.swift; sourceTree = "<group>"; };
+		B5775DF025A701950015FE8E /* DebugMenuViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugMenuViewController.swift; sourceTree = "<group>"; };
+		B5775DF625A702A70015FE8E /* ShowDebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowDebugMenu.swift; sourceTree = "<group>"; };
+		B5775E0025A704ED0015FE8E /* PhenixDebugging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixDebugging.swift; sourceTree = "<group>"; };
+		B5775E0E25A72BC40015FE8E /* UIApplication+Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Version.swift"; sourceTree = "<group>"; };
+		B5775E1425A72C960015FE8E /* Bundle+Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Version.swift"; sourceTree = "<group>"; };
+		B5775E1A25A72CCA0015FE8E /* Bundle+Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Version.swift"; sourceTree = "<group>"; };
+		B5775E2025A738EB0015FE8E /* PhenixLogs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixLogs.swift; sourceTree = "<group>"; };
 		B5777E5E246C25CB000B4CA9 /* LaunchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchViewController.swift; sourceTree = "<group>"; };
 		B5777E71246D6015000B4CA9 /* UserMediaStreamController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserMediaStreamController.swift; sourceTree = "<group>"; };
 		B5793607248549C5001044C2 /* JoinedRoomMembersDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinedRoomMembersDelegate.swift; sourceTree = "<group>"; };
@@ -477,6 +499,8 @@
 		B54D599124507CD200454066 /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
+				B5775E0025A704ED0015FE8E /* PhenixDebugging.swift */,
+				B5775E2025A738EB0015FE8E /* PhenixLogs.swift */,
 				B54D599224507D3700454066 /* PhenixRoomCreation.swift */,
 				B54D599424507D4200454066 /* PhenixRoomJoining.swift */,
 				B5E4EA47246EC12200F48B38 /* PhenixRoomPublishing.swift */,
@@ -487,6 +511,7 @@
 		B54D599624519E7A00454066 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				B5775E1A25A72CCA0015FE8E /* Bundle+Version.swift */,
 				B54D599724519E9000454066 /* OSLog.swift */,
 				B510D0CF248E65AD003FAEC0 /* PhenixDisposables.swift */,
 				B54D59A62451D78100454066 /* RoomAlias.swift */,
@@ -625,6 +650,22 @@
 			path = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		B5775A2925A346760015FE8E /* Providers */ = {
+			isa = PBXGroup;
+			children = (
+				B57508B9258A369B00056C8C /* AudioLevelProvider.swift */,
+			);
+			path = Providers;
+			sourceTree = "<group>";
+		};
+		B5775DE125A701630015FE8E /* Debug Menu */ = {
+			isa = PBXGroup;
+			children = (
+				B5775DF025A701950015FE8E /* DebugMenuViewController.swift */,
+			);
+			path = "Debug Menu";
+			sourceTree = "<group>";
+		};
 		B5777E5D246C2590000B4CA9 /* Launch Scene */ = {
 			isa = PBXGroup;
 			children = (
@@ -691,6 +732,7 @@
 				B59D19E62462DFDF008E2C2D /* JoinMeeting.swift */,
 				B59D19ED2462E038008E2C2D /* MeetingFinished.swift */,
 				B59D19E42462DFCB008E2C2D /* ShowMeeting.swift */,
+				B5775DF625A702A70015FE8E /* ShowDebugMenu.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -707,6 +749,7 @@
 			isa = PBXGroup;
 			children = (
 				B54D59B0245307CC00454066 /* Active Meeting Scene */,
+				B5775DE125A701630015FE8E /* Debug Menu */,
 				B59D19DB24629F47008E2C2D /* Join Meeting Scene */,
 				B5777E5D246C2590000B4CA9 /* Launch Scene */,
 				B54D59A12451BCBF00454066 /* New Meeting Scene */,
@@ -740,6 +783,7 @@
 			isa = PBXGroup;
 			children = (
 				B510D0E7248FCA63003FAEC0 /* ActivityIndicatorProvider.swift */,
+				B5775E1425A72C960015FE8E /* Bundle+Version.swift */,
 				B51141C624FD2229007584A1 /* CATransaction+NoAnimations.swift */,
 				B59D19F924631398008E2C2D /* CellIdentified.swift */,
 				B5019601245AAD9B00DDF6AB /* ChildController.swift */,
@@ -748,6 +792,7 @@
 				B5704D3124642DBA00D9703A /* Encode.swift */,
 				B54D599B2451B3E500454066 /* OSLog.swift */,
 				B5BB0837244F28E80094F254 /* Storyboarded.swift */,
+				B5775E0E25A72BC40015FE8E /* UIApplication+Version.swift */,
 				B5704D352464436F00D9703A /* ViewControllerAlerts.swift */,
 			);
 			path = Utils;
@@ -802,7 +847,9 @@
 			isa = PBXGroup;
 			children = (
 				B579360B2486AD59001044C2 /* RoomMember.swift */,
+				B516172A2588E20D0099E56B /* RoomMemberMediaController.swift */,
 				B5C0C63125273D7900D7543A /* Observers */,
+				B5775A2925A346760015FE8E /* Providers */,
 			);
 			path = Member;
 			sourceTree = "<group>";
@@ -810,6 +857,7 @@
 		B5C0C63125273D7900D7543A /* Observers */ = {
 			isa = PBXGroup;
 			children = (
+				B5385A23258B95E700DFBDE1 /* RoomMemberAudioLevelObserver.swift */,
 				B5DDA24A24B49FB900809648 /* RoomMemberAudioObserver.swift */,
 				B5DDA24C24B4B11B00809648 /* RoomMemberVideoObserver.swift */,
 			);
@@ -823,6 +871,7 @@
 				B5E4EA7324741B8400F48B38 /* CameraPlaceholderView.swift */,
 				B5E4EA7D2475379100F48B38 /* CameraView.swift */,
 				B5C25EF4245B010600542E1C /* ControlButton.swift */,
+				B5385A2D258BA03300DFBDE1 /* AudioLevelView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -1239,6 +1288,7 @@
 				B5D1318F252F4E2500B0027B /* DeeplinkService.swift in Sources */,
 				B55FF044252B1D1D00FC7B4F /* DeeplinkModelProvider.swift in Sources */,
 				B5C25EF5245B010600542E1C /* ControlButton.swift in Sources */,
+				B5385A2E258BA03300DFBDE1 /* AudioLevelView.swift in Sources */,
 				B59D19EE2462E038008E2C2D /* MeetingFinished.swift in Sources */,
 				B5D4F99F249353BE002FDCB6 /* PageViewController.swift in Sources */,
 				B54D59A02451B7C900454066 /* Launcher.swift in Sources */,
@@ -1252,7 +1302,9 @@
 				B5704D682465369000D9703A /* ActiveMeetingView.swift in Sources */,
 				B5E4EA7424741B8400F48B38 /* CameraPlaceholderView.swift in Sources */,
 				B5619D25249776F00072669D /* PageContainerMember.swift in Sources */,
+				B5775E0F25A72BC40015FE8E /* UIApplication+Version.swift in Sources */,
 				B5619D292497A0EF0072669D /* TabBarButton.swift in Sources */,
+				B5775DF125A701950015FE8E /* DebugMenuViewController.swift in Sources */,
 				B566BF722481431A00A2DE75 /* ActiveMeetingMemberListDataSource.swift in Sources */,
 				B5E4EA7E2475379100F48B38 /* CameraView.swift in Sources */,
 				B53D8F50244DCBA30055CE66 /* AppDelegate.swift in Sources */,
@@ -1268,10 +1320,12 @@
 				B5C25EFD245B33D900542E1C /* NewMeetingView.swift in Sources */,
 				B50195E42457180F00DDF6AB /* UIButton.swift in Sources */,
 				B59D19DD24629F69008E2C2D /* JoinMeetingViewController.swift in Sources */,
+				B5775E1525A72C960015FE8E /* Bundle+Version.swift in Sources */,
 				B53D8F52244DCBA30055CE66 /* SceneDelegate.swift in Sources */,
 				B566BF76248143F700A2DE75 /* ActiveMeetingMemberTableViewCell.swift in Sources */,
 				B5619D2724977CA60072669D /* ActiveMeetingChatViewController.swift in Sources */,
 				B510D0E6248FC258003FAEC0 /* ActivityIndicatorController.swift in Sources */,
+				B5775DF725A702A70015FE8E /* ShowDebugMenu.swift in Sources */,
 				B5019602245AAD9B00DDF6AB /* ChildController.swift in Sources */,
 				B54D599E2451B5D100454066 /* DependencyContainer.swift in Sources */,
 				B563A4B6247D51FF007101C7 /* ActiveMeetingInformationViewController.swift in Sources */,
@@ -1303,21 +1357,27 @@
 				B5DDA24B24B49FB900809648 /* RoomMemberAudioObserver.swift in Sources */,
 				B5E4EA722473F17C00F48B38 /* JoinedRoom.swift in Sources */,
 				B5170FC92559674100255FC0 /* RoomMediaController.swift in Sources */,
+				B5385A24258B95E700DFBDE1 /* RoomMemberAudioLevelObserver.swift in Sources */,
 				B5DE1DE724F7C9E400FE50A5 /* PhenixOptionBuilder.swift in Sources */,
 				B5C0C6122527343600D7543A /* ChatProvider.swift in Sources */,
 				B54D598B2450626C00454066 /* PhenixManager.swift in Sources */,
+				B5775E0125A704ED0015FE8E /* PhenixDebugging.swift in Sources */,
 				B51141C524FD18B0007584A1 /* RoomMemberDelegate.swift in Sources */,
+				B5775E1B25A72CCA0015FE8E /* Bundle+Version.swift in Sources */,
 				B54D599824519E9000454066 /* OSLog.swift in Sources */,
 				B579360C2486AD59001044C2 /* RoomMember.swift in Sources */,
+				B5775E2125A738EB0015FE8E /* PhenixLogs.swift in Sources */,
 				B5793608248549C5001044C2 /* JoinedRoomMembersDelegate.swift in Sources */,
 				B579360A248549F2001044C2 /* JoinedRoomDelegate.swift in Sources */,
 				B54D59AD2453040100454066 /* PhenixConfiguration.swift in Sources */,
+				B516172B2588E20D0099E56B /* RoomMemberMediaController.swift in Sources */,
 				B5777E72246D6015000B4CA9 /* UserMediaStreamController.swift in Sources */,
 				B5E4EA48246EC12200F48B38 /* PhenixRoomPublishing.swift in Sources */,
 				B54D599324507D3700454066 /* PhenixRoomCreation.swift in Sources */,
 				B54D59A72451D78100454066 /* RoomAlias.swift in Sources */,
 				B5DDA24D24B4B11B00809648 /* RoomMemberVideoObserver.swift in Sources */,
 				B594ABBB2499F52A0042ED1F /* VideoLayer.swift in Sources */,
+				B57508BA258A369B00056C8C /* AudioLevelProvider.swift in Sources */,
 				B510D0D0248E65AD003FAEC0 /* PhenixDisposables.swift in Sources */,
 				B5170FDD25596D7400255FC0 /* RoomMemberController.swift in Sources */,
 			);
@@ -1556,7 +1616,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2020.0.0;
+				MARKETING_VERSION = 2021.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.phenixrts.suite.groups;
 				PRODUCT_NAME = "Phenix Groups";
 				SWIFT_VERSION = 5.0;
@@ -1579,7 +1639,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2020.0.0;
+				MARKETING_VERSION = 2021.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.phenixrts.suite.groups;
 				PRODUCT_NAME = "Phenix Groups";
 				SWIFT_VERSION = 5.0;
@@ -1697,7 +1757,6 @@
 			baseConfigurationReference = 8C40D2E6EDD9E71AF631406E /* Pods-PhenixChat.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
@@ -1729,7 +1788,6 @@
 			baseConfigurationReference = 22187DE6D39E085980B88B03 /* Pods-PhenixChat.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
-				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;

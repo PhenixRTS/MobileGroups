@@ -1,16 +1,16 @@
 //
-//  Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import Foundation
 import os.log
 import PhenixSdk
 
-public class RoomMember {
-    public enum StreamObservationError: Error {
-        case streamNotProvided
-    }
+internal protocol MemberRepresentation: AnyObject {
+    var identifier: String { get }
+}
 
+public class RoomMember: MemberRepresentation {
     public enum SubscriptionType {
         case audio
         case video
@@ -24,12 +24,12 @@ public class RoomMember {
 
     private weak var roomExpress: PhenixRoomExpress?
     private let phenixMember: PhenixMember
+    private let audioTracks: [PhenixMediaStreamTrack]?
     private var subscriber: PhenixExpressSubscriber?
+    private var renderer: PhenixRenderer?
     private var streams: [PhenixStream]
-    private var subscriptionStream: PhenixStream?
     private var subscriptionState: SubscriptionState = .notSubscribed
     private var streamDisposable: PhenixDisposable?
-    private var mediaDisposables = [PhenixDisposable]()
 
     internal let queue: DispatchQueue
     internal var identifier: String {
@@ -42,93 +42,66 @@ public class RoomMember {
     internal weak var roomController: RoomMemberControllerDelegate?
     internal var subscriptionType: SubscriptionType?
     internal var audioObservations = [ObjectIdentifier: AudioObservation]()
+    internal var audioLevelObservations = [ObjectIdentifier: AudioLevelObservation]()
     internal var videoObservations = [ObjectIdentifier: VideoObservation]()
 
     public let isSelf: Bool
     public let screenName: String
     public var previewLayer: VideoLayer
-    public private(set) var isAudioAvailable = false {
-        didSet {
-            audioStateDidChange(enabled: isAudioAvailable)
-        }
-    }
-    public private(set) var isVideoAvailable = false {
-        didSet {
-            videoStateDidChange(enabled: isVideoAvailable)
-        }
-    }
+    public private(set) var media: RoomMemberMediaController?
 
-    internal init(_ member: PhenixMember, isSelf: Bool, roomExpress: PhenixRoomExpress, queue: DispatchQueue = .main) {
-        self.phenixMember = member
+    internal init(_ member: PhenixMember, isSelf: Bool, roomExpress: PhenixRoomExpress, queue: DispatchQueue = .main, renderer: PhenixRenderer? = nil, audioTracks: [PhenixMediaStreamTrack]? = nil) {
+        self.queue = queue
         self.isSelf = isSelf
+        self.streams = []
+        self.renderer = renderer
+        self.audioTracks = audioTracks
+        self.phenixMember = member
         self.roomExpress = roomExpress
         self.screenName = (member.getObservableScreenName()?.getValue() ?? "N/A") as String
-        self.streams = []
-        self.queue = queue
 
         self.previewLayer = VideoLayer()
     }
 
     internal func observeStreams() {
-        os_log(.debug, log: .roomMember, "Observe streams (%{PRIVATE}s)", description)
-        streamDisposable = phenixMember.getObservableStreams()?.subscribe(memberStreamDidChange)
+        queue.async { [weak self] in
+            guard let self = self else { return }
+            os_log(.debug, log: .roomMember, "Observe streams (%{PRIVATE}s)", self.description)
+            self.streamDisposable = self.phenixMember.getObservableStreams().subscribe(self.memberStreamDidChange)
+        }
     }
 
     internal func dispose() {
-        os_log(.debug, log: .roomMember, "Dispose, (%{PRIVATE}s)", description)
+        dispatchPrecondition(condition: .onQueue(queue))
 
-        resetSubscription()
-        resetObservers()
-        resetStream()
+        os_log(.debug, log: .roomMember, "Dispose, (%{PRIVATE}s)", self.description)
+
+        self.streamDisposable = nil
+        self.subscriber = nil
+        self.renderer = nil
+
+        self.media?.dispose()
+        self.media = nil
     }
 }
 
 // MARK: - Private methods
 private extension RoomMember {
-    func observeAudioStream() throws {
-        guard let stream = subscriptionStream else {
-            os_log(.debug, log: .roomMember, "Cannot subscribe for audio changes, stream not provided, (%{PRIVATE}s)", self.description)
-            throw StreamObservationError.streamNotProvided
-        }
+    func setupMediaController(for stream: PhenixStream) {
+        dispatchPrecondition(condition: .onQueue(queue))
 
-        os_log(.debug, log: .roomMember, "Observe audio stream changes (%{PRIVATE}s)", description)
-        stream.getObservableAudioState()?.subscribe(audioStateDidChange)?.append(to: &mediaDisposables)
-    }
-
-    func observeVideoStream() throws {
-        guard let stream = subscriptionStream else {
-            os_log(.debug, log: .roomMember, "Cannot subscribe for video changes, stream not provided, (%{PRIVATE}s)", self.description)
-            throw StreamObservationError.streamNotProvided
-        }
-
-        os_log(.debug, log: .roomMember, "Observe video stream changes (%{PRIVATE}s)", description)
-        stream.getObservableVideoState()?.subscribe(videoStateDidChange)?.append(to: &mediaDisposables)
-    }
-
-    func resetSubscription() {
-        os_log(.debug, log: .roomMember, "Reset subscription (%{PRIVATE}s)", description)
-
-        subscriptionState = .notSubscribed
-        subscriber?.stop()
-        subscriber = nil
-        subscriptionStream = nil
-    }
-
-    func resetStream() {
-        os_log(.debug, log: .roomMember, "Reset stream (%{PRIVATE}s)", description)
-
-        subscriptionStream = nil
-        streamDisposable = nil
-    }
-
-    func resetObservers() {
-        os_log(.debug, log: .roomMember, "Reset observers (%{PRIVATE}s)", self.description)
-
-        mediaDisposables.removeAll()
+        let audioTracks: [PhenixMediaStreamTrack]? = subscriber?.getAudioTracks() ?? self.audioTracks
+        media = RoomMemberMediaController(stream: stream, renderer: renderer, audioTracks: audioTracks, queue: queue, memberRepresentation: self)
+        media?.delegate = self
+        media?.observeAudioLevel()
+        media?.observeAudioStream()
+        media?.observeVideoStream()
     }
 
     func resetPreview() {
-        os_log(.debug, log: .roomMember, "Reset preview (%{PRIVATE}s)", self.description)
+        dispatchPrecondition(condition: .onQueue(queue))
+
+        os_log(.debug, log: .roomMember, "Reset preview (%{PRIVATE}s)", description)
         DispatchQueue.main.async { [weak self] in
             self?.previewLayer.removeFromSuperlayer()
         }
@@ -160,6 +133,7 @@ private extension RoomMember {
 
     func nextStream() -> PhenixStream? {
         dispatchPrecondition(condition: .onQueue(queue))
+
         if streams.isEmpty {
             return nil
         }
@@ -194,10 +168,7 @@ private extension RoomMember {
             os_log(.debug, log: .roomMember, "Member is Self, only subscribe for media state changes, (%{PRIVATE}s)", description)
 
             subscriptionState = .subscribed
-            self.subscriptionStream = stream
-
-            try? observeAudioStream()
-            try? observeVideoStream()
+            setupMediaController(for: stream)
 
             completion?(true)
             return
@@ -215,32 +186,34 @@ private extension RoomMember {
 
         os_log(.debug, log: .roomMember, "Subscribe to member stream with %{PRIVATE}s type, (%{PRIVATE}s)", String(describing: type), description)
 
-        roomExpress.subscribe(toMemberStream: stream, options) { [weak self] status, subscriber, _ in
+        roomExpress.subscribe(toMemberStream: stream, options) { [weak self] status, subscriber, renderer in
             guard let self = self else { return }
 
-            os_log(.debug, log: .roomMember, "Member subscription callback with status - %{PRIVATE}s, (%{PRIVATE}s)", String(describing: status.rawValue), self.description)
+            self.queue.async {
+                os_log(.debug, log: .roomMember, "Member subscription callback with status - %{PRIVATE}s, (%{PRIVATE}s)", String(describing: status.rawValue), self.description)
 
-            switch status {
-            case .ok:
-                self.subscriptionState = .subscribed
-                self.subscriber = subscriber
-                self.subscriptionStream = stream
+                switch status {
+                case .ok:
+                    self.subscriptionState = .subscribed
+                    self.subscriber = subscriber
+                    self.renderer = renderer
 
-                try? self.observeAudioStream()
-                try? self.observeVideoStream()
+                    self.setupMediaController(for: stream)
 
-                completion?(true)
+                    completion?(true)
 
-            default:
-                self.subscriptionState = .notSubscribed
-                self.subscriptionStream = nil
+                default:
+                    self.subscriptionState = .notSubscribed
 
-                completion?(false)
+                    completion?(false)
+                }
             }
         }
     }
 
     func options(for type: SubscriptionType) -> PhenixSubscribeToMemberStreamOptions {
+        dispatchPrecondition(condition: .onQueue(queue))
+
         switch type {
         case .audio:
             return PhenixOptionBuilder.createSubscribeToMemberAudioStreamOptions()
@@ -260,29 +233,13 @@ internal extension RoomMember {
 
             os_log(.debug, log: .roomMember, "Member stream did change callback received, (%{PRIVATE}s)", self.description)
 
-            self.resetSubscription()
-            self.resetObservers()
-            self.resetStream()
+            self.subscriptionState = .notSubscribed
+
+            self.subscriber = nil
+            self.media?.dispose()
+            self.media = nil
 
             self.process(streams)
-        }
-    }
-
-    func audioStateDidChange(_ changes: PhenixObservableChange<NSNumber>?) {
-        queue.async { [weak self] in
-            guard let value = changes?.value else { return }
-            guard let state = PhenixTrackState(rawValue: Int(truncating: value)) else { return }
-
-            self?.isAudioAvailable = state == .enabled
-        }
-    }
-
-    func videoStateDidChange(_ changes: PhenixObservableChange<NSNumber>?) {
-        queue.async { [weak self] in
-            guard let value = changes?.value else { return }
-            guard let state = PhenixTrackState(rawValue: Int(truncating: value)) else { return }
-
-            self?.isVideoAvailable = state == .enabled
         }
     }
 }
@@ -290,7 +247,16 @@ internal extension RoomMember {
 // MARK: - CustomStringConvertible
 extension RoomMember: CustomStringConvertible {
     public var description: String {
-        "RoomMember, session identifier: \(identifier) name: \(screenName), isSelf: \(isSelf), audio: \(isAudioAvailable), video: \(isVideoAvailable)"
+        "RoomMember, session identifier: \(identifier) name: \(screenName), isSelf: \(isSelf), media: \(media?.description ?? "-")"
+    }
+}
+
+// MARK: - MediaDelegate
+extension RoomMember: MediaDelegate {
+    func audioLevelDidChange(decibel: Double) {
+        dispatchPrecondition(condition: .onQueue(queue))
+
+        audioLevelDidChange(decibel)
     }
 }
 

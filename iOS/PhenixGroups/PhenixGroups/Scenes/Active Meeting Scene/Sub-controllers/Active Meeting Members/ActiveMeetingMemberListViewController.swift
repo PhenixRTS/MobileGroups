@@ -1,5 +1,5 @@
 //
-//  Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import os.log
@@ -12,6 +12,10 @@ class ActiveMeetingMemberListViewController: UITableViewController, PageContaine
 
     weak var delegate: ActiveMeetingPreview?
 
+    var pinnedMemberExist: Bool {
+        dataSource.pinnedMember != nil
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -19,9 +23,7 @@ class ActiveMeetingMemberListViewController: UITableViewController, PageContaine
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        defer {
-            tableView.deselectRow(at: indexPath, animated: true)
-        }
+        defer { tableView.deselectRow(at: indexPath, animated: true) }
 
         os_log(.debug, log: .activeMeetingScene, "Member row selected (%{PRIVATE}s)", indexPath.description)
 
@@ -108,15 +110,16 @@ private extension ActiveMeetingMemberListViewController {
 
     /// Sets focused member for the main view video preview layer
     func setDefaultFocusedMemberIfPossible() {
-        guard dataSource.pinnedMember == nil else {
+        guard pinnedMemberExist == false else {
             os_log(.debug, log: .activeMeetingScene, "Pinned member already exist, focus isn't changed.")
             return
         }
 
-        let memberCount = self.dataSource.members.count
+        let memberCount = dataSource.members.count
 
         guard memberCount > 0 else {
             os_log(.error, log: .activeMeetingScene, "No members available for the currently joined meeting.")
+            delegate?.setFocus(on: nil)
             return
         }
 
@@ -124,8 +127,8 @@ private extension ActiveMeetingMemberListViewController {
         // Notes:
         // 1. first member always is the current device user
         // 2. second member has the latest activity timestamp (ordered by newest timestamp first )
-        let member = memberCount > 1 ? self.dataSource.members[1] : self.dataSource.members[0]
-        self.delegate?.setFocus(on: member)
+        let member = memberCount > 1 ? dataSource.members[1] : dataSource.members[0]
+        delegate?.setFocus(on: member)
     }
 
     /// Reloads tableview with additional logic for pinned member cell
@@ -133,25 +136,21 @@ private extension ActiveMeetingMemberListViewController {
     /// If user has a pinned member, it will make necessary updates to save new pinned row location or remove it if necessary.
     /// - Parameter pinnedMemberPosition: Pinned member position type
     func reloadMemberList(pinnedMemberPosition: PinnedMemberPosition) {
-        DispatchQueue.main.async { [weak self] in
-            guard let self = self else { return }
+        switch pinnedMemberPosition {
+        case .memberRelocated(let oldIndexPath, let newIndexPath):
+            unpin(cellAt: oldIndexPath)
+            tableView.reloadData()
+            pin(cellAt: newIndexPath)
 
-            switch pinnedMemberPosition {
-            case .memberRelocated(let oldIndexPath, let newIndexPath):
-                self.unpin(cellAt: oldIndexPath)
-                self.tableView.reloadData()
-                self.pin(cellAt: newIndexPath)
+        case .memberRemoved(let oldIndexPath):
+            unpin(cellAt: oldIndexPath)
+            tableView.reloadData()
+            setDefaultFocusedMemberIfPossible()
 
-            case .memberRemoved(let oldIndexPath):
-                self.unpin(cellAt: oldIndexPath)
-                self.tableView.reloadData()
-                self.setDefaultFocusedMemberIfPossible()
-
-            case .memberNotMoved,
-                 .noPinnedMember:
-                self.tableView.reloadData()
-                self.setDefaultFocusedMemberIfPossible()
-            }
+        case .memberNotMoved,
+             .noPinnedMember:
+            tableView.reloadData()
+            setDefaultFocusedMemberIfPossible()
         }
     }
 }
@@ -159,30 +158,34 @@ private extension ActiveMeetingMemberListViewController {
 // MARK: - JoinedRoomMembersDelegate
 extension ActiveMeetingMemberListViewController: JoinedRoomMembersDelegate {
     func memberListDidChange(_ list: [RoomMember]) {
-        os_log(.debug, log: .activeMeetingScene, "Member list did change, %{PRIVATE}s", list.description)
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
 
-        dataSource.members = list
-        title = "(\(list.count))"
+            os_log(.debug, log: .activeMeetingScene, "Member list did change, %{PRIVATE}s", list.description)
 
-        // Update currently pinned member in the list
+            self.dataSource.members = list
+            self.title = "(\(list.count))"
 
-        // Check if a member has been pinned
-        guard let pinnedMember = dataSource.pinnedMember, let previousPinnedMemberIndex = dataSource.indexPathForSelectedRow?.row else {
-            reloadMemberList(pinnedMemberPosition: .noPinnedMember)
-            return
-        }
+            // Update currently pinned member in the list
 
-        // Check if pinned member still exists in the member list
-        guard let currentPinnedMemberIndex = list.firstIndex(where: { $0 == pinnedMember }) else {
-            reloadMemberList(pinnedMemberPosition: .memberRemoved(oldIndexPath: IndexPath(row: previousPinnedMemberIndex, section: 0)))
-            return
-        }
+            // Check if a member has been pinned
+            guard let pinnedMember = self.dataSource.pinnedMember, let previousPinnedMemberIndex = self.dataSource.indexPathForSelectedRow?.row else {
+                self.reloadMemberList(pinnedMemberPosition: .noPinnedMember)
+                return
+            }
 
-        // Check if pinned member row index has changed after the member list update
-        if currentPinnedMemberIndex != previousPinnedMemberIndex {
-            reloadMemberList(pinnedMemberPosition: .memberRelocated(oldIndexPath: .for(rowIndex: previousPinnedMemberIndex), newIndexPath: .for(rowIndex: currentPinnedMemberIndex)))
-        } else {
-            reloadMemberList(pinnedMemberPosition: .memberNotMoved)
+            // Check if pinned member still exists in the member list
+            guard let currentPinnedMemberIndex = list.firstIndex(where: { $0 == pinnedMember }) else {
+                self.reloadMemberList(pinnedMemberPosition: .memberRemoved(oldIndexPath: IndexPath(row: previousPinnedMemberIndex, section: 0)))
+                return
+            }
+
+            // Check if pinned member row index has changed after the member list update
+            if currentPinnedMemberIndex != previousPinnedMemberIndex {
+                self.reloadMemberList(pinnedMemberPosition: .memberRelocated(oldIndexPath: .for(rowIndex: previousPinnedMemberIndex), newIndexPath: .for(rowIndex: currentPinnedMemberIndex)))
+            } else {
+                self.reloadMemberList(pinnedMemberPosition: .memberNotMoved)
+            }
         }
     }
 }
