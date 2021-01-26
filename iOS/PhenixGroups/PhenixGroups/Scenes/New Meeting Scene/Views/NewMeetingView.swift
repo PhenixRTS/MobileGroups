@@ -21,6 +21,7 @@ class NewMeetingView: UIView {
     var cameraViewMultipleTapHandler: (() -> Void)?
 
     private var muteImage: UIImageView!
+    private var buttonShadowGradient: CAGradientLayer!
     @IBOutlet private var cameraView: CameraView!
     @IBOutlet private var controlView: NewMeetingControlView!
     @IBOutlet private var controlViewContainer: UIView!
@@ -48,6 +49,11 @@ class NewMeetingView: UIView {
         cameraHandler?(enabled)
 
         showCamera(enabled)
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        buttonShadowGradient.frame = buttonShadowView.bounds
     }
 
     func configure(displayName: String) {
@@ -129,15 +135,15 @@ class NewMeetingView: UIView {
 
 private extension NewMeetingView {
     func configureShadowView() {
-        let gradient = CAGradientLayer()
+        buttonShadowGradient = CAGradientLayer()
 
-        gradient.frame = buttonShadowView.bounds
-        gradient.colors = [
+        buttonShadowGradient.frame = buttonShadowView.bounds
+        buttonShadowGradient.colors = [
             UIColor.clear.cgColor,
             UIColor.black.withAlphaComponent(0.2).cgColor
         ]
 
-        buttonShadowView.layer.insertSublayer(gradient, at: 0)
+        buttonShadowView.layer.insertSublayer(buttonShadowGradient, at: 0)
     }
 
     func configureButtons() {
