@@ -9,12 +9,30 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
     private(set) var coordinator: MainCoordinator?
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        if #available(iOS 13.0, *) {
-            // All magic happens in SceneDelegate.swift
-            return true
+    /// Provide an alert with information and then terminate the application
+    ///
+    /// - Parameters:
+    ///   - title: Title for the alert
+    ///   - message: Message for the alert
+    ///   - file: The file name to print with `message`. The default is the file
+    ///   where `terminate(afterDisplayingAlertWithTitle:message:file:line:)` is called.
+    ///   - line: The line number to print along with `message`. The default is the line number where
+    ///   `terminate(afterDisplayingAlertWithTitle:message:file:line:)` is called.
+    static func terminate(afterDisplayingAlertWithTitle title: String, message: String, file: StaticString = #file, line: UInt = #line) {
+        guard let delegate = UIApplication.shared.delegate as? AppDelegate,
+              let window = delegate.window else {
+            fatalError(message)
         }
 
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Close app", style: .default) { _ in
+            fatalError(message, file: file, line: line)
+        })
+
+        window.rootViewController?.present(alert, animated: true)
+    }
+
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Setup main window
         let window = UIWindow(frame: UIScreen.main.bounds)
         self.window = window
@@ -42,12 +60,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             return false
         }
 
+        let terminate: () -> Void = {
+            Self.terminate(
+                afterDisplayingAlertWithTitle: "Configuration has changed.",
+                message: "Please start the app again to apply the changes."
+            )
+        }
+
         if let backend = deeplink.backend, backend != coordinator.phenixBackend {
-            prepareToExit(window)
+            terminate()
+            return false
         }
 
         if let uri = deeplink.uri, uri != coordinator.phenixPcast {
-            prepareToExit(window)
+            terminate()
+            return false
         }
 
         guard let code = deeplink.alias else {
@@ -57,21 +84,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         coordinator.join(meetingCode: code)
 
         return true
-    }
-
-    func prepareToExit(_ window: UIWindow?) {
-        let alert = UIAlertController(
-            title: "Configuration has changed.",
-            message: "Please start the app again to apply the changes.",
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "Close app", style: .default) { _ in
-            fatalError("Configuration has changed. App needs to be restarted.")
-        })
-
-        if let nc = window?.rootViewController as? UINavigationController {
-            nc.present(alert, animated: true)
-        }
     }
 
     private func makeDeeplinkIfNeeded(_ launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> DeeplinkModel? {

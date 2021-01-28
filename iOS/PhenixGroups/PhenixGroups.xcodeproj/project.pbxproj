@@ -29,7 +29,6 @@
 		B5385A24258B95E700DFBDE1 /* RoomMemberAudioLevelObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5385A23258B95E700DFBDE1 /* RoomMemberAudioLevelObserver.swift */; };
 		B5385A2E258BA03300DFBDE1 /* AudioLevelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5385A2D258BA03300DFBDE1 /* AudioLevelView.swift */; };
 		B53D8F50244DCBA30055CE66 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B53D8F4F244DCBA30055CE66 /* AppDelegate.swift */; };
-		B53D8F52244DCBA30055CE66 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B53D8F51244DCBA30055CE66 /* SceneDelegate.swift */; };
 		B53D8F57244DCBA30055CE66 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B53D8F55244DCBA30055CE66 /* Main.storyboard */; };
 		B53D8F59244DCBA80055CE66 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B53D8F58244DCBA80055CE66 /* Assets.xcassets */; };
 		B53D8F5C244DCBA80055CE66 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B53D8F5A244DCBA80055CE66 /* LaunchScreen.storyboard */; };
@@ -206,7 +205,6 @@
 		B5385A2D258BA03300DFBDE1 /* AudioLevelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioLevelView.swift; sourceTree = "<group>"; };
 		B53D8F4C244DCBA30055CE66 /* Phenix Groups.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Phenix Groups.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B53D8F4F244DCBA30055CE66 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		B53D8F51244DCBA30055CE66 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		B53D8F56244DCBA30055CE66 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		B53D8F58244DCBA80055CE66 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B53D8F5B244DCBA80055CE66 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -430,7 +428,6 @@
 			children = (
 				B5AC268B2552D59A003E2AEA /* Phenix Groups.entitlements */,
 				B53D8F4F244DCBA30055CE66 /* AppDelegate.swift */,
-				B53D8F51244DCBA30055CE66 /* SceneDelegate.swift */,
 				B5BB0830244F27BD0094F254 /* Coordinators */,
 				B5BB082F244F27B30094F254 /* Managers */,
 				B59D19EF2462E230008E2C2D /* Models */,
@@ -1321,7 +1318,6 @@
 				B50195E42457180F00DDF6AB /* UIButton.swift in Sources */,
 				B59D19DD24629F69008E2C2D /* JoinMeetingViewController.swift in Sources */,
 				B5775E1525A72C960015FE8E /* Bundle+Version.swift in Sources */,
-				B53D8F52244DCBA30055CE66 /* SceneDelegate.swift in Sources */,
 				B566BF76248143F700A2DE75 /* ActiveMeetingMemberTableViewCell.swift in Sources */,
 				B5619D2724977CA60072669D /* ActiveMeetingChatViewController.swift in Sources */,
 				B510D0E6248FC258003FAEC0 /* ActivityIndicatorController.swift in Sources */,
