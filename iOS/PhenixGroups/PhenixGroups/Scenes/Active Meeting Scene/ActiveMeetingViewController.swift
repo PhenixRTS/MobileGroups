@@ -34,6 +34,8 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
 
     private var loudestMemberTimer: Timer?
 
+    private weak var memberFocusDelegate: MemberFocusDelegate?
+
     /// Contains a reference to the *RoomMember* instance, which is currently displayed in the view's *cameraView* (the main preview).
     var focusedMember: RoomMember? {
         didSet { focusDidChange(from: oldValue, to: focusedMember) }
@@ -83,7 +85,6 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
 
     func resetFocusedMember() {
         focusedMember = nil
-        membersViewController.resetPinnedMember()
     }
 
     func leaveRoom() {
@@ -130,6 +131,7 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
     }
 }
 
+// MARK: - Private methods
 private extension ActiveMeetingViewController {
     // MARK: - Configuration
     func configure() {
@@ -164,18 +166,10 @@ private extension ActiveMeetingViewController {
     }
 
     func configureMainPreview(for member: RoomMember?) {
-        if let member = member {
-            activeMeetingView.setMicrophone(enabled: member.media?.isAudioAvailable ?? false)
-            activeMeetingView.setCamera(placeholder: member.screenName)
-            activeMeetingView.setCamera(layer: member.previewLayer)
-            activeMeetingView.setCamera(enabled: member.media?.isVideoAvailable ?? false)
-            member.addAudioObserver(activeMeetingView)
-            member.addVideoObserver(activeMeetingView)
-        } else {
-            activeMeetingView.setMicrophone(enabled: false)
-            activeMeetingView.setCamera(placeholder: "")
-            activeMeetingView.setCamera(enabled: false)
-        }
+        activeMeetingView.setMicrophone(enabled: member?.media?.isAudioAvailable ?? false)
+        activeMeetingView.setCamera(placeholder: member?.screenName ?? "")
+        activeMeetingView.setCamera(layer: member?.previewLayer)
+        activeMeetingView.setCamera(enabled: member?.media?.isVideoAvailable ?? false)
     }
 
     func configurePageController() {
@@ -207,6 +201,7 @@ private extension ActiveMeetingViewController {
         let vc = ActiveMeetingMemberListViewController()
         membersViewController = vc
         vc.delegate = self
+        self.memberFocusDelegate = vc
         return vc
     }
 
@@ -226,7 +221,7 @@ private extension ActiveMeetingViewController {
     func setAudio(enabled: Bool) {
         os_log(.debug, log: .activeMeetingScene, "Set audio %{PUBLIC}s", enabled == true ? "enabled" : "disabled")
         // Inform the joined room that the current audio state has changed
-        joinedRoom.media?.setAudio(enabled: enabled)
+        joinedRoom.mediaController?.setAudio(enabled: enabled)
         // Inform the local media stream that the current audio state has changed.
         // This is needed to inform other controllers (like Join Meeting scene controller) that user has enabled/disabled the audio.
         media?.setAudio(enabled: enabled)
@@ -235,7 +230,7 @@ private extension ActiveMeetingViewController {
     func setVideo(enabled: Bool) {
         os_log(.debug, log: .activeMeetingScene, "Set video %{PUBLIC}s", enabled == true ? "enabled" : "disabled")
         // Inform the joined room that the current video state has changed
-        joinedRoom.media?.setVideo(enabled: enabled)
+        joinedRoom.mediaController?.setVideo(enabled: enabled)
         // Inform the local media stream that the current video state has changed.
         // This is needed to inform other controllers (like Join Meeting scene controller) that user has enabled/disabled the video.
         media?.setVideo(enabled: enabled)
@@ -316,15 +311,18 @@ private extension ActiveMeetingViewController {
     // MARK: - Other functionality
 
     func focusDidChange(from oldMember: RoomMember?, to newMember: RoomMember?) {
-        os_log(.debug, log: .activeMeetingScene, "Focused did change from old member (%{PRIVATE}s) to new member (%{PRIVATE}s)", oldMember?.description ?? "-", newMember?.description ?? "-")
+        os_log(.debug, log: .activeMeetingScene, "Focused did change. Old member %{PRIVATE}s; New member %{PRIVATE}s", oldMember?.description ?? "none", newMember?.description ?? "none")
 
-        guard oldMember != newMember else { return }
+        if let member = oldMember {
+            member.removeAudioObserver(activeMeetingView)
+            member.removeVideoObserver(activeMeetingView)
+            memberFocusDelegate?.memberLostFocus(member)
+        }
 
-        oldMember?.removeAudioObserver(activeMeetingView)
-        oldMember?.removeVideoObserver(activeMeetingView)
-
-        if let oldMember = oldMember {
-            membersViewController.reloadVideoPreview(for: oldMember)
+        if let member = newMember {
+            member.addAudioObserver(activeMeetingView)
+            member.addVideoObserver(activeMeetingView)
+            memberFocusDelegate?.memberObtainedFocus(member)
         }
     }
 
@@ -355,7 +353,7 @@ private extension ActiveMeetingViewController {
 // MARK: - ActiveMeetingPreview
 extension ActiveMeetingViewController: ActiveMeetingPreview {
     func setFocus(on member: RoomMember?) {
-        guard focusedMember != member else { return }
+        guard member != focusedMember else { return }
         configureMainPreview(for: member)
         focusedMember = member
     }

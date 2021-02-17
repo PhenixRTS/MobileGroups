@@ -60,6 +60,7 @@ class MeetingHistoryTableViewController: UITableViewController, Storyboarded {
     }
 }
 
+// MARK: - Private methods
 private extension MeetingHistoryTableViewController {
     func configureTableView() {
         tableView.dataSource = dataSource

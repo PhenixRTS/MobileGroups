@@ -7,10 +7,10 @@ import PhenixCore
 import UIKit
 
 class Launcher {
-    private let deeplink: DeeplinkModel?
+    private let deeplink: PhenixDeeplinkModel?
     private weak var window: UIWindow?
 
-    init(window: UIWindow, deeplink: DeeplinkModel? = nil) {
+    init(window: UIWindow, deeplink: PhenixDeeplinkModel? = nil) {
         self.window = window
         self.deeplink = deeplink
     }
@@ -58,8 +58,9 @@ class Launcher {
 
             let backend = self.deeplink?.backend ?? PhenixConfiguration.backend
             let pcast = self.deeplink?.uri ?? PhenixConfiguration.pcast
+            let maxVideoMembers = self.deeplink?.maxVideoMembers ?? 12
 
-            let manager = PhenixManager(backend: backend, pcast: pcast)
+            let manager = PhenixManager(backend: backend, pcast: pcast, maxVideoSubscriptions: maxVideoMembers)
             manager.start(unrecoverableErrorCompletion: unrecoverableErrorCompletion)
 
             let preferences = Preferences()

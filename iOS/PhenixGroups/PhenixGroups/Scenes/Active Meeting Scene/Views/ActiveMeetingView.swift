@@ -5,6 +5,7 @@
 import PhenixCore
 import UIKit
 
+// swiftlint:disable file_length
 class ActiveMeetingView: UIView {
     typealias ControlButtonHandler = (_ enabled: Bool) -> Void
 

@@ -6,11 +6,11 @@ import Foundation
 import os.log
 import PhenixSdk
 
-internal protocol MemberRepresentation: AnyObject {
+internal protocol RoomMemberRepresentation: AnyObject {
     var identifier: String { get }
 }
 
-public class RoomMember: MemberRepresentation {
+public class RoomMember: RoomMemberRepresentation {
     public enum SubscriptionType {
         case audio
         case video
@@ -28,7 +28,11 @@ public class RoomMember: MemberRepresentation {
     private var subscriber: PhenixExpressSubscriber?
     private var renderer: PhenixRenderer?
     private var streams: [PhenixStream]
-    private var subscriptionState: SubscriptionState = .notSubscribed
+    private var subscriptionState: SubscriptionState = .notSubscribed {
+        didSet {
+            os_log(.debug, log: .roomMember, "Subscription state changed, (%{PRIVATE}s)", self.description)
+        }
+    }
     private var streamDisposable: PhenixDisposable?
 
     internal let queue: DispatchQueue
@@ -50,7 +54,14 @@ public class RoomMember: MemberRepresentation {
     public var previewLayer: VideoLayer
     public private(set) var media: RoomMemberMediaController?
 
-    internal init(_ member: PhenixMember, isSelf: Bool, roomExpress: PhenixRoomExpress, queue: DispatchQueue = .main, renderer: PhenixRenderer? = nil, audioTracks: [PhenixMediaStreamTrack]? = nil) {
+    internal init(
+        _ member: PhenixMember,
+        roomExpress: PhenixRoomExpress,
+        queue: DispatchQueue = .main,
+        isSelf: Bool,
+        renderer: PhenixRenderer? = nil,
+        audioTracks: [PhenixMediaStreamTrack]? = nil
+    ) {
         self.queue = queue
         self.isSelf = isSelf
         self.streams = []
@@ -66,7 +77,7 @@ public class RoomMember: MemberRepresentation {
     internal func observeStreams() {
         queue.async { [weak self] in
             guard let self = self else { return }
-            os_log(.debug, log: .roomMember, "Observe streams (%{PRIVATE}s)", self.description)
+            os_log(.debug, log: .roomMember, "Observe stream changes, (%{PRIVATE}s)", self.description)
             self.streamDisposable = self.phenixMember.getObservableStreams().subscribe(self.memberStreamDidChange)
         }
     }
@@ -91,8 +102,9 @@ private extension RoomMember {
         dispatchPrecondition(condition: .onQueue(queue))
 
         let audioTracks: [PhenixMediaStreamTrack]? = subscriber?.getAudioTracks() ?? self.audioTracks
-        media = RoomMemberMediaController(stream: stream, renderer: renderer, audioTracks: audioTracks, queue: queue, memberRepresentation: self)
+        media = RoomMemberMediaController(stream: stream, renderer: renderer, audioTracks: audioTracks, queue: queue)
         media?.delegate = self
+        media?.memberRepresentation = self
         media?.observeAudioLevel()
         media?.observeAudioStream()
         media?.observeVideoStream()
@@ -144,7 +156,7 @@ private extension RoomMember {
     func subscribe(to stream: PhenixStream, with type: RoomMember.SubscriptionType, completion: ((Bool) -> Void)?) {
         dispatchPrecondition(condition: .onQueue(queue))
 
-        os_log(.debug, log: .roomMember, "Subscribe to stream: %{PRIVATE}s, type: %{PRIVATE}s, (%{PRIVATE}s)", stream.description, String(describing: type), description)
+        os_log(.debug, log: .roomMember, "Subscribe to stream with type: %{PRIVATE}s, (%{PRIVATE}s)", String(describing: type), description)
 
         guard subscriptionState == .notSubscribed else {
             assertionFailure("Do not try to subscribe for a stream if there is already an active subscription")
@@ -165,8 +177,9 @@ private extension RoomMember {
              We only need to observe for the media state changes (audio and video) for Self member,
              to receive the updates if media gets enabled/disabled.
              */
-            os_log(.debug, log: .roomMember, "Member is Self, only subscribe for media state changes, (%{PRIVATE}s)", description)
+            os_log(.debug, log: .roomMember, "Member is Self, only subscribe for media state changes, not to the stream, (%{PRIVATE}s)", description)
 
+            subscriptionType = .video
             subscriptionState = .subscribed
             setupMediaController(for: stream)
 
@@ -179,18 +192,15 @@ private extension RoomMember {
         }
 
         // Save subscription type.
-        // For "self" member we do not need to save this, because it is using local media
         subscriptionType = type
 
         let options = self.options(for: type)
-
-        os_log(.debug, log: .roomMember, "Subscribe to member stream with %{PRIVATE}s type, (%{PRIVATE}s)", String(describing: type), description)
 
         roomExpress.subscribe(toMemberStream: stream, options) { [weak self] status, subscriber, renderer in
             guard let self = self else { return }
 
             self.queue.async {
-                os_log(.debug, log: .roomMember, "Member subscription callback with status - %{PRIVATE}s, (%{PRIVATE}s)", String(describing: status.rawValue), self.description)
+                os_log(.debug, log: .roomMember, "Subscribed with status - %{PRIVATE}s, (%{PRIVATE}s)", String(describing: status.rawValue), self.description)
 
                 switch status {
                 case .ok:
@@ -231,7 +241,7 @@ internal extension RoomMember {
             guard let self = self else { return }
             guard let streams = changes?.value as? [PhenixStream] else { return }
 
-            os_log(.debug, log: .roomMember, "Member stream did change callback received, (%{PRIVATE}s)", self.description)
+            os_log(.debug, log: .roomMember, "Stream changed, (%{PRIVATE}s)", self.description)
 
             self.subscriptionState = .notSubscribed
 
@@ -247,12 +257,12 @@ internal extension RoomMember {
 // MARK: - CustomStringConvertible
 extension RoomMember: CustomStringConvertible {
     public var description: String {
-        "RoomMember, session identifier: \(identifier) name: \(screenName), isSelf: \(isSelf), media: \(media?.description ?? "-")"
+        "RoomMember, session identifier: \(identifier), isSelf: \(isSelf), subscription: \(subscriptionState), name: \(screenName), media: \(media?.description ?? "-")"
     }
 }
 
-// MARK: - MediaDelegate
-extension RoomMember: MediaDelegate {
+// MARK: - RoomMemberMediaDelegate
+extension RoomMember: RoomMemberMediaDelegate {
     func audioLevelDidChange(decibel: Double) {
         dispatchPrecondition(condition: .onQueue(queue))
 

@@ -24,6 +24,7 @@ class JoinMeetingViewController: UIViewController, Storyboarded {
     }
 }
 
+// MARK: - Private methods
 private extension JoinMeetingViewController {
     func configure() {
         joinMeetingView.joinMeetingHandler = { [weak self] code in

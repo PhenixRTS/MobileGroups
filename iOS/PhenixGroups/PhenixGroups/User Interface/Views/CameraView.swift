@@ -7,21 +7,18 @@ import UIKit
 
 class CameraView: UIView {
     private var cameraPlaceholderView: CameraPlaceholderView!
+    private var cameraLayerView: UIView!
 
     var cameraLayer: CALayer? {
-        layer.sublayers?.first { $0 is VideoLayer }
+        cameraLayerView.layer.sublayers?.first { $0 is VideoLayer }
     }
 
     var showCamera: Bool = true {
-        didSet {
-            cameraLayer?.isHidden = !showCamera
-        }
+        didSet { cameraLayerView?.isHidden = !showCamera }
     }
 
     var placeholderText: String? {
-        didSet {
-            cameraPlaceholderView.text = placeholderText
-        }
+        didSet { cameraPlaceholderView.text = placeholderText }
     }
 
     override init(frame: CGRect) {
@@ -36,12 +33,12 @@ class CameraView: UIView {
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        cameraLayer?.resize(as: layer)
+        cameraLayer?.resize(as: cameraLayerView.layer)
     }
 
     func setCameraLayer(_ cameraLayer: VideoLayer) {
         removeCameraLayer()
-        layer.add(cameraLayer)
+        cameraLayerView.layer.add(cameraLayer)
     }
 
     func removeCameraLayer() {
@@ -57,9 +54,18 @@ private extension CameraView {
         cameraPlaceholderView.translatesAutoresizingMaskIntoConstraints = false
         cameraPlaceholderView.text = nil
 
+        cameraLayerView = UIView()
+        cameraLayerView.translatesAutoresizingMaskIntoConstraints = false
+
         addSubview(cameraPlaceholderView)
+        addSubview(cameraLayerView)
 
         NSLayoutConstraint.activate([
+            cameraLayerView.topAnchor.constraint(equalTo: topAnchor),
+            cameraLayerView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            cameraLayerView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            cameraLayerView.bottomAnchor.constraint(equalTo: bottomAnchor),
+
             cameraPlaceholderView.topAnchor.constraint(equalTo: topAnchor),
             cameraPlaceholderView.leadingAnchor.constraint(equalTo: leadingAnchor),
             cameraPlaceholderView.trailingAnchor.constraint(equalTo: trailingAnchor),

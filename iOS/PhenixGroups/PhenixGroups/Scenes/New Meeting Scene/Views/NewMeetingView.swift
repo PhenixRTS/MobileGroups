@@ -69,6 +69,8 @@ class NewMeetingView: UIView {
         configureButtons()
 
         cameraView.placeholderText = displayName
+
+        // Configure tap gesture to open debug menu, when user taps 5 times on the video surface view.
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(cameraViewTappedMultipleTimes))
         tapGesture.numberOfTapsRequired = 5
         cameraView.addGestureRecognizer(tapGesture)

@@ -11,18 +11,19 @@ public class RoomMediaController {
 
     internal weak var roomRepresentation: RoomRepresentation?
 
-    init(publisher: PhenixExpressPublisher, queue: DispatchQueue = .main, roomRepresentation: RoomRepresentation? = nil) {
+    init(publisher: PhenixExpressPublisher, queue: DispatchQueue = .main) {
         self.queue = queue
         self.publisher = publisher
-        self.roomRepresentation = roomRepresentation
     }
 
-    /// Change room audio state
+    /// Change publishing audio state in the current room
+    ///
+    /// This will enabled or disable the audio publishing of the local device
     /// - Parameter enabled: True means that audio will be unmuted, false - muted
     public func setAudio(enabled: Bool) {
         queue.async { [weak self] in
             guard let self = self else { return }
-            os_log(.debug, log: .mediaController, "Set audio %{PUBLIC}s, (%{PRIVATE}s)", enabled == true ? "enabled" : "disabled", self.roomDescription)
+            os_log(.debug, log: .mediaController, "Set audio publishing %{PUBLIC}s, (%{PRIVATE}s)", enabled == true ? "enabled" : "disabled", self.roomDescription)
             if enabled {
                 self.publisher.enableAudio()
             } else {
@@ -31,12 +32,14 @@ public class RoomMediaController {
         }
     }
 
-    /// Change room video state
+    /// Change publishing video state in the current room
+    ///
+    /// This will enabled or disable the video publishing of the local device
     /// - Parameter enabled: True means that video will be enabled, false - disabled
     public func setVideo(enabled: Bool) {
         queue.async { [weak self] in
             guard let self = self else { return }
-            os_log(.debug, log: .mediaController, "Set video %{PUBLIC}s, (%{PRIVATE}s)", enabled == true ? "enabled" : "disabled", self.roomDescription)
+            os_log(.debug, log: .mediaController, "Set video publishing %{PUBLIC}s, (%{PRIVATE}s)", enabled == true ? "enabled" : "disabled", self.roomDescription)
             if enabled {
                 self.publisher.enableVideo()
             } else {

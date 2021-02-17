@@ -57,6 +57,7 @@ class NewMeetingViewController: UIViewController, Storyboarded {
     }
 }
 
+// MARK: - Private methods
 private extension NewMeetingViewController {
     func configure() {
         newMeetingView.configure(displayName: preferences?.displayName ?? device.name)

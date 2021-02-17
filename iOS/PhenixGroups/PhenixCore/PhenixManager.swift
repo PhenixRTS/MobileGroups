@@ -13,29 +13,23 @@ public final class PhenixManager {
     private var joinedRoom: JoinedRoom?
     private var chatService: PhenixChatService?
 
-    internal let privateQueue: DispatchQueue
+    internal let queue: DispatchQueue
     internal private(set) var roomExpress: PhenixRoomExpress!
 
     /// Backend URL used by Phenix SDK to communicate
     public let backend: URL
     public let pcast: URL?
+    /// Maximum allowed member count with video subscription at the same time.
+    public let maxVideoSubscriptions: Int
     public private(set) var userMediaStreamController: UserMediaStreamController!
 
     /// Initializer for Phenix manager
     /// - Parameter backend: Backend URL for Phenix SDK
-    public convenience init(backend: URL, pcast: URL?) {
-        let privateQueue = DispatchQueue(label: "com.phenixrts.suite.groups.core.PhenixManager")
-        self.init(backend: backend, pcast: pcast, privateQueue: privateQueue)
-    }
-
-    /// Initializer for internal tests
-    /// - Parameters:
-    ///   - backend: Backend URL for Phenix SDK
-    ///   - privateQueue: Private queue used for making manager thread safe and possible to run on background threads
-    internal init(backend: URL, pcast: URL?, privateQueue: DispatchQueue) {
-        self.privateQueue = privateQueue
-        self.backend = backend
+    public init(backend: URL, pcast: URL?, maxVideoSubscriptions: Int = 4) {
         self.pcast = pcast
+        self.queue = DispatchQueue(label: "com.phenixrts.suite.groups.core.PhenixManager")
+        self.backend = backend
+        self.maxVideoSubscriptions = maxVideoSubscriptions
     }
 
     /// Creates necessary instances of PhenixSdk which provides connection and media streaming possibilities
@@ -62,19 +56,19 @@ public final class PhenixManager {
 
         group.wait()
     }
-
-    func set(_ room: JoinedRoom) {
-        dispatchPrecondition(condition: .onQueue(privateQueue))
-
-        os_log(.debug, log: .phenixManager, "Set new joined room instance")
-        joinedRoom = room
-    }
 }
 
 // MARK: - Helper methods
 internal extension PhenixManager {
-    func makeJoinedRoom(from roomService: PhenixRoomService, roomExpress: PhenixRoomExpress, backend: URL, publisher: PhenixExpressPublisher? = nil, userMedia: UserMediaProvider? = nil) -> JoinedRoom {
-        dispatchPrecondition(condition: .onQueue(privateQueue))
+    func set(room: JoinedRoom) {
+        dispatchPrecondition(condition: .onQueue(queue))
+
+        os_log(.debug, log: .phenixManager, "Set new joined room instance")
+        joinedRoom = room
+    }
+
+    func makeJoinedRoom(roomService: PhenixRoomService, roomExpress: PhenixRoomExpress, backend: URL, publisher: PhenixExpressPublisher? = nil, userMedia: UserMediaProvider? = nil) -> JoinedRoom {
+        dispatchPrecondition(condition: .onQueue(queue))
 
         let queue = DispatchQueue(label: "com.phenixrts.suite.groups.core.JoinedRoom", qos: .userInitiated)
 
@@ -83,17 +77,49 @@ internal extension PhenixManager {
 
         // Save chat service if it don't exist already.
         if self.chatService == nil {
+            os_log(.debug, log: .phenixManager, "Chat service does not exist, create a new one")
             self.chatService = chatService
         }
 
-        let joinedRoom = JoinedRoom(roomExpress: roomExpress, backend: backend, roomService: roomService, chatService: chatService, queue: queue, publisher: publisher, userMedia: userMedia)
-        joinedRoom.delegate = self
+        // Create a media controller, which is responsible for the interactions with local device media for publishing,
+        // for example, setting audio and video ON/OFF.
+        let mediaController: RoomMediaController? = {
+            if let publisher = publisher {
+                return RoomMediaController(publisher: publisher, queue: queue)
+            } else {
+                return nil
+            }
+        }()
 
-        return joinedRoom
+        // Create a member controller, which is responsible for listening for joined room member list changes,
+        // new member stream observing and other things.
+        let memberController = RoomMemberController(
+            roomService: roomService,
+            roomExpress: roomExpress,
+            maxVideoSubscriptions: maxVideoSubscriptions,
+            queue: queue,
+            userMedia: userMedia
+        )
+
+        // Create a joined room, which is the connected room instance and also it holds the media and member controllers.
+        let room = JoinedRoom(
+            roomService: roomService,
+            chatService: chatService,
+            mediaController: mediaController,
+            memberController: memberController,
+            backend: backend,
+            queue: queue
+        )
+
+        room.delegate = self
+        mediaController?.roomRepresentation = room
+        memberController.roomRepresentation = room
+
+        return room
     }
 
     func disposeCurrentlyJoinedRoom() {
-        dispatchPrecondition(condition: .onQueue(privateQueue))
+        dispatchPrecondition(condition: .onQueue(queue))
 
         os_log(.debug, log: .phenixManager, "Destroy currently joined room instance, if exist")
         joinedRoom?.dispose()
@@ -138,7 +164,7 @@ private extension PhenixManager {
 // MARK: - JoinedRoomDelegate
 extension PhenixManager: JoinedRoomDelegate {
     func roomLeft(_ room: JoinedRoom) {
-        privateQueue.async { [weak self] in
+        queue.async { [weak self] in
             self?.chatService?.dispose()
             self?.chatService = nil
             self?.joinedRoom = nil

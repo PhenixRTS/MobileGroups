@@ -37,8 +37,8 @@ public protocol PhenixRoomJoining: AnyObject {
 
 extension PhenixManager: PhenixRoomJoining {
     public func joinRoom(with type: RoomIdentifierType, displayName: String, completion: @escaping JoinRoomHandler) {
-        privateQueue.async { [weak self] in
-            os_log(.debug, log: .phenixManager, "Joining a room with %{PUBLIC}s, display name: %{PUBLIC}s", type.description, displayName)
+        queue.async { [weak self] in
+            os_log(.debug, log: .phenixManager, "Joining a room with %{PRIVATE}s, display name: %{PRIVATE}s", type.description, displayName)
             guard let self = self else { return }
             let options: PhenixJoinRoomOptions
 
@@ -57,20 +57,30 @@ extension PhenixManager: PhenixRoomJoining {
 
 extension PhenixManager {
     private func joinRoom(with options: PhenixJoinRoomOptions, completion: @escaping JoinRoomHandler) {
-        dispatchPrecondition(condition: .onQueue(privateQueue))
+        dispatchPrecondition(condition: .onQueue(queue))
         precondition(self.roomExpress != nil, "Must call PhenixManager.start() before this method")
         self.roomExpress.joinRoom(options) { [weak self] status, roomService in
             guard let self = self else { return }
-            self.privateQueue.async {
-                os_log(.debug, log: .phenixManager, "Joining a room completed with status: %{PUBLIC}d", status.rawValue)
+            self.queue.async {
+                os_log(.debug, log: .phenixManager, "Room joining completed with status: %{PUBLIC}d", status.rawValue)
                 switch status {
                 case .ok:
                     guard let roomService = roomService else {
-                        fatalError("Could not get RoomService parameter")
+                        fatalError("PhenixRoomService not provided.")
                     }
 
-                    let joinedRoom = self.makeJoinedRoom(from: roomService, roomExpress: self.roomExpress, backend: self.backend)
-                    self.set(joinedRoom)
+                    // Clear existing room
+                    self.disposeCurrentlyJoinedRoom()
+
+                    // Make new room
+                    let joinedRoom = self.makeJoinedRoom(
+                        roomService: roomService,
+                        roomExpress: self.roomExpress,
+                        backend: self.backend
+                    )
+                    // Save new room
+                    self.set(room: joinedRoom)
+
                     completion(.success(joinedRoom))
 
                 default:

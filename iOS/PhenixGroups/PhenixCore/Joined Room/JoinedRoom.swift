@@ -19,44 +19,31 @@ public class JoinedRoom: ChatProvider, RoomRepresentation {
 
     internal weak var delegate: JoinedRoomDelegate?
 
-    public private(set) var media: RoomMediaController?
-    public let memberController: RoomMemberController
-    public let chatService: PhenixChatService
     public let backend: URL
+    public let chatService: PhenixChatService
+    public let mediaController: RoomMediaController?
+    public let memberController: RoomMemberController
     public var alias: String {
         roomService.getObservableActiveRoom()?.getValue()?.getObservableAlias()?.getValue() as String? ?? "N/A"
     }
 
-    init(roomExpress: PhenixRoomExpress, backend: URL, roomService: PhenixRoomService, chatService: PhenixChatService, queue: DispatchQueue, publisher: PhenixExpressPublisher? = nil, userMedia: UserMediaProvider? = nil) {
+    init(
+        roomService: PhenixRoomService,
+        chatService: PhenixChatService,
+        mediaController: RoomMediaController?,
+        memberController: RoomMemberController,
+        backend: URL,
+        queue: DispatchQueue
+    ) {
+        self.queue = queue
+        self.mediaController = mediaController
         self.backend = backend
         self.roomService = roomService
         self.chatService = chatService
-        self.queue = queue
-
-        if let publisher = publisher {
-            self.media = RoomMediaController(publisher: publisher, queue: queue)
-        }
-
-        self.memberController = RoomMemberController(roomService: roomService, roomExpress: roomExpress, queue: queue, userMedia: userMedia)
-        self.memberController.roomRepresentation = self
-
-        self.media?.roomRepresentation = self
+        self.memberController = memberController
     }
 
-    /// Clears all room disposables and all member subscriptions
-    ///
-    /// Must be called when SDK automatically re-publishes to the room, also if user didn't left the room manually.
-    internal func dispose() {
-        queue.sync { [weak self] in
-            guard let self = self else { return }
-            os_log(.debug, log: .joinedRoom, "Dispose, (%{PRIVATE}s)", self.description)
-
-            self.chatService.dispose()
-            self.memberController.dispose()
-        }
-    }
-
-    /// Clears all room disposables and all member subscriptions, stops publishing and leaves the room with SDK method
+    /// Clears all room disposables and all member subscriptions, stops publishing and leaves the room.
     public func leave() {
         queue.sync { [weak self] in
             guard let self = self else { return }
@@ -65,7 +52,7 @@ public class JoinedRoom: ChatProvider, RoomRepresentation {
             self.chatService.dispose()
             self.memberController.dispose()
 
-            self.media?.stop()
+            self.mediaController?.stop()
 
             self.roomService.leaveRoom { _, _ in
                 os_log(.debug, log: .joinedRoom, "Joined room left, (%{PRIVATE}s)", self.description)
@@ -75,10 +62,26 @@ public class JoinedRoom: ChatProvider, RoomRepresentation {
     }
 }
 
+// MARK: - Internal methods
+internal extension JoinedRoom {
+    /// Clears all room disposables and all member subscriptions.
+    ///
+    /// Must be called when SDK automatically re-publishes to the room, also if user didn't left the room manually.
+    func dispose() {
+        queue.sync { [weak self] in
+            guard let self = self else { return }
+            os_log(.debug, log: .joinedRoom, "Dispose, (%{PRIVATE}s)", self.description)
+
+            self.chatService.dispose()
+            self.memberController.dispose()
+        }
+    }
+}
+
 // MARK: - CustomStringConvertible
 extension JoinedRoom: CustomStringConvertible {
     public var description: String {
-        "Joined Room, backend: \(backend.absoluteURL), alias: \(alias))"
+        "Joined Room, backend: \(backend.absoluteURL), alias: \(alias)"
     }
 }
 

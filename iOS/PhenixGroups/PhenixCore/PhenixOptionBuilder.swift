@@ -9,6 +9,7 @@ import PhenixSdk
 enum PhenixOptionBuilder {
     static func createPCastExpressOptions(backend: URL, pcast: URL?, unrecoverableErrorCallback: @escaping (_ description: String?) -> Void) -> PhenixPCastExpressOptions {
         var builder: PhenixPCastExpressOptionsBuilder = PhenixPCastExpressFactory.createPCastExpressOptionsBuilder()
+            .withMinimumConsoleLogLevel("Info")
             .withBackendUri(backend.absoluteString)
             .withUnrecoverableErrorCallback { _, description in
                 os_log(.error, log: .phenixManager, "Unrecoverable Error: %{PRIVATE}s", String(describing: description))

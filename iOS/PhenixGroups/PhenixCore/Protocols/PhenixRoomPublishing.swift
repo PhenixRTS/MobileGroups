@@ -22,37 +22,44 @@ public protocol PhenixRoomPublishing: AnyObject {
 }
 
 extension PhenixManager: PhenixRoomPublishing {
+    // swiftlint:disable closure_body_length
     public func publishRoom(withAlias alias: String, displayName: String, completion: @escaping RoomPublishHandler) {
-        privateQueue.async { [weak self] in
+        queue.async { [weak self] in
             guard let self = self else { return }
 
-            os_log(.debug, log: .phenixManager, "Publishing to a room with alias: %{PUBLIC}s, display name: %{PUBLIC}s", alias, displayName)
+            os_log(.debug, log: .phenixManager, "Publishing to a room with alias: %{PRIVATE}s, display name: %{PRIVATE}s", alias, displayName)
             let roomOptions = PhenixOptionBuilder.createRoomOptions(alias: alias)
             let publishOptions = PhenixOptionBuilder.createPublishOptions(with: self.userMediaStreamController.userMediaStream)
             let localPublishToRoomOptions = PhenixOptionBuilder.createPublishToRoomOptions(with: roomOptions, publishOptions: publishOptions, displayName: displayName)
 
             precondition(self.roomExpress != nil, "Must call PhenixManager.start() before this method")
             self.roomExpress.publish(toRoom: localPublishToRoomOptions) { status, roomService, publisher in
-                self.privateQueue.async {
+                self.queue.async {
                     os_log(.debug, log: .phenixManager, "Room publishing completed with status: %{PUBLIC}d", status.rawValue)
                     switch status {
                     case .ok:
                         guard let roomService = roomService else {
-                            fatalError("Could not get RoomService parameter")
+                            fatalError("PhenixRoomService not provided.")
                         }
 
                         guard let publisher = publisher else {
-                            fatalError("Could not get Publisher parameter")
+                            fatalError("PhenixExpressPublisher not provided.")
                         }
 
                         // Clear existing room
                         self.disposeCurrentlyJoinedRoom()
 
                         // Make new room
-                        let joinedRoom = self.makeJoinedRoom(from: roomService, roomExpress: self.roomExpress, backend: self.backend, publisher: publisher, userMedia: self.userMediaStreamController)
+                        let joinedRoom = self.makeJoinedRoom(
+                            roomService: roomService,
+                            roomExpress: self.roomExpress,
+                            backend: self.backend,
+                            publisher: publisher,
+                            userMedia: self.userMediaStreamController
+                        )
 
                         // Save new room
-                        self.set(joinedRoom)
+                        self.set(room: joinedRoom)
 
                         completion(.success(joinedRoom))
 

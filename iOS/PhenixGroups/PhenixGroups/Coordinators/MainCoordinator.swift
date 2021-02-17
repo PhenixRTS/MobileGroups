@@ -4,6 +4,7 @@
 
 import os.log
 import PhenixCore
+import PhenixDebug
 import UIKit
 
 class MainCoordinator: Coordinator {
@@ -17,6 +18,7 @@ class MainCoordinator: Coordinator {
 
     var phenixBackend: URL { phenixManager.backend }
     var phenixPcast: URL? { phenixManager.pcast }
+    var phenixMaxVideoSubscriptions: Int { phenixManager.maxVideoSubscriptions }
 
     /// If provided before `start()` is executed, will automatically join provided meeting code
     var initialMeetingCode: String?
@@ -165,8 +167,8 @@ extension MainCoordinator: MeetingFinished {
 
 extension MainCoordinator: ShowDebugMenu {
     func showDebugMenu() {
-        let vc = DebugMenuViewController()
-        vc.phenix = self.phenixManager
+        let viewModel = PhenixDebugViewModel(pcast: phenixManager.phenixPCast)
+        let vc = PhenixDebugViewController(viewModel: viewModel)
         navigationController.present(vc, animated: true)
     }
 }

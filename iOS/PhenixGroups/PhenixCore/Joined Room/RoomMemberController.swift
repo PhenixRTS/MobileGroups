@@ -10,8 +10,6 @@ protocol RoomMemberControllerDelegate: AnyObject {
 }
 
 public class RoomMemberController {
-    private static let maxVideoSubscriptions = 3
-
     private weak var roomService: PhenixRoomService?
     private weak var roomExpress: PhenixRoomExpress?
 
@@ -23,16 +21,31 @@ public class RoomMemberController {
 
     internal weak var roomRepresentation: RoomRepresentation?
 
+    /// Maximum allowed member count with video subscription at the same time.
+    public let maxVideoSubscriptions: Int
     public let currentMember: RoomMember
     public weak var delegate: JoinedRoomMembersDelegate?
 
-    init(roomService: PhenixRoomService, roomExpress: PhenixRoomExpress, queue: DispatchQueue = .main, userMedia: UserMediaProvider? = nil, roomRepresentation: RoomRepresentation? = nil) {
+    init(
+        roomService: PhenixRoomService,
+        roomExpress: PhenixRoomExpress,
+        maxVideoSubscriptions: Int,
+        queue: DispatchQueue = .main,
+        userMedia: UserMediaProvider? = nil
+    ) {
         self.queue = queue
         self.roomService = roomService
         self.roomExpress = roomExpress
-        self.roomRepresentation = roomRepresentation
+        self.maxVideoSubscriptions = maxVideoSubscriptions
 
-        self.currentMember = RoomMember(roomService.getSelf(), isSelf: true, roomExpress: roomExpress, queue: queue, renderer: userMedia?.renderer, audioTracks: userMedia?.audioTracks)
+        self.currentMember = RoomMember(
+            roomService.getSelf(),
+            roomExpress: roomExpress,
+            queue: queue,
+            isSelf: true,
+            renderer: userMedia?.renderer,
+            audioTracks: userMedia?.audioTracks
+        )
         self.members = []
     }
 
@@ -57,7 +70,7 @@ internal extension RoomMemberController {
     func dispose() {
         dispatchPrecondition(condition: .onQueue(queue))
 
-        os_log(.debug, log: .joinedRoom, "Dispose room media controller, (%{PRIVATE}s)", self.roomDescription)
+        os_log(.debug, log: .joinedRoom, "Dispose room media controller, (%{PRIVATE}s)", roomDescription)
 
         self.memberListDisposable = nil
         self.members.forEach { $0.dispose() }
@@ -111,7 +124,7 @@ private extension RoomMemberController {
         guard newMembers.isEmpty == false else { return }
 
         members.formUnion(newMembers)
-        os_log(.debug, log: .memberController, "Members connected to the room: %{PRIVATE}s", newMembers.description)
+        os_log(.debug, log: .memberController, "Members connected to the room: %{PRIVATE}s, (%{PRIVATE}s)", newMembers.description, roomDescription)
 
         for member in newMembers {
             // Observe new member stream and then automatically subscribe to it
@@ -125,7 +138,7 @@ private extension RoomMemberController {
 
         guard oldMembers.isEmpty == false else { return }
 
-        os_log(.debug, log: .memberController, "Members disconnected from the room: %{PRIVATE}s", oldMembers.description)
+        os_log(.debug, log: .memberController, "Members disconnected from the room: %{PRIVATE}s, (%{PRIVATE}s)", oldMembers.description, roomDescription)
         members.subtract(oldMembers)
 
         for member in oldMembers {
@@ -150,13 +163,15 @@ private extension RoomMemberController {
         if member == currentMember {
             return currentMember
         } else {
-            return RoomMember(member, isSelf: false, roomExpress: roomExpress, queue: queue)
+            return RoomMember(member, roomExpress: roomExpress, queue: queue, isSelf: false)
         }
     }
 }
 
 // MARK: - RoomMemberControllerDelegate
 extension RoomMemberController: RoomMemberControllerDelegate {
+    /// Checks if the limit of the member subscription with video is reached.
+    /// - Returns: Bool, `true` - can subscribe with video, `false` - limit is reached, should not subscribe with video
     func canSubscribeWithVideo() -> Bool {
         dispatchPrecondition(condition: .onQueue(queue))
 
@@ -165,7 +180,9 @@ extension RoomMemberController: RoomMemberControllerDelegate {
             result += member.subscriptionType == .some(.video) ? 1 : 0
         }
 
-        if videoSubscriptions + 1 <= Self.maxVideoSubscriptions {
+        os_log(.debug, log: .memberController, "Active video subscriptions: %{PRIVATE}s/%{PRIVATE}s, (%{PRIVATE}s)", videoSubscriptions.description, maxVideoSubscriptions.description, roomDescription)
+
+        if videoSubscriptions + 1 <= maxVideoSubscriptions {
             return true
         } else {
             return false
@@ -186,7 +203,7 @@ private extension RoomMemberController {
 
 // MARK: - Sequence where Element == RoomMember
 fileprivate extension Sequence where Element == RoomMember {
-    /// Sort `RoomMember` list in a way that the `Self` member always will be first
+    /// Sort `RoomMember` list in a way that the `Self` member always will be first, then the second member always will be the one who joined last
     /// - Returns: Sorted `RoomMember` list
     func sorted() -> [Self.Element] {
         self.sorted { lhs, rhs -> Bool in
