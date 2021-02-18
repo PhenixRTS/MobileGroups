@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.repository
@@ -9,18 +9,21 @@ import android.os.Looper
 import androidx.lifecycle.MutableLiveData
 import com.phenixrts.common.Disposable
 import com.phenixrts.room.RoomService
-import com.phenixrts.room.TrackState
-import com.phenixrts.suite.groups.BuildConfig
 import com.phenixrts.suite.groups.common.enums.AudioLevel
 import com.phenixrts.suite.groups.common.extensions.call
 import com.phenixrts.suite.phenixcommon.common.launchMain
 import com.phenixrts.suite.groups.common.extensions.mapRoomMember
 import com.phenixrts.suite.groups.models.RoomMember
+import com.phenixrts.suite.phenixdeeplink.models.PhenixConfiguration
 import timber.log.Timber
+
+private const val MEMBER_PICK_DELAY = 1000 * 2L
+private const val MEMBER_RE_PICK_DELAY = 1000 * 5L
 
 class RoomMemberRepository(
     private val roomService: RoomService,
-    private val selfMember: RoomMember
+    private val selfMember: RoomMember,
+    private val configuration: PhenixConfiguration
 ) {
 
     private val disposables: MutableList<Disposable> = mutableListOf()
@@ -79,14 +82,8 @@ class RoomMemberRepository(
     private fun enableMemberRenderers(members: List<RoomMember>) {
         var showingVideoCount = members.count { it.canRenderVideo }
         members.forEach { member ->
-            val memberStream = member.member.observableStreams.value?.get(0)
-            val videoEnabled = memberStream?.observableVideoState?.value == TrackState.ENABLED
-            val audioMuted = memberStream?.observableAudioState?.value != TrackState.ENABLED
-            member.canShowPreview = videoEnabled
-            member.isMuted = audioMuted
-
             // Allow video render if limit not reached
-            if (showingVideoCount < BuildConfig.MAX_RENDERERS && !member.canRenderVideo) {
+            if (showingVideoCount < configuration.videoMemberCount && !member.canRenderVideo) {
                 member.canRenderVideo = true
                 showingVideoCount++
             }
@@ -173,8 +170,7 @@ class RoomMemberRepository(
 
     fun switchAudioStreamState(enabled: Boolean) {
         roomMembers.value?.find { it.isSelf }?.run {
-            if (isMuted == enabled) {
-                isMuted = !enabled
+            if (isAudioEnabled != enabled) {
                 Timber.d("Self audio state changed: $enabled $this")
                 onUpdate.call(this)
             }
@@ -183,8 +179,7 @@ class RoomMemberRepository(
 
     fun switchVideoStreamState(enabled: Boolean) {
         roomMembers.value?.find { it.isSelf }?.run {
-            if (canRenderVideo && canShowPreview != enabled) {
-                canShowPreview = enabled
+            if (canRenderVideo && isVideoEnabled != enabled) {
                 Timber.d("Self video state changed: $enabled $this")
                 onUpdate.call(this)
             }
@@ -194,11 +189,6 @@ class RoomMemberRepository(
     fun dispose() {
         clearDisposables()
         roomMembers.value?.forEach { it.dispose() }
-    }
-
-    private companion object {
-        private const val MEMBER_PICK_DELAY = 1000 * 2L
-        private const val MEMBER_RE_PICK_DELAY = 1000 * 5L
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.ui.screens.fragments
@@ -12,7 +12,7 @@ import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
 import com.phenixrts.suite.groups.common.extensions.*
 import com.phenixrts.suite.groups.repository.RepositoryProvider
-import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
+import com.phenixrts.suite.groups.ui.viewmodels.GroupsViewModel
 import javax.inject.Inject
 
 abstract class BaseFragment : Fragment() {

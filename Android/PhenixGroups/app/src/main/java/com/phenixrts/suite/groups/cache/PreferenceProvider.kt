@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.cache
@@ -7,9 +7,6 @@ package com.phenixrts.suite.groups.cache
 import android.content.Context
 import android.os.Build
 import com.phenixrts.suite.groups.GroupsApplication
-import com.phenixrts.suite.groups.models.RoomExpressConfiguration
-import com.phenixrts.suite.groups.models.fromJson
-import com.phenixrts.suite.groups.models.toJson
 
 class PreferenceProvider(private val context: GroupsApplication) {
 
@@ -28,27 +25,9 @@ class PreferenceProvider(private val context: GroupsApplication) {
             .apply()
     }
 
-    fun getRoomAlias(): String? = context.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE)
-        .getString(ROOM_ALIAS, null)
-
-    fun saveConfiguration(configuration: RoomExpressConfiguration?) {
-        context.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE).edit()
-            .putString(CONFIGURATION, configuration?.toJson())
-            .apply()
-    }
-
-    fun getConfiguration(): RoomExpressConfiguration? {
-        var configuration: RoomExpressConfiguration? = null
-        context.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE).getString(CONFIGURATION, null)?.let { cache ->
-            configuration = cache.fromJson()
-        }
-        return configuration
-    }
-
     companion object {
         private const val APP_PREFERENCES = "group_preferences"
         private const val DISPLAY_NAME = "display_name"
-        private const val CONFIGURATION = "configuration"
         private const val ROOM_ALIAS = "room_alias"
     }
 }

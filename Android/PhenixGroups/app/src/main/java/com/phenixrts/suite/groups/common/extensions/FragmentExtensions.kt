@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.common.extensions
@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.ui.MainActivity
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
-import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
+import com.phenixrts.suite.groups.ui.viewmodels.GroupsViewModel
 import com.phenixrts.suite.phenixcommon.common.launchMain
 import timber.log.Timber
 

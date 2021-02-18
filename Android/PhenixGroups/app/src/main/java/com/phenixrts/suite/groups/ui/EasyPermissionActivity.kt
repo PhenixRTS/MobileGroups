@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.ui
@@ -9,14 +9,17 @@ import android.annotation.SuppressLint
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.FragmentActivity
+import com.phenixrts.suite.phenixdeeplink.DeepLinkActivity
+import com.phenixrts.suite.phenixdeeplink.models.DeepLinkStatus
+import com.phenixrts.suite.phenixdeeplink.models.PhenixConfiguration
 import java.util.*
+import kotlin.collections.HashMap
 
 /**
  * Simplifies permission request to single Callback method call
  */
 @SuppressLint("Registered")
-open class EasyPermissionActivity : FragmentActivity() {
+open class EasyPermissionActivity : DeepLinkActivity() {
 
     private val permissionRequestHistory = hashMapOf<Int, (a: Boolean) -> Unit>()
 
@@ -45,6 +48,15 @@ open class EasyPermissionActivity : FragmentActivity() {
                 callback(true)
             }
         }
+    }
+
+    override val additionalConfiguration: HashMap<String, String>
+        get() = hashMapOf()
+
+    override fun isAlreadyInitialized(): Boolean = false
+
+    override fun onDeepLinkQueried(status: DeepLinkStatus, configuration: PhenixConfiguration, deepLink: String) {
+        /* Ignored */
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {

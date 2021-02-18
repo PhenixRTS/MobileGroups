@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+  ~ Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
   -->
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -9,7 +9,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.phenixrts.suite.groups.viewmodels.GroupsViewModel" />
+            type="com.phenixrts.suite.groups.ui.viewmodels.GroupsViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

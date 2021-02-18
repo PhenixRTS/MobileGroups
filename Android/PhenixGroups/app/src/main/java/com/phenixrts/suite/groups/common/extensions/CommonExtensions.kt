@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.common.extensions
@@ -46,11 +46,11 @@ fun MutableLiveData<Unit>.call() {
 }
 
 fun MutableLiveData<RoomMember>.call(roomMember: RoomMember) {
-    value = roomMember
+    postValue(roomMember)
 }
 
 fun MutableLiveData<List<RoomMessage>>.refresh() {
-    value = this.value
+    postValue(value)
 }
 
 fun RowMemberItemBinding.refresh() {

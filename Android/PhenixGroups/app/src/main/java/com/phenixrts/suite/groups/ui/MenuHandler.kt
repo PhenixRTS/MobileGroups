@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.ui
@@ -7,7 +7,7 @@ package com.phenixrts.suite.groups.ui
 import android.view.View
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.phenixrts.suite.groups.databinding.ActivityMainBinding
-import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
+import com.phenixrts.suite.groups.ui.viewmodels.GroupsViewModel
 import com.phenixrts.suite.phenixcommon.common.*
 import kotlinx.coroutines.delay
 import timber.log.Timber

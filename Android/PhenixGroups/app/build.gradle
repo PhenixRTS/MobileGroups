@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 apply plugin: 'com.android.application'
@@ -22,7 +22,7 @@ android {
         buildConfigField "String", "BACKEND_URL", "\"https://demo.phenixrts.com/pcast\""
         buildConfigField "String", "PCAST_URL", "\"\""
         buildConfigField "int", "EXPIRATION_DAYS", "10"
-        buildConfigField "int", "MAX_RENDERERS", "4"
+        buildConfigField "int", "MAX_VIDEO_MEMBERS", "4"
     }
     buildTypes {
         release {
@@ -58,6 +58,7 @@ android {
 
 dependencies {
     implementation project(":common")
+    implementation fileTree(dir: 'libs', include: ['*.aar'])
 
     // Kotlin
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinx_coroutines_version"
@@ -68,12 +69,12 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.core:core-ktx:1.3.2'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
+    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
 
     // Material
-    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'com.google.android.material:material:1.3.0'
 
     // Phenix
     implementation "com.phenixrts.android:phenix-sdk-android:$phenix_version"
@@ -92,7 +93,7 @@ dependencies {
     kapt "androidx.room:room-compiler:2.2.6"
 
     // Testing
-    testImplementation 'junit:junit:4.13.1'
+    testImplementation 'junit:junit:4.13.2'
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlinx_coroutines_version"
     testImplementation 'org.robolectric:robolectric:4.4'
     testImplementation 'androidx.test:core:1.3.0'

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.repository
@@ -18,10 +18,10 @@ import com.phenixrts.suite.groups.common.extensions.CHAT_SUBSCRIPTION_DELAY
 import com.phenixrts.suite.groups.common.getPublishOptions
 import com.phenixrts.suite.groups.common.getPublishToRoomOptions
 import com.phenixrts.suite.groups.common.getRoomOptions
-import com.phenixrts.suite.groups.models.RoomExpressConfiguration
 import com.phenixrts.suite.groups.models.RoomStatus
 import com.phenixrts.suite.phenixcommon.common.launchIO
 import com.phenixrts.suite.phenixcommon.common.launchMain
+import com.phenixrts.suite.phenixdeeplink.models.PhenixConfiguration
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import kotlin.coroutines.resume
@@ -30,7 +30,7 @@ import kotlin.coroutines.suspendCoroutine
 class RoomExpressRepository(
     private val cacheProvider: CacheProvider,
     private val roomExpress: RoomExpress,
-    private val configuration: RoomExpressConfiguration
+    private val configuration: PhenixConfiguration
 ) {
 
     private var isDisposed = false
@@ -60,7 +60,7 @@ class RoomExpressRepository(
                                 RoomInfoItem(
                                     room.roomId,
                                     room.observableAlias.value,
-                                    configuration.backend
+                                    configuration.backend ?: ""
                                 )
                             )
                         }

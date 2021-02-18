@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.repository
@@ -16,12 +16,14 @@ import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.phenixcommon.common.launchMain
-import com.phenixrts.suite.groups.models.RoomExpressConfiguration
 import com.phenixrts.suite.groups.models.RoomStatus
+import com.phenixrts.suite.phenixdeeplink.models.PhenixConfiguration
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+
+private const val REINITIALIZATION_DELAY = 1000L
 
 class RepositoryProvider(
     private val context: GroupsApplication,
@@ -30,7 +32,7 @@ class RepositoryProvider(
 
     private var roomExpressRepository: RoomExpressRepository? = null
     private var userMediaRepository: UserMediaRepository? = null
-    private var expressConfiguration: RoomExpressConfiguration = RoomExpressConfiguration()
+    private var expressConfiguration = PhenixConfiguration()
     var roomExpress: RoomExpress? = null
     val onRoomStatusChanged = MutableLiveData<RoomStatus>().apply { value = RoomStatus(RequestStatus.OK) }
 
@@ -67,7 +69,7 @@ class RepositoryProvider(
         }
     }
 
-    suspend fun reinitializeRoomExpress(configuration: RoomExpressConfiguration) {
+    suspend fun setupRoomExpress(configuration: PhenixConfiguration) {
         if (hasConfigurationChanged(configuration)) {
             Timber.d("Room Express configuration has changed: $configuration")
             expressConfiguration = configuration
@@ -93,7 +95,7 @@ class RepositoryProvider(
         }
     }
 
-    fun hasConfigurationChanged(configuration: RoomExpressConfiguration): Boolean = expressConfiguration != configuration
+    private fun hasConfigurationChanged(configuration: PhenixConfiguration): Boolean = expressConfiguration != configuration
 
     fun isRoomExpressInitialized(): Boolean = roomExpress != null
 
@@ -123,7 +125,4 @@ class RepositoryProvider(
 
     fun getCurrentConfiguration() = expressConfiguration
 
-    private companion object {
-        private const val REINITIALIZATION_DELAY = 1000L
-    }
 }

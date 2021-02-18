@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+  ~ Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
   -->
 
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -34,10 +34,12 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@id/member_name">
 
-            <SurfaceView
+            <ImageView
                 android:id="@+id/member_surface"
+                android:scaleType="centerCrop"
                 android:layout_width="match_parent"
-                android:layout_height="72dp"
+                android:layout_height="match_parent"
+                android:contentDescription="@null"
                 android:visibility="@{member.canRenderThumbnail() ? View.VISIBLE : View.GONE}" />
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -77,7 +79,7 @@
                 android:background="@drawable/bg_circle"
                 android:contentDescription="@string/preview_mic_off_icon_content_description"
                 android:src="@drawable/ic_mic_off"
-                android:visibility="@{member.muted ? View.VISIBLE : View.GONE }"
+                android:visibility="@{member.audioEnabled ? View.GONE : View.VISIBLE }"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 tools:ignore="RtlHardcoded"
@@ -92,7 +94,7 @@
                 android:layout_marginEnd="4dp"
                 android:layout_marginBottom="4dp"
                 android:contentDescription="@string/preview_volume_icon_content_description"
-                android:visibility="@{member.muted ? View.GONE : View.VISIBLE }"
+                android:visibility="@{member.audioEnabled ? View.VISIBLE : View.GONE }"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 tools:ignore="RtlHardcoded" />

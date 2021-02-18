@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.ui
@@ -28,7 +28,7 @@ import com.phenixrts.suite.groups.services.CameraForegroundService
 import com.phenixrts.suite.groups.ui.screens.LandingScreen
 import com.phenixrts.suite.groups.ui.screens.RoomScreen
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
-import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
+import com.phenixrts.suite.groups.ui.viewmodels.GroupsViewModel
 import com.phenixrts.suite.phenixcommon.DebugMenu
 import com.phenixrts.suite.phenixcommon.common.FileWriterDebugTree
 import com.phenixrts.suite.phenixcommon.common.launchMain

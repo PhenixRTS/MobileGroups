@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.ui.adapters
@@ -16,7 +16,7 @@ import com.phenixrts.suite.groups.common.getSubscribeAudioOptions
 import com.phenixrts.suite.groups.common.getSubscribeVideoOptions
 import com.phenixrts.suite.groups.databinding.RowMemberItemBinding
 import com.phenixrts.suite.groups.models.RoomMember
-import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
+import com.phenixrts.suite.groups.ui.viewmodels.GroupsViewModel
 import timber.log.Timber
 import kotlin.properties.Delegates
 
@@ -90,37 +90,27 @@ class MemberListAdapter(
             roomMember.startMemberRenderer()
 
             // Update member surfaces
-            if (viewModel.isInRoom.isTrue()) {
-                if (roomMember.isActiveRenderer) {
-                    // Update main surface visibility
-                    if (roomMember.canShowPreview) {
-                        Timber.d("Showing main surface: $roomMember")
-                        mainSurface.visibility = View.VISIBLE
-                    } else {
-                        Timber.d("Hiding main surface: $roomMember")
-                        mainSurface.visibility = View.GONE
-                    }
-                    // Update display name
-                    viewModel.displayName.value = roomMember.member.observableScreenName.value
-                    // Update mic icon
-                    if (roomMember.isMuted) {
-                        micIcon.visibility = View.VISIBLE
-                    } else {
-                        micIcon.visibility = View.GONE
-                    }
+            if (viewModel.isInRoom.isTrue() && roomMember.isActiveRenderer) {
+                // Update main surface visibility
+                if (roomMember.isVideoEnabled) {
+                    Timber.d("Showing main surface: $roomMember")
+                    mainSurface.visibility = View.VISIBLE
                 } else {
-                    roomMember.previewSurfaceView?.visibility = if (roomMember.isOffscreen) View.GONE else View.VISIBLE
+                    Timber.d("Hiding main surface: $roomMember")
+                    mainSurface.visibility = View.GONE
+                }
+                // Update display name
+                viewModel.displayName.value = roomMember.member.observableScreenName.value
+                // Update mic icon
+                if (roomMember.isAudioEnabled) {
+                    micIcon.visibility = View.GONE
+                } else {
+                    micIcon.visibility = View.VISIBLE
                 }
             }
             Timber.d("Updated member renderer $roomMember")
             subscriptionsInProgress.remove(roomMember.member.sessionId)
         }
-    }
-
-    fun hidePreviews(hide: Boolean) {
-        Timber.d("Hiding surfaces: $hide")
-        members.forEach { it.isOffscreen = hide }
-        notifyDataSetChanged()
     }
 
     class ViewHolder(val binding: RowMemberItemBinding) : RecyclerView.ViewHolder(binding.root)

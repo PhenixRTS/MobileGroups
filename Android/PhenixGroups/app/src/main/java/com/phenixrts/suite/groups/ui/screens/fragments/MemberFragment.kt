@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.ui.screens.fragments
@@ -14,7 +14,6 @@ import com.phenixrts.suite.groups.common.extensions.getSurfaceView
 import com.phenixrts.suite.groups.databinding.FragmentMembersBinding
 import com.phenixrts.suite.groups.models.RoomMember
 import com.phenixrts.suite.groups.ui.adapters.MemberListAdapter
-import com.phenixrts.suite.phenixcommon.common.launchMain
 import timber.log.Timber
 
 class MemberFragment : BaseFragment(), MemberListAdapter.OnMemberListener {
@@ -45,10 +44,6 @@ class MemberFragment : BaseFragment(), MemberListAdapter.OnMemberListener {
 
     override fun onMemberClicked(roomMember: RoomMember) {
         viewModel.pinActiveMember(roomMember)
-    }
-
-    fun hidePreviews(hide: Boolean) = launchMain {
-        (binding.memberList.adapter as MemberListAdapter).hidePreviews(hide)
     }
 
 }

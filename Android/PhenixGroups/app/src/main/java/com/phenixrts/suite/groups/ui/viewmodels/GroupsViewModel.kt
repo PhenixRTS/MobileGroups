@@ -1,8 +1,8 @@
 /*
- * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
-package com.phenixrts.suite.groups.viewmodels
+package com.phenixrts.suite.groups.ui.viewmodels
 
 import android.view.SurfaceHolder
 import androidx.lifecycle.LifecycleOwner
@@ -45,6 +45,7 @@ class GroupsViewModel(
     private var joinedRoomRepository: JoinedRoomRepository? = null
     private var userMediaRenderer: Renderer? = null
     private var userAudioTrack: MediaStreamTrack? = null
+    private var userVideoTrack: MediaStreamTrack? = null
 
     private val roomJoinedObserver = Observer<RequestStatus> { status ->
         launchMain {
@@ -103,7 +104,7 @@ class GroupsViewModel(
     }
 
     private fun getRoomListItems() = launchMain {
-        cacheProvider.cacheDao().getVisitedRooms(repositoryProvider.getCurrentConfiguration().backend).collect { rooms ->
+        cacheProvider.cacheDao().getVisitedRooms(repositoryProvider.getCurrentConfiguration().backend ?: "").collect { rooms ->
             roomList.value = rooms
         }
     }
@@ -120,13 +121,13 @@ class GroupsViewModel(
                 getRoomRepository()?.expressPublisher?.let { publisher ->
                     getRoomRepository()?.chatService?.let { chatService ->
                         val selfMember = RoomMember(roomService.self, true)
-                        selfMember.setSelfRenderer(userMediaRenderer, mainRendererSurface, userAudioTrack)
+                        selfMember.setSelfRenderer(userMediaRenderer, mainRendererSurface, userAudioTrack, userVideoTrack)
                         val roomAlias = roomService.observableActiveRoom?.value?.observableAlias?.value ?: ""
                         currentRoomAlias = roomAlias
                         val dateRoomLeft = getRoomDateLeft(roomAlias)
                         Timber.d("Joined room repository created: $roomAlias $dateRoomLeft")
                         joinedRoomRepository = JoinedRoomRepository(roomService, chatService, publisher, dateRoomLeft)
-                        roomMemberRepository = RoomMemberRepository(roomService, selfMember)
+                        roomMemberRepository = RoomMemberRepository(roomService, selfMember, repositoryProvider.getCurrentConfiguration())
                         // Update audio / video state
                         joinedRoomRepository?.switchAudioStreamState(isMicrophoneEnabled.isTrue())
                         joinedRoomRepository?.switchVideoStreamState(isVideoEnabled.isTrue())
@@ -202,6 +203,7 @@ class GroupsViewModel(
                 if (userMediaRenderer == null) {
                     userMediaRenderer = userMediaStream.mediaStream?.createRenderer(getRendererOptions())
                     userAudioTrack = userMediaStream.mediaStream?.audioTracks?.getOrNull(0)
+                    userVideoTrack = userMediaStream.mediaStream?.videoTracks?.getOrNull(0)
                     val renderStatus = userMediaRenderer?.start(mainRendererSurface)
                     if (renderStatus != RendererStartStatus.OK) {
                         status = RequestStatus.FAILED

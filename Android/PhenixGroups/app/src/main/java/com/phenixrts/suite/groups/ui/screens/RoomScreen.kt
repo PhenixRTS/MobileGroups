@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.ui.screens
@@ -77,10 +77,6 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
     override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) { /* Ignored */ }
 
     override fun onPageSelected(position: Int) {
-        // Hide member list surfaces when page scrolled
-        (childFragmentManager.findFragmentByTag(
-            "android:switcher:${binding.fragmentPager.id}:0"
-        ) as? MemberFragment)?.hidePreviews(position != TAB_MEMBERS)
         viewModel.setViewingChat(position == TAB_CHAT)
         hideKeyboard()
     }

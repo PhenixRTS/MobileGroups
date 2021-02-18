@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.common.extensions
@@ -17,7 +17,7 @@ import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.ui.MainActivity
 import com.phenixrts.suite.groups.ui.screens.JoinScreen
 import com.phenixrts.suite.groups.ui.screens.LoadingScreen
-import com.phenixrts.suite.groups.viewmodels.GroupsViewModel
+import com.phenixrts.suite.groups.ui.viewmodels.GroupsViewModel
 import com.phenixrts.suite.phenixcommon.common.launchMain
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope

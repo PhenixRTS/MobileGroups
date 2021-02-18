@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.repository
@@ -15,6 +15,9 @@ import com.phenixrts.suite.phenixcommon.common.launchIO
 import timber.log.Timber
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+
+// The timeout after we can assume that the video or audio pipeline is terminated
+private const val FAILURE_TIMEOUT = 1000 * 3L
 
 class UserMediaRepository(private val roomExpress: RoomExpress) {
 
@@ -113,11 +116,6 @@ class UserMediaRepository(private val roomExpress: RoomExpress) {
     interface OnMediaStateChange {
         fun onMicrophoneStateChanged(available: Boolean)
         fun onCameraStateChanged(available: Boolean)
-    }
-
-    private companion object {
-        // The timeout after we can assume that the video or audio pipeline is terminated
-        private const val FAILURE_TIMEOUT = 1000 * 3L
     }
 
 }
