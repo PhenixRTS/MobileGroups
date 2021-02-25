@@ -68,7 +68,9 @@ public class RoomMemberMediaController {
     /// Be aware that after retrieving the audio level it will purge the cache of all saved audio levels till now.
     /// - Returns: Decibels
     public func recentAudioLevel() -> Double {
-        let maxDecibel = audioLevelQueue.sync { audioLevelCache.max() ?? AudioLevelProvider.minimumDecibel }
+        let maxDecibel = audioLevelQueue.sync {
+            audioLevelCache.max() ?? AudioLevelProvider.minimumDecibel
+        }
 
         audioLevelQueue.async(flags: [.barrier]) { [weak self] in
             self?.audioLevelCache.removeAll()

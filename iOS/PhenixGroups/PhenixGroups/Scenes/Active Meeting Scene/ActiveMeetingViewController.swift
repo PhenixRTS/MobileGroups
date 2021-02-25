@@ -58,13 +58,8 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
         assert(displayName != nil, "Display name is necessary")
         assert(media != nil, "Media is necessary")
 
-        configure()
-
-        // Observe joined room
-        observeRoom()
-        configureMedia()
-
-        observeLoudestMember()
+        configureView()
+        configureRoom()
     }
 
     override func viewDidAppear(_ animated: Bool) {
@@ -73,7 +68,14 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
         activeMeetingView.refreshLandscapePosition()
     }
 
-    func observeRoom() {
+    func configureRoom() {
+        configureMedia()
+        subscribeToRoomEvents()
+        resetFocusedMember()
+        observeLoudestMember()
+    }
+
+    func subscribeToRoomEvents() {
         joinedRoom.memberController.delegate = membersViewController
         joinedRoom.memberController.subscribeToMemberList()
         joinedRoom.subscribeToChatMessages(chatViewController)
@@ -81,10 +83,6 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
         chatViewController.sendMessageHandler = { [weak self] message in
             self?.joinedRoom.send(message: message)
         }
-    }
-
-    func resetFocusedMember() {
-        focusedMember = nil
     }
 
     func leaveRoom() {
@@ -99,18 +97,11 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
         coordinator?.meetingFinished(meeting)
     }
 
-    /// Configure self member media
-    ///
-    /// Set up the camera preview for the current member (self member) from the local device camera, not from the observed member stream
-    func configureCurrentMemberMedia() {
-        // Set the preview layer from the local media for the "self" member, because "self" member does not subscribe
-        // for the media stream.
-        joinedRoom.memberController.currentMember.previewLayer = media.cameraLayer
-    }
-
     /// Configure UI elements to represent the current media state for current user
     func configureMedia() {
-        configureCurrentMemberMedia()
+        // Set the preview layer from the local media for the "self" member,
+        // because "self" member does not subscribe for the media stream.
+        joinedRoom.memberController.currentMember.previewLayer = media.cameraLayer
 
         activeMeetingView.setCameraControl(enabled: media.isVideoEnabled)
         activeMeetingView.setMicrophoneControl(enabled: media.isAudioEnabled)
@@ -129,12 +120,16 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
             }
         }
     }
+
+    func resetFocusedMember() {
+        focusedMember = nil
+    }
 }
 
 // MARK: - Private methods
 private extension ActiveMeetingViewController {
     // MARK: - Configuration
-    func configure() {
+    func configureView() {
         activeMeetingView.configure(displayName: displayName)
         activeMeetingView.leaveMeetingHandler = { [weak self] in
             self?.leaveRoom()

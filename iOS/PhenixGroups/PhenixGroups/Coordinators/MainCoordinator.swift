@@ -110,10 +110,7 @@ private extension MainCoordinator {
         }
 
         controller.joinedRoom = joinedRoom
-
-        controller.observeRoom()
-        controller.configureMedia()
-        controller.resetFocusedMember()
+        controller.configureRoom()
     }
 }
 

@@ -45,8 +45,7 @@ public class JoinedRoom: ChatProvider, RoomRepresentation {
 
     /// Clears all room disposables and all member subscriptions, stops publishing and leaves the room.
     public func leave() {
-        queue.sync { [weak self] in
-            guard let self = self else { return }
+        queue.sync {
             os_log(.debug, log: .joinedRoom, "Leave joined room, (%{PRIVATE}s)", self.description)
 
             self.chatService.dispose()
@@ -54,7 +53,8 @@ public class JoinedRoom: ChatProvider, RoomRepresentation {
 
             self.mediaController?.stop()
 
-            self.roomService.leaveRoom { _, _ in
+            self.roomService.leaveRoom { [weak self] _, _ in
+                guard let self = self else { return }
                 os_log(.debug, log: .joinedRoom, "Joined room left, (%{PRIVATE}s)", self.description)
                 self.delegate?.roomLeft(self)
             }
@@ -68,13 +68,11 @@ internal extension JoinedRoom {
     ///
     /// Must be called when SDK automatically re-publishes to the room, also if user didn't left the room manually.
     func dispose() {
-        queue.sync { [weak self] in
-            guard let self = self else { return }
-            os_log(.debug, log: .joinedRoom, "Dispose, (%{PRIVATE}s)", self.description)
+        dispatchPrecondition(condition: .onQueue(queue))
+        os_log(.debug, log: .joinedRoom, "Dispose, (%{PRIVATE}s)", description)
 
-            self.chatService.dispose()
-            self.memberController.dispose()
-        }
+        chatService.dispose()
+        memberController.dispose()
     }
 }
 

@@ -27,7 +27,7 @@ public final class PhenixManager {
     /// - Parameter backend: Backend URL for Phenix SDK
     public init(backend: URL, pcast: URL?, maxVideoSubscriptions: Int = 4) {
         self.pcast = pcast
-        self.queue = DispatchQueue(label: "com.phenixrts.suite.groups.core.PhenixManager")
+        self.queue = DispatchQueue(label: "com.phenixrts.suite.groups.core", qos: .userInitiated)
         self.backend = backend
         self.maxVideoSubscriptions = maxVideoSubscriptions
     }
@@ -60,17 +60,17 @@ public final class PhenixManager {
 
 // MARK: - Helper methods
 internal extension PhenixManager {
-    func set(room: JoinedRoom) {
+    func set(room: JoinedRoom?) {
         dispatchPrecondition(condition: .onQueue(queue))
 
-        os_log(.debug, log: .phenixManager, "Set new joined room instance")
+        os_log(.debug, log: .phenixManager, "Set new joined room: %{PRIVATE}s", room?.description ?? "nil")
         joinedRoom = room
     }
 
     func makeJoinedRoom(roomService: PhenixRoomService, roomExpress: PhenixRoomExpress, backend: URL, publisher: PhenixExpressPublisher? = nil, userMedia: UserMediaProvider? = nil) -> JoinedRoom {
         dispatchPrecondition(condition: .onQueue(queue))
 
-        let queue = DispatchQueue(label: "com.phenixrts.suite.groups.core.JoinedRoom", qos: .userInitiated)
+        let queue = self.queue
 
         // Re-use the same chat service or create a new one if the room was left previously.
         let chatService: PhenixChatService = self.chatService ?? PhenixChatService(roomService: roomService)
@@ -165,10 +165,11 @@ private extension PhenixManager {
 extension PhenixManager: JoinedRoomDelegate {
     func roomLeft(_ room: JoinedRoom) {
         queue.async { [weak self] in
+            guard room == self?.joinedRoom else { return }
+
             self?.chatService?.dispose()
             self?.chatService = nil
-            self?.joinedRoom = nil
-            os_log(.debug, log: .phenixManager, "Joined room instance removed: %{PRIVATE}s", room.description)
+            self?.set(room: nil)
         }
     }
 }

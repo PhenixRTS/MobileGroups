@@ -33,13 +33,17 @@ public class PhenixChatService {
     }
 
     public func dispose() {
-        chatMessagesDisposable = nil
+        queue.sync {
+            self.chatMessagesDisposable = nil
+        }
     }
 }
 
 // MARK: - Internal methods
 internal extension PhenixChatService {
     func deliver(_ messages: [PhenixRoomChatMessage]) {
+        dispatchPrecondition(condition: .onQueue(queue))
+
         os_log(.debug, log: .chatService, "Deliver chat messages to the delegate")
 
         DispatchQueue.main.async { [weak self] in
