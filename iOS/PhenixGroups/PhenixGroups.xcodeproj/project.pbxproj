@@ -162,20 +162,16 @@
 
 /* Begin PBXFileReference section */
 		14C0940C47CB1ABA71283874 /* Pods_PhenixChat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PhenixChat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		1D7122FB7386BC5A2B7D2A49 /* Pods-Core.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Core.release.xcconfig"; path = "Target Support Files/Pods-Core/Pods-Core.release.xcconfig"; sourceTree = "<group>"; };
 		22187DE6D39E085980B88B03 /* Pods-PhenixChat.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixChat.release.xcconfig"; path = "Target Support Files/Pods-PhenixChat/Pods-PhenixChat.release.xcconfig"; sourceTree = "<group>"; };
-		23863160E99035B5D5D62665 /* Pods-PhenixRoomChat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixRoomChat.debug.xcconfig"; path = "Target Support Files/Pods-PhenixRoomChat/Pods-PhenixRoomChat.debug.xcconfig"; sourceTree = "<group>"; };
 		3B78AA6938C8BC757DE59AB5 /* Pods-PhenixGroups.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixGroups.debug.xcconfig"; path = "Target Support Files/Pods-PhenixGroups/Pods-PhenixGroups.debug.xcconfig"; sourceTree = "<group>"; };
 		421F0FDC3467DAD2E4A7D711 /* Pods-PhenixCore.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixCore.release.xcconfig"; path = "Target Support Files/Pods-PhenixCore/Pods-PhenixCore.release.xcconfig"; sourceTree = "<group>"; };
 		4AA055CD7D86025352F11B8C /* Pods_PhenixCoreIntegrationTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PhenixCoreIntegrationTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		523835AD0E716DA1A6D2BFDB /* Pods_PhenixCoreUnitTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PhenixCoreUnitTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D4289DF1B5F519C3AD7FBE6 /* Pods_Core.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Core.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		8C014DB13C2EFC6F3ECF22EF /* Pods-PhenixRoomChat.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixRoomChat.release.xcconfig"; path = "Target Support Files/Pods-PhenixRoomChat/Pods-PhenixRoomChat.release.xcconfig"; sourceTree = "<group>"; };
 		8C40D2E6EDD9E71AF631406E /* Pods-PhenixChat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixChat.debug.xcconfig"; path = "Target Support Files/Pods-PhenixChat/Pods-PhenixChat.debug.xcconfig"; sourceTree = "<group>"; };
 		8E042A23CD3819CFAA3A3D3A /* Pods-PhenixCoreUnitTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixCoreUnitTests.release.xcconfig"; path = "Target Support Files/Pods-PhenixCoreUnitTests/Pods-PhenixCoreUnitTests.release.xcconfig"; sourceTree = "<group>"; };
 		9A2FBDD988943A994D0336EC /* Pods_PhenixGroups.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PhenixGroups.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9CDE1BBEC6A18B07C2BA72CE /* Pods-PhenixCore.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixCore.debug.xcconfig"; path = "Target Support Files/Pods-PhenixCore/Pods-PhenixCore.debug.xcconfig"; sourceTree = "<group>"; };
-		A4F57A13D345AD2A2C1113E3 /* Pods-Core.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Core.debug.xcconfig"; path = "Target Support Files/Pods-Core/Pods-Core.debug.xcconfig"; sourceTree = "<group>"; };
 		AA30080ACB7EAFD74C5393F0 /* Pods-PhenixCoreUnitTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixCoreUnitTests.debug.xcconfig"; path = "Target Support Files/Pods-PhenixCoreUnitTests/Pods-PhenixCoreUnitTests.debug.xcconfig"; sourceTree = "<group>"; };
 		B50195CF2456F27800DDF6AB /* PhenixCoreUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PhenixCoreUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B50195D32456F27800DDF6AB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -286,8 +282,6 @@
 		B5E4EA7D2475379100F48B38 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		B5EB975F24AE058400F458B0 /* PlaceholderTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderTextView.swift; sourceTree = "<group>"; };
 		C14018589F0F82A57D4D0B42 /* Pods-PhenixGroups.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixGroups.release.xcconfig"; path = "Target Support Files/Pods-PhenixGroups/Pods-PhenixGroups.release.xcconfig"; sourceTree = "<group>"; };
-		D8BC44E9C5B4596C131E7876 /* Pods-PhenixCoreIntegrationTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixCoreIntegrationTests.debug.xcconfig"; path = "Target Support Files/Pods-PhenixCoreIntegrationTests/Pods-PhenixCoreIntegrationTests.debug.xcconfig"; sourceTree = "<group>"; };
-		EF50CA9C0F0DB5BDECAE00C7 /* Pods-PhenixCoreIntegrationTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixCoreIntegrationTests.release.xcconfig"; path = "Target Support Files/Pods-PhenixCoreIntegrationTests/Pods-PhenixCoreIntegrationTests.release.xcconfig"; sourceTree = "<group>"; };
 		EFA941014B5CCB73D1134E8F /* Pods_PhenixCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PhenixCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -342,18 +336,12 @@
 			children = (
 				3B78AA6938C8BC757DE59AB5 /* Pods-PhenixGroups.debug.xcconfig */,
 				C14018589F0F82A57D4D0B42 /* Pods-PhenixGroups.release.xcconfig */,
-				A4F57A13D345AD2A2C1113E3 /* Pods-Core.debug.xcconfig */,
-				1D7122FB7386BC5A2B7D2A49 /* Pods-Core.release.xcconfig */,
 				9CDE1BBEC6A18B07C2BA72CE /* Pods-PhenixCore.debug.xcconfig */,
 				421F0FDC3467DAD2E4A7D711 /* Pods-PhenixCore.release.xcconfig */,
-				D8BC44E9C5B4596C131E7876 /* Pods-PhenixCoreIntegrationTests.debug.xcconfig */,
-				EF50CA9C0F0DB5BDECAE00C7 /* Pods-PhenixCoreIntegrationTests.release.xcconfig */,
 				AA30080ACB7EAFD74C5393F0 /* Pods-PhenixCoreUnitTests.debug.xcconfig */,
 				8E042A23CD3819CFAA3A3D3A /* Pods-PhenixCoreUnitTests.release.xcconfig */,
 				8C40D2E6EDD9E71AF631406E /* Pods-PhenixChat.debug.xcconfig */,
 				22187DE6D39E085980B88B03 /* Pods-PhenixChat.release.xcconfig */,
-				23863160E99035B5D5D62665 /* Pods-PhenixRoomChat.debug.xcconfig */,
-				8C014DB13C2EFC6F3ECF22EF /* Pods-PhenixRoomChat.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
