@@ -6,12 +6,14 @@ package com.phenixrts.suite.groups.repository
 
 import android.os.Handler
 import android.os.Looper
+import com.phenixrts.common.Disposable
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.express.*
 import com.phenixrts.pcast.*
 import com.phenixrts.suite.groups.common.extensions.getUserMedia
 import com.phenixrts.suite.groups.common.getUserMediaOptions
 import com.phenixrts.suite.phenixcommon.common.launchIO
+import com.phenixrts.suite.phenixcommon.common.launchMain
 import timber.log.Timber
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
@@ -43,8 +45,27 @@ class UserMediaRepository(private val roomExpress: RoomExpress) {
     }
     private var isMicrophoneAvailable = false
     private var isCameraAvailable = false
+    private var onlineCallbackDisposable: Disposable? = null
 
     var userMediaStream: UserMediaStream? = null
+
+    fun observeOnlineStatus(onStatusChanged: (isOnline: Boolean) -> Unit) {
+        Timber.d("Observing online status")
+        roomExpress.pCastExpress.observableIsOnlineStatus.subscribe { isOnline ->
+            launchMain {
+                Timber.d("Online state changed: $isOnline")
+                if (!isOnline) {
+                    userMediaStream?.dispose()
+                    userMediaStream = null
+                } else if (userMediaStream == null) {
+                    waitForUserStream()
+                }
+                onStatusChanged(isOnline)
+            }
+        }.run {
+            onlineCallbackDisposable = this
+        }
+    }
 
     private fun observeMediaStreams() {
         userMediaStream?.apply {
@@ -110,6 +131,8 @@ class UserMediaRepository(private val roomExpress: RoomExpress) {
 
     fun dispose() {
         isDisposed = true
+        onlineCallbackDisposable?.dispose()
+        onlineCallbackDisposable = null
         Timber.d("User media repository disposed")
     }
 

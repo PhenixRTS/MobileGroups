@@ -91,6 +91,7 @@ class JoinedRoomRepository(
     }
 
     fun switchVideoStreamState(enabled: Boolean) = launchIO {
+        if (publisher.hasEnded()) return@launchIO
         Timber.d("Switching publisher video streams: $enabled")
         if (enabled) {
             publisher.enableVideo()
@@ -100,6 +101,7 @@ class JoinedRoomRepository(
     }
 
     fun switchAudioStreamState(enabled: Boolean) = launchIO {
+        if (publisher.hasEnded()) return@launchIO
         Timber.d("Switching publisher audio streams: $enabled")
         if (enabled) {
             publisher.enableAudio()

@@ -12,7 +12,6 @@ import com.phenixrts.suite.groups.ui.MainActivity
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
 import com.phenixrts.suite.groups.ui.viewmodels.GroupsViewModel
 import com.phenixrts.suite.phenixcommon.common.launchMain
-import timber.log.Timber
 
 fun BaseFragment.injectDependencies() {
     GroupsApplication.component.inject(this)
@@ -51,7 +50,6 @@ fun Fragment.dismissFragment() = launchMain {
 
 fun Fragment.restartVideoPreview(viewModel: GroupsViewModel) = launchMain {
     if (hasCameraPermission()) {
-        Timber.d("Restarting video preview")
         viewModel.startUserMediaPreview(getSurfaceView().holder)
     }
 }

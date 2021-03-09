@@ -11,7 +11,6 @@ import com.phenixrts.environment.android.AndroidContext
 import com.phenixrts.express.PCastExpressFactory
 import com.phenixrts.express.RoomExpress
 import com.phenixrts.express.RoomExpressFactory
-import com.phenixrts.pcast.UserMediaStream
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.cache.CacheProvider
@@ -64,6 +63,12 @@ class RepositoryProvider(
                 if (mediaStatus == RequestStatus.FAILED) {
                     onRoomStatusChanged.value = RoomStatus(RequestStatus.FAILED,
                         context.getString(R.string.err_user_media_not_initialized))
+                } else {
+                    userMediaRepository?.observeOnlineStatus { isOnline ->
+                        if (!isOnline) {
+                            onRoomStatusChanged.value = RoomStatus(RequestStatus.GONE)
+                        }
+                    }
                 }
             }
         }
@@ -115,13 +120,7 @@ class RepositoryProvider(
         return userMediaRepository
     }
 
-    fun getUserMediaStream(): UserMediaStream? {
-        if (getUserMediaRepository()?.userMediaStream == null) {
-            onRoomStatusChanged.value = RoomStatus(RequestStatus.FAILED,
-                context.getString(R.string.err_user_media_not_initialized))
-        }
-        return getUserMediaRepository()?.userMediaStream
-    }
+    fun getUserMediaStream() = getUserMediaRepository()?.userMediaStream
 
     fun getCurrentConfiguration() = expressConfiguration
 

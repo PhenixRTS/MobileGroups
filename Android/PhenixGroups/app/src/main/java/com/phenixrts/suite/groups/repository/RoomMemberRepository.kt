@@ -189,6 +189,7 @@ class RoomMemberRepository(
     fun dispose() {
         clearDisposables()
         roomMembers.value?.forEach { it.dispose() }
+        roomMembers.postValue(listOf())
     }
 
 }

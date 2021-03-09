@@ -241,4 +241,15 @@ class GroupsViewModel(
         joinedRoomRepository?.setViewingChat(isViewingChat)
     }
 
+    fun onConnectionLost() {
+        isVideoEnabled.postValue(false)
+        isMicrophoneEnabled.postValue(false)
+        mainRendererSurface.setSurfaceHolder(null)
+        userMediaRenderer?.stop()
+        userMediaRenderer?.dispose()
+        userMediaRenderer = null
+        leaveRoom()
+        Timber.d("User media renderer disposed")
+    }
+
 }

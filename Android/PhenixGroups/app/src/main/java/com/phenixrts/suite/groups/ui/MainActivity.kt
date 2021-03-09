@@ -291,7 +291,12 @@ class MainActivity : EasyPermissionActivity() {
 
     private fun handleExceptions() {
         repositoryProvider.onRoomStatusChanged.observe(this, {
-            if (it.status != RequestStatus.OK) {
+            Timber.d("Room status changed: $it")
+            if (it.status == RequestStatus.GONE) {
+                showToast(getString(R.string.err_network_problems))
+                viewModel.onConnectionLost()
+                launchFragment(LandingScreen(), false)
+            } else if (it.status != RequestStatus.OK) {
                 closeApp(it.message)
             }
         })
@@ -307,6 +312,11 @@ class MainActivity : EasyPermissionActivity() {
                 launchMain {
                     Timber.d("Camera available: $available")
                     viewModel.isVideoEnabled.value = available
+                    if (available && viewModel.isVideoEnabled.isTrue()) {
+                        viewModel.startUserMediaPreview(binding.mainSurfaceView.holder)
+                    } else {
+                        showUserVideoPreview(available)
+                    }
                 }
             }
         })
