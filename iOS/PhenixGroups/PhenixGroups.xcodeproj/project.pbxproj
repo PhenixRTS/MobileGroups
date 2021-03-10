@@ -25,7 +25,11 @@
 		B516172B2588E20D0099E56B /* RoomMemberMediaController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B516172A2588E20D0099E56B /* RoomMemberMediaController.swift */; };
 		B5170FC92559674100255FC0 /* RoomMediaController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5170FC82559674100255FC0 /* RoomMediaController.swift */; };
 		B5170FDD25596D7400255FC0 /* RoomMemberController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5170FDC25596D7400255FC0 /* RoomMemberController.swift */; };
+		B52204F225F6058200E32F86 /* PhenixMediaChanges.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52204F125F6058200E32F86 /* PhenixMediaChanges.swift */; };
+		B52204F825F605FE00E32F86 /* PhenixUserStreamMediaObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52204F725F605FE00E32F86 /* PhenixUserStreamMediaObserver.swift */; };
 		B52FC75F24B850F800B98B46 /* UIImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FC75E24B850F800B98B46 /* UIImageView.swift */; };
+		B531ECC325F8A346004524A9 /* PhenixOnlineStatusObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B531ECC225F8A346004524A9 /* PhenixOnlineStatusObserver.swift */; };
+		B531ECCD25F8A52D004524A9 /* PhenixOnlineStatusChanges.swift in Sources */ = {isa = PBXBuildFile; fileRef = B531ECCC25F8A52D004524A9 /* PhenixOnlineStatusChanges.swift */; };
 		B5385A24258B95E700DFBDE1 /* RoomMemberAudioLevelObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5385A23258B95E700DFBDE1 /* RoomMemberAudioLevelObserver.swift */; };
 		B5385A2E258BA03300DFBDE1 /* AudioLevelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5385A2D258BA03300DFBDE1 /* AudioLevelView.swift */; };
 		B53D8F50244DCBA30055CE66 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B53D8F4F244DCBA30055CE66 /* AppDelegate.swift */; };
@@ -60,7 +64,6 @@
 		B5704D3024642BEB00D9703A /* CurrentDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D2F24642BEB00D9703A /* CurrentDate.swift */; };
 		B5704D3224642DBA00D9703A /* Encode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D3124642DBA00D9703A /* Encode.swift */; };
 		B5704D342464346500D9703A /* Decode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D332464346500D9703A /* Decode.swift */; };
-		B5704D362464436F00D9703A /* ViewControllerAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D352464436F00D9703A /* ViewControllerAlerts.swift */; };
 		B5704D682465369000D9703A /* ActiveMeetingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D672465369000D9703A /* ActiveMeetingView.swift */; };
 		B5704D7B2465701400D9703A /* ControlButtonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D7A2465701400D9703A /* ControlButtonTests.swift */; };
 		B57508BA258A369B00056C8C /* AudioLevelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B57508B9258A369B00056C8C /* AudioLevelProvider.swift */; };
@@ -192,7 +195,11 @@
 		B516172A2588E20D0099E56B /* RoomMemberMediaController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberMediaController.swift; sourceTree = "<group>"; };
 		B5170FC82559674100255FC0 /* RoomMediaController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RoomMediaController.swift; sourceTree = "<group>"; };
 		B5170FDC25596D7400255FC0 /* RoomMemberController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberController.swift; sourceTree = "<group>"; };
+		B52204F125F6058200E32F86 /* PhenixMediaChanges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixMediaChanges.swift; sourceTree = "<group>"; };
+		B52204F725F605FE00E32F86 /* PhenixUserStreamMediaObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixUserStreamMediaObserver.swift; sourceTree = "<group>"; };
 		B52FC75E24B850F800B98B46 /* UIImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageView.swift; sourceTree = "<group>"; };
+		B531ECC225F8A346004524A9 /* PhenixOnlineStatusObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixOnlineStatusObserver.swift; sourceTree = "<group>"; };
+		B531ECCC25F8A52D004524A9 /* PhenixOnlineStatusChanges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixOnlineStatusChanges.swift; sourceTree = "<group>"; };
 		B5385A23258B95E700DFBDE1 /* RoomMemberAudioLevelObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberAudioLevelObserver.swift; sourceTree = "<group>"; };
 		B5385A2D258BA03300DFBDE1 /* AudioLevelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioLevelView.swift; sourceTree = "<group>"; };
 		B53D8F4C244DCBA30055CE66 /* Phenix Groups.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Phenix Groups.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -229,7 +236,6 @@
 		B5704D2F24642BEB00D9703A /* CurrentDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentDate.swift; sourceTree = "<group>"; };
 		B5704D3124642DBA00D9703A /* Encode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Encode.swift; sourceTree = "<group>"; };
 		B5704D332464346500D9703A /* Decode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Decode.swift; sourceTree = "<group>"; };
-		B5704D352464436F00D9703A /* ViewControllerAlerts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewControllerAlerts.swift; sourceTree = "<group>"; };
 		B5704D672465369000D9703A /* ActiveMeetingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingView.swift; sourceTree = "<group>"; };
 		B5704D6F24656FBE00D9703A /* PhenixGroupsUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PhenixGroupsUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5704D7324656FBE00D9703A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -376,6 +382,15 @@
 			path = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		B52204FD25F607CA00E32F86 /* Observers */ = {
+			isa = PBXGroup;
+			children = (
+				B531ECC225F8A346004524A9 /* PhenixOnlineStatusObserver.swift */,
+				B52204F725F605FE00E32F86 /* PhenixUserStreamMediaObserver.swift */,
+			);
+			path = Observers;
+			sourceTree = "<group>";
+		};
 		B53D8F43244DCBA30055CE66 = {
 			isa = PBXGroup;
 			children = (
@@ -458,6 +473,7 @@
 				B5777E71246D6015000B4CA9 /* UserMediaStreamController.swift */,
 				B594ABBA2499F52A0042ED1F /* VideoLayer.swift */,
 				B57936052485499A001044C2 /* Joined Room */,
+				B52204FD25F607CA00E32F86 /* Observers */,
 				B54D599124507CD200454066 /* Protocols */,
 				B54D598C2450629C00454066 /* Supporting Files */,
 				B54D599624519E7A00454066 /* Utils */,
@@ -478,6 +494,8 @@
 			isa = PBXGroup;
 			children = (
 				B5775E0025A704ED0015FE8E /* PhenixDebugging.swift */,
+				B52204F125F6058200E32F86 /* PhenixMediaChanges.swift */,
+				B531ECCC25F8A52D004524A9 /* PhenixOnlineStatusChanges.swift */,
 				B54D599224507D3700454066 /* PhenixRoomCreation.swift */,
 				B54D599424507D4200454066 /* PhenixRoomJoining.swift */,
 				B5E4EA47246EC12200F48B38 /* PhenixRoomPublishing.swift */,
@@ -639,7 +657,7 @@
 				B5E4EA712473F17C00F48B38 /* JoinedRoom.swift */,
 				B5170FC82559674100255FC0 /* RoomMediaController.swift */,
 				B5170FDC25596D7400255FC0 /* RoomMemberController.swift */,
-				B5EB976A24AF482300F458B0 /* Models */,
+				B5C0C63025273D6300D7543A /* Member */,
 				B5793606248549B2001044C2 /* Protocols */,
 				B5C0C62B25273A2E00D7543A /* Providers */,
 			);
@@ -758,7 +776,6 @@
 				B54D599B2451B3E500454066 /* OSLog.swift */,
 				B5BB0837244F28E80094F254 /* Storyboarded.swift */,
 				B5775E0E25A72BC40015FE8E /* UIApplication+Version.swift */,
-				B5704D352464436F00D9703A /* ViewControllerAlerts.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -849,14 +866,6 @@
 				B5619D2A2497A3100072669D /* Views */,
 			);
 			path = PageViewController;
-			sourceTree = "<group>";
-		};
-		B5EB976A24AF482300F458B0 /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				B5C0C63025273D6300D7543A /* Member */,
-			);
-			path = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -1256,7 +1265,6 @@
 				B5D4F99F249353BE002FDCB6 /* PageViewController.swift in Sources */,
 				B54D59A02451B7C900454066 /* Launcher.swift in Sources */,
 				B566BF702481412900A2DE75 /* ActiveMeetingMemberListViewController.swift in Sources */,
-				B5704D362464436F00D9703A /* ViewControllerAlerts.swift in Sources */,
 				B59D19E72462DFDF008E2C2D /* JoinMeeting.swift in Sources */,
 				B59D19E024629FAE008E2C2D /* JoinMeetingView.swift in Sources */,
 				B560170F24AB4E420091692A /* ActiveMeetingChatTableViewCell.swift in Sources */,
@@ -1316,7 +1324,9 @@
 			files = (
 				B54D599524507D4200454066 /* PhenixRoomJoining.swift in Sources */,
 				B5DDA24B24B49FB900809648 /* RoomMemberAudioObserver.swift in Sources */,
+				B531ECCD25F8A52D004524A9 /* PhenixOnlineStatusChanges.swift in Sources */,
 				B5E4EA722473F17C00F48B38 /* JoinedRoom.swift in Sources */,
+				B52204F225F6058200E32F86 /* PhenixMediaChanges.swift in Sources */,
 				B5170FC92559674100255FC0 /* RoomMediaController.swift in Sources */,
 				B5385A24258B95E700DFBDE1 /* RoomMemberAudioLevelObserver.swift in Sources */,
 				B5DE1DE724F7C9E400FE50A5 /* PhenixOptionBuilder.swift in Sources */,
@@ -1325,8 +1335,10 @@
 				B5775E0125A704ED0015FE8E /* PhenixDebugging.swift in Sources */,
 				B51141C524FD18B0007584A1 /* RoomMemberDelegate.swift in Sources */,
 				B5775E1B25A72CCA0015FE8E /* Bundle+Version.swift in Sources */,
+				B52204F825F605FE00E32F86 /* PhenixUserStreamMediaObserver.swift in Sources */,
 				B54D599824519E9000454066 /* OSLog.swift in Sources */,
 				B579360C2486AD59001044C2 /* RoomMember.swift in Sources */,
+				B531ECC325F8A346004524A9 /* PhenixOnlineStatusObserver.swift in Sources */,
 				B5793608248549C5001044C2 /* JoinedRoomMembersDelegate.swift in Sources */,
 				B579360A248549F2001044C2 /* JoinedRoomDelegate.swift in Sources */,
 				B54D59AD2453040100454066 /* PhenixConfiguration.swift in Sources */,

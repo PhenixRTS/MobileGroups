@@ -59,6 +59,23 @@ public class UserMediaStreamController {
     }
 }
 
+// MARK: Internal methods
+internal extension UserMediaStreamController {
+    func dispose() {
+        renderer?.stop()
+
+        for track in userMediaStream.mediaStream.getAudioTracks() {
+            renderer?.setFrameReadyCallback(track, nil)
+        }
+
+        for track in userMediaStream.mediaStream.getVideoTracks() {
+            renderer?.setFrameReadyCallback(track, nil)
+        }
+
+        renderer = nil
+    }
+}
+
 // MARK: - Private methods
 private extension UserMediaStreamController {
     func makeRenderer() -> PhenixRenderer {
@@ -74,9 +91,7 @@ private extension UserMediaStreamController {
     }
 
     func subscribeForMediaFrameNotification() {
-        guard let renderer = renderer else {
-            return
-        }
+        guard let renderer = renderer else { return }
 
         // Get the current device audio track.
         if let audioTrack = userMediaStream.mediaStream.getAudioTracks()?.first {

@@ -8,6 +8,7 @@ import PhenixSdk
 
 public enum PhenixRoomPublishingError: Error {
     case failureStatus(PhenixRequestStatus)
+    case noMediaAvailable
 }
 
 public protocol PhenixRoomPublishing: AnyObject {
@@ -27,9 +28,14 @@ extension PhenixManager: PhenixRoomPublishing {
         queue.async { [weak self] in
             guard let self = self else { return }
 
+            guard let media = self.userMediaStreamController else {
+                completion(.failure(.noMediaAvailable))
+                return
+            }
+
             os_log(.debug, log: .phenixManager, "Publishing to a room with alias: %{PRIVATE}s, display name: %{PRIVATE}s", alias, displayName)
             let roomOptions = PhenixOptionBuilder.createRoomOptions(alias: alias)
-            let publishOptions = PhenixOptionBuilder.createPublishOptions(with: self.userMediaStreamController.userMediaStream)
+            let publishOptions = PhenixOptionBuilder.createPublishOptions(with: media.userMediaStream)
             let localPublishToRoomOptions = PhenixOptionBuilder.createPublishToRoomOptions(with: roomOptions, publishOptions: publishOptions, displayName: displayName)
 
             precondition(self.roomExpress != nil, "Must call PhenixManager.start() before this method")
@@ -55,7 +61,7 @@ extension PhenixManager: PhenixRoomPublishing {
                             roomExpress: self.roomExpress,
                             backend: self.backend,
                             publisher: publisher,
-                            userMedia: self.userMediaStreamController
+                            userMedia: media
                         )
 
                         // Save new room

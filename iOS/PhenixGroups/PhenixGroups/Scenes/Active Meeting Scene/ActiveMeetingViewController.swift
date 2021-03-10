@@ -44,7 +44,8 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
     var displayName: String!
 
     weak var coordinator: (MeetingFinished & ShowDebugMenu)?
-    weak var media: UserMediaStreamController!
+    weak var phenix: PhenixOnlineStatusChanges?
+    weak var media: UserMediaStreamController?
     weak var joinedRoom: JoinedRoom!
 
     var activeMeetingView: ActiveMeetingView {
@@ -58,6 +59,7 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
         assert(displayName != nil, "Display name is necessary")
         assert(media != nil, "Media is necessary")
 
+        phenix?.addOnlineStatusObserver(self)
         configureView()
         configureRoom()
     }
@@ -85,35 +87,39 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
         }
     }
 
-    func leaveRoom() {
+    func leaveRoom(withReason reason: String? = nil) {
         os_log(.debug, log: .activeMeetingScene, "Leaving meeting")
 
         let meeting = Meeting(code: joinedRoom.alias, leaveDate: .now, backendUrl: joinedRoom.backend)
+        loudestMemberTimer?.invalidate()
+        loudestMemberTimer = nil
         audioDisablingWorker?.cancel()
         videoDisablingWorker?.cancel()
         audioDisablingWorker = nil
         videoDisablingWorker = nil
         joinedRoom.leave()
-        coordinator?.meetingFinished(meeting)
+        coordinator?.meetingFinished(meeting, withReason: reason)
     }
 
     /// Configure UI elements to represent the current media state for current user
     func configureMedia() {
-        // Set the preview layer from the local media for the "self" member,
-        // because "self" member does not subscribe for the media stream.
-        joinedRoom.memberController.currentMember.previewLayer = media.cameraLayer
+        if let media = media {
+            // Set the preview layer from the local media for the "self" member,
+            // because "self" member does not subscribe for the media stream.
+            joinedRoom.memberController.currentMember.previewLayer = media.cameraLayer
+        }
 
-        activeMeetingView.setCameraControl(enabled: media.isVideoEnabled)
-        activeMeetingView.setMicrophoneControl(enabled: media.isAudioEnabled)
+        activeMeetingView.setCameraControl(enabled: media?.isVideoEnabled ?? false)
+        activeMeetingView.setMicrophoneControl(enabled: media?.isAudioEnabled ?? false)
 
-        media.audioFrameReadHandler = { [weak self] in
+        media?.audioFrameReadHandler = { [weak self] in
             DispatchQueue.main.async {
                 self?.enableAudioIfInterrupted()
                 self?.checkForAudioInterruption()
             }
         }
 
-        media.videoFrameReadHandler = { [weak self] in
+        media?.videoFrameReadHandler = { [weak self] in
             DispatchQueue.main.async {
                 self?.enableVideoIfInterrupted()
                 self?.checkForVideoInterruption()
@@ -351,5 +357,17 @@ extension ActiveMeetingViewController: ActiveMeetingPreview {
         guard member != focusedMember else { return }
         configureMainPreview(for: member)
         focusedMember = member
+    }
+}
+
+extension ActiveMeetingViewController: PhenixOnlineStatusObserver {
+    func phenixOnlineStatusDidChange(isOnline: Bool) {
+        DispatchQueue.main.async { [weak self] in
+            guard isOnline == false else { return }
+
+            self?.leaveRoom(
+                withReason: "Experiencing problems connecting to Phenix. Check your network status."
+            )
+        }
     }
 }

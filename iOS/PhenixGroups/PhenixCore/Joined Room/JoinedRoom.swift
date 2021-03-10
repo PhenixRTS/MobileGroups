@@ -53,9 +53,9 @@ public class JoinedRoom: ChatProvider, RoomRepresentation {
 
             self.mediaController?.stop()
 
-            self.roomService.leaveRoom { [weak self] _, _ in
+            self.roomService.leaveRoom { [weak self] _, status in
                 guard let self = self else { return }
-                os_log(.debug, log: .joinedRoom, "Joined room left, (%{PRIVATE}s)", self.description)
+                os_log(.debug, log: .joinedRoom, "Joined room left with status: %{PRIVATE}s, (%{PRIVATE}s)", String(describing: status.rawValue), self.description)
                 self.delegate?.roomLeft(self)
             }
         }

@@ -58,7 +58,16 @@ private extension JoinMeetingViewController {
 
                 DispatchQueue.main.async {
                     self.dismissActivityIndicator {
-                        self.presentAlert("Failed to join meeting")
+                        AppDelegate.present(alertWithTitle: "Failed to join meeting (\(status.rawValue))")
+                    }
+                }
+
+            case .failure(.noMediaAvailable):
+                os_log(.debug, log: .newMeetingScene, "Failed to publish to a meeting with alias: %{PUBLIC}s, no media available", code)
+
+                DispatchQueue.main.async {
+                    self.dismissActivityIndicator {
+                        AppDelegate.present(alertWithTitle: "Experiencing problems with local media. Check your network status.")
                     }
                 }
             }

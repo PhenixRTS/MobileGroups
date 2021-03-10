@@ -12,7 +12,7 @@ protocol DisplayNameDelegate: AnyObject {
 
 class NewMeetingViewController: UIViewController, Storyboarded {
     weak var coordinator: (ShowMeeting & JoinMeeting & ShowDebugMenu)?
-    weak var phenix: PhenixRoomPublishing?
+    weak var phenix: (PhenixRoomPublishing & PhenixMediaChanges)?
     weak var media: UserMediaStreamController?
     weak var preferences: Preferences?
 
@@ -31,7 +31,8 @@ class NewMeetingViewController: UIViewController, Storyboarded {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        configure()
+        phenix?.addUserStreamMediaControllerObserver(self)
+        configureView()
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -59,7 +60,7 @@ class NewMeetingViewController: UIViewController, Storyboarded {
 
 // MARK: - Private methods
 private extension NewMeetingViewController {
-    func configure() {
+    func configureView() {
         newMeetingView.configure(displayName: preferences?.displayName ?? device.name)
         newMeetingView.setDisplayNameDelegate(self)
         newMeetingView.openMenuHandler = { [weak self] in
@@ -67,6 +68,9 @@ private extension NewMeetingViewController {
         }
         newMeetingView.cameraViewMultipleTapHandler = { [weak self] in
             self?.coordinator?.showDebugMenu()
+        }
+        newMeetingView.isMediaAvailable = { [weak self] in
+            self?.media != nil
         }
 
         configureHistoryView()
@@ -108,11 +112,9 @@ private extension NewMeetingViewController {
     }
 
     func configureMedia() {
-        guard let media = media else { return }
-        newMeetingView.setCamera(layer: media.cameraLayer)
-        newMeetingView.setCamera(enabled: media.isVideoEnabled)
-
-        newMeetingView.setMicrophone(enabled: media.isAudioEnabled)
+        newMeetingView.setCamera(layer: media?.cameraLayer)
+        newMeetingView.setCamera(enabled: media?.isVideoEnabled ?? false)
+        newMeetingView.setMicrophone(enabled: media?.isAudioEnabled ?? false)
     }
 
     func setVideo(enabled: Bool) {
@@ -144,7 +146,16 @@ private extension NewMeetingViewController {
 
                 DispatchQueue.main.async {
                     self.dismissActivityIndicator {
-                        self.presentAlert("Failed to create/join a meeting")
+                        AppDelegate.present(alertWithTitle: "Failed to create/join a meeting (\(status.rawValue))")
+                    }
+                }
+
+            case .failure(.noMediaAvailable):
+                os_log(.debug, log: .newMeetingScene, "Failed to publish to a meeting with alias: %{PUBLIC}s, no media available", code)
+
+                DispatchQueue.main.async {
+                    self.dismissActivityIndicator {
+                        AppDelegate.present(alertWithTitle: "Experiencing problems with local media. Check your network status.")
                     }
                 }
             }
@@ -176,5 +187,15 @@ extension NewMeetingViewController: MeetingHistoryDelegate {
     func rejoin(_ meeting: Meeting) {
         os_log(.debug, log: .newMeetingScene, "Rejoin meeting %{PUBLIC}s (%{PRIVATE}s)", meeting.code, meeting.backendUrl.absoluteString)
         publishMeeting(with: meeting.code, displayName: displayName)
+    }
+}
+
+// MARK: - PhenixUserStreamMediaObserver
+extension NewMeetingViewController: PhenixUserStreamMediaObserver {
+    func userStreamMediaControllerDidChange(_ controller: UserMediaStreamController) {
+        DispatchQueue.main.async { [weak self] in
+            self?.media = controller
+            self?.configureMedia()
+        }
     }
 }
