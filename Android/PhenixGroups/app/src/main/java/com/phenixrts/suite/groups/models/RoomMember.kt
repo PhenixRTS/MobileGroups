@@ -41,8 +41,10 @@ data class RoomMember(
     private val disposables: MutableList<Disposable> = mutableListOf()
     private var videoRenderSurface = AndroidVideoRenderSurface()
     private var subscriptionDisposable: Disposable? = null
-    private var subscriber: ExpressSubscriber? = null
-    private var renderer: Renderer? = null
+    private var audioSubscriber: ExpressSubscriber? = null
+    private var videoSubscriber: ExpressSubscriber? = null
+    private var audioRenderer: Renderer? = null
+    private var videoRenderer: Renderer? = null
     private var audioTrack: MediaStreamTrack? = null
     private var videoTrack: MediaStreamTrack? = null
     private var isObserved = false
@@ -50,7 +52,7 @@ data class RoomMember(
     private var readDelay = System.currentTimeMillis()
     private var audioBuffer = arrayListOf<Double>()
     private var mainSurface: SurfaceHolder? = null
-    private val memberStream get() = member.observableStreams.value?.get(0)
+    private val memberStream get() = member.observableStreams.value?.getOrNull(0)
     private var currentStreamIndex = 0
     private val audioFrameCallback = Renderer.FrameReadyForProcessingCallback { frameNotification ->
         if (isActiveRenderer) return@FrameReadyForProcessingCallback
@@ -130,18 +132,18 @@ data class RoomMember(
 
     private fun observeAudioTrack() {
         if (audioTrack != null) {
-            renderer?.setFrameReadyCallback(audioTrack, audioFrameCallback)
+            audioRenderer?.setFrameReadyCallback(audioTrack, audioFrameCallback)
         }
     }
 
     private fun observeVideoTrack() {
         if (videoTrack != null) {
-            renderer?.setFrameReadyCallback(videoTrack, videoFrameCallback)
+            videoRenderer?.setFrameReadyCallback(videoTrack, videoFrameCallback)
         }
     }
 
     private fun observeDataQuality() {
-        renderer?.setDataQualityChangedCallback { _, status, _ ->
+        videoRenderer?.setDataQualityChangedCallback { _, status, _ ->
             if (isVideoEnabled && status != DataQualityStatus.ALL) {
                 Timber.d("Render quality status changed: $status Can show video: $isVideoEnabled : ${this@RoomMember.asString()}")
                 onUpdate.call(this@RoomMember)
@@ -155,17 +157,26 @@ data class RoomMember(
         }
     }
 
-    private fun updateSubscription(subscriber: ExpressSubscriber? = null, renderer: Renderer? = null) {
-        // Dispose old subscription and renderer
+    private fun updateSubscription(subscriber: ExpressSubscriber? = null, renderer: Renderer? = null,
+                                   isVideoStream: Boolean) {
         reset()
-        this.subscriber?.stop()
-        this.subscriber?.dispose()
-        this.renderer?.stop()
-        this.renderer?.dispose()
-
-        // Assign new values
-        this.subscriber = subscriber
-        this.renderer = renderer
+        if (isVideoStream) {
+            videoSubscriber?.stop()
+            videoSubscriber?.dispose()
+            videoRenderer?.stop()
+            videoRenderer?.dispose()
+            videoSubscriber = subscriber
+            videoRenderer = renderer
+            Timber.d("Video renderer updated: ${asString()}")
+        } else {
+            audioSubscriber?.stop()
+            audioSubscriber?.dispose()
+            audioRenderer?.stop()
+            audioRenderer?.dispose()
+            audioSubscriber = subscriber
+            audioRenderer = renderer
+            Timber.d("Audio renderer updated: ${asString()}")
+        }
     }
 
     fun isThisMember(sessionId: String?) = member.sessionId == sessionId
@@ -174,7 +185,8 @@ data class RoomMember(
 
     fun canRenderThumbnail() = canRenderVideo && isVideoEnabled && !isActiveRenderer
 
-    suspend fun subscribe(roomExpress: RoomExpress?, options: SubscribeToMemberStreamOptions) = suspendCancellableCoroutine<Unit> { continuation ->
+    suspend fun subscribe(roomExpress: RoomExpress?, options: SubscribeToMemberStreamOptions,
+                          isVideoStream: Boolean) = suspendCancellableCoroutine<Unit> { continuation ->
         if (roomExpress == null || isSelf) {
             if (continuation.isActive) continuation.resume(Unit)
             return@suspendCancellableCoroutine
@@ -183,18 +195,17 @@ data class RoomMember(
         subscriptionDisposable = null
         member.observableStreams.subscribe { streams ->
             Timber.d("Subscribing to member media: ${toString()}")
-            subscribeToStream(roomExpress, options, streams.toList(), continuation)
+            subscribeToStream(roomExpress, options, streams.toList(), isVideoStream, continuation)
         }.run { subscriptionDisposable = this }
     }
 
     private fun subscribeToStream(roomExpress: RoomExpress, options: SubscribeToMemberStreamOptions,
-                                          streams: List<Stream>, continuation: CancellableContinuation<Unit>){
+                                  streams: List<Stream>, isVideoStream: Boolean, continuation: CancellableContinuation<Unit>){
         streams.getOrNull(currentStreamIndex)?.let { stream ->
             roomExpress.subscribeToMemberStream(stream, options) { status, subscriber, renderer ->
                 Timber.d("Subscribed to member media: $status ${toString()}")
                 if (status == RequestStatus.OK) {
-                    updateSubscription(subscriber, renderer)
-                    startMemberRenderer()
+                    updateSubscription(subscriber, renderer, isVideoStream)
                     isSubscribed = true
                     if (continuation.isActive) continuation.resume(Unit)
                 } else {
@@ -207,7 +218,7 @@ data class RoomMember(
                         currentStreamIndex + 1 < streams.size -> {
                             currentStreamIndex++
                             Timber.d("Trying a different stream: $currentStreamIndex")
-                            subscribeToStream(roomExpress, options, streams, continuation)
+                            subscribeToStream(roomExpress, options, streams, isVideoStream, continuation)
                         }
                         continuation.isActive -> continuation.resume(Unit)
                     }
@@ -223,25 +234,26 @@ data class RoomMember(
 
     fun setSelfRenderer(renderer: Renderer?, videoRenderSurface: AndroidVideoRenderSurface,
                         audioTrack: MediaStreamTrack?, videoTrack: MediaStreamTrack?) {
-        this.renderer = renderer
+        this.audioRenderer = renderer
+        this.videoRenderer = renderer
         this.videoRenderSurface = videoRenderSurface
         this.audioTrack = audioTrack
         this.videoTrack = videoTrack
     }
 
     fun startMemberRenderer(): RendererStartStatus {
-        if (renderer == null) {
-            renderer = subscriber?.createRenderer(getRendererOptions())
+        if (videoRenderer == null) {
+            videoRenderer = videoSubscriber?.createRenderer(getRendererOptions())
         }
         if (!isSelf) {
             audioTrack?.run {
-                renderer?.setFrameReadyCallback(this, null)
+                audioRenderer?.setFrameReadyCallback(this, null)
             }
             videoTrack?.run {
-                renderer?.setFrameReadyCallback(this, null)
+                videoRenderer?.setFrameReadyCallback(this, null)
             }
-            audioTrack = subscriber?.audioTracks?.getOrNull(0)
-            videoTrack = subscriber?.videoTracks?.getOrNull(0)
+            audioTrack = audioSubscriber?.audioTracks?.getOrNull(0)
+            videoTrack = videoSubscriber?.videoTracks?.getOrNull(0)
         }
         observeMember()
         observeDataQuality()
@@ -253,7 +265,7 @@ data class RoomMember(
         videoRenderSurface.setSurfaceHolder(if (isActiveRenderer) mainSurface else null)
         if (!isRendererStarted && !isSelf) {
             val rendererStartStatus =
-                renderer?.start(videoRenderSurface) ?: RendererStartStatus.FAILED
+                videoRenderer?.start(videoRenderSurface) ?: RendererStartStatus.FAILED
             isRendererStarted = rendererStartStatus == RendererStartStatus.OK
             status = if (isVideoEnabled) rendererStartStatus else status
             Timber.d("Started video renderer: $status : ${toString()}")
@@ -278,7 +290,8 @@ data class RoomMember(
         previewSurface = null
         if (!isSelf) {
             videoRenderSurface.setSurfaceHolder(null)
-            updateSubscription()
+            updateSubscription(isVideoStream = false)
+            updateSubscription(isVideoStream = true)
         }
         Timber.d("Room member disposed: ${toString()}")
     } catch (e: Exception) {

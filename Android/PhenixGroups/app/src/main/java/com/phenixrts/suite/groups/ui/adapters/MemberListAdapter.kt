@@ -78,12 +78,10 @@ class MemberListAdapter(
 
             // Subscribe to member media if not subscribed yet
             if (!roomMember.isSubscribed) {
-                val options = if (roomMember.canRenderVideo) {
-                    getSubscribeVideoOptions()
-                } else {
-                    getSubscribeAudioOptions()
+                if (roomMember.canRenderVideo) {
+                    roomMember.subscribe(viewModel.roomExpress, getSubscribeVideoOptions(), isVideoStream = true)
                 }
-                roomMember.subscribe(viewModel.roomExpress, options)
+                roomMember.subscribe(viewModel.roomExpress, getSubscribeAudioOptions(), isVideoStream = false)
             }
 
             Timber.d("Starting member preview: $roomMember")

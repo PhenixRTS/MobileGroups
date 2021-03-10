@@ -37,6 +37,7 @@ fun getPublishToRoomOptions(userScreenName: String, roomOptions: RoomOptions, pu
 
 fun getSubscribeVideoOptions(): SubscribeToMemberStreamOptions =
     RoomExpressFactory.createSubscribeToMemberStreamOptionsBuilder()
+        .withCapabilities(arrayOf("video-only"))
         .buildSubscribeToMemberStreamOptions()
 
 fun getSubscribeAudioOptions(): SubscribeToMemberStreamOptions =

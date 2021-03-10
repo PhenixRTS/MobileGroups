@@ -22,7 +22,7 @@ android {
         buildConfigField "String", "BACKEND_URL", "\"https://demo.phenixrts.com/pcast\""
         buildConfigField "String", "PCAST_URL", "\"\""
         buildConfigField "int", "EXPIRATION_DAYS", "10"
-        buildConfigField "int", "MAX_VIDEO_MEMBERS", "4"
+        buildConfigField "int", "MAX_VIDEO_MEMBERS", "6"
     }
     buildTypes {
         release {
