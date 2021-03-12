@@ -81,7 +81,12 @@ enum PhenixOptionBuilder {
     static func createSubscribeToMemberAudioStreamOptions() -> PhenixSubscribeToMemberStreamOptions {
         PhenixRoomExpressFactory.createSubscribeToMemberStreamOptionsBuilder()
             .withCapabilities(["audio-only"])
-            .withAudioOnlyRenderer()
+            .buildSubscribeToMemberStreamOptions()
+    }
+
+    static func createSubscribeToMemberVideoStreamOptions() -> PhenixSubscribeToMemberStreamOptions {
+        PhenixRoomExpressFactory.createSubscribeToMemberStreamOptionsBuilder()
+            .withCapabilities(["video-only"])
             .buildSubscribeToMemberStreamOptions()
     }
 }

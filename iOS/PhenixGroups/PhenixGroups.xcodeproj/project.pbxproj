@@ -66,7 +66,7 @@
 		B5704D342464346500D9703A /* Decode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D332464346500D9703A /* Decode.swift */; };
 		B5704D682465369000D9703A /* ActiveMeetingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D672465369000D9703A /* ActiveMeetingView.swift */; };
 		B5704D7B2465701400D9703A /* ControlButtonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D7A2465701400D9703A /* ControlButtonTests.swift */; };
-		B57508BA258A369B00056C8C /* AudioLevelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B57508B9258A369B00056C8C /* AudioLevelProvider.swift */; };
+		B57508BA258A369B00056C8C /* MemberStreamAudioLevelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B57508B9258A369B00056C8C /* MemberStreamAudioLevelProvider.swift */; };
 		B5775DF725A702A70015FE8E /* ShowDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5775DF625A702A70015FE8E /* ShowDebugMenu.swift */; };
 		B5775E0125A704ED0015FE8E /* PhenixDebugging.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5775E0025A704ED0015FE8E /* PhenixDebugging.swift */; };
 		B5775E0F25A72BC40015FE8E /* UIApplication+Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5775E0E25A72BC40015FE8E /* UIApplication+Version.swift */; };
@@ -104,6 +104,13 @@
 		B5C25EF5245B010600542E1C /* ControlButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C25EF4245B010600542E1C /* ControlButton.swift */; };
 		B5C25EFD245B33D900542E1C /* NewMeetingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C25EFC245B33D900542E1C /* NewMeetingView.swift */; };
 		B5D4F99F249353BE002FDCB6 /* PageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D4F99E249353BE002FDCB6 /* PageViewController.swift */; };
+		B5D51C0B25FA0F3700AD1210 /* MemberStreamSubscriptionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D51C0A25FA0F3700AD1210 /* MemberStreamSubscriptionProvider.swift */; };
+		B5D51C1525FA1B5200AD1210 /* RoomMemberStreamSubscriptionController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D51C1425FA1B5200AD1210 /* RoomMemberStreamSubscriptionController.swift */; };
+		B5D51C1F25FA2F2400AD1210 /* RoomMemberStreamSubscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D51C1E25FA2F2400AD1210 /* RoomMemberStreamSubscription.swift */; };
+		B5D51C2925FA77F900AD1210 /* MemberStreamVideoStateProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D51C2825FA77F900AD1210 /* MemberStreamVideoStateProvider.swift */; };
+		B5D51C4325FB49EA00AD1210 /* MemberStreamAudioStateProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D51C4225FB49EA00AD1210 /* MemberStreamAudioStateProvider.swift */; };
+		B5D51C4D25FB8AA700AD1210 /* PhenixRequestStatusLocalized.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D51C4C25FB8AA700AD1210 /* PhenixRequestStatusLocalized.swift */; };
+		B5D51C5725FB98DE00AD1210 /* RoomMemberDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D51C5625FB98DE00AD1210 /* RoomMemberDescription.swift */; };
 		B5DDA24B24B49FB900809648 /* RoomMemberAudioObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DDA24A24B49FB900809648 /* RoomMemberAudioObserver.swift */; };
 		B5DDA24D24B4B11B00809648 /* RoomMemberVideoObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DDA24C24B4B11B00809648 /* RoomMemberVideoObserver.swift */; };
 		B5DE1DE724F7C9E400FE50A5 /* PhenixOptionBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DE1DE624F7C9E400FE50A5 /* PhenixOptionBuilder.swift */; };
@@ -240,7 +247,7 @@
 		B5704D6F24656FBE00D9703A /* PhenixGroupsUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PhenixGroupsUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5704D7324656FBE00D9703A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B5704D7A2465701400D9703A /* ControlButtonTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlButtonTests.swift; sourceTree = "<group>"; };
-		B57508B9258A369B00056C8C /* AudioLevelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioLevelProvider.swift; sourceTree = "<group>"; };
+		B57508B9258A369B00056C8C /* MemberStreamAudioLevelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberStreamAudioLevelProvider.swift; sourceTree = "<group>"; };
 		B5775DF625A702A70015FE8E /* ShowDebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowDebugMenu.swift; sourceTree = "<group>"; };
 		B5775E0025A704ED0015FE8E /* PhenixDebugging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixDebugging.swift; sourceTree = "<group>"; };
 		B5775E0E25A72BC40015FE8E /* UIApplication+Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Version.swift"; sourceTree = "<group>"; };
@@ -279,6 +286,13 @@
 		B5C25EF4245B010600542E1C /* ControlButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlButton.swift; sourceTree = "<group>"; };
 		B5C25EFC245B33D900542E1C /* NewMeetingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMeetingView.swift; sourceTree = "<group>"; };
 		B5D4F99E249353BE002FDCB6 /* PageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageViewController.swift; sourceTree = "<group>"; };
+		B5D51C0A25FA0F3700AD1210 /* MemberStreamSubscriptionProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberStreamSubscriptionProvider.swift; sourceTree = "<group>"; };
+		B5D51C1425FA1B5200AD1210 /* RoomMemberStreamSubscriptionController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberStreamSubscriptionController.swift; sourceTree = "<group>"; };
+		B5D51C1E25FA2F2400AD1210 /* RoomMemberStreamSubscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberStreamSubscription.swift; sourceTree = "<group>"; };
+		B5D51C2825FA77F900AD1210 /* MemberStreamVideoStateProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberStreamVideoStateProvider.swift; sourceTree = "<group>"; };
+		B5D51C4225FB49EA00AD1210 /* MemberStreamAudioStateProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberStreamAudioStateProvider.swift; sourceTree = "<group>"; };
+		B5D51C4C25FB8AA700AD1210 /* PhenixRequestStatusLocalized.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhenixRequestStatusLocalized.swift; sourceTree = "<group>"; };
+		B5D51C5625FB98DE00AD1210 /* RoomMemberDescription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberDescription.swift; sourceTree = "<group>"; };
 		B5DDA24A24B49FB900809648 /* RoomMemberAudioObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberAudioObserver.swift; sourceTree = "<group>"; };
 		B5DDA24C24B4B11B00809648 /* RoomMemberVideoObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberVideoObserver.swift; sourceTree = "<group>"; };
 		B5DE1DE624F7C9E400FE50A5 /* PhenixOptionBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhenixOptionBuilder.swift; sourceTree = "<group>"; };
@@ -423,6 +437,7 @@
 			children = (
 				B5AC268B2552D59A003E2AEA /* Phenix Groups.entitlements */,
 				B53D8F4F244DCBA30055CE66 /* AppDelegate.swift */,
+				B54D599F2451B7C900454066 /* Launcher.swift */,
 				B5BB0830244F27BD0094F254 /* Coordinators */,
 				B5B491C325DFAF9100D757C5 /* Deeplink */,
 				B5BB082F244F27B30094F254 /* Managers */,
@@ -470,6 +485,7 @@
 				B54D59AC2453040100454066 /* PhenixConfiguration.swift */,
 				B54D598A2450626C00454066 /* PhenixManager.swift */,
 				B5DE1DE624F7C9E400FE50A5 /* PhenixOptionBuilder.swift */,
+				B5D51C4C25FB8AA700AD1210 /* PhenixRequestStatusLocalized.swift */,
 				B5777E71246D6015000B4CA9 /* UserMediaStreamController.swift */,
 				B594ABBA2499F52A0042ED1F /* VideoLayer.swift */,
 				B57936052485499A001044C2 /* Joined Room */,
@@ -510,6 +526,7 @@
 				B54D599724519E9000454066 /* OSLog.swift */,
 				B510D0CF248E65AD003FAEC0 /* PhenixDisposables.swift */,
 				B54D59A62451D78100454066 /* RoomAlias.swift */,
+				B5D51C5625FB98DE00AD1210 /* RoomMemberDescription.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -638,7 +655,10 @@
 		B5775A2925A346760015FE8E /* Providers */ = {
 			isa = PBXGroup;
 			children = (
-				B57508B9258A369B00056C8C /* AudioLevelProvider.swift */,
+				B57508B9258A369B00056C8C /* MemberStreamAudioLevelProvider.swift */,
+				B5D51C4225FB49EA00AD1210 /* MemberStreamAudioStateProvider.swift */,
+				B5D51C0A25FA0F3700AD1210 /* MemberStreamSubscriptionProvider.swift */,
+				B5D51C2825FA77F900AD1210 /* MemberStreamVideoStateProvider.swift */,
 			);
 			path = Providers;
 			sourceTree = "<group>";
@@ -746,7 +766,6 @@
 			children = (
 				B510D0E5248FC258003FAEC0 /* ActivityIndicatorController.swift */,
 				B54D599D2451B5D100454066 /* DependencyContainer.swift */,
-				B54D599F2451B7C900454066 /* Launcher.swift */,
 				B50195ED24585C6200DDF6AB /* Preferences.swift */,
 			);
 			path = Managers;
@@ -830,6 +849,8 @@
 			children = (
 				B579360B2486AD59001044C2 /* RoomMember.swift */,
 				B516172A2588E20D0099E56B /* RoomMemberMediaController.swift */,
+				B5D51C1E25FA2F2400AD1210 /* RoomMemberStreamSubscription.swift */,
+				B5D51C1425FA1B5200AD1210 /* RoomMemberStreamSubscriptionController.swift */,
 				B5C0C63125273D7900D7543A /* Observers */,
 				B5775A2925A346760015FE8E /* Providers */,
 			);
@@ -1327,6 +1348,9 @@
 				B531ECCD25F8A52D004524A9 /* PhenixOnlineStatusChanges.swift in Sources */,
 				B5E4EA722473F17C00F48B38 /* JoinedRoom.swift in Sources */,
 				B52204F225F6058200E32F86 /* PhenixMediaChanges.swift in Sources */,
+				B5D51C5725FB98DE00AD1210 /* RoomMemberDescription.swift in Sources */,
+				B5D51C4D25FB8AA700AD1210 /* PhenixRequestStatusLocalized.swift in Sources */,
+				B5D51C0B25FA0F3700AD1210 /* MemberStreamSubscriptionProvider.swift in Sources */,
 				B5170FC92559674100255FC0 /* RoomMediaController.swift in Sources */,
 				B5385A24258B95E700DFBDE1 /* RoomMemberAudioLevelObserver.swift in Sources */,
 				B5DE1DE724F7C9E400FE50A5 /* PhenixOptionBuilder.swift in Sources */,
@@ -1341,17 +1365,21 @@
 				B531ECC325F8A346004524A9 /* PhenixOnlineStatusObserver.swift in Sources */,
 				B5793608248549C5001044C2 /* JoinedRoomMembersDelegate.swift in Sources */,
 				B579360A248549F2001044C2 /* JoinedRoomDelegate.swift in Sources */,
+				B5D51C1F25FA2F2400AD1210 /* RoomMemberStreamSubscription.swift in Sources */,
 				B54D59AD2453040100454066 /* PhenixConfiguration.swift in Sources */,
 				B516172B2588E20D0099E56B /* RoomMemberMediaController.swift in Sources */,
 				B5777E72246D6015000B4CA9 /* UserMediaStreamController.swift in Sources */,
 				B5E4EA48246EC12200F48B38 /* PhenixRoomPublishing.swift in Sources */,
+				B5D51C4325FB49EA00AD1210 /* MemberStreamAudioStateProvider.swift in Sources */,
 				B54D599324507D3700454066 /* PhenixRoomCreation.swift in Sources */,
 				B54D59A72451D78100454066 /* RoomAlias.swift in Sources */,
+				B5D51C2925FA77F900AD1210 /* MemberStreamVideoStateProvider.swift in Sources */,
 				B5DDA24D24B4B11B00809648 /* RoomMemberVideoObserver.swift in Sources */,
 				B594ABBB2499F52A0042ED1F /* VideoLayer.swift in Sources */,
-				B57508BA258A369B00056C8C /* AudioLevelProvider.swift in Sources */,
+				B57508BA258A369B00056C8C /* MemberStreamAudioLevelProvider.swift in Sources */,
 				B510D0D0248E65AD003FAEC0 /* PhenixDisposables.swift in Sources */,
 				B5170FDD25596D7400255FC0 /* RoomMemberController.swift in Sources */,
+				B5D51C1525FA1B5200AD1210 /* RoomMemberStreamSubscriptionController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -79,7 +79,7 @@ internal extension JoinedRoom {
 // MARK: - CustomStringConvertible
 extension JoinedRoom: CustomStringConvertible {
     public var description: String {
-        "Joined Room, backend: \(backend.absoluteURL), alias: \(alias)"
+        "Joined Room(backend: \(backend.absoluteURL), alias: \(alias))"
     }
 }
 

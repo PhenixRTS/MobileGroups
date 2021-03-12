@@ -2,19 +2,50 @@
 //  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
+import Foundation
+import os.log
 import PhenixSdk
 
-class AudioLevelProvider {
+class MemberStreamAudioLevelProvider: RoomMemberDescription {
     static let minimumDecibel: Double = -100.0
     static let maximumDecibel: Double = 0.0
 
     private let queue: DispatchQueue
+    private let renderer: PhenixRenderer
+    private let audioTracks: [PhenixMediaStreamTrack]
+
+    internal weak var memberRepresentation: RoomMemberRepresentation?
     internal var audioProcessCompletion: ((Double) -> Void)?
 
-    init(queue: DispatchQueue) {
+    init(renderer: PhenixRenderer, audioTracks: [PhenixMediaStreamTrack], queue: DispatchQueue) {
         self.queue = queue
+        self.renderer = renderer
+        self.audioTracks = audioTracks
     }
 
+    func observeLevel() {
+        queue.async { [weak self] in
+            guard let self = self else { return }
+
+            guard let track = self.audioTracks.first else { return }
+
+            os_log(.debug, log: .roomMemberStreamAudioLevelProvider, "Observe audio level changes, (%{PRIVATE}s)", self.memberDescription)
+            self.renderer.setFrameReadyCallback(track, self.didReceiveAudioFrame)
+        }
+    }
+
+    func dispose() {
+        dispatchPrecondition(condition: .onQueue(queue))
+
+        os_log(.debug, log: .roomMemberStreamAudioLevelProvider, "Dispose, (%{PRIVATE}s)", self.memberDescription)
+
+        for track in audioTracks {
+            renderer.setFrameReadyCallback(track, nil)
+        }
+    }
+}
+
+private extension MemberStreamAudioLevelProvider {
     func process(_ sampleBuffer: CMSampleBuffer) {
         queue.async { [weak self] in
             guard let self = self else { return }
@@ -24,7 +55,11 @@ class AudioLevelProvider {
             var lengthAtOffset = Int()
             var dataPointer: UnsafeMutablePointer<Int8>?
 
-            guard CMBlockBufferGetDataPointer(dataBuffer, atOffset: 0, lengthAtOffsetOut: &lengthAtOffset, totalLengthOut: &totalLength, dataPointerOut: &dataPointer) == kCMBlockBufferNoErr
+            guard CMBlockBufferGetDataPointer(dataBuffer,
+                                              atOffset: 0,
+                                              lengthAtOffsetOut: &lengthAtOffset,
+                                              totalLengthOut: &totalLength,
+                                              dataPointerOut: &dataPointer) == kCMBlockBufferNoErr
                     && lengthAtOffset == totalLength else { return }
 
             guard let formatDescription: CMAudioFormatDescription = CMSampleBufferGetFormatDescription(sampleBuffer) else { return }
@@ -43,9 +78,7 @@ class AudioLevelProvider {
             self.handle16BitIntegerAudio(data: dataPointer, length: totalLength, description: audioStreamBasicDescription.pointee)
         }
     }
-}
 
-private extension AudioLevelProvider {
     func handle16BitIntegerAudio(data: UnsafeMutablePointer<Int8>?, length: Int, description: AudioStreamBasicDescription) {
         dispatchPrecondition(condition: .onQueue(queue))
 
@@ -82,6 +115,17 @@ private extension AudioLevelProvider {
         return data.withMemoryRebound(to: T.self, capacity: length / MemoryLayout<T>.stride) { pointer -> [T] in
             let buffer = UnsafeBufferPointer(start: pointer, count: length / MemoryLayout<T>.stride)
             return Array(buffer)
+        }
+    }
+}
+
+// MARK: - Observable callbacks
+private extension MemberStreamAudioLevelProvider {
+    func didReceiveAudioFrame(_ notification: PhenixFrameNotification?) {
+        notification?.read { [weak self] sampleBuffer in
+            guard let sampleBuffer = sampleBuffer else { return }
+
+            self?.process(sampleBuffer)
         }
     }
 }

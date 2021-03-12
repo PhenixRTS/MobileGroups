@@ -5,5 +5,5 @@
 import Foundation
 
 protocol MeetingFinished: AnyObject {
-    func meetingFinished(_ meeting: Meeting, withReason reason: String?)
+    func meetingFinished(_ meeting: Meeting, withReason reason: (title: String, message: String?)?)
 }

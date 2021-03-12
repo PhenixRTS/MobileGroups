@@ -2,65 +2,59 @@
 //  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
+import Foundation
 import os.log
 import PhenixSdk
 
-internal protocol RoomMemberMediaDelegate: AnyObject {
+protocol RoomMemberMediaDelegate: AnyObject {
     func audioStateDidChange(enabled: Bool)
     func videoStateDidChange(enabled: Bool)
     func audioLevelDidChange(decibel: Double)
 }
 
-public class RoomMemberMediaController {
-    private weak var renderer: PhenixRenderer?
+public protocol MediaAvailability {
+    var isAudioAvailable: Bool { get }
+    var isVideoAvailable: Bool { get }
+}
 
-    private let stream: PhenixStream
+public protocol RecentAudioLevelProvider {
+    func recentAudioLevel() -> Double
+}
+
+public class RoomMemberMediaController: MediaAvailability, RecentAudioLevelProvider, RoomMemberDescription {
     private let queue: DispatchQueue
-    private let audioTracks: [PhenixMediaStreamTrack]?
     private let audioLevelQueue: DispatchQueue
-    private let audioLevelProvider: AudioLevelProvider
-    private var mediaDisposables: [PhenixDisposable]
     private var audioLevelCache: [Double]
+
+    private var videoStateProvider: MemberStreamVideoStateProvider?
+    private var audioStateProvider: MemberStreamAudioStateProvider?
+    private var audioLevelProvider: MemberStreamAudioLevelProvider?
 
     internal weak var delegate: RoomMemberMediaDelegate?
     internal weak var memberRepresentation: RoomMemberRepresentation?
 
     public private(set) var isAudioAvailable = false {
         didSet {
-            os_log(.debug, log: .roomMemberMediaController, "Audio state changed, (%{PRIVATE}s), (%{PRIVATE}s)", self.description, self.memberDescription)
+            os_log(.debug, log: .roomMemberMediaController, "Audio state changed, (%{PRIVATE}s), (%{PRIVATE}s)", memberDescription, description)
             delegate?.audioStateDidChange(enabled: isAudioAvailable)
         }
     }
     public private(set) var isVideoAvailable = false {
         didSet {
-            os_log(.debug, log: .roomMemberMediaController, "Video state changed, (%{PRIVATE}s), (%{PRIVATE}s)", self.description, self.memberDescription)
+            os_log(.debug, log: .roomMemberMediaController, "Video state changed, (%{PRIVATE}s), (%{PRIVATE}s)", memberDescription, description)
             delegate?.videoStateDidChange(enabled: isVideoAvailable)
         }
     }
 
-    init(
-        stream: PhenixStream,
-        renderer: PhenixRenderer?,
-        audioTracks: [PhenixMediaStreamTrack]?,
-        queue: DispatchQueue = .main
-    ) {
+    init(queue: DispatchQueue = .main) {
         self.queue = queue
-        self.stream = stream
-        self.renderer = renderer
-        self.audioTracks = audioTracks
         self.audioLevelQueue = DispatchQueue(
             label: "com.phenixrts.suite.groups.core.RoomMemberMediaController.AudioLevelProvider",
             qos: .userInitiated,
             attributes: .concurrent,
             target: queue
         )
-        self.audioLevelProvider = AudioLevelProvider(queue: queue)
-        self.mediaDisposables = []
         self.audioLevelCache = []
-
-        self.audioLevelProvider.audioProcessCompletion = { [weak self] decibel in
-            self?.processAudioLevel(decibel: decibel)
-        }
     }
 
     /// Retrieves recent max audio level in range -100...0 where -100 is the lowest but the 0 is the highest
@@ -68,8 +62,13 @@ public class RoomMemberMediaController {
     /// Be aware that after retrieving the audio level it will purge the cache of all saved audio levels till now.
     /// - Returns: Decibels
     public func recentAudioLevel() -> Double {
+        // Retrieve max audio decibel value and return it.
+        // After we have calculated the max value, clear
+        // the cache so that next time we would receive
+        // new max audio level value.
+
         let maxDecibel = audioLevelQueue.sync {
-            audioLevelCache.max() ?? AudioLevelProvider.minimumDecibel
+            audioLevelCache.max() ?? MemberStreamAudioLevelProvider.minimumDecibel
         }
 
         audioLevelQueue.async(flags: [.barrier]) { [weak self] in
@@ -78,56 +77,50 @@ public class RoomMemberMediaController {
 
         return maxDecibel
     }
+
+    func setAudioLevelProvider(_ provider: MemberStreamAudioLevelProvider) {
+        self.audioLevelProvider = provider
+
+        os_log(.debug, log: .roomMemberMediaController, "Audio level provider set, (%{PRIVATE}s), (%{PRIVATE}s)", memberDescription, description)
+
+        provider.audioProcessCompletion = { [weak self] decibel in
+            self?.processAudioLevel(decibel: decibel)
+        }
+        provider.observeLevel()
+    }
+
+    func setAudioStateProvider(_ provider: MemberStreamAudioStateProvider) {
+        self.audioStateProvider = provider
+
+        os_log(.debug, log: .roomMemberMediaController, "Audio state provider set, (%{PRIVATE}s), (%{PRIVATE}s)", memberDescription, description)
+
+        provider.stateChangeHandler = { [weak self] enabled in
+            self?.isAudioAvailable = enabled
+        }
+        provider.observeState()
+    }
+
+    func setVideoStateProvider(_ provider: MemberStreamVideoStateProvider) {
+        self.videoStateProvider = provider
+
+        os_log(.debug, log: .roomMemberMediaController, "Video state provider set, (%{PRIVATE}s), (%{PRIVATE}s)", memberDescription, description)
+
+        provider.stateChangeHandler = { [weak self] enabled in
+            self?.isVideoAvailable = enabled
+        }
+        provider.observeState()
+    }
 }
 
 // MARK: - CustomStringConvertible
 extension RoomMemberMediaController: CustomStringConvertible {
     public var description: String {
-        "RoomMemberMediaController, audio: \(isAudioAvailable), video: \(isVideoAvailable)"
+        "RoomMemberMediaController(audio: \(isAudioAvailable), video: \(isVideoAvailable))"
     }
 }
 
 // MARK: - Internal methods
 internal extension RoomMemberMediaController {
-    func observeAudioStream() {
-        queue.async { [weak self] in
-            guard let self = self else { return }
-
-            os_log(.debug, log: .roomMemberMediaController, "Observe audio state changes, (%{PRIVATE}s)", self.memberDescription)
-            self.stream
-                .getObservableAudioState()
-                .subscribe(self.audioStateDidChange)
-                .append(to: &self.mediaDisposables)
-        }
-    }
-
-    func observeVideoStream() {
-        queue.async { [weak self] in
-            guard let self = self else { return }
-
-            os_log(.debug, log: .roomMemberMediaController, "Observe video state changes, (%{PRIVATE}s)", self.memberDescription)
-            self.stream
-                .getObservableVideoState()
-                .subscribe(self.videoStateDidChange)
-                .append(to: &self.mediaDisposables)
-        }
-    }
-
-    func observeAudioLevel() {
-        queue.async { [weak self] in
-            guard let self = self else { return }
-
-            guard let renderer = self.renderer else {
-                os_log(.error, log: .roomMemberMediaController, "%{PRIVATE}s, renderer not provided, (%{PRIVATE}s)", #function, self.memberDescription)
-                return
-            }
-            guard let track = self.audioTracks?.first else { return }
-
-            os_log(.debug, log: .roomMemberMediaController, "Observe audio level changes, (%{PRIVATE}s)", self.memberDescription)
-            renderer.setFrameReadyCallback(track, self.didReceiveAudioFrame)
-        }
-    }
-
     func processAudioLevel(decibel: Double) {
         queue.async { [weak self] in
             self?.audioLevelQueue.async(flags: [.barrier]) {
@@ -140,44 +133,15 @@ internal extension RoomMemberMediaController {
     func dispose() {
         dispatchPrecondition(condition: .onQueue(queue))
 
-        os_log(.debug, log: .roomMemberMediaController, "Dispose, (%{PRIVATE}s), (%{PRIVATE}s)", self.description, self.memberDescription)
-        self.mediaDisposables.removeAll()
+        os_log(.debug, log: .roomMemberMediaController, "Dispose, (%{PRIVATE}s), (%{PRIVATE}s)", memberDescription, description)
 
-        if let track = self.audioTracks?.first {
-            self.renderer?.setFrameReadyCallback(track, nil)
-        }
-    }
-}
+        videoStateProvider?.dispose()
+        videoStateProvider = nil
 
-// MARK: - Private methods
-private extension RoomMemberMediaController {
-    var memberDescription: String { memberRepresentation?.identifier ?? "-" }
-}
+        audioStateProvider?.dispose()
+        audioStateProvider = nil
 
-// MARK: - Observable callbacks
-private extension RoomMemberMediaController {
-    func audioStateDidChange(_ changes: PhenixObservableChange<NSNumber>?) {
-        queue.async { [weak self] in
-            guard let value = changes?.value else { return }
-            guard let state = PhenixTrackState(rawValue: Int(truncating: value)) else { return }
-
-            self?.isAudioAvailable = state == .enabled
-        }
-    }
-
-    func videoStateDidChange(_ changes: PhenixObservableChange<NSNumber>?) {
-        queue.async { [weak self] in
-            guard let value = changes?.value else { return }
-            guard let state = PhenixTrackState(rawValue: Int(truncating: value)) else { return }
-
-            self?.isVideoAvailable = state == .enabled
-        }
-    }
-
-    func didReceiveAudioFrame(_ notification: PhenixFrameNotification?) {
-        notification?.read { [weak self] sampleBuffer in
-            guard let sampleBuffer = sampleBuffer else { return }
-            self?.audioLevelProvider.process(sampleBuffer)
-        }
+        audioLevelProvider?.dispose()
+        audioLevelProvider = nil
     }
 }

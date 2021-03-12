@@ -146,7 +146,7 @@ extension MainCoordinator: JoinCancellation {
 }
 
 extension MainCoordinator: MeetingFinished {
-    func meetingFinished(_ meeting: Meeting, withReason reason: String?) {
+    func meetingFinished(_ meeting: Meeting, withReason reason: (title: String, message: String?)?) {
         var meetings = preferences.meetings
 
         if let savedMeetingIndex = meetings.firstIndex(where: { $0.code == meeting.code }) {
@@ -166,7 +166,10 @@ extension MainCoordinator: MeetingFinished {
 
             UIView.transition(with: self.navigationController.view, animations: animation) {
                 if let reason = reason {
-                    AppDelegate.present(alertWithTitle: reason)
+                    AppDelegate.present(
+                        alertWithTitle: reason.title,
+                        message: reason.message
+                    )
                 }
             }
         }

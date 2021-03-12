@@ -9,10 +9,13 @@ import PhenixSdk
 
 public final class PhenixManager: PhenixMediaChanges, PhenixOnlineStatusChanges {
     public typealias UnrecoverableErrorHandler = (_ description: String?) -> Void
+    public typealias MediaCreationTimeoutHandler = () -> Void
 
     private var joinedRoom: JoinedRoom?
     private var chatService: PhenixChatService?
     private var onlineStatusDisposable: PhenixDisposable?
+    private var enableMediaCreationOnOnlineStatusChange: Bool = false
+    private var mediaCreationTimeoutHandler: MediaCreationTimeoutHandler?
 
     internal let queue: DispatchQueue
     internal private(set) var roomExpress: PhenixRoomExpress!
@@ -37,12 +40,23 @@ public final class PhenixManager: PhenixMediaChanges, PhenixOnlineStatusChanges 
         self.userStreamMediaObservations = [:]
     }
 
-    /// Creates necessary instances of PhenixSdk which provides connection and media streaming possibilities
+    /// Initializes necessary instances of the PhenixSdk which provides connection and media streaming possibilities.
     ///
-    /// Method needs to be executed before trying to create or join rooms.
-    public func start(unrecoverableErrorCompletion: @escaping UnrecoverableErrorHandler) {
+    /// Needs to be executed before trying to create, join or publish to a room.
+    /// - Parameters:
+    ///   - unrecoverableErrorCompletion: PhenixSdk unrecoverable error callback
+    ///   - mediaCreationTimeoutHandler: If media stream creation reaches timeout and cannot initialize itself, executed callback.
+    public func start(
+        unrecoverableErrorCompletion: @escaping UnrecoverableErrorHandler,
+        mediaCreationTimeoutHandler: MediaCreationTimeoutHandler?
+    ) {
         os_log(.debug, log: .phenixManager, "Setup Room Express")
-        setupRoomExpress(backend: backend, unrecoverableErrorCompletion)
+        self.mediaCreationTimeoutHandler = mediaCreationTimeoutHandler
+
+        queue.sync {
+            self.setupRoomExpress(backend: backend, unrecoverableErrorCompletion)
+            self.processMedia()
+        }
     }
 }
 
@@ -55,7 +69,13 @@ internal extension PhenixManager {
         joinedRoom = room
     }
 
-    func makeJoinedRoom(roomService: PhenixRoomService, roomExpress: PhenixRoomExpress, backend: URL, publisher: PhenixExpressPublisher? = nil, userMedia: UserMediaProvider? = nil) -> JoinedRoom {
+    func makeJoinedRoom(
+        roomExpress: PhenixRoomExpress,
+        roomService: PhenixRoomService,
+        backend: URL,
+        publisher: PhenixExpressPublisher? = nil,
+        userMedia: UserMediaProvider? = nil
+    ) -> JoinedRoom {
         dispatchPrecondition(condition: .onQueue(queue))
 
         let queue = self.queue
@@ -63,9 +83,9 @@ internal extension PhenixManager {
         // Re-use the same chat service or create a new one if the room was left previously.
         let chatService: PhenixChatService = self.chatService ?? PhenixChatService(roomService: roomService)
 
-        // Save chat service if it don't exist already.
+        // Save chat service if it doesn't exist already.
         if self.chatService == nil {
-            os_log(.debug, log: .phenixManager, "Chat service does not exist, create a new one")
+            os_log(.debug, log: .phenixManager, "Chat service does not exist, created a new one")
             self.chatService = chatService
         }
 
@@ -84,9 +104,9 @@ internal extension PhenixManager {
         let memberController = RoomMemberController(
             roomService: roomService,
             roomExpress: roomExpress,
+            userMedia: userMedia,
             maxVideoSubscriptions: maxVideoSubscriptions,
-            queue: queue,
-            userMedia: userMedia
+            queue: queue
         )
 
         // Create a joined room, which is the connected room instance and also it holds the media and member controllers.
@@ -124,7 +144,6 @@ private extension PhenixManager {
             unrecoverableErrorCallback: unrecoverableErrorCompletion
         )
         let roomExpressOptions = PhenixOptionBuilder.createRoomExpressOptions(with: pcastExpressOptions)
-
         roomExpress = PhenixRoomExpressFactory.createRoomExpress(roomExpressOptions)
 
         onlineStatusDisposable = roomExpress.pcastExpress
@@ -138,7 +157,9 @@ private extension PhenixManager {
         roomExpress.pcastExpress.getUserMedia(options) { status, userMediaStream in
             if status == .ok, let stream = userMediaStream {
                 os_log(.debug, log: .phenixManager, "User Media Stream initialized")
+
                 let controller = UserMediaStreamController(stream)
+                controller.subscribeForMediaFrameNotification()
 
                 completion(controller)
                 return
@@ -173,7 +194,17 @@ private extension PhenixManager {
 
         var mediaController: UserMediaStreamController!
 
+        // We need to always dispose and remove the existing user media
+        // stream from the memory before we try to create a new media
+        // stream. Right now Phenix SDK (v2021.0.1) does not allow
+        // multiple simultaneous media streams, because they share some
+        // facilities.
+        // By not doing it like this, when first media stream will
+        // get deallocated - it will also kill the second media stream.
+        // This situation can be triggered by losing network connection
+        // in an active room.
         userMediaStreamController?.dispose()
+        userMediaStreamController = nil
 
         let group = DispatchGroup()
         group.enter()
@@ -184,7 +215,20 @@ private extension PhenixManager {
         }
 
         if group.wait(timeout: .now() + 30) == .timedOut {
-            fatalError("Fatal error. Could not retrieve user media stream.")
+            os_log(
+                .debug,
+                log: .phenixManager,
+                "Could not retrieve user media stream before it reaches the timeout."
+            )
+
+            // Enable the possibility to create new media
+            // stream, so that if it failed on the first
+            // time right after application launch,
+            // it can retry to create it again when online
+            // status changes in future.
+            enableMediaCreationOnOnlineStatusChange = true
+            mediaCreationTimeoutHandler?()
+            return
         }
 
         userMediaStreamController = mediaController
@@ -205,7 +249,27 @@ private extension PhenixManager {
 
             guard isOnline == true else { return }
 
-            self.processMedia()
+            // Do not try to create user media for the first time
+            // when the "onlineStatusDidChange" is executed.
+            // We are creating the media already in the
+            // `func start(unrecoverableErrorCompletion:)` method
+            // right after the PhenixRoomExpress is created.
+            // PCastExpress executes this callback method
+            // right after the PhenixRoomExpress gets created
+            // if device meets the necessary conditions.
+            // So that can result in a race condition for media
+            // creation. To prevent that, we must ignore the
+            // first time when this callback is executed and not
+            // try to create the media once more.
+
+            if self.enableMediaCreationOnOnlineStatusChange {
+                self.processMedia()
+            } else {
+                // After first time "onlineStatusDidChange" is executed,
+                // we can allow to generate new media on future
+                // executions.
+                self.enableMediaCreationOnOnlineStatusChange = true
+            }
         }
     }
 }

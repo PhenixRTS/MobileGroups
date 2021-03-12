@@ -64,14 +64,14 @@ class ActiveMeetingMemberTableViewCell: UITableViewCell, CellIdentified {
     }
 
     func configureAudio() {
-        showMicrophone(enabled: member.media?.isAudioAvailable)
+        showMicrophone(enabled: member.media.isAudioAvailable)
         member.addAudioObserver(self)
         member.addAudioLevelObserver(self)
     }
 
     func configureVideo() {
         setCamera(layer: member.previewLayer)
-        showCamera(member.media?.isVideoAvailable ?? false)
+        showCamera(member.media.isVideoAvailable)
         member.addVideoObserver(self)
     }
 
