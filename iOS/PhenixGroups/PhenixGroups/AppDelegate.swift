@@ -30,6 +30,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             fatalError(message, file: file, line: line)
         })
 
+        window.rootViewController?.presentedViewController?.dismiss(animated: false)
         window.rootViewController?.present(alert, animated: true)
     }
 
@@ -42,7 +43,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
 
-        window.rootViewController?.present(alert, animated: true)
+        if let vc = window.rootViewController?.presentedViewController {
+            vc.present(alert, animated: true)
+        } else {
+            window.rootViewController?.present(alert, animated: true)
+        }
     }
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
