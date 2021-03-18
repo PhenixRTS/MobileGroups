@@ -33,6 +33,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window.rootViewController?.present(alert, animated: true)
     }
 
+    static func present(alertWithTitle title: String, message: String? = nil) {
+        guard let delegate = UIApplication.shared.delegate as? AppDelegate,
+              let window = delegate.window else {
+            fatalError("Fatal error. Could not load window instance.")
+        }
+
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+
+        window.rootViewController?.present(alert, animated: true)
+    }
+
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Setup main window
         let window = UIWindow(frame: UIScreen.main.bounds)

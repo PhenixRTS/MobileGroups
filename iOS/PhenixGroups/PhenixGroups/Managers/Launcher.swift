@@ -56,8 +56,8 @@ class Launcher {
             // Configure necessary object instances
             os_log(.debug, log: .launcher, "Configure Phenix instance")
 
-            let backend = self.deeplink?.backend ?? PhenixConfiguration.backend
             let pcast = self.deeplink?.uri ?? PhenixConfiguration.pcast
+            let backend = self.deeplink?.backend ?? PhenixConfiguration.backend
             let maxVideoMembers = self.deeplink?.maxVideoMembers ?? 12
 
             let manager = PhenixManager(backend: backend, pcast: pcast, maxVideoSubscriptions: maxVideoMembers)

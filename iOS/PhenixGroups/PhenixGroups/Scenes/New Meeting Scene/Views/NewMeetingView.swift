@@ -19,6 +19,7 @@ class NewMeetingView: UIView {
     var cameraHandler: ControlButtonHandler?
     var openMenuHandler: (() -> Void)?
     var cameraViewMultipleTapHandler: (() -> Void)?
+    var isMediaAvailable: (() -> Bool)?
 
     private var muteImage: UIImageView!
     private var buttonShadowGradient: CAGradientLayer!
@@ -33,6 +34,8 @@ class NewMeetingView: UIView {
 
     @IBAction
     private func microphoneButtonTapped(_ sender: ControlButton) {
+        guard isMediaAvailable?() == true else { return }
+
         sender.controlState.toggle()
 
         let enabled = sender.controlState == .on
@@ -43,6 +46,8 @@ class NewMeetingView: UIView {
 
     @IBAction
     private func cameraButtonTapped(_ sender: ControlButton) {
+        guard isMediaAvailable?() == true else { return }
+
         sender.controlState.toggle()
 
         let enabled = sender.controlState == .on
@@ -118,8 +123,12 @@ class NewMeetingView: UIView {
         controlView.delegate = delegate
     }
 
-    func setCamera(layer: VideoLayer) {
-        cameraView.setCameraLayer(layer)
+    func setCamera(layer: VideoLayer?) {
+        if let layer = layer {
+            cameraView.setCameraLayer(layer)
+        } else {
+            cameraView.removeCameraLayer()
+        }
     }
 
     func setupHistoryView(_ view: UIView) {

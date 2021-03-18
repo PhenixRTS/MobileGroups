@@ -7,21 +7,24 @@ import os.log
 import PhenixChat
 import PhenixSdk
 
-public final class PhenixManager {
+public final class PhenixManager: PhenixMediaChanges, PhenixOnlineStatusChanges {
     public typealias UnrecoverableErrorHandler = (_ description: String?) -> Void
 
     private var joinedRoom: JoinedRoom?
     private var chatService: PhenixChatService?
+    private var onlineStatusDisposable: PhenixDisposable?
 
     internal let queue: DispatchQueue
     internal private(set) var roomExpress: PhenixRoomExpress!
+    internal var onlineStatusObservations: [ObjectIdentifier: OnlineStatusObserver]
+    internal var userStreamMediaObservations: [ObjectIdentifier: UserStreamMediaObserver]
 
     /// Backend URL used by Phenix SDK to communicate
     public let backend: URL
     public let pcast: URL?
     /// Maximum allowed member count with video subscription at the same time.
     public let maxVideoSubscriptions: Int
-    public private(set) var userMediaStreamController: UserMediaStreamController!
+    public private(set) var userMediaStreamController: UserMediaStreamController?
 
     /// Initializer for Phenix manager
     /// - Parameter backend: Backend URL for Phenix SDK
@@ -30,31 +33,16 @@ public final class PhenixManager {
         self.queue = DispatchQueue(label: "com.phenixrts.suite.groups.core", qos: .userInitiated)
         self.backend = backend
         self.maxVideoSubscriptions = maxVideoSubscriptions
+        self.onlineStatusObservations = [:]
+        self.userStreamMediaObservations = [:]
     }
 
     /// Creates necessary instances of PhenixSdk which provides connection and media streaming possibilities
     ///
     /// Method needs to be executed before trying to create or join rooms.
     public func start(unrecoverableErrorCompletion: @escaping UnrecoverableErrorHandler) {
-        let group = DispatchGroup()
-
-        group.enter()
-        os_log(.debug, log: .phenixManager, "Start Room Express setup")
-        setupRoomExpress(backend: backend, unrecoverableErrorCompletion) {
-            os_log(.debug, log: .phenixManager, "Room Express setup completed")
-            group.leave()
-        }
-
-        group.wait()
-
-        group.enter()
-        os_log(.debug, log: .phenixManager, "Start User Media Stream setup")
-        setupMedia(unrecoverableErrorCompletion) {
-            os_log(.debug, log: .phenixManager, "User Media Stream setup completed")
-            group.leave()
-        }
-
-        group.wait()
+        os_log(.debug, log: .phenixManager, "Setup Room Express")
+        setupRoomExpress(backend: backend, unrecoverableErrorCompletion)
     }
 }
 
@@ -129,34 +117,95 @@ internal extension PhenixManager {
 
 // MARK: - Setup methods
 private extension PhenixManager {
-    func setupRoomExpress(backend: URL, _ unrecoverableErrorCompletion: @escaping UnrecoverableErrorHandler, completion: @escaping () -> Void) {
-        let pcastExpressOptions = PhenixOptionBuilder.createPCastExpressOptions(backend: backend, pcast: pcast, unrecoverableErrorCallback: unrecoverableErrorCompletion)
+    func setupRoomExpress(backend: URL, _ unrecoverableErrorCompletion: @escaping UnrecoverableErrorHandler) {
+        let pcastExpressOptions = PhenixOptionBuilder.createPCastExpressOptions(
+            backend: backend,
+            pcast: pcast,
+            unrecoverableErrorCallback: unrecoverableErrorCompletion
+        )
         let roomExpressOptions = PhenixOptionBuilder.createRoomExpressOptions(with: pcastExpressOptions)
 
-        #warning("Remove async quick-fix when Room Express will be thread safe.")
-        DispatchQueue.main.async {
-            self.roomExpress = PhenixRoomExpressFactory.createRoomExpress(roomExpressOptions)
-            os_log(.debug, log: .phenixManager, "Room Express initialized")
+        roomExpress = PhenixRoomExpressFactory.createRoomExpress(roomExpressOptions)
 
-            completion()
+        onlineStatusDisposable = roomExpress.pcastExpress
+            .getObservableIsOnlineStatus()
+            .subscribe(onlineStatusDidChange)
+    }
+
+    func makeMedia(completion: @escaping (UserMediaStreamController?) -> Void) {
+        os_log(.debug, log: .phenixManager, "Start User Media Stream initialization")
+        let options = PhenixUserMediaOptions.makeUserMediaOptions()
+        roomExpress.pcastExpress.getUserMedia(options) { status, userMediaStream in
+            if status == .ok, let stream = userMediaStream {
+                os_log(.debug, log: .phenixManager, "User Media Stream initialized")
+                let controller = UserMediaStreamController(stream)
+
+                completion(controller)
+                return
+            }
+
+            completion(nil)
         }
     }
 
-    func setupMedia(_ unrecoverableErrorCompletion: UnrecoverableErrorHandler? = nil, completion: @escaping () -> Void) {
-        let options = PhenixUserMediaOptions.makeUserMediaOptions()
-        roomExpress.pcastExpress.getUserMedia(options) { [weak self] status, userMediaStream in
+    func processMedia() {
+        dispatchPrecondition(condition: .onQueue(queue))
+
+        // Using DispatchGroup to block the current execution thread.
+        // It is necessary to always wait till the local media is retrieved,
+        // because without it, we cannot connect and publish to any room.
+        //
+        // There could be a scenario where the user is in a room and the
+        // device looses network connection, after it comes back online,
+        // SDK could try to re-publish to the same room once again to
+        // join it automatically, and to do that - user media stream is
+        // necessary.
+        // Before that happens SDK will always execute the PCast
+        // „isOnlineStatus“ callback to let know about the new "online"
+        // status. At that point app needs to retry to get new user
+        // media stream. So it needs to block the execution queue and
+        // wait for the async user media stream callback to return
+        // the stream and initialize the user media stream controller,
+        // which will be then used by the publisher.
+        // If that is not done, there can be a race condition between
+        // media retrieval and re-publishing, which will result in a
+        // bad app state.
+
+        var mediaController: UserMediaStreamController!
+
+        userMediaStreamController?.dispose()
+
+        let group = DispatchGroup()
+        group.enter()
+
+        makeMedia { controller in
+            mediaController = controller
+            group.leave()
+        }
+
+        if group.wait(timeout: .now() + 30) == .timedOut {
+            fatalError("Fatal error. Could not retrieve user media stream.")
+        }
+
+        userMediaStreamController = mediaController
+        userStreamMediaControllerDidChange(mediaController)
+    }
+}
+
+// MARK: - Observable callback methods
+private extension PhenixManager {
+    func onlineStatusDidChange(_ changes: PhenixObservableChange<NSNumber>?) {
+        queue.async { [weak self] in
             guard let self = self else { return }
+            guard let isOnline = changes?.value as? Bool else { return }
 
-            if status == .ok {
-                if let stream = userMediaStream {
-                    self.userMediaStreamController = UserMediaStreamController(stream)
-                    os_log(.debug, log: .phenixManager, "User Media Stream initialized")
-                    completion()
-                    return
-                }
-            }
+            os_log(.debug, log: .phenixManager, "Online status did change: %{PRIVATE}s", isOnline == true ? "online" : "offline")
 
-            unrecoverableErrorCompletion?("Could not provide user media stream (\(status.rawValue)")
+            self.onlineStatusDidChange(isOnline: isOnline)
+
+            guard isOnline == true else { return }
+
+            self.processMedia()
         }
     }
 }

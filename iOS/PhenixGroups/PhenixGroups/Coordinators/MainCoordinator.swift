@@ -23,7 +23,11 @@ class MainCoordinator: Coordinator {
     /// If provided before `start()` is executed, will automatically join provided meeting code
     var initialMeetingCode: String?
 
-    init(navigationController: UINavigationController, dependencyContainer: DependencyContainer, device: UIDevice = .current) {
+    init(
+        navigationController: UINavigationController,
+        dependencyContainer: DependencyContainer,
+        device: UIDevice = .current
+    ) {
         self.navigationController = navigationController
         self.dependencyContainer = dependencyContainer
         self.device = device
@@ -96,6 +100,7 @@ private extension MainCoordinator {
         let vc = ActiveMeetingViewController.instantiate()
         vc.coordinator = self
         vc.displayName = preferences.displayName
+        vc.phenix = phenixManager
         vc.media = phenixManager.userMediaStreamController
         vc.joinedRoom = joinedRoom
 
@@ -105,12 +110,12 @@ private extension MainCoordinator {
     }
 
     func refreshMeeting(_ joinedRoom: JoinedRoom) {
-        guard let controller = navigationController.visibleViewController as? ActiveMeetingViewController else {
+        guard let vc = navigationController.visibleViewController as? ActiveMeetingViewController else {
             fatalError("Visible view controller is not ActiveMeetingViewController")
         }
 
-        controller.joinedRoom = joinedRoom
-        controller.configureRoom()
+        vc.joinedRoom = joinedRoom
+        vc.configureRoom()
     }
 }
 
@@ -141,7 +146,7 @@ extension MainCoordinator: JoinCancellation {
 }
 
 extension MainCoordinator: MeetingFinished {
-    func meetingFinished(_ meeting: Meeting) {
+    func meetingFinished(_ meeting: Meeting, withReason reason: String?) {
         var meetings = preferences.meetings
 
         if let savedMeetingIndex = meetings.firstIndex(where: { $0.code == meeting.code }) {
@@ -155,8 +160,14 @@ extension MainCoordinator: MeetingFinished {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
 
-            UIView.transition(with: self.navigationController.view) {
+            let animation: () -> Void = {
                 self.navigationController.popViewController(animated: false)
+            }
+
+            UIView.transition(with: self.navigationController.view, animations: animation) {
+                if let reason = reason {
+                    AppDelegate.present(alertWithTitle: reason)
+                }
             }
         }
     }
@@ -171,7 +182,15 @@ extension MainCoordinator: ShowDebugMenu {
 }
 
 fileprivate extension UIView {
-    class func transition(with view: UIView, duration: TimeInterval = 0.25, options: UIView.AnimationOptions = [.transitionCrossDissolve], animations: (() -> Void)?) {
-        UIView.transition(with: view, duration: duration, options: options, animations: animations, completion: nil)
+    class func transition(
+        with view: UIView,
+        duration: TimeInterval = 0.25,
+        options: UIView.AnimationOptions = [.transitionCrossDissolve],
+        animations: @escaping () -> Void,
+        completion: (() -> Void)? = nil
+    ) {
+        UIView.transition(with: view, duration: duration, options: options, animations: animations) { _ in
+            completion?()
+        }
     }
 }
