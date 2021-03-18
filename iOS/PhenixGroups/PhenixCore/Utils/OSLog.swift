@@ -16,4 +16,8 @@ extension OSLog {
     static let mediaController = OSLog(subsystem: subsystem, category: "Phenix.Core.MediaController")
     static let memberController = OSLog(subsystem: subsystem, category: "Phenix.Core.MemberController")
     static let roomMemberMediaController = OSLog(subsystem: subsystem, category: "Phenix.Core.RoomMemberMediaController")
+    static let roomMemberStreamSubscriptionController = OSLog(subsystem: subsystem, category: "Phenix.Core.RoomMemberStreamSubscriptionController")
+    static let roomMemberStreamAudioLevelProvider = OSLog(subsystem: subsystem, category: "Phenix.Core.RoomMemberStreamAudioLevelProvider")
+    static let roomMemberStreamAudioStateProvider = OSLog(subsystem: subsystem, category: "Phenix.Core.RoomMemberStreamAudioStateProvider")
+    static let roomMemberStreamVideoStateProvider = OSLog(subsystem: subsystem, category: "Phenix.Core.RoomMemberStreamVideoStateProvider")
 }

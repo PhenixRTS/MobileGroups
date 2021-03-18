@@ -58,7 +58,10 @@ private extension JoinMeetingViewController {
 
                 DispatchQueue.main.async {
                     self.dismissActivityIndicator {
-                        AppDelegate.present(alertWithTitle: "Failed to join meeting (\(status.rawValue))")
+                        AppDelegate.present(
+                            alertWithTitle: "Failed to join a meeting",
+                            message: "(\(status.description))"
+                        )
                     }
                 }
 
@@ -67,7 +70,10 @@ private extension JoinMeetingViewController {
 
                 DispatchQueue.main.async {
                     self.dismissActivityIndicator {
-                        AppDelegate.present(alertWithTitle: "Experiencing problems with local media. Check your network status.")
+                        AppDelegate.present(
+                            alertWithTitle: "Experiencing problems with local media",
+                            message: "Check your network status."
+                        )
                     }
                 }
             }

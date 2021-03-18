@@ -41,7 +41,7 @@ extension PhenixManager: PhenixRoomPublishing {
             precondition(self.roomExpress != nil, "Must call PhenixManager.start() before this method")
             self.roomExpress.publish(toRoom: localPublishToRoomOptions) { status, roomService, publisher in
                 self.queue.async {
-                    os_log(.debug, log: .phenixManager, "Room publishing completed with status: %{PUBLIC}d", status.rawValue)
+                    os_log(.debug, log: .phenixManager, "Room publishing completed with status: %{PUBLIC}s", status.description)
                     switch status {
                     case .ok:
                         guard let roomService = roomService else {
@@ -57,8 +57,8 @@ extension PhenixManager: PhenixRoomPublishing {
 
                         // Make new room
                         let joinedRoom = self.makeJoinedRoom(
-                            roomService: roomService,
                             roomExpress: self.roomExpress,
+                            roomService: roomService,
                             backend: self.backend,
                             publisher: publisher,
                             userMedia: media

@@ -6,7 +6,7 @@ import Foundation
 import PhenixSdk
 
 internal protocol UserMediaProvider: AnyObject {
-    var renderer: PhenixRenderer? { get }
+    var renderer: PhenixRenderer { get }
     var audioTracks: [PhenixMediaStreamTrack] { get }
 }
 
@@ -14,21 +14,13 @@ public class UserMediaStreamController {
     public typealias AudioFrameNotificationHandler = () -> Void
     public typealias VideoFrameNotificationHandler = () -> Void
 
-    internal private(set) var renderer: PhenixRenderer? {
-        didSet { subscribeForMediaFrameNotification() }
-    }
-
+    internal let renderer: PhenixRenderer
     internal let userMediaStream: PhenixUserMediaStream
     internal var cameraMode: PhenixFacingMode = .user {
         didSet { setCamera(facing: cameraMode) }
     }
 
-    public private(set) lazy var cameraLayer: VideoLayer = {
-        let layer = VideoLayer()
-        renderer = makeRenderer()
-        renderer?.start(layer)
-        return layer
-    }()
+    public let cameraLayer: VideoLayer
 
     /// Indicates current device audio state
     public private(set) var isAudioEnabled: Bool = true
@@ -41,7 +33,11 @@ public class UserMediaStreamController {
     public var videoFrameReadHandler: VideoFrameNotificationHandler?
 
     init(_ userMediaStream: PhenixUserMediaStream) {
+        self.cameraLayer = VideoLayer()
         self.userMediaStream = userMediaStream
+        self.renderer = userMediaStream.mediaStream.createRenderer()
+
+        self.renderer.start(cameraLayer)
     }
 
     public func setAudio(enabled: Bool) {
@@ -62,37 +58,21 @@ public class UserMediaStreamController {
 // MARK: Internal methods
 internal extension UserMediaStreamController {
     func dispose() {
-        renderer?.stop()
+        renderer.stop()
 
         for track in userMediaStream.mediaStream.getAudioTracks() {
-            renderer?.setFrameReadyCallback(track, nil)
+            renderer.setFrameReadyCallback(track, nil)
         }
 
         for track in userMediaStream.mediaStream.getVideoTracks() {
-            renderer?.setFrameReadyCallback(track, nil)
+            renderer.setFrameReadyCallback(track, nil)
         }
 
-        renderer = nil
-    }
-}
-
-// MARK: - Private methods
-private extension UserMediaStreamController {
-    func makeRenderer() -> PhenixRenderer {
-        userMediaStream.mediaStream.createRenderer()
-    }
-
-    func setCamera(facing mode: PhenixFacingMode) {
-        let options = PhenixUserMediaOptions
-            .makeUserMediaOptions()
-            .setCamera(facing: mode)
-
-        userMediaStream.apply(options)
+        audioFrameReadHandler = nil
+        videoFrameReadHandler = nil
     }
 
     func subscribeForMediaFrameNotification() {
-        guard let renderer = renderer else { return }
-
         // Get the current device audio track.
         if let audioTrack = userMediaStream.mediaStream.getAudioTracks()?.first {
             renderer.setFrameReadyCallback(audioTrack, audioFrameNotificationReceived)
@@ -102,6 +82,17 @@ private extension UserMediaStreamController {
         if let videoTrack = userMediaStream.mediaStream.getVideoTracks()?.first {
             renderer.setFrameReadyCallback(videoTrack, videoFrameNotificationReceived)
         }
+    }
+}
+
+// MARK: - Private methods
+private extension UserMediaStreamController {
+    func setCamera(facing mode: PhenixFacingMode) {
+        let options = PhenixUserMediaOptions
+            .makeUserMediaOptions()
+            .setCamera(facing: mode)
+
+        userMediaStream.apply(options)
     }
 
     func audioFrameNotificationReceived(_ notification: PhenixFrameNotification?) {

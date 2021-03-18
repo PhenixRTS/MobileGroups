@@ -5,7 +5,7 @@
 import os.log
 import PhenixSdk
 
-protocol RoomMemberControllerDelegate: AnyObject {
+protocol SubscriptionTypeProvider: AnyObject {
     func canSubscribeWithVideo() -> Bool
 }
 
@@ -29,9 +29,9 @@ public class RoomMemberController {
     init(
         roomService: PhenixRoomService,
         roomExpress: PhenixRoomExpress,
+        userMedia: UserMediaProvider?,
         maxVideoSubscriptions: Int,
-        queue: DispatchQueue = .main,
-        userMedia: UserMediaProvider? = nil
+        queue: DispatchQueue = .main
     ) {
         self.queue = queue
         self.roomService = roomService
@@ -39,13 +39,13 @@ public class RoomMemberController {
         self.maxVideoSubscriptions = maxVideoSubscriptions
 
         self.currentMember = RoomMember(
-            roomService.getSelf(),
+            localMember: roomService.getSelf(),
             roomExpress: roomExpress,
-            queue: queue,
-            isSelf: true,
             renderer: userMedia?.renderer,
-            audioTracks: userMedia?.audioTracks
+            audioTracks: userMedia?.audioTracks,
+            queue: queue
         )
+
         self.members = []
     }
 
@@ -58,10 +58,9 @@ public class RoomMemberController {
     }
 
     public func recentlyLoudestMember() -> RoomMember? {
-        let minimumDecibel = AudioLevelProvider.minimumDecibel
-        return members
-            .filter { $0.media?.isAudioAvailable == true }
-            .max { $0.media?.recentAudioLevel() ?? minimumDecibel < $1.media?.recentAudioLevel() ?? minimumDecibel }
+        members
+            .filter { $0.media.isAudioAvailable == true }
+            .max { $0.media.recentAudioLevel() < $1.media.recentAudioLevel() }
     }
 }
 
@@ -128,7 +127,7 @@ private extension RoomMemberController {
 
         for member in newMembers {
             // Observe new member stream and then automatically subscribe to it
-            member.roomController = self
+            member.subscriptionController.subscriptionTypeProvider = self
             member.observeStreams()
         }
     }
@@ -163,13 +162,13 @@ private extension RoomMemberController {
         if member == currentMember {
             return currentMember
         } else {
-            return RoomMember(member, roomExpress: roomExpress, queue: queue, isSelf: false)
+            return RoomMember(remoteMember: member, roomExpress: roomExpress, queue: queue)
         }
     }
 }
 
 // MARK: - RoomMemberControllerDelegate
-extension RoomMemberController: RoomMemberControllerDelegate {
+extension RoomMemberController: SubscriptionTypeProvider {
     /// Checks if the limit of the member subscription with video is reached.
     /// - Returns: Bool, `true` - can subscribe with video, `false` - limit is reached, should not subscribe with video
     func canSubscribeWithVideo() -> Bool {
@@ -177,7 +176,7 @@ extension RoomMemberController: RoomMemberControllerDelegate {
 
         // Calculate, how many of members have video subscription at the moment.
         let videoSubscriptions = members.reduce(into: 0) { result, member in
-            result += member.subscriptionType == .some(.video) ? 1 : 0
+            result += member.subscriptionController.desiredSubscriptionTypes.contains(.video) ? 1 : 0
         }
 
         os_log(.debug, log: .memberController, "Active video subscriptions: %{PRIVATE}s/%{PRIVATE}s, (%{PRIVATE}s)", videoSubscriptions.description, maxVideoSubscriptions.description, roomDescription)

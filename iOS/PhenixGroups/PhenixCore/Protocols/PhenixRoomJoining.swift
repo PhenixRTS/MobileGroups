@@ -74,8 +74,8 @@ extension PhenixManager {
 
                     // Make new room
                     let joinedRoom = self.makeJoinedRoom(
-                        roomService: roomService,
                         roomExpress: self.roomExpress,
+                        roomService: roomService,
                         backend: self.backend
                     )
                     // Save new room

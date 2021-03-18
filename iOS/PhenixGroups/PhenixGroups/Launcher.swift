@@ -35,18 +35,26 @@ class Launcher {
         window?.rootViewController = nc
         window?.makeKeyAndVisible()
 
-        let unrecoverableErrorCompletion: (String?) -> Void = { [weak nc] description in
-            // Unrecoverable Error Completion
-            let reason = description ?? "N/A"
-            let alert = UIAlertController(title: "Error", message: "Phenix SDK reached unrecoverable error: (\(reason))", preferredStyle: .alert)
-            alert.addAction(
-                UIAlertAction(title: "Close app", style: .default) { _ in
-                    fatalError("Unrecoverable error: \(String(describing: description))")
-                }
-            )
+        let unrecoverableErrorCompletion: (String?) -> Void = { description in
+            DispatchQueue.main.async {
+                AppDelegate.terminate(
+                    afterDisplayingAlertWithTitle: "Something went wrong!",
+                    message: "Application entered in unrecoverable state and will be terminated (\(description ?? "N/A"))."
+                )
+            }
+        }
 
-            nc?.presentedViewController?.dismiss(animated: false)
-            nc?.present(alert, animated: true)
+        let mediaCreationTimeoutCompletion: () -> Void = {
+            // Setting a delay to prevent a race condition with the
+            // transition animation on the navigation controller
+            // when the coordinator tries to switch screens to the
+            // new meeting screen after the app has launched.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                AppDelegate.present(
+                    alertWithTitle: "Experiencing problems connecting to Phenix",
+                    message: "Check your network status."
+                )
+            }
         }
 
         // Prepare all the necessary components on a background thread.
@@ -58,10 +66,13 @@ class Launcher {
 
             let pcast = self.deeplink?.uri ?? PhenixConfiguration.pcast
             let backend = self.deeplink?.backend ?? PhenixConfiguration.backend
-            let maxVideoMembers = self.deeplink?.maxVideoMembers ?? 12
+            let maxVideoMembers = self.deeplink?.maxVideoMembers ?? 6
 
             let manager = PhenixManager(backend: backend, pcast: pcast, maxVideoSubscriptions: maxVideoMembers)
-            manager.start(unrecoverableErrorCompletion: unrecoverableErrorCompletion)
+            manager.start(
+                unrecoverableErrorCompletion: unrecoverableErrorCompletion,
+                mediaCreationTimeoutHandler: mediaCreationTimeoutCompletion
+            )
 
             let preferences = Preferences()
 
@@ -69,7 +80,7 @@ class Launcher {
             os_log(.debug, log: .launcher, "Create Dependency container")
             let container = DependencyContainer(phenixManager: manager, preferences: preferences)
 
-            os_log(.debug, log: .launcher, "Start main coodinator")
+            os_log(.debug, log: .launcher, "Start main coordinator")
             let coordinator = MainCoordinator(navigationController: nc, dependencyContainer: container)
             coordinator.initialMeetingCode = self.deeplink?.alias
 

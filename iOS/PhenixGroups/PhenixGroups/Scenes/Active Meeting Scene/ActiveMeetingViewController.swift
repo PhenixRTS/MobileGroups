@@ -87,7 +87,7 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
         }
     }
 
-    func leaveRoom(withReason reason: String? = nil) {
+    func leaveRoom(withReason reason: (title: String, message: String?)? = nil) {
         os_log(.debug, log: .activeMeetingScene, "Leaving meeting")
 
         let meeting = Meeting(code: joinedRoom.alias, leaveDate: .now, backendUrl: joinedRoom.backend)
@@ -167,10 +167,10 @@ private extension ActiveMeetingViewController {
     }
 
     func configureMainPreview(for member: RoomMember?) {
-        activeMeetingView.setMicrophone(enabled: member?.media?.isAudioAvailable ?? false)
+        activeMeetingView.setMicrophone(enabled: member?.media.isAudioAvailable ?? false)
         activeMeetingView.setCamera(placeholder: member?.screenName ?? "")
         activeMeetingView.setCamera(layer: member?.previewLayer)
-        activeMeetingView.setCamera(enabled: member?.media?.isVideoAvailable ?? false)
+        activeMeetingView.setCamera(enabled: member?.media.isVideoAvailable ?? false)
     }
 
     func configurePageController() {
@@ -366,7 +366,10 @@ extension ActiveMeetingViewController: PhenixOnlineStatusObserver {
             guard isOnline == false else { return }
 
             self?.leaveRoom(
-                withReason: "Experiencing problems connecting to Phenix. Check your network status."
+                withReason: (
+                    title: "Experiencing problems connecting to Phenix",
+                    message: "Check your network status."
+                )
             )
         }
     }
