@@ -3,20 +3,21 @@
  */
 
 buildscript {
-    ext.kotlin_version = '1.4.31'
-    ext.lifecycle_version = '2.3.0'
+    ext.kotlin_version = '1.5.0'
+    ext.lifecycle_version = '2.3.1'
     ext.arch_version = '2.1.0'
-    ext.dagger_version = '2.32'
-    ext.kotlinx_coroutines_version = '1.4.1'
-    ext.kotlinx_serialization_version = '1.0.0-RC'
-    ext.phenix_version = '2021.0.2'
+    ext.dagger_version = '2.34'
+    ext.kotlinx_coroutines_version = '1.4.3'
+    ext.kotlinx_serialization_version = '1.2.0'
+    ext.phenix_version = '2021.0.7'
+    ext.room_version = '2.3.0'
 
     repositories {
         google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.2'
+        classpath 'com.android.tools.build:gradle:4.2.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath "org.jetbrains.kotlin:kotlin-serialization:$kotlin_version"
     }
