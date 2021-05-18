@@ -194,31 +194,36 @@ class MainActivity : EasyPermissionActivity() {
             launchFragment(LandingScreen(), false)
         }
         viewModel.initObservers(this)
-        viewModel.isMicrophoneEnabled.observe(this, { enabled ->
+        viewModel.isDataLost.observe(this) { lost ->
+            if (viewModel.isInRoom.isTrue()) {
+                binding.activeMemberData.visibility = if (lost) View.VISIBLE else View.GONE
+            }
+        }
+        viewModel.isMicrophoneEnabled.observe(this) { enabled ->
             val color = ContextCompat.getColor(this, if (enabled) R.color.accentGrayColor else R.color.accentColor)
             binding.microphoneButton.setImageResource(if (enabled) R.drawable.ic_mic_on else R.drawable.ic_mic_off)
             binding.microphoneButton.backgroundTintList = ColorStateList.valueOf(color)
             if (viewModel.isInRoom.isFalse()) {
                 binding.activeMemberMic.visibility = if (enabled) View.GONE else View.VISIBLE
             }
-        })
-        viewModel.isVideoEnabled.observe(this, { enabled ->
+        }
+        viewModel.isVideoEnabled.observe(this) { enabled ->
             val color = ContextCompat.getColor(this, if (enabled) R.color.accentGrayColor else R.color.accentColor)
             binding.cameraButton.setImageResource(if (enabled) R.drawable.ic_camera_on else R.drawable.ic_camera_off)
             binding.cameraButton.backgroundTintList = ColorStateList.valueOf(color)
             showUserVideoPreview(enabled)
-        })
-        viewModel.memberCount.observe(this, { memberCount ->
+        }
+        viewModel.memberCount.observe(this) { memberCount ->
             val label =  if (memberCount > 0) getString(R.string.tab_members_count, memberCount) else " "
             binding.mainLandscapeMemberCount.visibility = if (memberCount > 0) View.VISIBLE else View.GONE
             binding.mainLandscapeMemberCount.text = label
-        })
-        viewModel.unreadMessageCount.observe(this, { messageCount ->
+        }
+        viewModel.unreadMessageCount.observe(this) { messageCount ->
             val label = if (messageCount < 100) "$messageCount" else getString(R.string.tab_message_count)
             binding.mainLandscapeMessageCount.visibility = if (messageCount > 0) View.VISIBLE else View.GONE
             binding.mainLandscapeMessageCount.text = label
-        })
-        viewModel.isControlsEnabled.observe(this, { enabled ->
+        }
+        viewModel.isControlsEnabled.observe(this) { enabled ->
             if (viewModel.isInRoom.isTrue()) {
                 if (enabled) {
                     menuHandler.showTopMenu()
@@ -226,11 +231,11 @@ class MainActivity : EasyPermissionActivity() {
                     menuHandler.hideTopMenu()
                 }
             }
-        })
-        viewModel.onPermissionRequested.observe(this, {
+        }
+        viewModel.onPermissionRequested.observe(this) {
             initMediaButtons()
-        })
-        viewModel.onRoomJoined.observe(this, { status ->
+        }
+        viewModel.onRoomJoined.observe(this) { status ->
             launchMain {
                 if (viewModel.isInRoom.isFalse()) {
                     Timber.d("Room joined with status: $status")
@@ -242,7 +247,7 @@ class MainActivity : EasyPermissionActivity() {
                     }
                 }
             }
-        })
+        }
         initMediaButtons()
         menuHandler.onStart()
         debugMenu.onStart(getString(R.string.debug_app_version,

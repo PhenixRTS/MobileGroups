@@ -23,6 +23,7 @@ android {
         buildConfigField "String", "PCAST_URL", "\"\""
         buildConfigField "int", "EXPIRATION_DAYS", "10"
         buildConfigField "int", "MAX_VIDEO_MEMBERS", "6"
+        buildConfigField "long", "DATA_QUALITY_TIMEOUT_MS", "10000"
     }
     buildTypes {
         release {
@@ -31,8 +32,8 @@ android {
         }
     }
     buildFeatures {
-        viewBinding = true
-        dataBinding = true
+        viewBinding true
+        dataBinding true
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -61,10 +62,10 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.aar'])
 
     // Android
-    implementation 'androidx.core:core-ktx:1.6.0-alpha03'
-    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.core:core-ktx:1.7.0-alpha01'
+    implementation 'androidx.appcompat:appcompat:1.3.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'com.google.android.material:material:1.4.0'
     implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version"
@@ -94,6 +95,6 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$kotlinx_coroutines_version"
     testImplementation 'org.robolectric:robolectric:4.5.1'
-    testImplementation 'androidx.test:core:1.3.0'
+    testImplementation 'androidx.test:core:1.4.0'
 
 }

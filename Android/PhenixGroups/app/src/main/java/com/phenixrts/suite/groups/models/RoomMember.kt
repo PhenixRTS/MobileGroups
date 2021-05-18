@@ -4,14 +4,14 @@
 
 package com.phenixrts.suite.groups.models
 
+import android.os.Handler
+import android.os.Looper
 import android.view.SurfaceHolder
 import android.widget.ImageView
 import androidx.lifecycle.MutableLiveData
 import com.phenixrts.common.Disposable
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.express.ExpressSubscriber
-import com.phenixrts.express.RoomExpress
-import com.phenixrts.express.SubscribeToMemberStreamOptions
 import com.phenixrts.media.audio.android.AndroidAudioFrame
 import com.phenixrts.media.video.android.AndroidVideoFrame
 import com.phenixrts.pcast.*
@@ -21,6 +21,7 @@ import com.phenixrts.pcast.android.AndroidVideoRenderSurface
 import com.phenixrts.room.Member
 import com.phenixrts.room.Stream
 import com.phenixrts.room.TrackState
+import com.phenixrts.suite.groups.BuildConfig
 import com.phenixrts.suite.groups.common.enums.AudioLevel
 import com.phenixrts.suite.groups.common.extensions.asString
 import com.phenixrts.suite.groups.common.extensions.call
@@ -40,6 +41,7 @@ data class RoomMember(
 
     private val disposables: MutableList<Disposable> = mutableListOf()
     private var videoRenderSurface = AndroidVideoRenderSurface()
+    private var subscriptionConfiguration: MemberSubscriptionConfiguration? = null
     private var subscriptionDisposable: Disposable? = null
     private var audioSubscriber: ExpressSubscriber? = null
     private var videoSubscriber: ExpressSubscriber? = null
@@ -85,6 +87,17 @@ data class RoomMember(
             }
         })
     }
+    private val dataQualityHandler = Handler(Looper.getMainLooper())
+    private val dataQualityRunner = Runnable {
+        launchMain {
+            Timber.d("Data lost for: ${BuildConfig.DATA_QUALITY_TIMEOUT_MS}")
+            isDataLost = true
+            onUpdate.call(this@RoomMember)
+            subscriptionConfiguration?.let { configuration ->
+                subscribe(configuration)
+            }
+        }
+    }
 
     val onUpdate: MutableLiveData<RoomMember> = MutableLiveData()
     var audioLevel: MutableLiveData<AudioLevel> = MutableLiveData()
@@ -95,6 +108,7 @@ data class RoomMember(
     var isActiveRenderer = false
     var isPinned = false
     var isSubscribed = false
+    var isDataLost = false
 
     private fun observeMember() {
         try {
@@ -143,9 +157,45 @@ data class RoomMember(
     }
 
     private fun observeDataQuality() {
-        videoRenderer?.setDataQualityChangedCallback { _, status, _ ->
-            if (isVideoEnabled && status != DataQualityStatus.ALL) {
-                Timber.d("Render quality status changed: $status Can show video: $isVideoEnabled : ${this@RoomMember.asString()}")
+        if (videoRenderer != null) {
+            videoRenderer!!.setDataQualityChangedCallback { _, status, _ ->
+                launchMain {
+                    val dataLostState = isDataLost
+                    if (status == DataQualityStatus.ALL) {
+                        isDataLost = false
+                        dataQualityHandler.removeCallbacks(dataQualityRunner)
+                    } else if (status == DataQualityStatus.NO_DATA) {
+                        Timber.d("Render video quality status changed: $status Can show video: $isVideoEnabled : ${this@RoomMember.asString()}")
+                        subscriptionConfiguration?.let { configuration ->
+                            subscribe(configuration)
+                        }
+                        dataQualityHandler.postDelayed(dataQualityRunner, BuildConfig.DATA_QUALITY_TIMEOUT_MS)
+                    }
+                    if (dataLostState != isDataLost) {
+                        onUpdate.call(this@RoomMember)
+                    }
+                }
+            }
+        } else {
+            audioRenderer?.setDataQualityChangedCallback { _, status, _ ->
+                launchMain {
+                    val dataLostState = isDataLost
+                    if (status == DataQualityStatus.ALL) {
+                        isDataLost = false
+                        dataQualityHandler.removeCallbacks(dataQualityRunner)
+                    } else if (status == DataQualityStatus.NO_DATA) {
+                        Timber.d("Render audio quality status changed: $status Can play audio: $isAudioEnabled : ${this@RoomMember.asString()}")
+                        subscriptionConfiguration?.let { configuration ->
+                            subscribe(configuration)
+                        }
+                        dataQualityHandler.postDelayed(dataQualityRunner, BuildConfig.DATA_QUALITY_TIMEOUT_MS)
+                    }
+                    if (dataLostState != isDataLost) {
+                        onUpdate.call(this@RoomMember)
+                    }
+                }
+            } ?: run {
+                isDataLost = true
                 onUpdate.call(this@RoomMember)
             }
         }
@@ -185,27 +235,28 @@ data class RoomMember(
 
     fun canRenderThumbnail() = canRenderVideo && isVideoEnabled && !isActiveRenderer
 
-    suspend fun subscribe(roomExpress: RoomExpress?, options: SubscribeToMemberStreamOptions,
-                          isVideoStream: Boolean) = suspendCancellableCoroutine<Unit> { continuation ->
-        if (roomExpress == null || isSelf) {
+    suspend fun subscribe(configuration: MemberSubscriptionConfiguration) = suspendCancellableCoroutine<Unit> { continuation ->
+        if (configuration.roomExpress == null || isSelf) {
             if (continuation.isActive) continuation.resume(Unit)
             return@suspendCancellableCoroutine
         }
+        subscriptionConfiguration = configuration
         subscriptionDisposable?.dispose()
         subscriptionDisposable = null
         member.observableStreams.subscribe { streams ->
             Timber.d("Subscribing to member media: ${toString()}")
-            subscribeToStream(roomExpress, options, streams.toList(), isVideoStream, continuation)
+            currentStreamIndex = 0
+            subscribeToStream(configuration, streams.toList(), continuation)
         }.run { subscriptionDisposable = this }
     }
 
-    private fun subscribeToStream(roomExpress: RoomExpress, options: SubscribeToMemberStreamOptions,
-                                  streams: List<Stream>, isVideoStream: Boolean, continuation: CancellableContinuation<Unit>){
+    private fun subscribeToStream(configuration: MemberSubscriptionConfiguration, streams: List<Stream>,
+                                  continuation: CancellableContinuation<Unit>){
         streams.getOrNull(currentStreamIndex)?.let { stream ->
-            roomExpress.subscribeToMemberStream(stream, options) { status, subscriber, renderer ->
+            configuration.roomExpress?.subscribeToMemberStream(stream, configuration.options) { status, subscriber, renderer ->
                 Timber.d("Subscribed to member media: $status ${toString()}")
                 if (status == RequestStatus.OK) {
-                    updateSubscription(subscriber, renderer, isVideoStream)
+                    updateSubscription(subscriber, renderer, configuration.isVideoStream)
                     isSubscribed = true
                     if (continuation.isActive) continuation.resume(Unit)
                 } else {
@@ -218,7 +269,7 @@ data class RoomMember(
                         currentStreamIndex + 1 < streams.size -> {
                             currentStreamIndex++
                             Timber.d("Trying a different stream: $currentStreamIndex")
-                            subscribeToStream(roomExpress, options, streams, isVideoStream, continuation)
+                            subscribeToStream(configuration, streams, continuation)
                         }
                         continuation.isActive -> continuation.resume(Unit)
                     }

@@ -54,12 +54,6 @@ class UserMediaRepository(private val roomExpress: RoomExpress) {
         roomExpress.pCastExpress.observableIsOnlineStatus.subscribe { isOnline ->
             launchMain {
                 Timber.d("Online state changed: $isOnline")
-                if (!isOnline) {
-                    userMediaStream?.dispose()
-                    userMediaStream = null
-                } else if (userMediaStream == null) {
-                    waitForUserStream()
-                }
                 onStatusChanged(isOnline)
             }
         }.run {

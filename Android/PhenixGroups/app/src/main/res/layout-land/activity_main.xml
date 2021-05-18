@@ -93,6 +93,20 @@
                     tools:visibility="visible"
                     app:tint="@color/accentColor" />
 
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/active_member_data"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:contentDescription="@string/preview_icon_content_description"
+                    android:src="@drawable/ic_data_quality"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    tools:visibility="visible"
+                    app:tint="@color/accentColor" />
+
                 <LinearLayout
                     android:id="@+id/media_controls"
                     android:layout_width="match_parent"

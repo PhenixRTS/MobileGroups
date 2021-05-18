@@ -61,6 +61,7 @@ class GroupsViewModel(
 
     private val roomMemberObserver = Observer<List<RoomMember>> { members ->
         launchMain {
+            isDataLost.value = members.find { it.isActiveRenderer }?.isDataLost ?: false
             roomMembers.value = members
         }
     }
@@ -74,6 +75,7 @@ class GroupsViewModel(
     val memberCount = MutableLiveData<Int>().apply { value = 0 }
     val unreadMessageCount = MutableLiveData<Int>().apply { value = 0 }
     val displayName = MutableLiveData<String>()
+    val isDataLost = MutableLiveData<Boolean>().apply { value = false }
     val isVideoEnabled = MutableLiveData<Boolean>().apply { value = true }
     val isMicrophoneEnabled = MutableLiveData<Boolean>().apply { value = true }
     val isInRoom = MutableLiveData<Boolean>().apply { value = false }
@@ -153,16 +155,16 @@ class GroupsViewModel(
 
     fun initObservers(lifecycleOwner: LifecycleOwner) = launchMain {
         displayName.value = preferenceProvider.getDisplayName()
-        isMicrophoneEnabled.observe(lifecycleOwner, { enabled ->
+        isMicrophoneEnabled.observe(lifecycleOwner) { enabled ->
             getMediaRepository()?.switchAudioStreamState(enabled)
             joinedRoomRepository?.switchAudioStreamState(enabled)
             roomMemberRepository?.switchAudioStreamState(enabled)
-        })
-        isVideoEnabled.observe(lifecycleOwner, { enabled ->
+        }
+        isVideoEnabled.observe(lifecycleOwner) { enabled ->
             getMediaRepository()?.switchVideoStreamState(enabled)
             joinedRoomRepository?.switchVideoStreamState(enabled)
             roomMemberRepository?.switchVideoStreamState(enabled)
-        })
+        }
     }
 
     fun joinRoomById(roomId: String, userScreenName: String) {
@@ -242,12 +244,6 @@ class GroupsViewModel(
     }
 
     fun onConnectionLost() {
-        isVideoEnabled.postValue(false)
-        isMicrophoneEnabled.postValue(false)
-        mainRendererSurface.setSurfaceHolder(null)
-        userMediaRenderer?.stop()
-        userMediaRenderer?.dispose()
-        userMediaRenderer = null
         leaveRoom()
         Timber.d("User media renderer disposed")
     }

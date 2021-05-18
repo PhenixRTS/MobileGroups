@@ -15,6 +15,7 @@ import com.phenixrts.suite.groups.common.extensions.refresh
 import com.phenixrts.suite.groups.common.getSubscribeAudioOptions
 import com.phenixrts.suite.groups.common.getSubscribeVideoOptions
 import com.phenixrts.suite.groups.databinding.RowMemberItemBinding
+import com.phenixrts.suite.groups.models.MemberSubscriptionConfiguration
 import com.phenixrts.suite.groups.models.RoomMember
 import com.phenixrts.suite.groups.ui.viewmodels.GroupsViewModel
 import timber.log.Timber
@@ -79,9 +80,11 @@ class MemberListAdapter(
             // Subscribe to member media if not subscribed yet
             if (!roomMember.isSubscribed) {
                 if (roomMember.canRenderVideo) {
-                    roomMember.subscribe(viewModel.roomExpress, getSubscribeVideoOptions(), isVideoStream = true)
+                    roomMember.subscribe(MemberSubscriptionConfiguration(viewModel.roomExpress,
+                        getSubscribeVideoOptions(), isVideoStream = true))
                 }
-                roomMember.subscribe(viewModel.roomExpress, getSubscribeAudioOptions(), isVideoStream = false)
+                roomMember.subscribe(MemberSubscriptionConfiguration(viewModel.roomExpress,
+                    getSubscribeAudioOptions(), isVideoStream = false))
             }
 
             Timber.d("Starting member preview: $roomMember")
