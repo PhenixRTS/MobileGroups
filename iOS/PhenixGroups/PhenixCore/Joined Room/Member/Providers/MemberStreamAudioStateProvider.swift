@@ -24,7 +24,13 @@ class MemberStreamAudioStateProvider: RoomMemberDescription {
         queue.async { [weak self] in
             guard let self = self else { return }
 
-            os_log(.debug, log: .roomMemberStreamAudioStateProvider, "Observe audio state changes, (%{PRIVATE}s)", self.memberDescription)
+            os_log(
+                .debug,
+                log: .roomMemberStreamAudioStateProvider,
+                "%{private}s, Observe audio state changes",
+                self.memberDescription
+            )
+
             self.stream
                 .getObservableAudioState()
                 .subscribe(self.audioStateDidChange)
@@ -35,7 +41,7 @@ class MemberStreamAudioStateProvider: RoomMemberDescription {
     func dispose() {
         dispatchPrecondition(condition: .onQueue(queue))
 
-        os_log(.debug, log: .roomMemberStreamAudioStateProvider, "Dispose, (%{PRIVATE}s)", memberDescription)
+        os_log(.debug, log: .roomMemberStreamAudioStateProvider, "%{private}s, Dispose", memberDescription)
 
         disposables.removeAll()
         stateChangeHandler = nil

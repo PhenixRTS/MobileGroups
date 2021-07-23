@@ -29,7 +29,13 @@ class MemberStreamAudioLevelProvider: RoomMemberDescription {
 
             guard let track = self.audioTracks.first else { return }
 
-            os_log(.debug, log: .roomMemberStreamAudioLevelProvider, "Observe audio level changes, (%{PRIVATE}s)", self.memberDescription)
+            os_log(
+                .debug,
+                log: .roomMemberStreamAudioLevelProvider,
+                "%{private}s, Observe audio level changes",
+                self.memberDescription
+            )
+
             self.renderer.setFrameReadyCallback(track, self.didReceiveAudioFrame)
         }
     }
@@ -37,7 +43,7 @@ class MemberStreamAudioLevelProvider: RoomMemberDescription {
     func dispose() {
         dispatchPrecondition(condition: .onQueue(queue))
 
-        os_log(.debug, log: .roomMemberStreamAudioLevelProvider, "Dispose, (%{PRIVATE}s)", self.memberDescription)
+        os_log(.debug, log: .roomMemberStreamAudioLevelProvider, "%{private}s, Dispose", memberDescription)
 
         for track in audioTracks {
             renderer.setFrameReadyCallback(track, nil)

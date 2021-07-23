@@ -78,6 +78,7 @@ extension PhenixManager {
                         roomService: roomService,
                         backend: self.backend
                     )
+
                     // Save new room
                     self.set(room: joinedRoom)
 

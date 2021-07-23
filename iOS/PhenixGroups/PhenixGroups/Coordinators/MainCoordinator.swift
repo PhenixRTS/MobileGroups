@@ -97,6 +97,8 @@ private extension MainCoordinator {
             navigationController.presentedViewController?.dismiss(animated: true)
         }
 
+        os_log(.debug, log: .coordinator, "Move to joined room")
+
         let vc = ActiveMeetingViewController.instantiate()
         vc.coordinator = self
         vc.displayName = preferences.displayName
@@ -110,9 +112,11 @@ private extension MainCoordinator {
     }
 
     func refreshMeeting(_ joinedRoom: JoinedRoom) {
-        guard let vc = navigationController.visibleViewController as? ActiveMeetingViewController else {
+        guard let vc = navigationController.topViewController as? ActiveMeetingViewController else {
             fatalError("Visible view controller is not ActiveMeetingViewController")
         }
+
+        os_log(.debug, log: .coordinator, "Refresh joined room")
 
         vc.joinedRoom = joinedRoom
         vc.configureRoom()
@@ -121,7 +125,7 @@ private extension MainCoordinator {
 
 extension MainCoordinator: ShowMeeting {
     func showMeeting(_ joinedRoom: JoinedRoom) {
-        if navigationController.visibleViewController is ActiveMeetingViewController {
+        if navigationController.topViewController is ActiveMeetingViewController {
             refreshMeeting(joinedRoom)
         } else {
             moveToMeeting(joinedRoom)
