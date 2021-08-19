@@ -3,18 +3,18 @@
  */
 
 buildscript {
-    ext.kotlin_version = '1.5.30-M1'
+    ext.kotlin_version = '1.5.30-RC'
     ext.lifecycle_version = '2.3.1'
     ext.arch_version = '2.1.0'
     ext.dagger_version = '2.35'
     ext.kotlinx_coroutines_version = '1.5.0'
     ext.kotlinx_serialization_version = '1.2.0'
-    ext.phenix_version = '2021.0.12'
+    ext.phenix_version = '2021.0.15'
     ext.room_version = '2.3.0'
 
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.2.2'
@@ -26,7 +26,7 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
         maven {
             url project.findProperty("phenixMavenRepositoryUrl") ?: "https://maven.pkg.github.com/PhenixRTS/AndroidSDK"
 
