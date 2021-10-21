@@ -21,7 +21,7 @@ import com.phenixrts.suite.groups.common.getRoomOptions
 import com.phenixrts.suite.groups.models.RoomStatus
 import com.phenixrts.suite.phenixcommon.common.launchIO
 import com.phenixrts.suite.phenixcommon.common.launchMain
-import com.phenixrts.suite.phenixdeeplink.models.PhenixConfiguration
+import com.phenixrts.suite.phenixdeeplink.models.PhenixDeepLinkConfiguration
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import kotlin.coroutines.resume
@@ -30,7 +30,7 @@ import kotlin.coroutines.suspendCoroutine
 class RoomExpressRepository(
     private val cacheProvider: CacheProvider,
     private val roomExpress: RoomExpress,
-    private val configuration: PhenixConfiguration
+    private val configuration: PhenixDeepLinkConfiguration
 ) {
 
     private var isDisposed = false
@@ -60,7 +60,7 @@ class RoomExpressRepository(
                                 RoomInfoItem(
                                     room.roomId,
                                     room.observableAlias.value,
-                                    configuration.backend ?: ""
+                                    configuration.backend
                                 )
                             )
                         }

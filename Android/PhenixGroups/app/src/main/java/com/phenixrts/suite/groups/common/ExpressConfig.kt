@@ -9,6 +9,22 @@ import com.phenixrts.pcast.*
 import com.phenixrts.room.RoomOptions
 import com.phenixrts.room.RoomServiceFactory
 import com.phenixrts.room.RoomType
+import com.phenixrts.suite.groups.BuildConfig
+import com.phenixrts.suite.phenixdeeplink.models.PhenixDeepLinkConfiguration
+
+val DEFAULT_CONFIG get() = PhenixDeepLinkConfiguration(
+    authToken = "",
+    rawActs = "",
+    backend = BuildConfig.BACKEND_URL,
+    rawChannelAliases = "",
+    edgeToken = "",
+    rawStreamTokens = "",
+    rawMimeTypes = "",
+    publishToken = "",
+    rawStreamIDs = "",
+    uri = BuildConfig.PCAST_URL,
+    maxVideoMembers = BuildConfig.MAX_VIDEO_MEMBERS.toString()
+)
 
 fun getPublishOptions(userMediaStream: UserMediaStream): PublishOptions = PCastExpressFactory.createPublishOptionsBuilder()
     .withUserMedia(userMediaStream)

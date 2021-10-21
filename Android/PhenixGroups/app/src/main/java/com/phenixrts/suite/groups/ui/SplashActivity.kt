@@ -4,28 +4,24 @@
 
 package com.phenixrts.suite.groups.ui
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import androidx.appcompat.app.AlertDialog
-import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.R
-import com.phenixrts.suite.groups.cache.PreferenceProvider
 import com.phenixrts.suite.groups.common.extensions.*
 import com.phenixrts.suite.groups.databinding.ActivitySplashBinding
 import com.phenixrts.suite.groups.models.*
-import com.phenixrts.suite.groups.repository.RepositoryProvider
 import com.phenixrts.suite.phenixcommon.common.launchMain
 import com.phenixrts.suite.phenixdeeplink.models.DeepLinkStatus
-import com.phenixrts.suite.phenixdeeplink.models.PhenixConfiguration
+import com.phenixrts.suite.phenixdeeplink.models.PhenixDeepLinkConfiguration
 import timber.log.Timber
-import javax.inject.Inject
 
+@SuppressLint("CustomSplashScreen")
 class SplashActivity : EasyPermissionActivity() {
 
-    @Inject lateinit var repositoryProvider: RepositoryProvider
-    @Inject lateinit var preferenceProvider: PreferenceProvider
     private lateinit var binding: ActivitySplashBinding
 
     private val timeoutHandler = Handler(Looper.getMainLooper())
@@ -39,12 +35,19 @@ class SplashActivity : EasyPermissionActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        GroupsApplication.component.inject(this)
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        timeoutHandler.postDelayed(timeoutRunnable, TIMEOUT_DELAY)
     }
 
-    override fun onDeepLinkQueried(status: DeepLinkStatus, configuration: PhenixConfiguration, deepLink: String) {
+    override fun onDeepLinkQueried(
+        status: DeepLinkStatus,
+        configuration: PhenixDeepLinkConfiguration,
+        rawConfiguration: Map<String, String>,
+        deepLink: String
+    ) {
+        super.onDeepLinkQueried(status, configuration, rawConfiguration, deepLink)
+        Timber.d("Deep link queried: $status, $deepLink")
         launchMain {
             when (status) {
                 DeepLinkStatus.RELOAD -> showAppRestartRequired()
@@ -56,7 +59,7 @@ class SplashActivity : EasyPermissionActivity() {
                         if (granted) {
                             showLandingScreen(configuration)
                         } else {
-                            onDeepLinkQueried(status, configuration, deepLink)
+                            onDeepLinkQueried(status, configuration, rawConfiguration, deepLink)
                         }
                     }
                 }
@@ -75,9 +78,8 @@ class SplashActivity : EasyPermissionActivity() {
             .show()
     }
 
-    private fun showLandingScreen(configuration: PhenixConfiguration) = launchMain {
+    private fun showLandingScreen(configuration: PhenixDeepLinkConfiguration) = launchMain {
         Timber.d("Waiting for PCast")
-        timeoutHandler.postDelayed(timeoutRunnable, TIMEOUT_DELAY)
         repositoryProvider.setupRoomExpress(configuration)
         repositoryProvider.waitForPCast()
         timeoutHandler.removeCallbacks(timeoutRunnable)

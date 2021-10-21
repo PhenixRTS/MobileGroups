@@ -106,7 +106,7 @@ class GroupsViewModel(
     }
 
     private fun getRoomListItems() = launchMain {
-        cacheProvider.cacheDao().getVisitedRooms(repositoryProvider.getCurrentConfiguration().backend ?: "").collect { rooms ->
+        cacheProvider.cacheDao().getVisitedRooms(repositoryProvider.getCurrentConfiguration().backend).collect { rooms ->
             roomList.value = rooms
         }
     }

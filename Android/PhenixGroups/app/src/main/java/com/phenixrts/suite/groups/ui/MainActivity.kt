@@ -16,13 +16,10 @@ import com.phenixrts.common.RequestStatus
 import com.phenixrts.suite.groups.BuildConfig
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.R
-import com.phenixrts.suite.groups.cache.CacheProvider
-import com.phenixrts.suite.groups.cache.PreferenceProvider
 import com.phenixrts.suite.groups.common.extensions.*
 import com.phenixrts.suite.groups.databinding.ActivityMainBinding
 import com.phenixrts.suite.groups.models.DeepLinkModel
 import com.phenixrts.suite.groups.receivers.CellularStateReceiver
-import com.phenixrts.suite.groups.repository.RepositoryProvider
 import com.phenixrts.suite.groups.repository.UserMediaRepository
 import com.phenixrts.suite.groups.services.CameraForegroundService
 import com.phenixrts.suite.groups.ui.screens.LandingScreen
@@ -30,12 +27,10 @@ import com.phenixrts.suite.groups.ui.screens.RoomScreen
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
 import com.phenixrts.suite.groups.ui.viewmodels.GroupsViewModel
 import com.phenixrts.suite.phenixcommon.DebugMenu
-import com.phenixrts.suite.phenixcommon.common.FileWriterDebugTree
 import com.phenixrts.suite.phenixcommon.common.launchMain
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.delay
 import timber.log.Timber
-import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -43,11 +38,6 @@ const val EXTRA_DEEP_LINK_MODEL = "ExtraDeepLinkModel"
 
 class MainActivity : EasyPermissionActivity() {
 
-    @Inject lateinit var repositoryProvider: RepositoryProvider
-    @Inject lateinit var cacheProvider: CacheProvider
-    @Inject lateinit var preferenceProvider: PreferenceProvider
-    @Inject lateinit var cellularStateReceiver: CellularStateReceiver
-    @Inject lateinit var fileWriterTree: FileWriterDebugTree
     lateinit var binding: ActivityMainBinding
 
     private val viewModel: GroupsViewModel by lazyViewModel({ application as GroupsApplication }, {
@@ -63,6 +53,7 @@ class MainActivity : EasyPermissionActivity() {
     }
     val menuHandler: MenuHandler by lazy { MenuHandler(binding, viewModel) }
 
+    private val cameraService by lazy { Intent(this, CameraForegroundService::class.java) }
     private val timerHandler = Handler(Looper.getMainLooper())
     private val timerRunnable = Runnable {
         launchMain {
@@ -75,7 +66,6 @@ class MainActivity : EasyPermissionActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        GroupsApplication.component.inject(this)
         binding = ActivityMainBinding.inflate(layoutInflater)
         binding.model = viewModel
         binding.lifecycleOwner = this@MainActivity
@@ -97,6 +87,7 @@ class MainActivity : EasyPermissionActivity() {
         menuHandler.onStop()
         debugMenu.onStop()
         cellularStateReceiver.unregister()
+        switchCameraForegroundService(false)
     }
 
     override fun onBackPressed() {
@@ -107,8 +98,7 @@ class MainActivity : EasyPermissionActivity() {
                 }
             }
         }
-        if (menuHandler.isClosed() && debugMenu.isClosed()){
-            switchCameraForegroundService(false)
+        if (menuHandler.isClosed() && debugMenu.isClosed()) {
             super.onBackPressed()
         }
     }
@@ -263,7 +253,6 @@ class MainActivity : EasyPermissionActivity() {
     private fun switchCameraForegroundService(enabled: Boolean) {
         if (CameraForegroundService.isRunning() != enabled) {
             Timber.d(if (enabled) "Starting service" else "Stopping service")
-            val cameraService = Intent(this, CameraForegroundService::class.java)
             if (enabled) {
                 ContextCompat.startForegroundService(this, cameraService)
             } else {

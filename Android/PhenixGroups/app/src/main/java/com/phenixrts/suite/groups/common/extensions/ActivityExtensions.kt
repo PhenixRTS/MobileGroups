@@ -19,10 +19,7 @@ import com.phenixrts.suite.groups.ui.screens.JoinScreen
 import com.phenixrts.suite.groups.ui.screens.LoadingScreen
 import com.phenixrts.suite.groups.ui.viewmodels.GroupsViewModel
 import com.phenixrts.suite.phenixcommon.common.launchMain
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import kotlin.system.exitProcess
 
@@ -30,7 +27,7 @@ private const val QUIT_DELAY = 1000L
 
 fun View.showSnackBar(message: String) {
     if (message.isNotBlank()) {
-        GlobalScope.launch(Dispatchers.Main) {
+        launchMain {
             Snackbar.make(this@showSnackBar, message, Snackbar.LENGTH_INDEFINITE).show()
         }
     }
@@ -38,7 +35,7 @@ fun View.showSnackBar(message: String) {
 
 fun FragmentActivity.showToast(message: String) {
     if (message.isNotBlank()) {
-        GlobalScope.launch(Dispatchers.Main) {
+        launchMain {
             Toast.makeText(this@showToast, message, Toast.LENGTH_SHORT).show()
         }
     }

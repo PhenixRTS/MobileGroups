@@ -4,6 +4,7 @@
 
 package com.phenixrts.suite.groups.ui.adapters
 
+import android.annotation.SuppressLint
 import android.view.*
 import android.widget.ImageView
 import androidx.lifecycle.LifecycleOwner
@@ -21,6 +22,7 @@ import com.phenixrts.suite.groups.ui.viewmodels.GroupsViewModel
 import timber.log.Timber
 import kotlin.properties.Delegates
 
+@SuppressLint("NotifyDataSetChanged")
 class MemberListAdapter(
     private val viewModel: GroupsViewModel,
     private val mainSurface: SurfaceView,

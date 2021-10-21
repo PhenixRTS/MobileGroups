@@ -14,9 +14,10 @@ import com.phenixrts.express.RoomExpressFactory
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.cache.CacheProvider
+import com.phenixrts.suite.groups.common.DEFAULT_CONFIG
 import com.phenixrts.suite.phenixcommon.common.launchMain
 import com.phenixrts.suite.groups.models.RoomStatus
-import com.phenixrts.suite.phenixdeeplink.models.PhenixConfiguration
+import com.phenixrts.suite.phenixdeeplink.models.PhenixDeepLinkConfiguration
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import kotlin.coroutines.resume
@@ -31,7 +32,7 @@ class RepositoryProvider(
 
     private var roomExpressRepository: RoomExpressRepository? = null
     private var userMediaRepository: UserMediaRepository? = null
-    private var expressConfiguration = PhenixConfiguration()
+    private var expressConfiguration = DEFAULT_CONFIG
     var roomExpress: RoomExpress? = null
     val onRoomStatusChanged = MutableLiveData<RoomStatus>().apply { value = RoomStatus(RequestStatus.OK) }
 
@@ -74,7 +75,7 @@ class RepositoryProvider(
         }
     }
 
-    suspend fun setupRoomExpress(configuration: PhenixConfiguration) {
+    suspend fun setupRoomExpress(configuration: PhenixDeepLinkConfiguration) {
         if (hasConfigurationChanged(configuration)) {
             Timber.d("Room Express configuration has changed: $configuration")
             expressConfiguration = configuration
@@ -100,7 +101,7 @@ class RepositoryProvider(
         }
     }
 
-    private fun hasConfigurationChanged(configuration: PhenixConfiguration): Boolean = expressConfiguration != configuration
+    private fun hasConfigurationChanged(configuration: PhenixDeepLinkConfiguration): Boolean = expressConfiguration != configuration
 
     fun isRoomExpressInitialized(): Boolean = roomExpress != null
 

@@ -14,7 +14,7 @@ import com.phenixrts.suite.groups.common.extensions.call
 import com.phenixrts.suite.phenixcommon.common.launchMain
 import com.phenixrts.suite.groups.common.extensions.mapRoomMember
 import com.phenixrts.suite.groups.models.RoomMember
-import com.phenixrts.suite.phenixdeeplink.models.PhenixConfiguration
+import com.phenixrts.suite.phenixdeeplink.models.PhenixDeepLinkConfiguration
 import timber.log.Timber
 
 private const val MEMBER_PICK_DELAY = 1000 * 2L
@@ -23,7 +23,7 @@ private const val MEMBER_RE_PICK_DELAY = 1000 * 5L
 class RoomMemberRepository(
     private val roomService: RoomService,
     private val selfMember: RoomMember,
-    private val configuration: PhenixConfiguration
+    private val configuration: PhenixDeepLinkConfiguration
 ) {
 
     private val disposables: MutableList<Disposable> = mutableListOf()
