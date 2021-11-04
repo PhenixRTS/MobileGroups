@@ -24,7 +24,13 @@ class MemberStreamVideoStateProvider: RoomMemberDescription {
         queue.async { [weak self] in
             guard let self = self else { return }
 
-            os_log(.debug, log: .roomMemberMediaController, "Observe video state changes, (%{PRIVATE}s)", self.memberDescription)
+            os_log(
+                .debug,
+                log: .roomMemberStreamVideoStateProvider,
+                "%{private}s, Observe video state changes",
+                self.memberDescription
+            )
+
             self.stream
                 .getObservableVideoState()
                 .subscribe(self.videoStateDidChange)
@@ -35,7 +41,12 @@ class MemberStreamVideoStateProvider: RoomMemberDescription {
     func dispose() {
         dispatchPrecondition(condition: .onQueue(queue))
 
-        os_log(.debug, log: .roomMemberMediaController, "Dispose, (%{PRIVATE}s)", self.memberDescription)
+        os_log(
+            .debug,
+            log: .roomMemberStreamVideoStateProvider,
+            "%{private}s, Dispose",
+            self.memberDescription
+        )
 
         disposables.removeAll()
         stateChangeHandler = nil

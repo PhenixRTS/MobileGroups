@@ -5,8 +5,8 @@
 import os.log
 import PhenixSdk
 
-protocol SubscriptionTypeProvider: AnyObject {
-    func canSubscribeWithVideo() -> Bool
+protocol RoomMemberControllerDelegate: AnyObject {
+    func canSubscribeForVideo() -> Bool
 }
 
 public class RoomMemberController {
@@ -52,14 +52,23 @@ public class RoomMemberController {
     public func subscribeToMemberList() {
         queue.async { [weak self] in
             guard let self = self else { return }
-            os_log(.debug, log: .memberController, "Subscribe to room member list updates, (%{PRIVATE}s)", self.roomDescription)
-            self.memberListDisposable = self.roomService?.getObservableActiveRoom().getValue().getObservableMembers().subscribe(self.memberListDidChange)
+            os_log(
+                .debug,
+                log: .memberController,
+                "%{private}s, Subscribe to room member list updates",
+                self.roomDescription
+            )
+            self.memberListDisposable = self.roomService?
+                .getObservableActiveRoom()
+                .getValue()
+                .getObservableMembers()
+                .subscribe(self.memberListDidChange)
         }
     }
 
     public func recentlyLoudestMember() -> RoomMember? {
         members
-            .filter { $0.media.isAudioAvailable == true }
+            .filter { $0.state == .active && $0.media.isAudioAvailable == true }
             .max { $0.media.recentAudioLevel() < $1.media.recentAudioLevel() }
     }
 }
@@ -69,7 +78,7 @@ internal extension RoomMemberController {
     func dispose() {
         dispatchPrecondition(condition: .onQueue(queue))
 
-        os_log(.debug, log: .joinedRoom, "Dispose room media controller, (%{PRIVATE}s)", roomDescription)
+        os_log(.debug, log: .memberController, "%{private}s, Dispose", roomDescription)
 
         self.memberListDisposable = nil
         self.members.forEach { $0.dispose() }
@@ -94,7 +103,12 @@ private extension RoomMemberController {
 
         // Compare the new list of members with the old list of members.
         // Also update the current member list.
-        process(newMembers: newMembers, oldMembers: self.members, connectedMemberHandler: membersConnected, disconnectedMemberHandler: membersDisconnected)
+        process(
+            newMembers: newMembers,
+            oldMembers: self.members,
+            connectedMemberHandler: membersConnected,
+            disconnectedMemberHandler: membersDisconnected
+        )
     }
 
     /// Find out, did the members list has changes inside it
@@ -107,6 +121,22 @@ private extension RoomMemberController {
     ///   - disconnectedMemberHandler: Closure for handling members, if there are any who just now disconnected.
     func process(newMembers: Set<RoomMember>, oldMembers: Set<RoomMember>, connectedMemberHandler: (Set<RoomMember>) -> Void, disconnectedMemberHandler: (Set<RoomMember>) -> Void) {
         dispatchPrecondition(condition: .onQueue(queue))
+
+        os_log(
+            .debug,
+            log: .memberController,
+            "%{private}s, Old members: %{private}s",
+            roomDescription,
+            oldMembers.description
+        )
+
+        os_log(
+            .debug,
+            log: .memberController,
+            "%{private}s, New members: %{PRIVATE}s",
+            roomDescription,
+            newMembers.description
+        )
 
         // Get list of elements which does not exist in updatedMemberList but exist in currentMemberList, in simple words, members who left.
         let disconnectedMembers = oldMembers.subtracting(newMembers)
@@ -123,11 +153,17 @@ private extension RoomMemberController {
         guard newMembers.isEmpty == false else { return }
 
         members.formUnion(newMembers)
-        os_log(.debug, log: .memberController, "Members connected to the room: %{PRIVATE}s, (%{PRIVATE}s)", newMembers.description, roomDescription)
+        os_log(
+            .debug,
+            log: .memberController,
+            "%{private}s, Members connected to the room: %{private}s",
+            roomDescription,
+            newMembers.description
+        )
 
         for member in newMembers {
-            // Observe new member stream and then automatically subscribe to it
-            member.subscriptionController.subscriptionTypeProvider = self
+            // Observe new member streams
+            member.addStateObserver(self)
             member.observeStreams()
         }
     }
@@ -137,7 +173,13 @@ private extension RoomMemberController {
 
         guard oldMembers.isEmpty == false else { return }
 
-        os_log(.debug, log: .memberController, "Members disconnected from the room: %{PRIVATE}s, (%{PRIVATE}s)", oldMembers.description, roomDescription)
+        os_log(
+            .debug,
+            log: .memberController,
+            "%{private}s, Members disconnected from the room: %{private}s",
+            roomDescription,
+            oldMembers.description
+        )
         members.subtract(oldMembers)
 
         for member in oldMembers {
@@ -159,27 +201,37 @@ private extension RoomMemberController {
             fatalError("Room Express must be provided")
         }
 
-        if member == currentMember {
+        guard member != currentMember else {
             return currentMember
-        } else {
-            return RoomMember(remoteMember: member, roomExpress: roomExpress, queue: queue)
         }
+
+        let newMember = RoomMember(remoteMember: member, roomExpress: roomExpress, queue: queue)
+        newMember.membersControllerDelegate = self
+
+        return newMember
     }
 }
 
 // MARK: - RoomMemberControllerDelegate
-extension RoomMemberController: SubscriptionTypeProvider {
+extension RoomMemberController: RoomMemberControllerDelegate {
     /// Checks if the limit of the member subscription with video is reached.
     /// - Returns: Bool, `true` - can subscribe with video, `false` - limit is reached, should not subscribe with video
-    func canSubscribeWithVideo() -> Bool {
-        dispatchPrecondition(condition: .onQueue(queue))
+    func canSubscribeForVideo() -> Bool {
+//        dispatchPrecondition(condition: .onQueue(queue))
 
         // Calculate, how many of members have video subscription at the moment.
         let videoSubscriptions = members.reduce(into: 0) { result, member in
-            result += member.subscriptionController.desiredSubscriptionTypes.contains(.video) ? 1 : 0
+            result += member.subscribesToVideo ? 1 : 0
         }
 
-        os_log(.debug, log: .memberController, "Active video subscriptions: %{PRIVATE}s/%{PRIVATE}s, (%{PRIVATE}s)", videoSubscriptions.description, maxVideoSubscriptions.description, roomDescription)
+        os_log(
+            .debug,
+            log: .memberController,
+            "%{private}s, Active video subscriptions: %{private}s/%{private}s",
+            roomDescription,
+            videoSubscriptions.description,
+            maxVideoSubscriptions.description
+        )
 
         if videoSubscriptions + 1 <= maxVideoSubscriptions {
             return true
@@ -189,13 +241,33 @@ extension RoomMemberController: SubscriptionTypeProvider {
     }
 }
 
+// MARK: - RoomMemberStateObserver
+extension RoomMemberController: RoomMemberStateObserver {
+    public func roomMember(_ member: RoomMember, didChange state: RoomMember.State) {
+        membersListDidChange(members)
+    }
+}
+
 // MARK: - Observable callback methods
 private extension RoomMemberController {
     func memberListDidChange(_ changes: PhenixObservableChange<NSArray>?) {
         queue.async { [weak self] in
-            guard let members = changes?.value as? [PhenixMember] else { return }
+            guard let self = self else {
+                return
+            }
 
-            self?.processLatestMembers(members)
+            guard let members = changes?.value as? [PhenixMember] else {
+                return
+            }
+
+            os_log(
+                .debug,
+                log: .memberController,
+                "%{private}s, Member list did change",
+                self.roomDescription
+            )
+
+            self.processLatestMembers(members)
         }
     }
 }

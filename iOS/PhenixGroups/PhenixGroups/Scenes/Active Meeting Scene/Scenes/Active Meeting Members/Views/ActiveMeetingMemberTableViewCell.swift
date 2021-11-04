@@ -12,6 +12,7 @@ class ActiveMeetingMemberTableViewCell: UITableViewCell, CellIdentified {
     private var muteImage: UIImageView!
     private var muteImageBackground: UIView!
     private var audioLevelView: AudioLevelView!
+    private var awayImageView: UIImageView!
 
     weak var member: RoomMember! {
         didSet {
@@ -61,6 +62,7 @@ class ActiveMeetingMemberTableViewCell: UITableViewCell, CellIdentified {
     func configure(member: RoomMember) {
         self.member = member
         displayNameLabel.text = member.screenName
+        setAway(member.state == .away)
     }
 
     func configureAudio() {
@@ -90,6 +92,10 @@ class ActiveMeetingMemberTableViewCell: UITableViewCell, CellIdentified {
             showAudioLevelIndicator(false)
         }
     }
+
+    func setAway(_ enabled: Bool) {
+        awayImageView.isHidden = !enabled
+    }
 }
 
 // MARK: - Private methods
@@ -118,12 +124,15 @@ private extension ActiveMeetingMemberTableViewCell {
         audioLevelView = AudioLevelView()
         audioLevelView.translatesAutoresizingMaskIntoConstraints = false
 
+        awayImageView = UIImageView.makeAwayImageView()
+
         contentView.addSubview(cameraView)
         contentView.addSubview(pinView)
         contentView.addSubview(displayNameLabel)
         contentView.addSubview(muteImage)
         contentView.insertSubview(muteImageBackground, belowSubview: muteImage)
         contentView.addSubview(audioLevelView)
+        contentView.addSubview(awayImageView)
 
         setupConstraints()
     }
@@ -158,7 +167,12 @@ private extension ActiveMeetingMemberTableViewCell {
             muteImageBackground.bottomAnchor.constraint(equalTo: muteImage.bottomAnchor, constant: 2),
 
             audioLevelView.trailingAnchor.constraint(equalTo: cameraView.trailingAnchor, constant: -6),
-            audioLevelView.bottomAnchor.constraint(equalTo: cameraView.bottomAnchor, constant: -6)
+            audioLevelView.bottomAnchor.constraint(equalTo: cameraView.bottomAnchor, constant: -6),
+
+            awayImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 6),
+            awayImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -6),
+            awayImageView.widthAnchor.constraint(equalToConstant: 18),
+            awayImageView.heightAnchor.constraint(equalToConstant: 18)
         ])
     }
 

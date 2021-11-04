@@ -23,7 +23,13 @@ public class RoomMediaController {
     public func setAudio(enabled: Bool) {
         queue.async { [weak self] in
             guard let self = self else { return }
-            os_log(.debug, log: .mediaController, "Set audio publishing %{PUBLIC}s, (%{PRIVATE}s)", enabled == true ? "enabled" : "disabled", self.roomDescription)
+            os_log(
+                .debug,
+                log: .mediaController,
+                "%{private}s, Set audio publishing %{public}s",
+                self.roomDescription,
+                enabled == true ? "enabled" : "disabled"
+            )
             if enabled {
                 self.publisher.enableAudio()
             } else {
@@ -39,7 +45,13 @@ public class RoomMediaController {
     public func setVideo(enabled: Bool) {
         queue.async { [weak self] in
             guard let self = self else { return }
-            os_log(.debug, log: .mediaController, "Set video publishing %{PUBLIC}s, (%{PRIVATE}s)", enabled == true ? "enabled" : "disabled", self.roomDescription)
+            os_log(
+                .debug,
+                log: .mediaController,
+                "%{private}s, Set video publishing %{public}s",
+                self.roomDescription,
+                enabled == true ? "enabled" : "disabled"
+            )
             if enabled {
                 self.publisher.enableVideo()
             } else {
@@ -54,7 +66,7 @@ internal extension RoomMediaController {
     func stop() {
         dispatchPrecondition(condition: .onQueue(queue))
 
-        os_log(.debug, log: .mediaController, "Stop media, (%{PRIVATE}s)", roomDescription)
+        os_log(.debug, log: .mediaController, "%{private}s, Stop media", roomDescription)
         publisher.stop()
     }
 }

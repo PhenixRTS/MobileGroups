@@ -136,13 +136,17 @@ extension ActiveMeetingMemberListViewController: JoinedRoomMembersDelegate {
     func memberListDidChange(_ list: [RoomMember]) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            os_log(.debug, log: .activeMeetingScene, "Member list did change, %{PRIVATE}s", list.description)
+            os_log(.debug, log: .activeMeetingScene, "Member list did change, %{private}s", list.description)
+
+            let members = list.filter {
+                $0.state == .active || $0.state == .away
+            }
 
             // Check if cell is selected in tableview (selected cell represents the pinned member).
             guard let indexPath = self.tableView.indexPathForSelectedRow else {
                 // No cell is selected.
-                self.dataSource.members = list
-                self.reload(data: list, indexPathForSelectedRow: nil)
+                self.dataSource.members = members
+                self.reload(data: members, indexPathForSelectedRow: nil)
                 return
             }
 
@@ -152,9 +156,9 @@ extension ActiveMeetingMemberListViewController: JoinedRoomMembersDelegate {
             // Search for the new index of the member in the received member list array.
             // This new member list array will replace the currently used member list.
             // By searching for the member inside the new list, we can calculate where it will be located in the tableview.
-            guard let index = list.firstIndex(where: { $0 == member }) else {
+            guard let index = members.firstIndex(where: { $0 == member }) else {
                 // Member does not exist inside the new member list, apparently it disconnected.
-                self.dataSource.members = list
+                self.dataSource.members = members
                 self.reload(data: list, indexPathForSelectedRow: nil)
                 return
             }
@@ -164,7 +168,7 @@ extension ActiveMeetingMemberListViewController: JoinedRoomMembersDelegate {
             indexPathForSelectedRow.row = index
 
             // Reload the list.
-            self.reload(data: list, indexPathForSelectedRow: indexPathForSelectedRow)
+            self.reload(data: members, indexPathForSelectedRow: indexPathForSelectedRow)
         }
     }
 }

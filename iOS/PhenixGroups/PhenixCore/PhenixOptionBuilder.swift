@@ -7,7 +7,11 @@ import os.log
 import PhenixSdk
 
 enum PhenixOptionBuilder {
-    static func createPCastExpressOptions(backend: URL, pcast: URL?, unrecoverableErrorCallback: @escaping (_ description: String?) -> Void) -> PhenixPCastExpressOptions {
+    static func createPCastExpressOptions(
+        backend: URL,
+        pcast: URL?,
+        unrecoverableErrorCallback: @escaping (_ description: String?) -> Void
+    ) -> PhenixPCastExpressOptions {
         var builder: PhenixPCastExpressOptionsBuilder = PhenixPCastExpressFactory.createPCastExpressOptionsBuilder()
             .withMinimumConsoleLogLevel("Info")
             .withBackendUri(backend.absoluteString)
@@ -23,7 +27,9 @@ enum PhenixOptionBuilder {
         return builder.buildPCastExpressOptions()
     }
 
-    static func createRoomExpressOptions(with pcastExpressOptions: PhenixPCastExpressOptions) -> PhenixRoomExpressOptions {
+    static func createRoomExpressOptions(
+        with pcastExpressOptions: PhenixPCastExpressOptions
+    ) -> PhenixRoomExpressOptions {
         PhenixRoomExpressFactory.createRoomExpressOptionsBuilder()
             .withPCastExpressOptions(pcastExpressOptions)
             .buildRoomExpressOptions()
@@ -64,7 +70,11 @@ enum PhenixOptionBuilder {
             .buildPublishOptions()
     }
 
-    static func createPublishToRoomOptions(with roomOptions: PhenixRoomOptions, publishOptions: PhenixPublishOptions, displayName: String) -> PhenixPublishToRoomOptions {
+    static func createPublishToRoomOptions(
+        with roomOptions: PhenixRoomOptions,
+        publishOptions: PhenixPublishOptions,
+        displayName: String
+    ) -> PhenixPublishToRoomOptions {
         PhenixRoomExpressFactory.createPublishToRoomOptionsBuilder()
             .withRoomOptions(roomOptions)
             .withPublishOptions(publishOptions)
@@ -72,21 +82,23 @@ enum PhenixOptionBuilder {
             .buildPublishToRoomOptions()
     }
 
-    static func createSubscribeToMemberVideoStreamOptions(with layer: CALayer) -> PhenixSubscribeToMemberStreamOptions {
-        PhenixRoomExpressFactory.createSubscribeToMemberStreamOptionsBuilder()
-            .withRenderer(layer)
-            .buildSubscribeToMemberStreamOptions()
-    }
-
-    static func createSubscribeToMemberAudioStreamOptions() -> PhenixSubscribeToMemberStreamOptions {
-        PhenixRoomExpressFactory.createSubscribeToMemberStreamOptionsBuilder()
+    static func createSubscribeToMemberAudioStreamOptions(
+        streamEndHandler: ((PhenixStreamEndedReason) -> Void)? = nil
+    ) -> PhenixSubscribeToMemberStreamOptions {
+        let options = PhenixPCastExpressFactory.createMonitorOptionsBuilder().buildMonitorOptions()
+        return PhenixRoomExpressFactory.createSubscribeToMemberStreamOptionsBuilder()
             .withCapabilities(["audio-only"])
+            .withMonitor(nil, { reason, _, _ in streamEndHandler?(reason) }, options)
             .buildSubscribeToMemberStreamOptions()
     }
 
-    static func createSubscribeToMemberVideoStreamOptions() -> PhenixSubscribeToMemberStreamOptions {
-        PhenixRoomExpressFactory.createSubscribeToMemberStreamOptionsBuilder()
+    static func createSubscribeToMemberVideoStreamOptions(
+        streamEndHandler: ((PhenixStreamEndedReason) -> Void)? = nil
+    ) -> PhenixSubscribeToMemberStreamOptions {
+        let options = PhenixPCastExpressFactory.createMonitorOptionsBuilder().buildMonitorOptions()
+        return PhenixRoomExpressFactory.createSubscribeToMemberStreamOptionsBuilder()
             .withCapabilities(["video-only"])
+            .withMonitor(nil, { reason, _, _ in streamEndHandler?(reason) }, options)
             .buildSubscribeToMemberStreamOptions()
     }
 }

@@ -46,7 +46,7 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
     weak var coordinator: (MeetingFinished & ShowDebugMenu)?
     weak var phenix: PhenixOnlineStatusChanges?
     weak var media: UserMediaStreamController?
-    weak var joinedRoom: JoinedRoom!
+    weak var joinedRoom: JoinedRoom?
 
     var activeMeetingView: ActiveMeetingView {
         view as! ActiveMeetingView
@@ -55,7 +55,6 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        assert(joinedRoom != nil, "Joined meeting instance is necessary")
         assert(displayName != nil, "Display name is necessary")
         assert(media != nil, "Media is necessary")
 
@@ -78,16 +77,26 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
     }
 
     func subscribeToRoomEvents() {
+        guard let joinedRoom = joinedRoom else {
+            os_log(.error, log: .activeMeetingScene, "Joined room not available. (%{private}s)", #function)
+            return
+        }
+
         joinedRoom.memberController.delegate = membersViewController
         joinedRoom.memberController.subscribeToMemberList()
         joinedRoom.subscribeToChatMessages(chatViewController)
 
         chatViewController.sendMessageHandler = { [weak self] message in
-            self?.joinedRoom.send(message: message)
+            self?.joinedRoom?.send(message: message)
         }
     }
 
     func leaveRoom(withReason reason: (title: String, message: String?)? = nil) {
+        guard let joinedRoom = joinedRoom else {
+            os_log(.error, log: .activeMeetingScene, "Joined room not available. (%{private}s)", #function)
+            return
+        }
+
         os_log(.debug, log: .activeMeetingScene, "Leaving meeting")
 
         let meeting = Meeting(code: joinedRoom.alias, leaveDate: .now, backendUrl: joinedRoom.backend)
@@ -103,6 +112,11 @@ class ActiveMeetingViewController: UIViewController, Storyboarded {
 
     /// Configure UI elements to represent the current media state for current user
     func configureMedia() {
+        guard let joinedRoom = joinedRoom else {
+            os_log(.error, log: .activeMeetingScene, "Joined room not available. (%{private}s)", #function)
+            return
+        }
+
         if let media = media {
             // Set the preview layer from the local media for the "self" member,
             // because "self" member does not subscribe for the media stream.
@@ -174,6 +188,11 @@ private extension ActiveMeetingViewController {
     }
 
     func configurePageController() {
+        guard let joinedRoom = joinedRoom else {
+            os_log(.error, log: .activeMeetingScene, "Joined room not available. (%{private}s)", #function)
+            return
+        }
+
         let controllers = [
             makeMembersViewController(),
             makeChatViewController(),
@@ -220,6 +239,11 @@ private extension ActiveMeetingViewController {
     // MARK: - Audio & Video interaction
 
     func setAudio(enabled: Bool) {
+        guard let joinedRoom = joinedRoom else {
+            os_log(.error, log: .activeMeetingScene, "Joined room not available. (%{private}s)", #function)
+            return
+        }
+
         os_log(.debug, log: .activeMeetingScene, "Set audio %{PUBLIC}s", enabled == true ? "enabled" : "disabled")
         // Inform the joined room that the current audio state has changed
         joinedRoom.mediaController?.setAudio(enabled: enabled)
@@ -229,6 +253,11 @@ private extension ActiveMeetingViewController {
     }
 
     func setVideo(enabled: Bool) {
+        guard let joinedRoom = joinedRoom else {
+            os_log(.error, log: .activeMeetingScene, "Joined room not available. (%{private}s)", #function)
+            return
+        }
+
         os_log(.debug, log: .activeMeetingScene, "Set video %{PUBLIC}s", enabled == true ? "enabled" : "disabled")
         // Inform the joined room that the current video state has changed
         joinedRoom.mediaController?.setVideo(enabled: enabled)
@@ -343,7 +372,7 @@ private extension ActiveMeetingViewController {
         loudestMemberTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { [weak self] _ in
             guard let self = self else { return }
             guard self.membersViewController.pinnedMemberExist == false else { return }
-            guard let loudestMember = self.joinedRoom.memberController.recentlyLoudestMember() else { return }
+            guard let loudestMember = self.joinedRoom?.memberController.recentlyLoudestMember() else { return }
             if self.focusedMember != loudestMember {
                 self.setFocus(on: loudestMember)
             }
@@ -362,14 +391,12 @@ extension ActiveMeetingViewController: ActiveMeetingPreview {
 
 extension ActiveMeetingViewController: PhenixOnlineStatusObserver {
     func phenixOnlineStatusDidChange(isOnline: Bool) {
-        DispatchQueue.main.async { [weak self] in
+        DispatchQueue.main.async {
             guard isOnline == false else { return }
 
-            self?.leaveRoom(
-                withReason: (
-                    title: "Experiencing problems connecting to Phenix",
-                    message: "Check your network status."
-                )
+            AppDelegate.present(
+                alertWithTitle: "Experiencing problems with the connecting",
+                message: "Check your network status."
             )
         }
     }

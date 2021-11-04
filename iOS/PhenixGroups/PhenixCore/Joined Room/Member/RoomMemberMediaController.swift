@@ -35,13 +35,26 @@ public class RoomMemberMediaController: MediaAvailability, RecentAudioLevelProvi
 
     public private(set) var isAudioAvailable = false {
         didSet {
-            os_log(.debug, log: .roomMemberMediaController, "Audio state changed, (%{PRIVATE}s), (%{PRIVATE}s)", memberDescription, description)
+            os_log(
+                .debug,
+                log: .roomMemberMediaController,
+                "%{private}s, Audio state changed to %{public}d",
+                memberDescription,
+                isAudioAvailable
+            )
             delegate?.audioStateDidChange(enabled: isAudioAvailable)
         }
     }
+
     public private(set) var isVideoAvailable = false {
         didSet {
-            os_log(.debug, log: .roomMemberMediaController, "Video state changed, (%{PRIVATE}s), (%{PRIVATE}s)", memberDescription, description)
+            os_log(
+                .debug,
+                log: .roomMemberMediaController,
+                "%{public}s, Video state changed to %{public}d",
+                memberDescription,
+                isVideoAvailable
+            )
             delegate?.videoStateDidChange(enabled: isVideoAvailable)
         }
     }
@@ -78,37 +91,55 @@ public class RoomMemberMediaController: MediaAvailability, RecentAudioLevelProvi
         return maxDecibel
     }
 
-    func setAudioLevelProvider(_ provider: MemberStreamAudioLevelProvider) {
-        self.audioLevelProvider = provider
+    func setAudioLevelProvider(_ provider: MemberStreamAudioLevelProvider?) {
+        audioLevelProvider?.dispose()
+        audioLevelProvider = provider
 
-        os_log(.debug, log: .roomMemberMediaController, "Audio level provider set, (%{PRIVATE}s), (%{PRIVATE}s)", memberDescription, description)
+        os_log(
+            .debug,
+            log: .roomMemberMediaController,
+            "%{public}s, Audio level provider set",
+            memberDescription
+        )
 
-        provider.audioProcessCompletion = { [weak self] decibel in
+        provider?.audioProcessCompletion = { [weak self] decibel in
             self?.processAudioLevel(decibel: decibel)
         }
-        provider.observeLevel()
+        provider?.observeLevel()
     }
 
-    func setAudioStateProvider(_ provider: MemberStreamAudioStateProvider) {
-        self.audioStateProvider = provider
+    func setAudioStateProvider(_ provider: MemberStreamAudioStateProvider?) {
+        audioStateProvider?.dispose()
+        audioStateProvider = provider
 
-        os_log(.debug, log: .roomMemberMediaController, "Audio state provider set, (%{PRIVATE}s), (%{PRIVATE}s)", memberDescription, description)
+        os_log(
+            .debug,
+            log: .roomMemberMediaController,
+            "%{public}s, Audio state provider set",
+            memberDescription
+        )
 
-        provider.stateChangeHandler = { [weak self] enabled in
+        provider?.stateChangeHandler = { [weak self] enabled in
             self?.isAudioAvailable = enabled
         }
-        provider.observeState()
+        provider?.observeState()
     }
 
-    func setVideoStateProvider(_ provider: MemberStreamVideoStateProvider) {
-        self.videoStateProvider = provider
+    func setVideoStateProvider(_ provider: MemberStreamVideoStateProvider?) {
+        videoStateProvider?.dispose()
+        videoStateProvider = provider
 
-        os_log(.debug, log: .roomMemberMediaController, "Video state provider set, (%{PRIVATE}s), (%{PRIVATE}s)", memberDescription, description)
+        os_log(
+            .debug,
+            log: .roomMemberMediaController,
+            "%{public}s, Video state provider set",
+            memberDescription
+        )
 
-        provider.stateChangeHandler = { [weak self] enabled in
+        provider?.stateChangeHandler = { [weak self] enabled in
             self?.isVideoAvailable = enabled
         }
-        provider.observeState()
+        provider?.observeState()
     }
 }
 
@@ -116,6 +147,21 @@ public class RoomMemberMediaController: MediaAvailability, RecentAudioLevelProvi
 extension RoomMemberMediaController: CustomStringConvertible {
     public var description: String {
         "RoomMemberMediaController(audio: \(isAudioAvailable), video: \(isVideoAvailable))"
+    }
+}
+
+// MARK: - CustomDebugStringConvertible
+extension RoomMemberMediaController: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        """
+        RoomMemberMediaController(
+        audio: \(isAudioAvailable),
+        video: \(isVideoAvailable),
+        videoStateProvider: \(String(describing: videoStateProvider)),
+        audioStateProvider: \(String(describing: audioStateProvider)),
+        audioLevelProvider: \(String(describing: audioLevelProvider)),
+        audioLevelCache: \(audioLevelCache))
+        """
     }
 }
 
@@ -133,7 +179,7 @@ internal extension RoomMemberMediaController {
     func dispose() {
         dispatchPrecondition(condition: .onQueue(queue))
 
-        os_log(.debug, log: .roomMemberMediaController, "Dispose, (%{PRIVATE}s), (%{PRIVATE}s)", memberDescription, description)
+        os_log(.debug, log: .roomMemberMediaController, "%{public}s, Dispose", memberDescription)
 
         videoStateProvider?.dispose()
         videoStateProvider = nil

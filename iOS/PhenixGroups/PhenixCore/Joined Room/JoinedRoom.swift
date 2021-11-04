@@ -24,7 +24,11 @@ public class JoinedRoom: ChatProvider, RoomRepresentation {
     public let mediaController: RoomMediaController?
     public let memberController: RoomMemberController
     public var alias: String {
-        roomService.getObservableActiveRoom()?.getValue()?.getObservableAlias()?.getValue() as String? ?? "N/A"
+        roomService
+            .getObservableActiveRoom()?
+            .getValue()?
+            .getObservableAlias()?
+            .getValue() as String? ?? "N/A"
     }
 
     init(
@@ -46,7 +50,12 @@ public class JoinedRoom: ChatProvider, RoomRepresentation {
     /// Clears all room disposables and all member subscriptions, stops publishing and leaves the room.
     public func leave() {
         queue.sync {
-            os_log(.debug, log: .joinedRoom, "Leave joined room, (%{PRIVATE}s)", self.description)
+            os_log(
+                .debug,
+                log: .joinedRoom,
+                "%{private}s, Leave joined room",
+                self.description
+            )
 
             self.chatService.dispose()
             self.memberController.dispose()
@@ -55,7 +64,13 @@ public class JoinedRoom: ChatProvider, RoomRepresentation {
 
             self.roomService.leaveRoom { [weak self] _, status in
                 guard let self = self else { return }
-                os_log(.debug, log: .joinedRoom, "Joined room left with status: %{PRIVATE}s, (%{PRIVATE}s)", String(describing: status.rawValue), self.description)
+                os_log(
+                    .debug,
+                    log: .joinedRoom,
+                    "%{private}s, Joined room left with status: %{private}s",
+                    self.description,
+                    String(describing: status.rawValue)
+                )
                 self.delegate?.roomLeft(self)
             }
         }
@@ -69,7 +84,7 @@ internal extension JoinedRoom {
     /// Must be called when SDK automatically re-publishes to the room, also if user didn't left the room manually.
     func dispose() {
         dispatchPrecondition(condition: .onQueue(queue))
-        os_log(.debug, log: .joinedRoom, "Dispose, (%{PRIVATE}s)", description)
+        os_log(.debug, log: .joinedRoom, "%{private}s, Dispose", description)
 
         chatService.dispose()
         memberController.dispose()
