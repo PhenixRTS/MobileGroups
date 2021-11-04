@@ -14,7 +14,6 @@ public final class PhenixManager: PhenixMediaChanges, PhenixOnlineStatusChanges 
     private var joinedRoom: JoinedRoom?
     private var chatService: PhenixChatService?
     private var onlineStatusDisposable: PhenixDisposable?
-    private var enableMediaCreationOnOnlineStatusChange: Bool = false
     private var mediaCreationTimeoutHandler: MediaCreationTimeoutHandler?
 
     internal let queue: DispatchQueue
@@ -172,39 +171,13 @@ private extension PhenixManager {
     func processMedia() {
         dispatchPrecondition(condition: .onQueue(queue))
 
+        precondition(userMediaStreamController == nil, "User media stream should not be initialized.")
+
         // Using DispatchGroup to block the current execution thread.
         // It is necessary to always wait till the local media is retrieved,
         // because without it, we cannot connect and publish to any room.
-        //
-        // There could be a scenario where the user is in a room and the
-        // device looses network connection, after it comes back online,
-        // SDK could try to re-publish to the same room once again to
-        // join it automatically, and to do that - user media stream is
-        // necessary.
-        // Before that happens SDK will always execute the PCast
-        // „isOnlineStatus“ callback to let know about the new "online"
-        // status. At that point app needs to retry to get new user
-        // media stream. So it needs to block the execution queue and
-        // wait for the async user media stream callback to return
-        // the stream and initialize the user media stream controller,
-        // which will be then used by the publisher.
-        // If that is not done, there can be a race condition between
-        // media retrieval and re-publishing, which will result in a
-        // bad app state.
 
         var mediaController: UserMediaStreamController!
-
-        // We need to always dispose and remove the existing user media
-        // stream from the memory before we try to create a new media
-        // stream. Right now Phenix SDK (v2021.0.1) does not allow
-        // multiple simultaneous media streams, because they share some
-        // facilities.
-        // By not doing it like this, when first media stream will
-        // get deallocated - it will also kill the second media stream.
-        // This situation can be triggered by losing network connection
-        // in an active room.
-        userMediaStreamController?.dispose()
-        userMediaStreamController = nil
 
         let group = DispatchGroup()
         group.enter()
@@ -221,12 +194,6 @@ private extension PhenixManager {
                 "Could not retrieve user media stream before it reaches the timeout."
             )
 
-            // Enable the possibility to create new media
-            // stream, so that if it failed on the first
-            // time right after application launch,
-            // it can retry to create it again when online
-            // status changes in future.
-            enableMediaCreationOnOnlineStatusChange = true
             mediaCreationTimeoutHandler?()
             return
         }
@@ -243,33 +210,14 @@ private extension PhenixManager {
             guard let self = self else { return }
             guard let isOnline = changes?.value as? Bool else { return }
 
-            os_log(.debug, log: .phenixManager, "Online status did change: %{PRIVATE}s", isOnline == true ? "online" : "offline")
+            os_log(
+                .debug,
+                log: .phenixManager,
+                "Online status did change: %{PRIVATE}s",
+                isOnline == true ? "online" : "offline"
+            )
 
             self.onlineStatusDidChange(isOnline: isOnline)
-
-            guard isOnline == true else { return }
-
-            // Do not try to create user media for the first time
-            // when the "onlineStatusDidChange" is executed.
-            // We are creating the media already in the
-            // `func start(unrecoverableErrorCompletion:)` method
-            // right after the PhenixRoomExpress is created.
-            // PCastExpress executes this callback method
-            // right after the PhenixRoomExpress gets created
-            // if device meets the necessary conditions.
-            // So that can result in a race condition for media
-            // creation. To prevent that, we must ignore the
-            // first time when this callback is executed and not
-            // try to create the media once more.
-
-            if self.enableMediaCreationOnOnlineStatusChange {
-                self.processMedia()
-            } else {
-                // After first time "onlineStatusDidChange" is executed,
-                // we can allow to generate new media on future
-                // executions.
-                self.enableMediaCreationOnOnlineStatusChange = true
-            }
         }
     }
 }
