@@ -10,12 +10,19 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.phenixrts.suite.groups.databinding.RowRoomItemBinding
 import com.phenixrts.suite.groups.cache.entities.RoomInfoItem
+import com.phenixrts.suite.groups.common.AdapterDiff
 import kotlin.properties.Delegates
 
-class RoomListAdapter(private val callback: OnRoomJoin) : RecyclerView.Adapter<RoomListAdapter.ViewHolder>() {
+class RoomListAdapter(
+    private val onRoomJoinClicked: (String) -> Unit
+) : RecyclerView.Adapter<RoomListAdapter.ViewHolder>() {
 
     var data: List<RoomInfoItem> by Delegates.observable(emptyList()) { _, old, new ->
-        DiffUtil.calculateDiff(RoomInfoDiff(old, new)).dispatchUpdatesTo(this)
+        DiffUtil.calculateDiff(
+            AdapterDiff(old, new) { oldItem, newItem ->
+                oldItem.roomId == newItem.roomId
+            }
+        ).dispatchUpdatesTo(this)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -26,32 +33,11 @@ class RoomListAdapter(private val callback: OnRoomJoin) : RecyclerView.Adapter<R
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.binding.room = data[position]
-        holder.binding.roomRejoinButton.tag = data[position].roomId
+        holder.binding.roomRejoinButton.tag = data[position].alias
         holder.binding.roomRejoinButton.setOnClickListener {
-            callback.onRoomJoinClicked(it.tag as String)
+            onRoomJoinClicked(it.tag as String)
         }
     }
 
     class ViewHolder(val binding: RowRoomItemBinding) : RecyclerView.ViewHolder(binding.root)
-
-    class RoomInfoDiff(private val oldItems: List<RoomInfoItem>,
-                             private val newItems: List<RoomInfoItem>
-    ) : DiffUtil.Callback() {
-
-        override fun getOldListSize() = oldItems.size
-
-        override fun getNewListSize() = newItems.size
-
-        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldItems[oldItemPosition].roomId == newItems[newItemPosition].roomId
-        }
-
-        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-            return oldItems[oldItemPosition] == newItems[newItemPosition]
-        }
-    }
-
-    interface OnRoomJoin {
-        fun onRoomJoinClicked(roomId: String)
-    }
 }

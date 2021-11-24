@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:lines="1"
             android:ellipsize="end"
-            android:text="@{chatMessage.observableSenderName}"
+            android:text="@{chatMessage.name}"
             android:textColor="@{chatMessage.isSelf ? @color/primaryTextAccentColor : @color/secondaryTextColor}"
             android:textSize="14sp"
             android:layout_toStartOf="@id/message_time_label"
@@ -37,7 +37,7 @@
             android:lines="1"
             android:ellipsize="end"
             android:layout_alignParentEnd="true"
-            android:text="@{chatMessage.observableMessageTime}"
+            android:text="@{chatMessage.time}"
             android:textColor="@color/secondaryTextColor"
             tools:text="3 min"/>
 
@@ -45,7 +45,7 @@
             android:id="@+id/message_body"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@{chatMessage.observableMessageBody}"
+            android:text="@{chatMessage.message}"
             android:textSize="18sp"
             android:autoLink="all"
             android:textColor="@color/primaryTextDarkColor"

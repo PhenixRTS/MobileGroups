@@ -12,11 +12,16 @@
         <item name="android:textColorPrimary">@color/primaryTextColor</item>
         <item name="android:windowActionBarOverlay">true</item>
         <item name="windowActionBarOverlay">true</item>
+        <item name="android:navigationBarColor">@color/primaryDarkColor</item>
         <item name="android:windowBackground">@drawable/bg_splash</item>
     </style>
 
     <style name="TabTextStyle" parent="TextAppearance.Design.Tab">
         <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="AlertDialogTheme" parent="Theme.MaterialComponents.Light.Dialog.Alert">
+        <item name="android:textColor">@color/primaryTextDarkColor</item>
     </style>
 
 </resources>

@@ -5,26 +5,21 @@
 package com.phenixrts.suite.groups.injection
 
 import androidx.room.Room
-import com.phenixrts.suite.groups.BuildConfig
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
-import com.phenixrts.suite.phenixcommon.common.FileWriterDebugTree
 import com.phenixrts.suite.groups.receivers.CellularStateReceiver
-import com.phenixrts.suite.groups.repository.RepositoryProvider
+import com.phenixrts.suite.phenixcore.PhenixCore
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
-
-private const val TIMBER_TAG = "PhenixApp"
 
 @Module
 class InjectionModule(private val context: GroupsApplication) {
 
     @Singleton
     @Provides
-    fun provideRepositoryProvider(cacheProvider: CacheProvider): RepositoryProvider
-            = RepositoryProvider(context, cacheProvider)
+    fun providePhenixCore() = PhenixCore(context)
 
     @Provides
     @Singleton
@@ -38,10 +33,5 @@ class InjectionModule(private val context: GroupsApplication) {
     @Provides
     @Singleton
     fun provideCellularStateReceiver(): CellularStateReceiver = CellularStateReceiver(context)
-
-    @Provides
-    @Singleton
-    fun provideFileWriterDebugTree(): FileWriterDebugTree =
-        FileWriterDebugTree(context, TIMBER_TAG, "${BuildConfig.APPLICATION_ID}.provider")
 
 }

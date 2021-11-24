@@ -9,24 +9,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.databinding.FragmentInfoBinding
-import com.phenixrts.suite.phenixcommon.common.launchMain
+import com.phenixrts.suite.phenixcore.common.launchMain
 
-const val EXTRA_ROOM_ALIAS = "extraRoomAlias"
 const val INTENT_CHOOSER_TYPE = "text/plain"
 
-class InfoFragment : Fragment() {
+class InfoFragment : BaseFragment() {
 
     private lateinit var binding: FragmentInfoBinding
-    private lateinit var roomCode: String
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
         FragmentInfoBinding.inflate(inflater, container, false).apply {
             binding = this
-            roomCode = arguments?.getString(EXTRA_ROOM_ALIAS, "") ?: ""
-            roomAlias = roomCode
+            roomAlias = viewModel.currentRoomAlias
             lifecycleOwner = this@InfoFragment
         }.root
 
@@ -40,7 +36,7 @@ class InfoFragment : Fragment() {
     private fun showIntentChooser() = launchMain {
         val intent = Intent(Intent.ACTION_SEND).apply {
             putExtra(Intent.EXTRA_SUBJECT, R.string.info_meeting_subject)
-            putExtra(Intent.EXTRA_TEXT, getString(R.string.info_meeting_url, roomCode))
+            putExtra(Intent.EXTRA_TEXT, getString(R.string.info_meeting_url, viewModel.currentRoomAlias))
             type = INTENT_CHOOSER_TYPE
         }
         startActivity(Intent.createChooser(intent, getString(R.string.info_share)))

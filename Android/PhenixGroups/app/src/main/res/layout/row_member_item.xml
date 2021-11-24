@@ -10,7 +10,7 @@
     <data>
         <variable
             name="member"
-            type="com.phenixrts.suite.groups.models.RoomMember" />
+            type="com.phenixrts.suite.phenixcore.repositories.models.PhenixMember" />
 
         <import type="android.view.View" />
     </data>
@@ -40,7 +40,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:contentDescription="@null"
-                android:visibility="@{member.canRenderThumbnail() ? View.VISIBLE : View.GONE}" />
+                android:visibility="@{member.videoEnabled ? View.VISIBLE : View.GONE}" />
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/member_preview_icon"
@@ -50,7 +50,7 @@
                 android:layout_gravity="center"
                 android:padding="8dp"
                 android:contentDescription="@string/preview_icon_content_description"
-                android:visibility="@{member.canRenderThumbnail() ? View.GONE : View.VISIBLE}"
+                android:visibility="@{member.videoEnabled ? View.GONE : View.VISIBLE}"
                 android:background="@color/primaryBackgroundLightColor"
                 android:src="@drawable/ic_member"
                 app:tint="@android:color/black" />
@@ -62,7 +62,7 @@
                 android:layout_gravity="center"
                 android:padding="16dp"
                 android:contentDescription="@string/preview_icon_content_description"
-                android:visibility="@{member.pinned ? View.VISIBLE : View.GONE}"
+                android:visibility="@{member.selected ? View.VISIBLE : View.GONE}"
                 android:background="@color/primaryBackgroundLightColor"
                 android:src="@drawable/ic_pin"
                 tools:visibility="gone"
@@ -122,7 +122,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="16dp"
-            android:text="@{member.getScreenName()}"
+            android:text="@{member.name}"
             android:textSize="16sp"
             tools:ignore="RtlHardcoded"
             tools:text="Member Name"

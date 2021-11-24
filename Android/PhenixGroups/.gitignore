@@ -96,3 +96,4 @@ lint/tmp/
 /.idea/misc.xml
 /.idea/runConfigurations.xml
 /.idea/jarRepositories.xml
+/.idea/deploymentTargetDropDown.xml

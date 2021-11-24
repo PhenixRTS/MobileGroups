@@ -4,14 +4,11 @@
 
 package com.phenixrts.suite.groups.common.extensions
 
-import android.view.SurfaceView
-import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.ui.MainActivity
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
-import com.phenixrts.suite.groups.ui.viewmodels.GroupsViewModel
-import com.phenixrts.suite.phenixcommon.common.launchMain
+import com.phenixrts.suite.phenixcore.common.launchUI
 
 fun BaseFragment.injectDependencies() {
     GroupsApplication.component.inject(this)
@@ -29,33 +26,18 @@ fun Fragment.hideKeyboard() {
     }
 }
 
-fun Fragment.getSurfaceView(): SurfaceView = (requireActivity() as MainActivity).getSurfaceView()
-
-fun Fragment.getMicIcon(): ImageView = (requireActivity() as MainActivity).getMicIcon()
-
-fun Fragment.joinRoom(viewModel: GroupsViewModel, roomAlias: String, displayName: String)
-        = (requireActivity() as? MainActivity)?.joinRoom(viewModel, roomAlias, displayName)
-
 fun Fragment.launchFragment(fragment: Fragment, addToBackStack: Boolean = true)
         = requireActivity().launchFragment(fragment, addToBackStack)
 
-fun Fragment.showLoadingScreen() = requireActivity().showLoadingScreen()
-
-fun Fragment.hideLoadingScreen() = requireActivity().hideLoadingScreen()
-
-fun Fragment.dismissFragment() = launchMain {
+fun Fragment.dismissFragment() = launchUI {
     hideKeyboard()
     requireActivity().onBackPressed()
 }
 
-fun Fragment.restartVideoPreview(viewModel: GroupsViewModel) = launchMain {
-    if (hasCameraPermission()) {
-        viewModel.startUserMediaPreview(getSurfaceView().holder)
-    }
-}
+fun Fragment.hideTopMenu() = (activity as? MainActivity)?.menuHandler?.hideTopMenu()
 
-fun Fragment.hideTopMenu() = (requireActivity() as? MainActivity)?.menuHandler?.hideTopMenu()
+fun Fragment.showBottomMenu() = (activity as? MainActivity)?.menuHandler?.showBottomMenu()
 
-fun Fragment.showBottomMenu() = (requireActivity() as? MainActivity)?.menuHandler?.showBottomMenu()
+fun Fragment.hasCameraPermission() = (activity as? MainActivity)?.hasCameraPermission() ?: false
 
-fun Fragment.hasCameraPermission() = (requireActivity() as? MainActivity)?.hasCameraPermission() ?: false
+fun Fragment.askForPermissions(callback: (Boolean) -> Unit) = (activity as? MainActivity)?.askForPermissions(callback)

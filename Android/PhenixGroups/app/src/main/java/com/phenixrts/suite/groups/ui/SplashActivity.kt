@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.ui
@@ -14,9 +14,12 @@ import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.common.extensions.*
 import com.phenixrts.suite.groups.databinding.ActivitySplashBinding
 import com.phenixrts.suite.groups.models.*
-import com.phenixrts.suite.phenixcommon.common.launchMain
-import com.phenixrts.suite.phenixdeeplink.models.DeepLinkStatus
-import com.phenixrts.suite.phenixdeeplink.models.PhenixDeepLinkConfiguration
+import com.phenixrts.suite.phenixcore.common.launchUI
+import com.phenixrts.suite.phenixdeeplinks.models.DeepLinkStatus
+import com.phenixrts.suite.phenixdeeplinks.models.PhenixDeepLinkConfiguration
+import com.phenixrts.suite.phenixcore.repositories.models.PhenixError
+import com.phenixrts.suite.phenixcore.repositories.models.PhenixEvent
+import com.phenixrts.suite.phenixdeeplinks.common.init
 import timber.log.Timber
 
 @SuppressLint("CustomSplashScreen")
@@ -26,18 +29,33 @@ class SplashActivity : EasyPermissionActivity() {
 
     private val timeoutHandler = Handler(Looper.getMainLooper())
     private val timeoutRunnable = Runnable {
-        launchMain {
+        launchUI {
             binding.root.showSnackBar(getString(R.string.err_network_problems))
         }
     }
-
-    override fun isAlreadyInitialized() = repositoryProvider.isRoomExpressInitialized()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
         timeoutHandler.postDelayed(timeoutRunnable, TIMEOUT_DELAY)
+
+        launchUI {
+            phenixCore.onError.collect { error ->
+                if (error == PhenixError.FAILED_TO_INITIALIZE) {
+                    Timber.d("Splash: Failed to initialize Phenix Core: $error")
+                    showErrorDialog(error.message)
+                }
+            }
+        }
+        launchUI {
+            phenixCore.onEvent.collect { event ->
+                Timber.d("Splash: Phenix core event: $event")
+                if (event == PhenixEvent.PHENIX_CORE_INITIALIZED) {
+                    showLandingScreen()
+                }
+            }
+        }
     }
 
     override fun onDeepLinkQueried(
@@ -46,25 +64,28 @@ class SplashActivity : EasyPermissionActivity() {
         rawConfiguration: Map<String, String>,
         deepLink: String
     ) {
-        super.onDeepLinkQueried(status, configuration, rawConfiguration, deepLink)
         Timber.d("Deep link queried: $status, $deepLink")
-        launchMain {
-            when (status) {
-                DeepLinkStatus.RELOAD -> showAppRestartRequired()
-                DeepLinkStatus.READY -> if (arePermissionsGranted()) {
-                    showLandingScreen(configuration)
-                } else {
-                    preferenceProvider.saveRoomAlias(null)
-                    askForPermissions { granted ->
-                        if (granted) {
-                            showLandingScreen(configuration)
-                        } else {
-                            onDeepLinkQueried(status, configuration, rawConfiguration, deepLink)
-                        }
+        when (status) {
+            DeepLinkStatus.RELOAD -> showAppRestartRequired()
+            DeepLinkStatus.READY -> if (arePermissionsGranted()) {
+                initializePhenixCore(configuration)
+            } else {
+                preferenceProvider.roomAlias = null
+                askForPermissions { granted ->
+                    if (granted) {
+                        initializePhenixCore(configuration)
+                    } else {
+                        onDeepLinkQueried(status, configuration, rawConfiguration, deepLink)
                     }
                 }
             }
         }
+    }
+
+    private fun initializePhenixCore(configuration: PhenixDeepLinkConfiguration) {
+        timeoutHandler.postDelayed(timeoutRunnable, TIMEOUT_DELAY)
+        Timber.d("Initializing phenix core: $configuration")
+        phenixCore.init(configuration)
     }
 
     private fun showAppRestartRequired() {
@@ -78,15 +99,10 @@ class SplashActivity : EasyPermissionActivity() {
             .show()
     }
 
-    private fun showLandingScreen(configuration: PhenixDeepLinkConfiguration) = launchMain {
-        Timber.d("Waiting for PCast")
-        repositoryProvider.setupRoomExpress(configuration)
-        repositoryProvider.waitForPCast()
+    private fun showLandingScreen() {
         timeoutHandler.removeCallbacks(timeoutRunnable)
         Timber.d("Navigating to Landing Screen")
-        val intent = Intent(this@SplashActivity, MainActivity::class.java)
-        intent.putExtra(EXTRA_DEEP_LINK_MODEL, configuration.channels.getOrNull(0) ?: "")
-        startActivity(intent)
+        startActivity(Intent(this@SplashActivity, MainActivity::class.java))
         finish()
     }
 

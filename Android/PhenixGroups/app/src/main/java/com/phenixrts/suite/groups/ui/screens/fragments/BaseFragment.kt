@@ -11,18 +11,18 @@ import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
 import com.phenixrts.suite.groups.common.extensions.*
-import com.phenixrts.suite.groups.repository.RepositoryProvider
 import com.phenixrts.suite.groups.ui.viewmodels.GroupsViewModel
+import com.phenixrts.suite.phenixcore.PhenixCore
 import javax.inject.Inject
 
 abstract class BaseFragment : Fragment() {
 
-    @Inject lateinit var repositoryProvider: RepositoryProvider
+    @Inject lateinit var phenixCore: PhenixCore
     @Inject lateinit var cacheProvider: CacheProvider
     @Inject lateinit var preferenceProvider: PreferenceProvider
 
     val viewModel: GroupsViewModel by lazyViewModel({ requireActivity().application as GroupsApplication }, {
-        GroupsViewModel(cacheProvider, preferenceProvider, repositoryProvider)
+        GroupsViewModel(cacheProvider, preferenceProvider, phenixCore)
     })
 
     open fun onBackPressed() {}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.ui
@@ -14,23 +14,18 @@ import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
 import com.phenixrts.suite.groups.receivers.CellularStateReceiver
-import com.phenixrts.suite.groups.repository.RepositoryProvider
-import com.phenixrts.suite.phenixcommon.common.FileWriterDebugTree
-import com.phenixrts.suite.phenixdeeplink.DeepLinkActivity
-import com.phenixrts.suite.phenixdeeplink.models.DeepLinkStatus
-import com.phenixrts.suite.phenixdeeplink.models.PhenixDeepLinkConfiguration
+import com.phenixrts.suite.phenixcore.PhenixCore
+import com.phenixrts.suite.phenixdeeplinks.DeepLinkActivity
 import java.util.*
 import javax.inject.Inject
-import kotlin.collections.HashMap
 
 @SuppressLint("Registered")
-open class EasyPermissionActivity : DeepLinkActivity() {
+abstract class EasyPermissionActivity : DeepLinkActivity() {
 
-    @Inject lateinit var repositoryProvider: RepositoryProvider
     @Inject lateinit var preferenceProvider: PreferenceProvider
     @Inject lateinit var cacheProvider: CacheProvider
     @Inject lateinit var cellularStateReceiver: CellularStateReceiver
-    @Inject lateinit var fileWriterTree: FileWriterDebugTree
+    @Inject lateinit var phenixCore: PhenixCore
 
     private val permissionRequestHistory = hashMapOf<Int, (a: Boolean) -> Unit>()
 
@@ -61,15 +56,9 @@ open class EasyPermissionActivity : DeepLinkActivity() {
         }
     }
 
-    override val additionalConfiguration: HashMap<String, String>
-        get() = hashMapOf()
+    override val additionalConfiguration = hashMapOf<String, String>()
 
-    override fun isAlreadyInitialized(): Boolean = false
-
-    override fun onDeepLinkQueried(status: DeepLinkStatus, configuration: PhenixDeepLinkConfiguration,
-                                   rawConfiguration: Map<String, String>, deepLink: String) {
-        /* Ignored */
-    }
+    override fun isAlreadyInitialized() = phenixCore.isInitialized
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)

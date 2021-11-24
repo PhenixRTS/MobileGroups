@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.ui.screens
@@ -10,21 +10,26 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.updateLayoutParams
-import androidx.core.widget.addTextChangedListener
-import com.phenixrts.common.RequestStatus
+import androidx.core.widget.doAfterTextChanged
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.common.extensions.*
+import com.phenixrts.suite.groups.common.getRoomCode
 import com.phenixrts.suite.groups.databinding.ScreenLandingBinding
 import com.phenixrts.suite.groups.ui.adapters.RoomListAdapter
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
-import com.phenixrts.suite.phenixcommon.common.launchMain
+import com.phenixrts.suite.phenixcore.common.launchUI
 import timber.log.Timber
 
-class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
+class LandingScreen : BaseFragment() {
 
     private lateinit var binding: ScreenLandingBinding
 
-    private val roomAdapter = RoomListAdapter(this)
+    private val roomAdapter by lazy {
+        RoomListAdapter { roomAlias ->
+            Timber.d("Join clicked for: $roomAlias")
+            joinRoom(roomAlias)
+        }
+    }
     private val isInLandscape by lazy {
         resources.configuration.orientation != Configuration.ORIENTATION_PORTRAIT
     }
@@ -42,46 +47,29 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
         binding.roomList.adapter = roomAdapter
         binding.newRoomButton.setOnClickListener {
             Timber.d("Create Room clicked")
-            createRoom()
+            joinRoom()
         }
         binding.joinRoomButton.setOnClickListener {
             launchFragment(JoinScreen())
         }
-        binding.screenDisplayName.addTextChangedListener(afterTextChanged = {
-            preferenceProvider.saveDisplayName(it?.toString() ?: "")
-        })
+        binding.screenDisplayName.doAfterTextChanged {
+            viewModel.displayName = it?.toString() ?: ""
+        }
         binding.landingMenuButton.setOnClickListener {
             showBottomMenu()
         }
 
-        viewModel.displayName.value = preferenceProvider.getDisplayName()
-        viewModel.isControlsEnabled.value = true
-        viewModel.isInRoom.value = false
-        viewModel.roomList.observe(viewLifecycleOwner, {
-            Timber.d("Room list data changed: (Is portrait: $isInLandscape), $it")
-            updateRoomListHeight(it.size)
-            roomAdapter.data = it
-        })
-        if (viewModel.isVideoEnabled.isTrue()) {
-            getSurfaceView().visibility = View.VISIBLE
-        } else {
-            getSurfaceView().visibility = View.GONE
-        }
-        if (viewModel.isMicrophoneEnabled.isTrue()) {
-            getMicIcon().visibility = View.GONE
-        } else {
-            getMicIcon().visibility = View.VISIBLE
+        launchUI {
+            viewModel.roomList.collect { rooms ->
+                Timber.d("Room list data changed: (Is portrait: $isInLandscape), $rooms")
+                updateRoomListHeight(rooms.size)
+                roomAdapter.data = rooms
+            }
         }
 
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             hideTopMenu()
         }
-        restartVideoPreview(viewModel)
-    }
-
-    override fun onRoomJoinClicked(roomId: String) {
-        Timber.d("Join clicked for: $roomId")
-        joinRoomById(roomId)
     }
 
     private fun updateRoomListHeight(itemCount: Int) {
@@ -92,31 +80,13 @@ class LandingScreen : BaseFragment(), RoomListAdapter.OnRoomJoin {
         }
     }
 
-    /**
-     * Create a new meeting room
-     */
-    private fun createRoom() = launchMain {
-        if (!hasCameraPermission()) {
-            viewModel.onPermissionRequested.call()
-            return@launchMain
-        }
-        showLoadingScreen()
-        val response = viewModel.createRoom()
-        if (response.status == RequestStatus.OK) {
-            joinRoomById(response.message)
-        } else {
-            showToast(getString(R.string.err_create_room_failed))
-            hideLoadingScreen()
+    private fun joinRoom(roomAlias: String = getRoomCode()) {
+        launchUI {
+            if (!hasCameraPermission()) {
+                askForPermissions { joinRoom(roomAlias) }
+                return@launchUI
+            }
+            viewModel.joinRoom(roomAlias = roomAlias)
         }
     }
-
-    private fun joinRoomById(roomId: String) = launchMain {
-        if (!hasCameraPermission()) {
-            viewModel.onPermissionRequested.call()
-            return@launchMain
-        }
-        showLoadingScreen()
-        viewModel.joinRoomById(roomId, preferenceProvider.getDisplayName())
-    }
-
 }
