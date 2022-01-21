@@ -4,7 +4,6 @@
 
 package com.phenixrts.suite.groups.injection
 
-import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.ui.EasyPermissionActivity
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
 import dagger.Component
@@ -13,7 +12,6 @@ import javax.inject.Singleton
 @Singleton
 @Component(modules = [InjectionModule::class])
 interface InjectionComponent {
-    fun inject(target: GroupsApplication)
     fun inject(target: BaseFragment)
     fun inject(target: EasyPermissionActivity)
 }

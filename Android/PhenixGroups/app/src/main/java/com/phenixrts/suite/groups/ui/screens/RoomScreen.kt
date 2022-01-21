@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.ui.screens
@@ -19,6 +19,7 @@ import com.phenixrts.suite.groups.common.extensions.showBottomMenu
 import com.phenixrts.suite.groups.databinding.ScreenRoomBinding
 import com.phenixrts.suite.groups.ui.adapters.RoomScreenPageAdapter
 import com.phenixrts.suite.groups.ui.screens.fragments.*
+import com.phenixrts.suite.phenixcore.common.launchUI
 import timber.log.Timber
 
 class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
@@ -31,7 +32,7 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
             listOf(
                 MemberFragment(),
                 ChatFragment(),
-                getInfoFragment()
+                InfoFragment()
             )
         )
     }
@@ -53,17 +54,16 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
         setMessageCount(0)
         refreshTabs()
 
-        viewModel.isControlsEnabled.value = false
-        viewModel.isInRoom.value = true
-
-        viewModel.memberCount.observe(viewLifecycleOwner, { count ->
-            Timber.d("Member count changed: $count")
-            setMemberCount(count)
-        })
-        viewModel.unreadMessageCount.observe(viewLifecycleOwner, { count ->
-            Timber.d("Unread message count changed: $count")
-            setMessageCount(count)
-        })
+        launchUI {
+            viewModel.memberCount.collect { members ->
+                setMemberCount(members)
+            }
+        }
+        launchUI {
+            viewModel.messages.collect { messages ->
+                setMessageCount(messages.count { !it.isRead })
+            }
+        }
         Timber.d("Room screen created: ${viewModel.currentRoomAlias}")
     }
 
@@ -81,15 +81,7 @@ class RoomScreen : BaseFragment(), ViewPager.OnPageChangeListener {
         hideKeyboard()
     }
 
-    private fun getInfoFragment(): InfoFragment {
-        val fragment = InfoFragment()
-        val bundle = Bundle()
-        bundle.putString(EXTRA_ROOM_ALIAS, viewModel.currentRoomAlias)
-        fragment.arguments = bundle
-        return fragment
-    }
-
-    private fun setMemberCount(memberCount: Int) {
+    private fun setMemberCount(memberCount: Long) {
         val label =  if (memberCount > 0) resources.getString(R.string.tab_members_count, memberCount) else " "
         binding.fragmentTabLayout.getTabAt(TAB_MEMBERS)?.text = label
         refreshTabs()

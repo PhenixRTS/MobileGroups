@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+  ~ Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
   -->
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -10,8 +10,20 @@
         <import type="android.view.View" />
 
         <variable
-            name="model"
-            type="com.phenixrts.suite.groups.ui.viewmodels.GroupsViewModel" />
+            name="isDataLost"
+            type="Boolean" />
+
+        <variable
+            name="controlsEnabled"
+            type="Boolean" />
+
+        <variable
+            name="isInRoom"
+            type="Boolean" />
+
+        <variable
+            name="displayName"
+            type="String" />
     </data>
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -63,7 +75,7 @@
                         android:layout_height="wrap_content"
                         android:textColor="@color/primaryTextColor"
                         android:textSize="24sp"
-                        android:text="@{model.displayName}"
+                        android:text="@{displayName}"
                         tools:text="Nickname" />
 
                 </LinearLayout>
@@ -101,7 +113,7 @@
                     android:layout_marginBottom="16dp"
                     android:contentDescription="@string/preview_icon_content_description"
                     android:src="@drawable/ic_data_quality"
-                    android:visibility="gone"
+                    android:visibility="@{isDataLost ? View.VISIBLE : View.GONE}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     tools:visibility="visible"
@@ -114,7 +126,7 @@
                     android:gravity="center_horizontal|bottom"
                     android:padding="12dp"
                     android:background="@drawable/bg_controls_fade_up"
-                    android:visibility="@{!model.isInRoom() || model.isControlsEnabled() ? View.VISIBLE : View.GONE}"
+                    android:visibility="@{!isInRoom || controlsEnabled ? View.VISIBLE : View.GONE}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent">
@@ -139,7 +151,7 @@
                         android:elevation="5dp"
                         android:clickable="true"
                         android:focusable="true"
-                        android:visibility="@{model.isInRoom ? View.VISIBLE : View.GONE}"
+                        android:visibility="@{isInRoom ? View.VISIBLE : View.GONE}"
                         android:src="@drawable/ic_call_end"
                         android:tint="@color/primaryTextColor"
                         android:contentDescription="@null"
@@ -281,6 +293,15 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <com.phenixrts.suite.phenixdebugmenu.DebugMenu
+                android:id="@+id/debug_menu"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

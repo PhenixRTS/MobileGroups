@@ -4,21 +4,22 @@
 
 package com.phenixrts.suite.groups.common.extensions
 
-import android.view.SurfaceView
+import android.os.Process.killProcess
+import android.os.Process.myPid
 import android.view.View
 import android.view.inputmethod.InputMethodManager
-import android.widget.ImageView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import com.google.android.material.snackbar.Snackbar
 import com.phenixrts.suite.groups.R
-import com.phenixrts.suite.groups.ui.MainActivity
 import com.phenixrts.suite.groups.ui.screens.JoinScreen
 import com.phenixrts.suite.groups.ui.screens.LoadingScreen
-import com.phenixrts.suite.groups.ui.viewmodels.GroupsViewModel
-import com.phenixrts.suite.phenixcommon.common.launchMain
+import com.phenixrts.suite.phenixcore.common.launchMain
+import com.phenixrts.suite.phenixcore.common.launchUI
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import kotlin.system.exitProcess
@@ -33,9 +34,13 @@ fun View.showSnackBar(message: String) {
     }
 }
 
+fun View.setVisibleOr(visible: Boolean, orWhat: Int = View.GONE) {
+    visibility = if (visible) View.VISIBLE else orWhat
+}
+
 fun FragmentActivity.showToast(message: String) {
     if (message.isNotBlank()) {
-        launchMain {
+        launchUI {
             Toast.makeText(this@showToast, message, Toast.LENGTH_SHORT).show()
         }
     }
@@ -43,11 +48,13 @@ fun FragmentActivity.showToast(message: String) {
 
 fun FragmentActivity.closeApp(message: String? = null) {
     message?.let { showToast(it) }
-    launchMain {
+    launchUI {
         delay(QUIT_DELAY)
+        Timber.d("Finishing app process")
         finishAffinity()
         finishAndRemoveTask()
-        exitProcess(0)
+        killProcess(myPid())
+        exitProcess(1)
     }
 }
 
@@ -58,11 +65,7 @@ fun FragmentActivity.hideKeyboard() {
     ContextCompat.getSystemService(this, InputMethodManager::class.java)?.hideSoftInputFromWindow(token, 0)
 }
 
-fun MainActivity.getSurfaceView(): SurfaceView = binding.mainSurfaceView
-
-fun MainActivity.getMicIcon(): ImageView = binding.activeMemberMic
-
-fun FragmentActivity.showLoadingScreen() = launchMain {
+fun FragmentActivity.showLoadingScreen() = launchUI {
     Timber.d("Showing loading")
     supportFragmentManager.run {
         if (findFragmentByTag(LoadingScreen::class.java.name) == null) {
@@ -73,7 +76,7 @@ fun FragmentActivity.showLoadingScreen() = launchMain {
     }
 }
 
-fun FragmentActivity.hideLoadingScreen() = launchMain {
+fun FragmentActivity.hideLoadingScreen() = launchUI {
     Timber.d("Hiding loading")
     supportFragmentManager.run {
         findFragmentByTag(LoadingScreen::class.java.name)?.let {
@@ -83,7 +86,19 @@ fun FragmentActivity.hideLoadingScreen() = launchMain {
     }
 }
 
-fun FragmentActivity.launchFragment(fragment: Fragment, addToBackStack: Boolean = true) = launchMain {
+fun AppCompatActivity.showErrorDialog(error: String) {
+    AlertDialog.Builder(this, R.style.AlertDialogTheme)
+        .setCancelable(false)
+        .setMessage(error)
+        .setPositiveButton(getString(R.string.popup_ok)) { dialog, _ ->
+            dialog.dismiss()
+            closeApp()
+        }
+        .create()
+        .show()
+}
+
+fun FragmentActivity.launchFragment(fragment: Fragment, addToBackStack: Boolean = true) = launchUI {
     supportFragmentManager.run {
         val fullscreen = fragment is JoinScreen
         val container = if (fullscreen) R.id.fullscreen_fragment_container else R.id.fragment_container
@@ -97,14 +112,4 @@ fun FragmentActivity.launchFragment(fragment: Fragment, addToBackStack: Boolean 
         }
         transaction.commit()
     }
-}
-
-fun MainActivity.joinRoom(viewModel: GroupsViewModel, roomAlias: String, displayName: String) = launchMain {
-    if (!hasCameraPermission()) {
-        viewModel.onPermissionRequested.call()
-        return@launchMain
-    }
-    hideKeyboard()
-    showLoadingScreen()
-    viewModel.joinRoomByAlias(roomAlias, displayName)
 }

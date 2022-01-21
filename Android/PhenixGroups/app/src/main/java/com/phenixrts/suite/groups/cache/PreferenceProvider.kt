@@ -5,29 +5,26 @@
 package com.phenixrts.suite.groups.cache
 
 import android.content.Context
-import android.os.Build
 import com.phenixrts.suite.groups.GroupsApplication
+import kotlin.properties.ReadWriteProperty
+import kotlin.reflect.KProperty
 
 class PreferenceProvider(private val context: GroupsApplication) {
 
-    fun saveDisplayName(displayName: String) {
-        context.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE).edit()
-            .putString(DISPLAY_NAME, displayName)
-            .apply()
+    var displayName by stringPreference()
+    var roomAlias by stringPreference()
+
+    private val sharedPreferences by lazy { context.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE) }
+
+    private fun stringPreference() = object : ReadWriteProperty<Any?, String?> {
+        override fun getValue(thisRef: Any?, property: KProperty<*>) = sharedPreferences.getString(property.name, null)
+
+        override fun setValue(thisRef: Any?, property: KProperty<*>, value: String?) {
+            sharedPreferences.edit().putString(property.name, value).apply()
+        }
     }
 
-    fun getDisplayName(): String = context.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE)
-        .getString(DISPLAY_NAME, null) ?: Build.MODEL
-
-    fun saveRoomAlias(displayName: String?) {
-        context.getSharedPreferences(APP_PREFERENCES, Context.MODE_PRIVATE).edit()
-            .putString(ROOM_ALIAS, displayName)
-            .apply()
-    }
-
-    companion object {
+    private companion object {
         private const val APP_PREFERENCES = "group_preferences"
-        private const val DISPLAY_NAME = "display_name"
-        private const val ROOM_ALIAS = "room_alias"
     }
 }

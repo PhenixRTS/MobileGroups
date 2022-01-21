@@ -4,15 +4,11 @@
 
 package com.phenixrts.suite.groups.common.extensions
 
-import androidx.lifecycle.MutableLiveData
-import com.phenixrts.chat.ChatMessage
-import com.phenixrts.room.Member
 import com.phenixrts.suite.groups.BuildConfig
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.R
-import com.phenixrts.suite.groups.databinding.RowMemberItemBinding
-import com.phenixrts.suite.groups.models.RoomMember
 import com.phenixrts.suite.groups.models.RoomMessage
+import com.phenixrts.suite.phenixcore.repositories.models.PhenixMessage
 import java.util.*
 
 const val SECOND_MILLIS = 1000L
@@ -22,53 +18,21 @@ const val DAY_MILLIS = HOUR_MILLIS * 24L
 const val MONTH_MILLIS = DAY_MILLIS * 30L
 const val YEAR_MILLIS = MONTH_MILLIS * 12L
 
-// Delay before observing chat messages - SDK bug
-const val CHAT_SUBSCRIPTION_DELAY = 2000L
 const val DEFAULT_ANIMATION_DURATION = 200L
-
-fun MutableList<RoomMessage>.addUnique(messages: Array<ChatMessage>, selfName: String, dateRoomLeft: Date, isViewingChat: Boolean) {
-    messages.forEach {message ->
-        if (this.find { it.message.messageId == message.messageId } == null) {
-            val isSelf = selfName == message.observableFrom.value.observableScreenName.value
-            val isRead = isViewingChat || message.observableTimeStamp.value.time < dateRoomLeft.time
-            this.add(RoomMessage(message, isSelf, isRead))
-        }
-    }
-    this.sortBy { it.message.observableTimeStamp.value }
-}
-
-fun MutableLiveData<Boolean>.isTrue(default: Boolean = false) = if (value != null) value == true else default
-
-fun MutableLiveData<Boolean>.isFalse(default: Boolean = true) = if (value != null) value == false else default
-
-fun MutableLiveData<Unit>.call() {
-    value = Unit
-}
-
-fun MutableLiveData<RoomMember>.call(roomMember: RoomMember) {
-    postValue(roomMember)
-}
-
-fun MutableLiveData<List<RoomMessage>>.refresh() {
-    postValue(value)
-}
-
-fun RowMemberItemBinding.refresh() {
-    this.member = this.member
-}
-
-fun Member.mapRoomMember(members: List<RoomMember>?, selfSessionId: String) =
-    members?.find { it.isThisMember(this@mapRoomMember.sessionId) }?.apply {
-        member = this@mapRoomMember
-        isSelf = this@mapRoomMember.sessionId == selfSessionId
-    } ?: RoomMember(this, this@mapRoomMember.sessionId == selfSessionId)
-
-fun RoomMember.asString() = toString()
+const val MESSAGE_REFRESH_DELAY = MINUTE_MILLIS
 
 fun Calendar.expirationDate(): Date {
     add(Calendar.DAY_OF_MONTH, - BuildConfig.EXPIRATION_DAYS)
     return time
 }
+
+fun PhenixMessage.asRoomMessage(selfId: String, isRead: Boolean) = RoomMessage(
+    phenixMessage = this,
+    isSelf = memberId == selfId,
+    isRead = isRead
+)
+
+fun List<PhenixMessage>.asRoomMessages(selfId: String, isRead: Boolean) = map { it.asRoomMessage(selfId, isRead) }
 
 fun Date.elapsedTime(): String {
     val currentTime = System.currentTimeMillis()

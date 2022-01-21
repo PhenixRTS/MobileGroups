@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.ui.screens.fragments
@@ -8,31 +8,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Observer
-import com.phenixrts.common.RequestStatus
-import com.phenixrts.suite.groups.R
-import com.phenixrts.suite.groups.common.extensions.showToast
 import com.phenixrts.suite.groups.databinding.FragmentChatBinding
-import com.phenixrts.suite.groups.models.RoomMessage
 import com.phenixrts.suite.groups.ui.adapters.ChatListAdapter
-import com.phenixrts.suite.phenixcommon.common.launchMain
-import timber.log.Timber
+import com.phenixrts.suite.phenixcore.common.launchUI
+import com.phenixrts.suite.phenixcore.repositories.models.PhenixEvent
 
 class ChatFragment : BaseFragment() {
 
     private lateinit var binding: FragmentChatBinding
 
     private val adapter by lazy { ChatListAdapter() }
-
-    private val chatObserver = Observer<List<RoomMessage>> { messages ->
-        launchMain {
-            viewModel.unreadMessageCount.value = messages.count { !it.isRead }
-            adapter.data = messages
-            if (messages.isNotEmpty()) {
-                binding.chatHistory.scrollToPosition(messages.size - 1)
-            }
-        }
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentChatBinding.inflate(inflater, container, false)
@@ -46,22 +31,26 @@ class ChatFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        observeMessages()
-    }
-
-    private fun observeMessages() = launchMain {
-        if (isAdded) {
-            viewModel.chatMessages.observeForever(chatObserver)
+        launchUI {
+            viewModel.messages.collect { messages ->
+                adapter.data = messages
+                if (messages.isNotEmpty()) {
+                    binding.chatHistory.scrollToPosition(messages.size - 1)
+                }
+            }
+        }
+        launchUI {
+            phenixCore.onEvent.collect { event ->
+                if (event == PhenixEvent.MESSAGE_SENT) {
+                    binding.messageInputField.text.clear()
+                }
+            }
         }
     }
 
-    private fun sendMessage() = launchMain {
-        val status = viewModel.sendChatMessage(binding.messageInputField.text.toString())
-        if (status.status == RequestStatus.OK) {
-            binding.messageInputField.text.clear()
-        } else {
-            Timber.e("Cannot send message ${status.message}")
-            showToast(getString(R.string.err_chat_message_failed, status.message))
+    private fun sendMessage() {
+        binding.messageInputField.text.toString().takeIf { it.isNotBlank() }?.let { message ->
+            viewModel.sendChatMessage(message)
         }
     }
 

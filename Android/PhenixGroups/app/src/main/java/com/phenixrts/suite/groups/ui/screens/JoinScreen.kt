@@ -13,7 +13,6 @@ import androidx.transition.Slide
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.common.extensions.DEFAULT_ANIMATION_DURATION
 import com.phenixrts.suite.groups.common.extensions.dismissFragment
-import com.phenixrts.suite.groups.common.extensions.joinRoom
 import com.phenixrts.suite.groups.common.extensions.showToast
 import com.phenixrts.suite.groups.databinding.FragmentJoinBinding
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
@@ -34,9 +33,9 @@ class JoinScreen : BaseFragment() {
             dismissFragment()
         }
         binding.joinRoomButton.setOnClickListener {
-            binding.joinRoomCodeInput.text.toString().takeIf { it.isNotBlank() }?.let { code ->
-                Timber.d("Join Room clicked: $code")
-                joinRoom(viewModel, code, preferenceProvider.getDisplayName())
+            binding.joinRoomCodeInput.text.toString().takeIf { it.isNotBlank() }?.let { alias ->
+                Timber.d("Join Room clicked: $alias")
+                viewModel.joinRoom(roomAlias = alias)
             } ?: showToast(getString(R.string.err_enter_valid_room_code))
         }
     }

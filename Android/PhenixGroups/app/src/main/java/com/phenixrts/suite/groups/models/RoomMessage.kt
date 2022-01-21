@@ -4,45 +4,18 @@
 
 package com.phenixrts.suite.groups.models
 
-import androidx.lifecycle.MutableLiveData
-import com.phenixrts.chat.ChatMessage
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.common.extensions.elapsedTime
-import com.phenixrts.suite.phenixcommon.common.launchMain
-import kotlinx.coroutines.delay
+import com.phenixrts.suite.phenixcore.repositories.models.PhenixMessage
+import java.util.*
 
 data class RoomMessage(
-    val message: ChatMessage,
+    val phenixMessage: PhenixMessage,
     val isSelf: Boolean,
     var isRead: Boolean
 ) {
-
-    val observableMessageTime = MutableLiveData<String>()
-    val observableSenderName = MutableLiveData<String>()
-    val observableMessageBody = MutableLiveData<String>()
-
-    init {
-        refreshMessage()
-    }
-
-    private fun refreshMessage() {
-        launchMain {
-            observableMessageTime.value = message.observableTimeStamp.value.elapsedTime()
-            observableSenderName.value = if (isSelf) {
-                GroupsApplication.getString(R.string.group_call_chat_self)
-            }
-            else {
-                message.observableFrom.value.observableScreenName.value
-            }
-            observableMessageBody.value = message.observableMessage.value
-
-            delay(MESSAGE_TIME_UPDATE_DELAY)
-            refreshMessage()
-        }
-    }
-
-    private companion object {
-        private const val MESSAGE_TIME_UPDATE_DELAY = 1000 * 60L // 1 Minute
-    }
+    val name = if (isSelf) GroupsApplication.getString(R.string.group_call_chat_self) else phenixMessage.memberName
+    val time = Date(phenixMessage.messageDate).elapsedTime()
+    val message = phenixMessage.message
 }
