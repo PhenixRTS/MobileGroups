@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.common.extensions
@@ -26,10 +26,10 @@ import kotlin.system.exitProcess
 
 private const val QUIT_DELAY = 1000L
 
-fun View.showSnackBar(message: String) {
+fun View.showSnackBar(message: String, length: Int = Snackbar.LENGTH_INDEFINITE) {
     if (message.isNotBlank()) {
         launchMain {
-            Snackbar.make(this@showSnackBar, message, Snackbar.LENGTH_INDEFINITE).show()
+            Snackbar.make(this@showSnackBar, message, length).show()
         }
     }
 }

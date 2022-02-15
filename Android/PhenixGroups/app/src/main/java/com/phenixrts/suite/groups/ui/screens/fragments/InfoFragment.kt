@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.ui.screens.fragments
@@ -23,7 +23,7 @@ class InfoFragment : BaseFragment() {
         FragmentInfoBinding.inflate(inflater, container, false).apply {
             binding = this
             roomAlias = viewModel.currentRoomAlias
-            lifecycleOwner = this@InfoFragment
+            lifecycleOwner = viewLifecycleOwner
         }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -9,12 +9,16 @@ import android.graphics.Matrix
 import android.widget.ImageView
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.express.*
+import com.phenixrts.media.video.android.AndroidVideoFrame
 import com.phenixrts.pcast.*
+import com.phenixrts.pcast.android.AndroidReadVideoFrameCallback
 import com.phenixrts.pcast.android.AndroidVideoRenderSurface
 import com.phenixrts.room.*
-import com.phenixrts.suite.phenixcore.common.launchMain
-import com.phenixrts.suite.phenixcore.repositories.models.PhenixFrameReadyConfiguration
-import com.phenixrts.suite.phenixcore.repositories.models.PhenixRoomConfiguration
+import com.phenixrts.suite.phenixcore.common.*
+import com.phenixrts.suite.phenixcore.common.asFacingMode
+import com.phenixrts.suite.phenixcore.common.asMemberRole
+import com.phenixrts.suite.phenixcore.common.asRoomType
+import com.phenixrts.suite.phenixcore.repositories.models.*
 import kotlinx.coroutines.delay
 import timber.log.Timber
 
@@ -32,7 +36,7 @@ internal val rendererOptions get() = RendererOptions().apply {
 
 internal fun getRoomOptions(configuration: PhenixRoomConfiguration): RoomOptions {
     var roomOptionsBuilder = RoomServiceFactory.createRoomOptionsBuilder()
-        .withType(configuration.roomType)
+        .withType(configuration.roomType.asRoomType())
     if (configuration.roomAlias.isNotBlank()) {
         roomOptionsBuilder = roomOptionsBuilder.withAlias(configuration.roomAlias).withName(configuration.roomAlias)
     } else if (configuration.roomId.isNotBlank()) {
@@ -46,14 +50,42 @@ internal fun getPublishToRoomOptions(
     publishOptions: PublishOptions,
     configuration: PhenixRoomConfiguration
 ): PublishToRoomOptions {
-    val options = RoomExpressFactory.createPublishToRoomOptionsBuilder()
-        .withMemberRole(configuration.memberRole)
-        .withRoomOptions(roomOptions)
+    var options = RoomExpressFactory.createPublishToRoomOptionsBuilder()
+        .withMemberRole(configuration.memberRole.asMemberRole())
         .withPublishOptions(publishOptions)
+    options = if (configuration.roomId.isNotBlank()) {
+        options.withRoomId(configuration.roomId)
+    } else {
+        options.withRoomOptions(roomOptions)
+    }
     if (configuration.memberName.isNotBlank()) {
         options.withScreenName(configuration.memberName)
     }
     return options.buildPublishToRoomOptions()
+}
+
+internal fun getPublishToChannelOptions(
+    configuration: PhenixConfiguration,
+    channelConfiguration: PhenixChannelConfiguration,
+    userMediaStream: UserMediaStream
+): PublishToChannelOptions {
+    val channelOptions = RoomServiceFactory.createChannelOptionsBuilder()
+        .withName(channelConfiguration.channelAlias)
+        .withAlias(channelConfiguration.channelAlias)
+        .buildChannelOptions()
+    var publishOptionsBuilder = PCastExpressFactory.createPublishOptionsBuilder()
+        .withUserMedia(userMediaStream)
+    publishOptionsBuilder = if (!configuration.publishToken.isNullOrBlank()) {
+        Timber.d("Publishing with publish token: ${configuration.publishToken}")
+        publishOptionsBuilder.withStreamToken(configuration.publishToken).withSkipRetryOnUnauthorized()
+    } else {
+        Timber.d("Publishing with capabilities")
+        publishOptionsBuilder.withCapabilities(channelConfiguration.channelCapabilities.toTypedArray())
+    }
+    return ChannelExpressFactory.createPublishToChannelOptionsBuilder()
+        .withChannelOptions(channelOptions)
+        .withPublishOptions(publishOptionsBuilder.buildPublishOptions())
+        .buildPublishToChannelOptions()
 }
 
 internal fun getPublishOptions(userMediaStream: UserMediaStream, publishToken: String?,
@@ -86,7 +118,7 @@ internal fun getJoinRoomOptions(configuration: PhenixRoomConfiguration): JoinRoo
 
 internal fun getCreateRoomOptions(configuration: PhenixRoomConfiguration): RoomOptions {
     var roomOptionsBuilder = RoomServiceFactory.createRoomOptionsBuilder()
-        .withType(configuration.roomType)
+        .withType(configuration.roomType.asRoomType())
     if (configuration.roomAlias.isNotBlank()) {
         roomOptionsBuilder = roomOptionsBuilder.withAlias(configuration.roomAlias).withName(configuration.roomAlias)
     } else if (configuration.roomId.isNotBlank()) {
@@ -104,6 +136,7 @@ internal fun RoomExpress.joinRoom(configuration: PhenixRoomConfiguration, onJoin
 
 internal fun RoomExpress.createRoom(configuration: PhenixRoomConfiguration, onCreated: (RequestStatus) -> Unit) {
     createRoom(getCreateRoomOptions(configuration)) { status, _ ->
+        Timber.d("Room create completed with status: $status")
         onCreated(status)
     }
 }
@@ -125,20 +158,22 @@ internal fun getSubscribeVideoOptions(
     var memberStreamOptionsBuilder = RoomExpressFactory.createSubscribeToMemberStreamOptionsBuilder()
         .withRenderer(rendererSurface)
         .withRendererOptions(rendererOptions)
-        .withCapabilities(arrayOf("video-only"))
-    if (configuration?.roomVideoToken != null) {
-        memberStreamOptionsBuilder = memberStreamOptionsBuilder.withStreamToken(configuration.roomVideoToken)
+    memberStreamOptionsBuilder = if (configuration?.roomVideoToken != null) {
+        memberStreamOptionsBuilder.withStreamToken(configuration.roomVideoToken)
+    } else {
+        memberStreamOptionsBuilder.withCapabilities(arrayOf("video-only"))
     }
     return memberStreamOptionsBuilder.buildSubscribeToMemberStreamOptions()
 }
 
 internal fun getSubscribeAudioOptions(configuration: PhenixRoomConfiguration?): SubscribeToMemberStreamOptions {
     var memberStreamOptionsBuilder = RoomExpressFactory.createSubscribeToMemberStreamOptionsBuilder()
-        .withCapabilities(arrayOf("audio-only"))
         .withAudioOnlyRenderer()
         .withRendererOptions(rendererOptions)
-    if (configuration?.roomAudioToken != null) {
-        memberStreamOptionsBuilder = memberStreamOptionsBuilder.withStreamToken(configuration.roomAudioToken)
+    memberStreamOptionsBuilder = if (configuration?.roomAudioToken != null) {
+        memberStreamOptionsBuilder.withStreamToken(configuration.roomAudioToken)
+    } else {
+        memberStreamOptionsBuilder.withCapabilities(arrayOf("audio-only"))
     }
     return memberStreamOptionsBuilder.buildSubscribeToMemberStreamOptions()
 }
@@ -150,12 +185,33 @@ internal fun PCastExpress.getUserMedia(onMediaCollected: (userMedia: UserMediaSt
     }
 }
 
-internal fun getUserMediaOptions(facingMode: FacingMode = FacingMode.USER): UserMediaOptions = UserMediaOptions().apply {
-    videoOptions.capabilityConstraints[DeviceCapability.FACING_MODE] = listOf(DeviceConstraint(facingMode))
-    videoOptions.capabilityConstraints[DeviceCapability.HEIGHT] = listOf(DeviceConstraint(360.0))
-    videoOptions.capabilityConstraints[DeviceCapability.FRAME_RATE] = listOf(DeviceConstraint(15.0))
+internal fun getUserMediaOptions(configuration: PhenixPublishConfiguration): UserMediaOptions = UserMediaOptions().apply {
+    if (configuration.cameraFacingMode != PhenixFacingMode.UNDEFINED) {
+        videoOptions.capabilityConstraints[DeviceCapability.FACING_MODE] =
+            listOf(DeviceConstraint(configuration.cameraFacingMode.asFacingMode()))
+    }
+    videoOptions.capabilityConstraints[DeviceCapability.HEIGHT] =
+        listOf(DeviceConstraint(360.0))
+    videoOptions.capabilityConstraints[DeviceCapability.FRAME_RATE] =
+        listOf(DeviceConstraint(configuration.cameraFps))
+    videoOptions.enabled = configuration.isVideoEnabled
     audioOptions.capabilityConstraints[DeviceCapability.AUDIO_ECHO_CANCELATION_MODE] =
-        listOf(DeviceConstraint(AudioEchoCancelationMode.ON))
+        listOf(DeviceConstraint(configuration.echoCancellationMode.asAudioEchoCancelationMode()))
+    audioOptions.enabled = configuration.isAudioEnabled
+    Timber.d("Creating user media options from configuration: $configuration")
+}
+
+internal fun onVideoFrameCallback(
+    configuration: PhenixFrameReadyConfiguration?,
+    onBitmapPrepared: (Bitmap) -> Unit
+) = Renderer.FrameReadyForProcessingCallback { frameNotification ->
+    frameNotification?.read(object : AndroidReadVideoFrameCallback() {
+        override fun onVideoFrameEvent(videoFrame: AndroidVideoFrame?) {
+            videoFrame?.bitmap?.let { bitmap ->
+                onBitmapPrepared(bitmap.prepareBitmap(configuration))
+            }
+        }
+    })
 }
 
 internal fun ImageView.drawFrameBitmap(bitmap: Bitmap, delay: Boolean, onDrawn: () -> Unit) {
@@ -167,7 +223,7 @@ internal fun ImageView.drawFrameBitmap(bitmap: Bitmap, delay: Boolean, onDrawn: 
             onDrawn()
         }
     } catch (e: Exception) {
-        Timber.d(e, "Failed to draw bitmap")
+        Timber.e(e, "Failed to draw bitmap")
     }
 }
 
@@ -185,7 +241,13 @@ internal fun Bitmap.prepareBitmap(configuration: PhenixFrameReadyConfiguration?)
         matrix.postRotate(configuration.rotation)
         Bitmap.createBitmap(this, 0, 0, newWidth, newHeight, matrix, true)
     } catch (e: Exception) {
-        Timber.d(e, "Failed to prepare bitmap for: $configuration, $width, $height")
+        Timber.e(e, "Failed to prepare bitmap for: $configuration, $width, $height")
         this
     }
+}
+
+internal fun Renderer?.isSeekable() = try {
+    this?.isSeekable ?: false
+} catch (e: Exception) {
+    false
 }

@@ -8,6 +8,20 @@ enum class PhenixEvent(var data: Any? = null) {
     // Phenix
     PHENIX_CORE_INITIALIZED,
 
+    // Channel
+    /**
+     * Will hold [PhenixChannelConfiguration] as data
+     */
+    PHENIX_CHANNEL_PUBLISHING,
+    /**
+     * Will hold [PhenixChannelConfiguration] as data
+     */
+    PHENIX_CHANNEL_PUBLISHED,
+    /**
+     * Will hold [PhenixChannelConfiguration] as data
+     */
+    PHENIX_CHANNEL_PUBLISH_ENDED,
+
     // Room
     /**
      * Will hold [PhenixRoomConfiguration] as data
@@ -38,7 +52,16 @@ enum class PhenixEvent(var data: Any? = null) {
      */
     PHENIX_ROOM_LEFT,
 
-    // General
+    // Member
+    PHENIX_MEMBER_UPDATED,
+
+    // User media
     CAMERA_FLIPPED,
+    VIDEO_DISABLED,
+    VIDEO_ENABLED,
+    AUDIO_DISABLED,
+    AUDIO_ENABLED,
+
+    // General
     MESSAGE_SENT,
 }

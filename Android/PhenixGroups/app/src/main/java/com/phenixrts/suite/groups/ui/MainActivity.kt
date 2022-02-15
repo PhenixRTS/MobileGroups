@@ -12,6 +12,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import androidx.core.content.ContextCompat
+import com.google.android.material.snackbar.Snackbar
 import com.phenixrts.suite.groups.BuildConfig
 import com.phenixrts.suite.groups.GroupsApplication
 import com.phenixrts.suite.groups.R
@@ -23,12 +24,12 @@ import com.phenixrts.suite.groups.ui.screens.LandingScreen
 import com.phenixrts.suite.groups.ui.screens.RoomScreen
 import com.phenixrts.suite.groups.ui.screens.fragments.BaseFragment
 import com.phenixrts.suite.groups.ui.viewmodels.GroupsViewModel
+import com.phenixrts.suite.phenixcore.common.launchMain
 import com.phenixrts.suite.phenixcore.common.launchUI
+import com.phenixrts.suite.phenixcore.repositories.models.*
 import com.phenixrts.suite.phenixdeeplinks.models.DeepLinkStatus
 import com.phenixrts.suite.phenixdeeplinks.models.PhenixDeepLinkConfiguration
-import com.phenixrts.suite.phenixcore.repositories.models.PhenixError
-import com.phenixrts.suite.phenixcore.repositories.models.PhenixEvent
-import com.phenixrts.suite.phenixcore.repositories.models.PhenixMember
+import com.phenixrts.suite.phenixdebugmenu.models.DebugEvent
 import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.delay
 import timber.log.Timber
@@ -72,8 +73,12 @@ class MainActivity : EasyPermissionActivity() {
         rawConfiguration: Map<String, String>,
         deepLink: String
     ) {
-        Timber.d("Deep link queried: $status, $deepLink")
-        launchUI {
+        launchMain {
+            if (viewModel.wasConfigurationChanged) {
+                viewModel.wasConfigurationChanged = false
+                return@launchMain
+            }
+            Timber.d("Deep link queried: $status, $deepLink")
             if (viewModel.isInRoom) {
                 Timber.d("Leaving current room")
                 onBackPressed()
@@ -92,10 +97,14 @@ class MainActivity : EasyPermissionActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        menuHandler.onStop()
-        binding.debugMenu.onStop()
-        cellularStateReceiver.unregister()
-        switchCameraForegroundService(false)
+        viewModel.wasConfigurationChanged = isChangingConfigurations
+        if (!isChangingConfigurations) {
+            Timber.d("Destroying activity")
+            menuHandler.onStop()
+            binding.debugMenu.onStop()
+            cellularStateReceiver.unregister()
+            switchCameraForegroundService(false)
+        }
     }
 
     override fun onBackPressed() {
@@ -104,7 +113,9 @@ class MainActivity : EasyPermissionActivity() {
                 (it as? BaseFragment)?.onBackPressed()
             }
         }
-        if (menuHandler.isClosed() && binding.debugMenu.isClosed()) {
+        if (binding.debugMenu.isOpened()) {
+            binding.debugMenu.hide()
+        } else if (menuHandler.isClosed()) {
             super.onBackPressed()
         }
     }
@@ -117,7 +128,7 @@ class MainActivity : EasyPermissionActivity() {
         }
         hideKeyboard()
         showLoadingScreen()
-        viewModel.joinRoom(roomAlias = roomAlias)
+        viewModel.joinRoom(roomAlias)
     }
 
     private fun initViews(firstLaunch: Boolean) {
@@ -171,8 +182,8 @@ class MainActivity : EasyPermissionActivity() {
 
         launchUI {
             viewModel.members.collect { members ->
-                Timber.d("Members collected: $members")
-                binding.isDataLost = members.firstOrNull { it.isSelected }?.isDataLost ?: false
+                Timber.d("Members collected: ${members.size}, $members")
+                binding.isDataLost = members.firstOrNull { it.isSelected }?.connectionState == PhenixMemberConnectionState.AWAY
                 val audioEnabled = members.firstOrNull { it.isSelected }?.isAudioEnabled ?: true
                 binding.activeMemberMic.setVisibleOr(!audioEnabled)
 
@@ -244,6 +255,11 @@ class MainActivity : EasyPermissionActivity() {
                         binding.isInRoom = false
                         launchFragment(LandingScreen(), false)
                     }
+                    PhenixEvent.PHENIX_ROOM_CREATED -> {
+                        (event.data as? PhenixRoomConfiguration)?.roomAlias?.let { roomAlias ->
+                            viewModel.joinRoom(roomAlias)
+                        }
+                    }
                     else -> { /* Ignored */ }
                 }
             }
@@ -255,34 +271,36 @@ class MainActivity : EasyPermissionActivity() {
                     PhenixError.JOIN_ROOM_FAILED -> showToast(getString(R.string.err_join_room_failed))
                     PhenixError.CREATE_ROOM_FAILED -> showToast(getString(R.string.err_create_room_failed))
                     PhenixError.SEND_MESSAGE_FAILED -> showToast(getString(R.string.err_chat_message_failed))
+                    PhenixError.PUBLISH_ROOM_FAILED -> {
+                        hideLoadingScreen()
+                        showToast(getString(R.string.err_publish_room_failed))
+                        viewModel.leaveRoom()
+                    }
                     PhenixError.ROOM_GONE -> {
                         showToast(getString(R.string.err_network_problems))
                         viewModel.onConnectionLost()
                     }
-                    else -> { /* Ignored */ }
+                    else -> { Timber.d("Phenix core error: $error") }
                 }
             }
         }
         menuHandler.onStart()
-        viewModel.enableAudio(hasRecordAudioPermission() && !cellularStateReceiver.isInCall())
+        viewModel.enableAudio(hasRecordAudioPermission() && hasBluetoothPermission() && !cellularStateReceiver.isInCall())
         viewModel.enableVideo(hasCameraPermission() && !cellularStateReceiver.isInCall())
         phenixCore.previewOnSurface(binding.mainSurfaceView)
         viewModel.observeDebugMenu(
             binding.debugMenu,
-            onError = {
-                showToast(getString(R.string.err_share_logs_failed))
+            onError = { error ->
+                binding.root.showSnackBar(error, Snackbar.LENGTH_LONG)
             },
-            onShow = {
-                binding.debugMenu.showAppChooser(this@MainActivity)
+            onEvent = { event ->
+                when (event) {
+                    DebugEvent.SHOW_MENU -> binding.debugMenu.showAppChooser(this@MainActivity)
+                    DebugEvent.FILES_DELETED -> binding.root.showSnackBar(getString(R.string.files_deleted), Snackbar.LENGTH_LONG)
+                }
             }
         )
-        binding.debugMenu.onStart(getString(R.string.debug_app_version,
-            BuildConfig.VERSION_NAME,
-            BuildConfig.VERSION_CODE
-        ), getString(R.string.debug_sdk_version,
-            com.phenixrts.sdk.BuildConfig.VERSION_NAME,
-            com.phenixrts.sdk.BuildConfig.VERSION_CODE
-        ))
+        binding.debugMenu.onStart(BuildConfig.VERSION_NAME, BuildConfig.VERSION_CODE.toString())
         switchCameraForegroundService(true)
     }
 
@@ -328,19 +346,25 @@ class MainActivity : EasyPermissionActivity() {
     }
 
     private fun observeCellularState() {
-        cellularStateReceiver.observeCellularState(object: CellularStateReceiver.OnCallStateChanged {
-            override fun onAnswered() {
-                Timber.d("On Call Answered")
-                viewModel.enableAudio(false)
-                viewModel.enableVideo(false)
-            }
+        if (hasReadPhoneStatePermission()) {
+            cellularStateReceiver.observeCellularState(object : CellularStateReceiver.OnCallStateChanged {
+                override fun onAnswered() {
+                    Timber.d("On Call Answered")
+                    viewModel.enableAudio(false)
+                    viewModel.enableVideo(false)
+                }
 
-            override fun onHungUp() {
-                Timber.d("On Call Hung Up")
-                viewModel.enableAudio(hasRecordAudioPermission())
-                viewModel.enableVideo(hasCameraPermission())
+                override fun onHungUp() {
+                    Timber.d("On Call Hung Up")
+                    viewModel.enableAudio(hasRecordAudioPermission() && hasBluetoothPermission())
+                    viewModel.enableVideo(hasCameraPermission())
+                }
+            })
+        } else {
+            askForPermissions {
+                observeCellularState()
             }
-        })
+        }
     }
 
     private fun restartTimer() {

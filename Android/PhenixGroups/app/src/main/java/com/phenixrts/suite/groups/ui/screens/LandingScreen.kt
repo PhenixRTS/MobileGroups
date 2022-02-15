@@ -37,7 +37,7 @@ class LandingScreen : BaseFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = ScreenLandingBinding.inflate(inflater, container, false)
         binding.viewModel = viewModel
-        binding.lifecycleOwner = this
+        binding.lifecycleOwner = viewLifecycleOwner
         return binding.root
     }
 
@@ -47,7 +47,7 @@ class LandingScreen : BaseFragment() {
         binding.roomList.adapter = roomAdapter
         binding.newRoomButton.setOnClickListener {
             Timber.d("Create Room clicked")
-            joinRoom()
+            createRoom()
         }
         binding.joinRoomButton.setOnClickListener {
             launchFragment(JoinScreen())
@@ -86,7 +86,17 @@ class LandingScreen : BaseFragment() {
                 askForPermissions { joinRoom(roomAlias) }
                 return@launchUI
             }
-            viewModel.joinRoom(roomAlias = roomAlias)
+            viewModel.joinRoom(roomAlias)
+        }
+    }
+
+    private fun createRoom() {
+        launchUI {
+            if (!hasCameraPermission()) {
+                askForPermissions { createRoom() }
+                return@launchUI
+            }
+            viewModel.createRoom(getRoomCode())
         }
     }
 }

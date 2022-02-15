@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.cache.entities
@@ -13,6 +13,5 @@ data class RoomInfoItem(
     @PrimaryKey
     val roomId: String,
     val alias: String,
-    val backendUri: String,
     var dateLeft: Date = Date()
 )

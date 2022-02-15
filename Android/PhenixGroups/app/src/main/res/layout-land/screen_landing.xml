@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  ~ Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+  ~ Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
   -->
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -93,9 +93,12 @@
                         android:id="@+id/new_room_button"
                         style="?android:attr/buttonBarButtonStyle"
                         android:layout_width="wrap_content"
-                        android:layout_height="48dp"
+                        android:minHeight="48dp"
+                        android:layout_height="wrap_content"
                         android:layout_margin="8dp"
                         android:layout_weight="1"
+                        android:paddingTop="0dp"
+                        android:paddingBottom="0dp"
                         android:drawableStart="@drawable/ic_plus"
                         android:text="@string/new_room_button_label" />
 
@@ -103,8 +106,11 @@
                         android:id="@+id/join_room_button"
                         style="?android:attr/buttonBarButtonStyle"
                         android:layout_width="wrap_content"
-                        android:layout_height="48dp"
+                        android:minHeight="48dp"
+                        android:layout_height="wrap_content"
                         android:layout_margin="8dp"
+                        android:paddingTop="0dp"
+                        android:paddingBottom="0dp"
                         android:layout_weight="1"
                         android:text="@string/show_join_room_button_label" />
                 </LinearLayout>

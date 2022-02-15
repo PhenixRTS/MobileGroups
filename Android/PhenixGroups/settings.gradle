@@ -1,9 +1,8 @@
 /*
  * Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
-
 rootProject.name='Phenix Groups'
 include ':app'
 include ':phenixcore'
-include ':phenixdeeplinks'
 include ':phenixdebugmenu'
+include ':phenixdeeplink'

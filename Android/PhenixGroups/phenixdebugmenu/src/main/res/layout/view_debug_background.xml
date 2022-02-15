@@ -11,4 +11,4 @@
     android:layout_height="match_parent"
     android:alpha="0"
     android:visibility="gone"
-    android:background="@color/debug_translucent_color" />
+    android:background="@color/debug_gray_translucent" />

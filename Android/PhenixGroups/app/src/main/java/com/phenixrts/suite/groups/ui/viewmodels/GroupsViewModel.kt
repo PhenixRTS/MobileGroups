@@ -10,7 +10,6 @@ import android.os.Looper
 import com.phenixrts.suite.phenixcore.common.ConsumableSharedFlow
 
 import androidx.lifecycle.ViewModel
-import com.phenixrts.room.MemberRole
 import com.phenixrts.suite.groups.BuildConfig
 import com.phenixrts.suite.groups.cache.CacheProvider
 import com.phenixrts.suite.groups.cache.PreferenceProvider
@@ -22,10 +21,9 @@ import com.phenixrts.suite.groups.models.RoomMessage
 import com.phenixrts.suite.phenixcore.PhenixCore
 import com.phenixrts.suite.phenixcore.common.launchIO
 import com.phenixrts.suite.phenixcore.common.launch
+import com.phenixrts.suite.phenixcore.repositories.models.*
 import com.phenixrts.suite.phenixdebugmenu.DebugMenu
-import com.phenixrts.suite.phenixcore.repositories.models.PhenixMember
-import com.phenixrts.suite.phenixcore.repositories.models.PhenixRoom
-import com.phenixrts.suite.phenixcore.repositories.models.PhenixRoomConfiguration
+import com.phenixrts.suite.phenixdebugmenu.models.DebugEvent
 import kotlinx.coroutines.flow.asSharedFlow
 import timber.log.Timber
 import java.util.*
@@ -45,13 +43,15 @@ class GroupsViewModel(
     private val _members = ConsumableSharedFlow<List<PhenixMember>>(canReplay = true)
     private var isViewingChat = false
     private var currentRoom: PhenixRoom? = null
+    private var configuration: PhenixRoomConfiguration? = null
+    private var cameraFacingMode = PhenixFacingMode.USER
 
     private val refreshHandler = Handler(Looper.getMainLooper())
     private val refreshRunnable = Runnable {
         updateMessages()
     }
 
-    val roomList = cacheProvider.cacheDao().getVisitedRooms(phenixCore.configuration?.backend ?: BuildConfig.BACKEND_URL)
+    val roomList = cacheProvider.cacheDao().getVisitedRooms()
     val memberCount = phenixCore.memberCount
     var displayName: String by Delegates.observable(preferenceProvider.displayName ?: Build.MODEL) { _, _, name ->
         preferenceProvider.displayName = name
@@ -69,15 +69,25 @@ class GroupsViewModel(
 
     val isInRoom get() = currentRoom != null
     val currentRoomAlias get() = currentRoom?.alias ?: ""
+    var wasConfigurationChanged = false
 
     init {
         Timber.d("View model created")
         expireOldRooms()
         launch {
-            phenixCore.rooms.collect { rooms ->
-                val room = rooms.firstOrNull()
+            phenixCore.rooms.collect { room ->
                 currentRoom = room
-                Timber.d("Rooms updated: $rooms, $isInRoom")
+                configuration?.let {
+                    Timber.d("Will publish to room with configuration: $it")
+                    phenixCore.publishToRoom(it, PhenixPublishConfiguration(
+                        isAudioEnabled = isAudioEnabled,
+                        isVideoEnabled = isVideoEnabled,
+                        cameraFacingMode = cameraFacingMode
+                    ))
+                    phenixCore.subscribeForMessages(it.roomAlias, PhenixMessageConfiguration("", 0))
+                    configuration = null
+                }
+                Timber.d("Rooms updated: $room, $isInRoom")
                 if (room != null) {
                     onRoomJoined(room)
                 }
@@ -94,39 +104,56 @@ class GroupsViewModel(
         }
         launch {
             phenixCore.members.collect { members ->
-                members.firstOrNull { it.isSelf }?.let { self ->
-                    _onAudioEnabled.tryEmit(self.isAudioEnabled)
-                    _onVideoEnabled.tryEmit(self.isVideoEnabled)
+                members.filter { it.connectionState != PhenixMemberConnectionState.REMOVED }.let { filteredMembers ->
+                    filteredMembers.firstOrNull { it.isSelf }?.let { self ->
+                        Timber.d("Self member updated: $self")
+                        _onAudioEnabled.tryEmit(self.isAudioEnabled)
+                        _onVideoEnabled.tryEmit(self.isVideoEnabled)
+                    }
+                    _members.tryEmit(filteredMembers)
                 }
-                _members.tryEmit(members)
+            }
+        }
+
+        launch {
+            phenixCore.mediaState.collect { state ->
+                Timber.d("Media state updated: $state")
+                cameraFacingMode = state.cameraFacingMode
+                _onAudioEnabled.tryEmit(state.isAudioEnabled)
+                _onVideoEnabled.tryEmit(state.isVideoEnabled)
             }
         }
     }
 
     fun enableVideo(enabled: Boolean) {
+        Timber.d("Enabling video: $enabled")
         phenixCore.setSelfVideoEnabled(enabled)
-        _onVideoEnabled.tryEmit(enabled)
     }
 
     fun enableAudio(enabled: Boolean) {
+        Timber.d("Enabling audio: $enabled")
         phenixCore.setSelfAudioEnabled(enabled)
-        _onAudioEnabled.tryEmit(enabled)
     }
 
-    fun joinRoom(roomAlias: String? = null, roomId: String? = null) {
-        if (roomAlias == null && roomId == null) return
-        phenixCore.publishToRoom(PhenixRoomConfiguration(
-            roomId = roomId ?: "",
-            roomAlias = roomAlias ?: "",
-            memberName = displayName,
-            memberRole = MemberRole.MODERATOR,
-            maxVideoRenderers = phenixCore.configuration?.maxVideoRenderers ?: BuildConfig.MAX_VIDEO_MEMBERS
-        ))
+    fun joinRoom(roomAlias: String) {
+        createRoomConfig(roomAlias).run {
+            configuration = this
+            Timber.d("Joining room with configuration: $configuration")
+            phenixCore.joinRoom(this)
+        }
+    }
+
+    fun createRoom(roomAlias: String) {
+        createRoomConfig(roomAlias).run {
+            configuration = this
+            Timber.d("Creating room with configuration: $configuration")
+            phenixCore.createRoom(this)
+        }
     }
 
     fun sendChatMessage(message: String) {
         Timber.d("Sending message: $message")
-        phenixCore.sendMessage(message, "")
+        phenixCore.sendMessage(currentRoomAlias, message, "")
     }
 
     fun switchCameraFacing() = phenixCore.flipCamera()
@@ -154,14 +181,26 @@ class GroupsViewModel(
         leaveRoom()
     }
 
-    fun observeDebugMenu(debugMenu: DebugMenu, onError: () -> Unit, onShow: () -> Unit) {
+    fun observeDebugMenu(debugMenu: DebugMenu, onError: (String) -> Unit, onEvent: (DebugEvent) -> Unit) {
         debugMenu.observeDebugMenu(
             phenixCore,
             "${BuildConfig.APPLICATION_ID}.provider",
             onError = onError,
-            onShow = onShow
+            onEvent = onEvent
         )
     }
+
+    private fun createRoomConfig(roomAlias: String) =
+        PhenixRoomConfiguration(
+            roomAlias = roomAlias,
+            memberName = displayName,
+            memberRole = PhenixMemberRole.MODERATOR,
+            maxVideoRenderers = phenixCore.configuration?.maxVideoSubscriptions ?: BuildConfig.MAX_VIDEO_MEMBERS,
+            roomAudioToken = phenixCore.configuration?.roomAudioStreamToken,
+            roomVideoToken = phenixCore.configuration?.roomVideoStreamToken,
+            audioEnabled = isAudioEnabled,
+            videoEnabled = isVideoEnabled
+        )
 
     private fun updateMessages() {
         _messages.tryEmit(rawMessages.map { it.copy() })
@@ -177,7 +216,6 @@ class GroupsViewModel(
         cacheProvider.cacheDao().insertRoom(RoomInfoItem(
             alias = room.alias,
             roomId = room.id,
-            backendUri = phenixCore.configuration?.backend ?: BuildConfig.BACKEND_URL,
             dateLeft = getRoomDateLeft(room.alias)
         ))
     }

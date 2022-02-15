@@ -6,22 +6,31 @@ package com.phenixrts.suite.phenixcore.repositories.channel
 
 import android.view.SurfaceView
 import android.widget.ImageView
+import com.phenixrts.common.RequestStatus
 import com.phenixrts.express.ChannelExpress
-import com.phenixrts.express.PCastExpress
+import com.phenixrts.express.ExpressPublisher
+import com.phenixrts.pcast.UserMediaStream
+import com.phenixrts.room.RoomService
 import com.phenixrts.suite.phenixcore.common.ConsumableSharedFlow
 import com.phenixrts.suite.phenixcore.common.asPhenixChannels
 import com.phenixrts.suite.phenixcore.common.launchIO
 import com.phenixrts.suite.phenixcore.repositories.channel.models.PhenixCoreChannel
+import com.phenixrts.suite.phenixcore.repositories.chat.PhenixChatRepository
+import com.phenixrts.suite.phenixcore.repositories.core.common.getPublishToChannelOptions
 import com.phenixrts.suite.phenixcore.repositories.models.*
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
 
 internal class PhenixChannelRepository(
-    private val pCastExpress: PCastExpress,
     private val channelExpress: ChannelExpress,
-    private val configuration: PhenixConfiguration
+    private val configuration: PhenixConfiguration,
+    private val chatRepository: PhenixChatRepository
 ) {
-    private val rawChannels = mutableListOf<PhenixCoreChannel>()
+    private val pCastExpress = channelExpress.roomExpress!!.pCastExpress
+    private val rawChannels = mutableSetOf<PhenixCoreChannel>()
+    private var publisher: ExpressPublisher? = null
+    private var roomService: RoomService? = null
+    private var channelConfiguration: PhenixChannelConfiguration? = null
 
     private val _onError = ConsumableSharedFlow<PhenixError>()
     private val _onEvent = ConsumableSharedFlow<PhenixEvent>()
@@ -31,110 +40,140 @@ internal class PhenixChannelRepository(
     val onError = _onError.asSharedFlow()
     val onEvent = _onEvent.asSharedFlow()
 
-    fun joinAllChannels(channelAliases: List<String>, streamIDs: List<String>) {
-        if (configuration.channelTokens.isNotEmpty() && configuration.channelTokens.size != channelAliases.size) {
+    fun joinAllChannels(channelAliases: List<String>) {
+        if (configuration.channelStreamTokens.isNotEmpty() && configuration.channelStreamTokens.size != channelAliases.size) {
             _onError.tryEmit(PhenixError.JOIN_ROOM_FAILED)
             return
         }
         channelAliases.forEachIndexed { index, channelAlias ->
-            if (rawChannels.any { it.channelAlias == channelAlias }) return
-            val channel = PhenixCoreChannel(pCastExpress, channelExpress, configuration, channelAlias = channelAlias)
-            Timber.d("Joining channel: $channelAlias")
-            channel.join(
-                PhenixChannelConfiguration(
-                    channelAlias = channelAlias,
-                    streamToken = configuration.channelTokens.getOrNull(index) ?: configuration.edgeToken,
-                    publishToken = configuration.publishToken ?: configuration.edgeToken
-                )
+            if (hasChannel(channelAlias)) return
+            val channel = PhenixCoreChannel(pCastExpress, channelExpress, configuration, chatRepository, channelAlias)
+            val phenixChannelConfiguration = PhenixChannelConfiguration(
+                channelAlias = channelAlias,
+                streamToken = configuration.channelStreamTokens.getOrNull(index) ?: configuration.streamToken,
+                publishToken = configuration.publishToken
             )
-            launchIO { channel.onUpdated.collect { _channels.tryEmit(rawChannels.asPhenixChannels()) } }
-            launchIO { channel.onError.collect { _onError.tryEmit(it) } }
-            rawChannels.add(channel)
-        }
-        streamIDs.forEachIndexed { index, streamID ->
-            if (rawChannels.any { it.streamID == streamID }) return
-            val channel = PhenixCoreChannel(pCastExpress, channelExpress, configuration, streamID = streamID)
-            Timber.d("Joining channel: $streamID")
-            channel.join(
-                PhenixChannelConfiguration(
-                    channelID = streamID,
-                    streamToken = configuration.channelTokens.getOrNull(index) ?: configuration.edgeToken,
-                    publishToken = configuration.publishToken ?: configuration.edgeToken
-                )
-            )
-            launchIO { channel.onUpdated.collect { _channels.tryEmit(rawChannels.asPhenixChannels()) } }
-            launchIO { channel.onError.collect { _onError.tryEmit(it) } }
-            rawChannels.add(channel)
+            joinChannel(channel, phenixChannelConfiguration)
         }
         _channels.tryEmit(rawChannels.asPhenixChannels())
     }
 
-    fun joinChannel(config: PhenixChannelConfiguration) {
+    fun joinChannel(phenixChannelConfiguration: PhenixChannelConfiguration) {
+        val config = PhenixChannelConfiguration(
+            channelAlias = phenixChannelConfiguration.channelAlias,
+            channelID = phenixChannelConfiguration.channelID,
+            streamToken = phenixChannelConfiguration.streamToken ?: configuration.streamToken,
+            publishToken = phenixChannelConfiguration.publishToken ?: configuration.publishToken,
+            channelCapabilities = phenixChannelConfiguration.channelCapabilities
+        )
+        channelConfiguration = config
         val channelAlias = config.channelAlias
-        if (rawChannels.any { it.channelAlias == channelAlias }) return
-        val channel = PhenixCoreChannel(pCastExpress, channelExpress, configuration, channelAlias)
-        channel.join(config)
-        launchIO { channel.onUpdated.collect { _channels.tryEmit(rawChannels.asPhenixChannels()) } }
-        launchIO { channel.onError.collect { _onError.tryEmit(it) } }
-        rawChannels.add(channel)
+        if (hasChannel(channelAlias)) return
+        val channel = PhenixCoreChannel(pCastExpress, channelExpress, configuration, chatRepository, channelAlias!!)
+        joinChannel(channel, config)
         _channels.tryEmit(rawChannels.asPhenixChannels())
+    }
+
+    fun publishToChannel(phenixChannelConfiguration: PhenixChannelConfiguration, userMediaStream: UserMediaStream) {
+        channelConfiguration = phenixChannelConfiguration
+        Timber.d("Publishing to channel: $phenixChannelConfiguration")
+        _onEvent.tryEmit(PhenixEvent.PHENIX_CHANNEL_PUBLISHING)
+        channelExpress.publishToChannel(
+            getPublishToChannelOptions(configuration, phenixChannelConfiguration, userMediaStream)
+        ) { status: RequestStatus?, service: RoomService?, expressPublisher: ExpressPublisher? ->
+            Timber.d("Stream is published: $status")
+            publisher = expressPublisher
+            roomService = service
+            if (status == RequestStatus.OK && roomService != null && publisher != null) {
+                _onEvent.tryEmit(PhenixEvent.PHENIX_CHANNEL_PUBLISHED.apply { data = phenixChannelConfiguration })
+            } else {
+                _onError.tryEmit(PhenixError.PUBLISH_CHANNEL_FAILED.apply { data = phenixChannelConfiguration })
+            }
+        }
+    }
+
+    fun stopPublishingToChannel() {
+        Timber.d("Stopping media publishing")
+        publisher?.stop()
+        publisher = null
+        _onEvent.tryEmit(PhenixEvent.PHENIX_CHANNEL_PUBLISH_ENDED.apply { data = channelConfiguration })
     }
 
     fun selectChannel(channelAlias: String, isSelected: Boolean) {
-        rawChannels.find { it.channelAlias == channelAlias }?.selectChannel(isSelected)
+        findChannel(channelAlias)?.selectChannel(isSelected)
     }
 
     fun renderOnSurface(channelAlias: String, surfaceView: SurfaceView?) {
-        rawChannels.find { it.channelAlias == channelAlias }?.renderOnSurface(surfaceView)
+        findChannel(channelAlias)?.renderOnSurface(surfaceView)
     }
 
     fun renderOnImage(channelAlias: String, imageView: ImageView?, configuration: PhenixFrameReadyConfiguration?) {
-        rawChannels.find { it.channelAlias == channelAlias }?.renderOnImage(imageView, configuration)
+        findChannel(channelAlias)?.renderOnImage(imageView, configuration)
     }
 
     fun setAudioEnabled(channelAlias: String, enabled: Boolean) {
-        rawChannels.find { it.channelAlias == channelAlias }?.setAudioEnabled(enabled)
+        findChannel(channelAlias)?.setAudioEnabled(enabled)
     }
 
     fun createTimeShift(channelAlias: String, timestamp: Long) {
-        rawChannels.find { it.channelAlias == channelAlias }?.createTimeShift(timestamp)
+        findChannel(channelAlias)?.createTimeShift(timestamp)
     }
 
     fun startTimeShift(channelAlias: String, duration: Long) {
-        rawChannels.find { it.channelAlias == channelAlias }?.startTimeShift(duration)
+        findChannel(channelAlias)?.startTimeShift(duration)
     }
 
     fun seekTimeShift(channelAlias: String, offset: Long) {
-        rawChannels.find { it.channelAlias == channelAlias }?.seekTimeShift(offset)
+        findChannel(channelAlias)?.seekTimeShift(offset)
     }
 
     fun playTimeShift(channelAlias: String) {
-        rawChannels.find { it.channelAlias == channelAlias }?.playTimeShift()
+        findChannel(channelAlias)?.playTimeShift()
     }
 
     fun pauseTimeShift(channelAlias: String) {
-        rawChannels.find { it.channelAlias == channelAlias }?.pauseTimeShift()
+        findChannel(channelAlias)?.pauseTimeShift()
     }
 
     fun stopTimeShift(channelAlias: String) {
-        rawChannels.find { it.channelAlias == channelAlias }?.stopTimeShift()
+        findChannel(channelAlias)?.stopTimeShift()
     }
 
     fun limitBandwidth(channelAlias: String, bandwidth: Long) {
-        rawChannels.find { it.channelAlias == channelAlias }?.limitBandwidth(bandwidth)
+        findChannel(channelAlias)?.limitBandwidth(bandwidth)
     }
 
     fun releaseBandwidthLimiter(channelAlias: String) {
-        rawChannels.find { it.channelAlias == channelAlias }?.releaseBandwidthLimiter()
+        findChannel(channelAlias)?.releaseBandwidthLimiter()
     }
 
-    fun subscribeForMessages(channelAlias: String) {
-        rawChannels.find { it.channelAlias == channelAlias }?.subscribeForMessages()
+    fun subscribeForMessages(channelAlias: String, configuration: PhenixMessageConfiguration) =
+        findChannel(channelAlias)?.subscribeForMessages(configuration)
+
+    fun leaveChannel(channelAlias: String) {
+        findChannel(channelAlias)?.run {
+            release()
+            rawChannels.remove(this)
+            _channels.tryEmit(rawChannels.asPhenixChannels())
+        }
     }
 
     fun release() {
         rawChannels.forEach { it.release() }
         rawChannels.clear()
+        _channels.tryEmit(rawChannels.asPhenixChannels())
+    }
+
+    private fun hasChannel(channelAlias: String?) = rawChannels.any { it.channelAlias == channelAlias }
+
+    private fun findChannel(channelAlias: String) = rawChannels.find { it.channelAlias == channelAlias }
+
+    private fun joinChannel(channel: PhenixCoreChannel, channelConfiguration: PhenixChannelConfiguration) {
+        Timber.d("Joining channel: $channel, $channelConfiguration")
+        channel.join(channelConfiguration)
+        launchIO { channel.onUpdated.collect { _channels.tryEmit(rawChannels.asPhenixChannels()) } }
+        launchIO { channel.onError.collect { _onError.tryEmit(it) } }
+        rawChannels.add(channel)
     }
 
 }

@@ -14,20 +14,19 @@ import com.phenixrts.express.ExpressSubscriber
 import com.phenixrts.express.RoomExpress
 import com.phenixrts.express.SubscribeToMemberStreamOptions
 import com.phenixrts.media.audio.android.AndroidAudioFrame
-import com.phenixrts.media.video.android.AndroidVideoFrame
 import com.phenixrts.pcast.*
 import com.phenixrts.pcast.android.AndroidReadAudioFrameCallback
-import com.phenixrts.pcast.android.AndroidReadVideoFrameCallback
 import com.phenixrts.pcast.android.AndroidVideoRenderSurface
 import com.phenixrts.room.*
 import com.phenixrts.suite.phenixcore.common.ConsumableSharedFlow
 import com.phenixrts.suite.phenixcore.common.launchMain
+import com.phenixrts.suite.phenixcore.common.observableUnique
 import com.phenixrts.suite.phenixcore.repositories.core.common.*
 import com.phenixrts.suite.phenixcore.repositories.core.common.getSubscribeAudioOptions
 import com.phenixrts.suite.phenixcore.repositories.core.common.getSubscribeVideoOptions
-import com.phenixrts.suite.phenixcore.repositories.core.common.prepareBitmap
 import com.phenixrts.suite.phenixcore.repositories.models.PhenixError
 import com.phenixrts.suite.phenixcore.repositories.models.PhenixFrameReadyConfiguration
+import com.phenixrts.suite.phenixcore.repositories.models.PhenixMemberConnectionState
 import com.phenixrts.suite.phenixcore.repositories.models.PhenixRoomConfiguration
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -35,12 +34,11 @@ import timber.log.Timber
 import kotlin.coroutines.resume
 import kotlin.math.abs
 import kotlin.math.log10
-import kotlin.properties.Delegates
 
 private const val READ_TIMEOUT_DELAY = 200
 private const val DEFAULT_BANDWIDTH_LIMIT = 350_000L
 private const val INITIAL_AUDIO_LEVEL = 1f
-private const val DATA_QUALITY_TIMEOUT = 1000 * 10L
+private const val STREAM_SUBSCRIPTION_TIMEOUT = 1000 * 10L
 
 internal data class PhenixCoreMember(
     var member: Member,
@@ -54,37 +52,25 @@ internal data class PhenixCoreMember(
     private var videoStateDisposable: Disposable? = null
     private var audioStateDisposable: Disposable? = null
     private var bandwidthDisposable: Disposable? = null
+    private var roleDisposable: Disposable? = null
     private var videoSubscriber: ExpressSubscriber? = null
     private var audioSubscriber: ExpressSubscriber? = null
     private var audioRenderer: Renderer? = null
     private var videoRenderer: Renderer? = null
-    private var currentStreamUri = ""
-    private var isSubscribed = false
+    private var observingStreams = false
     private var isFirstFrameDrawn = false
     private var canRenderVideo = true
     private var readDelay = System.currentTimeMillis()
     private var audioBuffer = arrayListOf<Double>()
     private var streamImageView: ImageView? = null
     private var frameReadyConfiguration: PhenixFrameReadyConfiguration? = null
+    private val memberStreams = mutableSetOf<PhenixCoreMemberStream>()
 
-    private val videoFrameCallback = Renderer.FrameReadyForProcessingCallback { frameNotification ->
-        frameNotification?.read(object : AndroidReadVideoFrameCallback() {
-            override fun onVideoFrameEvent(videoFrame: AndroidVideoFrame?) {
-                videoFrame?.bitmap?.prepareBitmap(frameReadyConfiguration)?.let { bitmap ->
-                    streamImageView?.drawFrameBitmap(bitmap, isFirstFrameDrawn) {
-                        isFirstFrameDrawn = true
-                    }
-                }
-            }
-        })
-    }
-    private val dataQualityHandler = Handler(Looper.getMainLooper())
-    private val dataQualityRunner = Runnable {
+    private val streamSubscriptionHandler = Handler(Looper.getMainLooper())
+    private val streamSubscriptionRunner = Runnable {
         launchMain {
-            Timber.d("Data lost after: $DATA_QUALITY_TIMEOUT")
-            isDataLost = true
-            isSubscribed = false
-            subscribeToMemberMedia(canRenderVideo)
+            Timber.d("Retrying stream subscription for: ${asString()}")
+            subscribeToMemberStream()
         }
     }
 
@@ -94,70 +80,56 @@ internal data class PhenixCoreMember(
     val onUpdated = _onUpdated.asSharedFlow()
     val onError = _onError.asSharedFlow()
 
+    @Suppress("MemberVisibilityCanBePrivate")
+    val isModerator get() = memberRole == MemberRole.MODERATOR
     val memberId get() = member.sessionId ?: ""
     val isDisposable get() = !isSelf && !isModerator
     val hasRaisedHand get() = member.observableState.value == MemberState.HAND_RAISED
-    val isModerator get() = memberRole == MemberRole.MODERATOR
     val isVideoRendering get() = videoRenderer != null
+    var handRaiseTimestamp: Long = 0
+        private set
 
-    var memberRole: MemberRole by Delegates.observable(member.observableRole.value) { _, oldValue, newValue ->
-        if (oldValue != newValue) {
-            Timber.d("Member role changed: $newValue for: ${asString()}")
-            _onUpdated.tryEmit(Unit)
-        }
+    var connectionState: PhenixMemberConnectionState by observableUnique(PhenixMemberConnectionState.PENDING) { newValue ->
+        Timber.d("Member connection state changed: $newValue for: ${asString()}")
+        _onUpdated.tryEmit(Unit)
     }
-    var memberState: MemberState by Delegates.observable(member.observableState.value) { _, oldValue, newValue ->
-        if (oldValue != newValue) {
-            Timber.d("Member state changed: $newValue for: ${asString()}")
-            _onUpdated.tryEmit(Unit)
-        }
+    var memberRole: MemberRole by observableUnique(member.observableRole.value) { newValue ->
+        Timber.d("Member role changed: $newValue for: ${asString()}")
+        _onUpdated.tryEmit(Unit)
     }
-    var memberName: String by Delegates.observable(member.observableScreenName.value) { _, oldValue, newValue ->
-        if (oldValue != newValue) {
-            Timber.d("Member name changed: $newValue for: ${asString()}")
-            _onUpdated.tryEmit(Unit)
-        }
+    var memberState: MemberState by observableUnique(member.observableState.value) { newValue ->
+        Timber.d("Member state changed: $newValue for: ${asString()}")
+        handRaiseTimestamp = if (hasRaisedHand) member.observableLastUpdate.value.time else 0
+        _onUpdated.tryEmit(Unit)
     }
-    var audioLevel by Delegates.observable(INITIAL_AUDIO_LEVEL) { _, oldValue, newValue ->
-        if (oldValue != newValue) {
-            Timber.d("Member audio level changed: $newValue for: ${asString()}")
-            _onUpdated.tryEmit(Unit)
-        }
+    var memberName: String by observableUnique(member.observableScreenName.value) { newValue ->
+        Timber.d("Member name changed: $newValue for: ${asString()}")
+        _onUpdated.tryEmit(Unit)
     }
-    var isSelected by Delegates.observable(false) { _, oldValue, newValue ->
-        if (oldValue != newValue) {
-            Timber.d("Member isSelected changed: $newValue for: ${asString()}")
-            _onUpdated.tryEmit(Unit)
-        }
+    var audioLevel by observableUnique(INITIAL_AUDIO_LEVEL) { newValue ->
+        Timber.d("Member audio level changed: $newValue for: ${asString()}")
+        _onUpdated.tryEmit(Unit)
     }
-    var isAudioEnabled by Delegates.observable(false) { _, oldValue, newValue ->
+    var isSelected by observableUnique(false) { newValue ->
+        Timber.d("Member isSelected changed: $newValue for: ${asString()}")
+        _onUpdated.tryEmit(Unit)
+    }
+    var isAudioEnabled by observableUnique(false) { newValue ->
         if (newValue) {
             audioRenderer?.unmuteAudio()
         } else {
             audioRenderer?.muteAudio()
         }
-        if (oldValue != newValue) {
-            Timber.d("Member audio state changed: $newValue for: ${asString()}")
-            _onUpdated.tryEmit(Unit)
-        }
+        Timber.d("Member audio state changed: $newValue for: ${asString()}")
+        _onUpdated.tryEmit(Unit)
     }
-    var isVideoEnabled by Delegates.observable(false) { _, oldValue, newValue ->
-        if (oldValue != newValue) {
-            Timber.d("Member video state changed: $newValue for: ${asString()}")
-            _onUpdated.tryEmit(Unit)
-        }
+    var isVideoEnabled by observableUnique(false) { newValue ->
+        Timber.d("Member video state changed: $newValue for: ${asString()}")
+        _onUpdated.tryEmit(Unit)
     }
-    var volume by Delegates.observable(0) { _, oldValue, newValue ->
-        if (oldValue != newValue) {
-            Timber.d("Member volume changed: $newValue for: ${asString()}")
-            _onUpdated.tryEmit(Unit)
-        }
-    }
-    var isDataLost by Delegates.observable(false) { _, oldValue, newValue ->
-        if (oldValue != newValue) {
-            Timber.d("Member data state changed: $newValue for: ${asString()}")
-            _onUpdated.tryEmit(Unit)
-        }
+    var volume by observableUnique(0) { newValue ->
+        Timber.d("Member volume changed: $newValue for: ${asString()}")
+        _onUpdated.tryEmit(Unit)
     }
 
     fun isThisMember(sessionId: String?) = member.sessionId == sessionId
@@ -174,52 +146,26 @@ internal data class PhenixCoreMember(
         streamImageView = imageView
         frameReadyConfiguration = configuration
         videoSubscriber?.videoTracks?.lastOrNull()?.let { videoTrack ->
-            val callback = if (streamImageView == null) null else videoFrameCallback
+            val callback = if (streamImageView == null) null else onVideoFrameCallback(configuration) { bitmap ->
+                streamImageView?.drawFrameBitmap(bitmap, isFirstFrameDrawn) {
+                    isFirstFrameDrawn = true
+                }
+            }
             if (callback == null) isFirstFrameDrawn = false
-            videoRenderer?.setFrameReadyCallback(videoTrack, null)
             videoRenderer?.setFrameReadyCallback(videoTrack, callback)
         }
     }
 
     fun subscribeToMemberMedia(canRender: Boolean) {
-        if (canRenderVideo != canRender) isSubscribed = false
-        if (isSubscribed) return
-        isSubscribed = true
+        if (observingStreams) return
         canRenderVideo = canRender
+        observingStreams = true
+        connectionState = PhenixMemberConnectionState.PENDING
         Timber.d("Subscribing to member media: ${asString()}")
         member.observableStreams.subscribe { streams ->
-            streams.lastOrNull()?.let { stream ->
-                launchMain {
-                    Timber.d("Member stream count changed: ${streams.size}, re-subscribing: ${stream.streamUri != currentStreamUri}")
-                    if (stream.streamUri == currentStreamUri) return@launchMain
-                    currentStreamUri = stream.streamUri
-                    if (!isSelf) {
-                        Timber.d("Subscribing to member stream: $currentStreamUri ${asString()}")
-                        val aspectRatioMode = AspectRatioMode.FILL
-                        val videoOptions = getSubscribeVideoOptions(videoRenderSurface, aspectRatioMode, roomConfiguration)
-                        val audioOptions = getSubscribeAudioOptions(roomConfiguration)
-                        if (canRenderVideo) {
-                            subscribeToStream(roomExpress, stream, videoOptions, true)
-                        }
-                        subscribeToStream(roomExpress, stream, audioOptions, false)
-                    }
-                    stream.observableVideoState.subscribe { trackState ->
-                        Timber.d("Member video state changed: $trackState ${asString()}")
-                        isVideoEnabled = stream.observableVideoState.value == TrackState.ENABLED
-                    }.run {
-                        videoStateDisposable?.dispose()
-                        videoStateDisposable = this
-                    }
-                    stream.observableAudioState.subscribe { trackState ->
-                        Timber.d("Member audio state changed: $trackState ${asString()}")
-                        isAudioEnabled = stream.observableAudioState.value == TrackState.ENABLED
-                    }.run {
-                        audioStateDisposable?.dispose()
-                        audioStateDisposable = this
-                    }
-                    observeDataQuality()
-                }
-            }
+            memberStreams.clear()
+            memberStreams.addAll(streams.map { PhenixCoreMemberStream(it) })
+            subscribeToMemberStream()
         }.run {
             mediaStreamDisposable?.dispose()
             mediaStreamDisposable = this
@@ -231,10 +177,10 @@ internal data class PhenixCoreMember(
         videoStateDisposable?.dispose()
         audioStateDisposable?.dispose()
         bandwidthDisposable?.dispose()
-        isSubscribed = false
+        roleDisposable?.dispose()
+        observingStreams = false
         isSelected = false
         isFirstFrameDrawn = false
-        currentStreamUri = ""
         videoRenderSurface.setSurfaceHolder(null)
         if (!isSelf) {
             videoSubscriber?.stop()
@@ -252,6 +198,59 @@ internal data class PhenixCoreMember(
         Timber.d("Room member disposed: ${asString()}")
     } catch (e: Exception) {
         Timber.d("Failed to dispose room member: ${asString()}")
+    }
+
+    private fun subscribeToMemberStream() {
+        streamSubscriptionHandler.removeCallbacks(streamSubscriptionRunner)
+        if (memberStreams.isEmpty()) {
+            connectionState = PhenixMemberConnectionState.REMOVED
+            return
+        }
+        connectionState = PhenixMemberConnectionState.PENDING
+        memberStreams.first().let { memberStream ->
+            launchMain {
+                val stream = memberStream.stream
+                Timber.d("Member stream count changed: ${memberStreams.size}, re-subscribing: ${!memberStream.isSubscribed}")
+                if (memberStream.isSubscribed) return@launchMain
+                if (!isSelf) {
+                    Timber.d("Subscribing to member stream: ${stream.streamUri} ${asString()} with: $roomConfiguration")
+                    val aspectRatioMode = AspectRatioMode.FILL
+                    val videoOptions = getSubscribeVideoOptions(videoRenderSurface, aspectRatioMode, roomConfiguration)
+                    val audioOptions = getSubscribeAudioOptions(roomConfiguration)
+                    var subscribedVideo = false
+                    if (canRenderVideo) {
+                        subscribedVideo = subscribeToStream(roomExpress, stream, videoOptions, true)
+                    }
+                    val subscribedAudio = subscribeToStream(roomExpress, stream, audioOptions, false)
+                    connectionState = if (subscribedVideo || subscribedAudio)
+                        PhenixMemberConnectionState.ACTIVE else PhenixMemberConnectionState.AWAY
+                    memberStreams.first {
+                        it.stream.streamUri == stream.streamUri
+                    }.isSubscribed = subscribedAudio || subscribedVideo
+                    if (!subscribedAudio && !subscribedVideo) {
+                        memberStreams.remove(memberStream)
+                        streamSubscriptionHandler.postDelayed(streamSubscriptionRunner, STREAM_SUBSCRIPTION_TIMEOUT)
+                        return@launchMain
+                    }
+                }
+                stream.observableVideoState.subscribe { trackState ->
+                    Timber.d("Member video state changed: $trackState ${asString()}")
+                    isVideoEnabled = stream.observableVideoState.value == TrackState.ENABLED
+                }.run {
+                    videoStateDisposable?.dispose()
+                    videoStateDisposable = this
+                }
+                stream.observableAudioState.subscribe { trackState ->
+                    Timber.d("Member audio state changed: $trackState ${asString()}")
+                    isAudioEnabled = stream.observableAudioState.value == TrackState.ENABLED
+                }.run {
+                    audioStateDisposable?.dispose()
+                    audioStateDisposable = this
+                }
+                observeDataQuality()
+                observeMemberRole()
+            }
+        }
     }
 
     private fun observeAudio() {
@@ -290,12 +289,16 @@ internal data class PhenixCoreMember(
         }
     }
 
-    private suspend fun subscribeToStream(roomExpress: RoomExpress, stream: Stream,
-                                          options: SubscribeToMemberStreamOptions, isVideo: Boolean) = suspendCancellableCoroutine<Unit> { continuation ->
+    private suspend fun subscribeToStream(
+        roomExpress: RoomExpress,
+        stream: Stream,
+        options: SubscribeToMemberStreamOptions,
+        isVideo: Boolean
+    ) = suspendCancellableCoroutine { continuation ->
         roomExpress.subscribeToMemberStream(stream, options) { status, expressSubscriber, mediaRenderer ->
             Timber.d("Subscribed to member media: $status ${asString()}")
             if (status != RequestStatus.OK) {
-                if (continuation.isActive) continuation.resume(Unit)
+                if (continuation.isActive) continuation.resume(false)
                 return@subscribeToMemberStream
             }
             if (isVideo) {
@@ -311,7 +314,7 @@ internal data class PhenixCoreMember(
                 isAudioEnabled = stream.observableAudioState.value == TrackState.ENABLED
                 observeAudio()
             }
-            if (continuation.isActive) continuation.resume(Unit)
+            if (continuation.isActive) continuation.resume(true)
         }
     }
 
@@ -319,12 +322,23 @@ internal data class PhenixCoreMember(
         val rendererToObserve = if (videoRenderer != null) videoRenderer else audioRenderer
         rendererToObserve?.setDataQualityChangedCallback { _, status, _ ->
             if (status == DataQualityStatus.ALL) {
-                isDataLost = false
-                dataQualityHandler.removeCallbacks(dataQualityRunner)
+                connectionState = PhenixMemberConnectionState.ACTIVE
+                streamSubscriptionHandler.removeCallbacks(streamSubscriptionRunner)
             } else if (status == DataQualityStatus.NO_DATA) {
-                Timber.d("Render video data lost for: ${asString()}")
-                dataQualityHandler.postDelayed(dataQualityRunner, DATA_QUALITY_TIMEOUT)
+                Timber.d("Renderer data lost for: ${asString()}")
+                connectionState = PhenixMemberConnectionState.AWAY
+                streamSubscriptionHandler.postDelayed(streamSubscriptionRunner, STREAM_SUBSCRIPTION_TIMEOUT)
             }
+        }
+    }
+
+    private fun observeMemberRole() {
+        member.observableRole?.subscribe { role ->
+            Timber.d("Member role changed: $role")
+            memberRole = role
+        }?.run {
+            roleDisposable?.dispose()
+            roleDisposable = this
         }
     }
 
@@ -335,7 +349,6 @@ internal data class PhenixCoreMember(
                 "\"role\":\"${member.observableRole.value}\"," +
                 "\"state\":\"${member.observableState.value}\"," +
                 "\"hasRenderer\":\"${videoRenderer != null}\"," +
-                "\"isSubscribed\":\"${isSubscribed}\"," +
                 "\"isAudioEnabled\":\"${isAudioEnabled}\"," +
                 "\"isVideoEnabled\":\"${isVideoEnabled}\"," +
                 "\"canRenderVideo\":\"${canRenderVideo}\"," +
@@ -345,6 +358,8 @@ internal data class PhenixCoreMember(
                 "\"hasRaisedHand\":\"${hasRaisedHand}\"," +
                 "\"hasAudioRenderer\":\"${audioRenderer != null}\"," +
                 "\"hasVideoRenderer\":\"${videoRenderer != null}\"," +
+                "\"handRaiseTimestamp\":\"${handRaiseTimestamp}\"," +
+                "\"connectionState\":\"${connectionState}\"," +
                 "\"isModerator\":\"${isModerator}\"}"
     }
 }

@@ -7,6 +7,7 @@ package com.phenixrts.suite.groups.ui
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager.PERMISSION_GRANTED
+import android.os.Build
 import android.os.Bundle
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -16,7 +17,6 @@ import com.phenixrts.suite.groups.cache.PreferenceProvider
 import com.phenixrts.suite.groups.receivers.CellularStateReceiver
 import com.phenixrts.suite.phenixcore.PhenixCore
 import com.phenixrts.suite.phenixdeeplinks.DeepLinkActivity
-import java.util.*
 import javax.inject.Inject
 
 @SuppressLint("Registered")
@@ -29,34 +29,7 @@ abstract class EasyPermissionActivity : DeepLinkActivity() {
 
     private val permissionRequestHistory = hashMapOf<Int, (a: Boolean) -> Unit>()
 
-    fun hasCameraPermission(): Boolean =
-        ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PERMISSION_GRANTED
-
-    fun hasRecordAudioPermission(): Boolean =
-        ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PERMISSION_GRANTED
-
-    fun arePermissionsGranted(): Boolean = hasCameraPermission() && hasRecordAudioPermission()
-
-    fun askForPermissions(callback: (granted: Boolean) -> Unit) {
-        run {
-            val permissions = arrayListOf<String>()
-            if (!hasRecordAudioPermission()) {
-                permissions.add(Manifest.permission.RECORD_AUDIO)
-            }
-            if (!hasCameraPermission()) {
-                permissions.add(Manifest.permission.CAMERA)
-            }
-            if (permissions.isNotEmpty()) {
-                val requestCode = Date().time.toInt().low16bits()
-                permissionRequestHistory[requestCode] = callback
-                ActivityCompat.requestPermissions(this, permissions.toTypedArray(), requestCode)
-            } else {
-                callback(true)
-            }
-        }
-    }
-
-    override val additionalConfiguration = hashMapOf<String, String>()
+    override val additionalConfiguration = hashMapOf(Pair("publishingEnabled", "true"))
 
     override fun isAlreadyInitialized() = phenixCore.isInitialized
 
@@ -73,6 +46,48 @@ abstract class EasyPermissionActivity : DeepLinkActivity() {
         super.onCreate(savedInstanceState)
     }
 
-    private fun Int.low16bits() = this and 0xFFFF
+    fun hasCameraPermission(): Boolean =
+        ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PERMISSION_GRANTED
+
+    fun hasRecordAudioPermission(): Boolean =
+        ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PERMISSION_GRANTED
+
+    fun hasReadPhoneStatePermission(): Boolean =
+        ContextCompat.checkSelfPermission(this, Manifest.permission.READ_PHONE_STATE) == PERMISSION_GRANTED
+
+    fun hasBluetoothPermission(): Boolean = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+        ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PERMISSION_GRANTED else true
+
+    fun arePermissionsGranted(): Boolean = hasCameraPermission() &&
+            hasRecordAudioPermission() &&
+            hasReadPhoneStatePermission() &&
+            hasBluetoothPermission()
+
+    fun askForPermissions(callback: (granted: Boolean) -> Unit) {
+        run {
+            val permissions = arrayListOf<String>()
+            if (!hasRecordAudioPermission()) {
+                permissions.add(Manifest.permission.RECORD_AUDIO)
+            }
+            if (!hasCameraPermission()) {
+                permissions.add(Manifest.permission.CAMERA)
+            }
+            if (!hasReadPhoneStatePermission()) {
+                permissions.add(Manifest.permission.READ_PHONE_STATE)
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !hasBluetoothPermission()) {
+                permissions.add(Manifest.permission.BLUETOOTH_CONNECT)
+            }
+            if (permissions.isNotEmpty()) {
+                val requestCode = randomRequestCode()
+                permissionRequestHistory[requestCode] = callback
+                ActivityCompat.requestPermissions(this, permissions.toTypedArray(), requestCode)
+            } else {
+                callback(true)
+            }
+        }
+    }
+
+    private fun randomRequestCode() = (0..4).map { (0..9).random() }.joinToString(separator = "").toInt()
 
 }

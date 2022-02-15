@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import com.phenixrts.suite.groups.databinding.FragmentMembersBinding
 import com.phenixrts.suite.groups.ui.adapters.MemberListAdapter
 import com.phenixrts.suite.phenixcore.common.launchUI
+import com.phenixrts.suite.phenixcore.repositories.models.PhenixEvent
 import timber.log.Timber
 
 class MemberFragment : BaseFragment() {
@@ -31,7 +32,7 @@ class MemberFragment : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentMembersBinding.inflate(inflater, container, false)
-        binding.lifecycleOwner = this
+        binding.lifecycleOwner = viewLifecycleOwner
         binding.memberList.adapter = adapter
         binding.memberList.itemAnimator?.changeDuration = 0
         return binding.root
@@ -45,6 +46,13 @@ class MemberFragment : BaseFragment() {
                 adapter.members = members
             }
         }
-    }
 
+        launchUI {
+            phenixCore.onEvent.collect { event ->
+                if (event == PhenixEvent.CAMERA_FLIPPED) {
+                    adapter.notifyItemChanged(0)
+                }
+            }
+        }
+    }
 }

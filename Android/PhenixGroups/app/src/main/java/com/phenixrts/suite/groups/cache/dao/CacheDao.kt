@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.cache.dao
@@ -12,8 +12,8 @@ import java.util.*
 @Dao
 interface CacheDao {
 
-    @Query("SELECT * FROM room_item WHERE backendUri = :uri ORDER BY dateLeft DESC")
-    fun getVisitedRooms(uri: String): Flow<List<RoomInfoItem>>
+    @Query("SELECT * FROM room_item ORDER BY dateLeft DESC")
+    fun getVisitedRooms(): Flow<List<RoomInfoItem>>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insertRoom(roomInfoItem: RoomInfoItem)

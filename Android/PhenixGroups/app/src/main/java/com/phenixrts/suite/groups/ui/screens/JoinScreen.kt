@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.ui.screens
@@ -34,8 +34,8 @@ class JoinScreen : BaseFragment() {
         }
         binding.joinRoomButton.setOnClickListener {
             binding.joinRoomCodeInput.text.toString().takeIf { it.isNotBlank() }?.let { alias ->
-                Timber.d("Join Room clicked: $alias")
-                viewModel.joinRoom(roomAlias = alias)
+                Timber.d("Create Room clicked: $alias")
+                viewModel.createRoom(roomAlias = alias)
             } ?: showToast(getString(R.string.err_enter_valid_room_code))
         }
     }

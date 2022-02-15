@@ -10,19 +10,16 @@ plugins {
 }
 
 android {
-    compileSdkVersion 31
-    buildToolsVersion "30.0.3"
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.phenixrts.suite.groups"
-        minSdkVersion 23
-        targetSdkVersion 31
-        versionCode 4
-        versionName "2021.0.0"
+        minSdk 21
+        targetSdk 33
+        versionCode 5
+        versionName "2022.0"
         archivesBaseName = "PhenixGroups"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        buildConfigField "String", "BACKEND_URL", "\"https://demo.phenixrts.com/pcast\""
-        buildConfigField "String", "PCAST_URL", "\"\""
         buildConfigField "int", "EXPIRATION_DAYS", "10"
         buildConfigField "int", "MAX_VIDEO_MEMBERS", "6"
         buildConfigField "long", "DATA_QUALITY_TIMEOUT_MS", "10000"
@@ -61,46 +58,47 @@ android {
             includeAndroidResources = true
         }
     }
+    buildToolsVersion '33.0.0'
+    namespace 'com.phenixrts.suite.groups'
 }
 
 dependencies {
     // Phenix core and submodules
     implementation project(":phenixcore")
-    implementation project(":phenixdeeplinks")
+    implementation project(":phenixdeeplink")
     implementation project(":phenixdebugmenu")
 
     // Android
-    implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.appcompat:appcompat:1.4.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
-    implementation 'com.google.android.material:material:1.4.0'
-    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
+    api 'androidx.core:core-ktx:1.8.0'
+    api 'androidx.appcompat:appcompat:1.5.0'
+    api 'androidx.constraintlayout:constraintlayout:2.1.4'
+    api 'com.google.android.material:material:1.6.1'
+    api "androidx.lifecycle:lifecycle-extensions:2.2.0"
+    api 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1'
+    api 'androidx.lifecycle:lifecycle-runtime-ktx:2.5.1'
 
     // Kotlin
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0-native-mt'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0-native-mt'
-    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2'
-
-    // Phenix
-    implementation "com.phenixrts.android:phenix-sdk-android:2021.0.15"
+    api 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+    api 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4'
+    api 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0'
 
     // Dagger
-    kapt 'com.google.dagger:dagger-compiler:2.40.5'
-    kapt 'com.google.dagger:dagger-android-processor:2.40.5'
-    implementation 'com.google.dagger:dagger-android-support:2.40.5'
+    kapt 'com.google.dagger:dagger-compiler:2.43.2'
+    kapt 'com.google.dagger:dagger-android-processor:2.43.2'
+    api 'com.google.dagger:dagger-android-support:2.43.2'
 
     // Timber
-    implementation 'com.jakewharton.timber:timber:5.0.1'
+    api 'com.jakewharton.timber:timber:5.0.1'
 
     // Room components
-    implementation 'androidx.room:room-runtime:2.4.0'
-    implementation 'androidx.room:room-ktx:2.4.0'
-    kapt 'androidx.room:room-compiler:2.4.0'
+    api 'androidx.room:room-runtime:2.4.3'
+    api 'androidx.room:room-ktx:2.4.3'
+    kapt 'androidx.room:room-compiler:2.4.3'
 
     // Testing
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0-native-mt'
-    testImplementation 'org.robolectric:robolectric:4.7.3'
+    testImplementation 'org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4'
+    testImplementation 'org.robolectric:robolectric:4.8.1'
     testImplementation 'androidx.test:core:1.4.0'
 
 }

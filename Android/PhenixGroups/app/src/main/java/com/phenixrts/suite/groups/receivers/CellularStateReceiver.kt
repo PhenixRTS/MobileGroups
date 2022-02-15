@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.groups.receivers
@@ -13,7 +13,7 @@ class CellularStateReceiver(context: Context) : PhoneStateListener() {
 
     private val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
     private var callback: OnCallStateChanged? = null
-    private var currentState = telephonyManager.callState
+    private var currentState = -1
 
     fun observeCellularState(callback: OnCallStateChanged) {
         this.callback = callback
@@ -27,6 +27,7 @@ class CellularStateReceiver(context: Context) : PhoneStateListener() {
 
     fun isInCall() = telephonyManager.callState == TelephonyManager.CALL_STATE_OFFHOOK
 
+    @Deprecated("Deprecated in Java")
     override fun onCallStateChanged(state: Int, phoneNumber: String?) {
         super.onCallStateChanged(state, phoneNumber)
         if (currentState != state) {

@@ -1,10 +1,9 @@
 <!--
-  ~ Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+  ~ Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="com.phenixrts.suite.groups">
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -12,6 +11,7 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-feature android:name="android.hardware.camera" />
 
     <queries>
@@ -48,13 +48,25 @@
                     android:host="phenixrts.com"
                     android:pathPrefix="/group/"
                     android:scheme="https" />
+                <data
+                    android:host="stg.phenixrts.com"
+                    android:pathPrefix="/group/"
+                    android:scheme="https" />
+                <data
+                    android:host="pcast.phenixrts.com"
+                    android:pathPrefix="/group/"
+                    android:scheme="https" />
+                <data
+                    android:host="pcast-stg.phenixrts.com"
+                    android:pathPrefix="/group/"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
 
         <activity
             android:name=".ui.MainActivity"
             android:windowSoftInputMode="adjustPan"
-            android:launchMode="singleTask"
+            android:launchMode="singleTop"
             android:exported="false" />
 
         <provider

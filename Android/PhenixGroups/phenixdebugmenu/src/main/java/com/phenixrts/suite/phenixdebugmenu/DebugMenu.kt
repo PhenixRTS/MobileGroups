@@ -21,7 +21,8 @@ import com.phenixrts.suite.phenixdebugmenu.common.hide
 import com.phenixrts.suite.phenixdebugmenu.common.isOpened
 import com.phenixrts.suite.phenixdebugmenu.common.open
 import com.phenixrts.suite.phenixdebugmenu.databinding.ViewDebugLayoutBinding
-import kotlinx.coroutines.flow.single
+import com.phenixrts.suite.phenixdebugmenu.models.DebugEvent
+import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.lang.Exception
 
@@ -29,13 +30,15 @@ class DebugMenu: CoordinatorLayout {
 
     private var fileWriterDebugTree: FileWriterDebugTree? = null
     private val filesToLog = arrayListOf<Uri>()
-    private var onShow: () -> Unit = {}
-    private var onError: () -> Unit = {}
+    private var onEvent: (DebugEvent) -> Unit = {}
+    private var onError: (String) -> Unit = {}
     private var providerAuthority: String = ""
-    private var phenixCore: PhenixCore? = null
+    private var sdkVersion: String = ""
 
     private lateinit var binding: ViewDebugLayoutBinding
     private lateinit var debugMenu: BottomSheetBehavior<View>
+
+    private val adapter by lazy { LogAdapter() }
 
     private var lastTapTime = System.currentTimeMillis()
     private var tapCount = 0
@@ -52,11 +55,20 @@ class DebugMenu: CoordinatorLayout {
         initView()
     }
 
-    fun observeDebugMenu(phenixCore: PhenixCore, authority: String, onShow: () -> Unit, onError: () -> Unit) {
+    fun observeDebugMenu(
+        phenixCore: PhenixCore,
+        authority: String,
+        onEvent: (DebugEvent) -> Unit,
+        onError: (String) -> Unit
+    ) {
         fileWriterDebugTree = phenixCore.debugTree
         providerAuthority = authority
-        this.phenixCore = phenixCore
-        this.onShow = onShow
+        sdkVersion = context.getString(
+            R.string.debug_sdk_version,
+            phenixCore.sdkVersion,
+            phenixCore.sdkCode
+        )
+        this.onEvent = onEvent
         this.onError = onError
     }
 
@@ -76,24 +88,31 @@ class DebugMenu: CoordinatorLayout {
             )
         }
 
-    fun onStart(appVersion: String, sdkVersion: String) {
+    fun onStart(appVersion: String, appCode: String) {
         debugMenu.addBottomSheetCallback(menuStateListener)
-        binding.debugMenu.debugClose.setOnClickListener { hideDebugMenu() }
-        binding.debugMenu.debugAppVersion.text = appVersion
+        binding.debugMenu.debugClose.setOnClickListener { hide() }
+        binding.debugMenu.debugAppVersion.text = context.getString(
+            R.string.debug_app_version,
+            appVersion,
+            appCode
+        )
         binding.debugMenu.debugSdkVersion.text = sdkVersion
         binding.debugMenu.debugShare.setOnClickListener { shareLogs() }
+        binding.debugMenu.debugClear.setOnClickListener { clearLogs() }
+        binding.debugMenu.debugShowApp.setOnClickListener { showLogs(showAppLogs = true) }
+        binding.debugMenu.debugShowSdk.setOnClickListener { showLogs(showAppLogs = false) }
+        binding.debugMenu.debugBack.setOnClickListener { hideLogs() }
     }
 
     fun onStop() {
         debugMenu.removeBottomSheetCallback(menuStateListener)
     }
 
-    fun isClosed(): Boolean {
-        if (debugMenu.isOpened()) {
-            debugMenu.hide()
-            return false
-        }
-        return true
+    fun isOpened() = debugMenu.isOpened()
+
+    fun hide() {
+        Timber.d("Hiding debug menu")
+        debugMenu.hide()
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -106,6 +125,7 @@ class DebugMenu: CoordinatorLayout {
             }
             false
         }
+        binding.debugMenu.debugLogs.adapter = adapter
     }
 
     private val menuStateListener = object : BottomSheetBehavior.BottomSheetCallback() {
@@ -122,32 +142,51 @@ class DebugMenu: CoordinatorLayout {
         }
     }
 
-    private fun showDebugMenu() {
+    private fun show() {
         Timber.d("Showing debug menu")
         debugMenu.open()
     }
 
-    private fun hideDebugMenu() {
-        Timber.d("Hiding bottom menu")
-        debugMenu.hide()
+    private fun showLogs(showAppLogs: Boolean) {
+        binding.debugMenu.debugLogContainer.visibility = View.VISIBLE
+        binding.debugMenu.debugMenuButtons.visibility = View.GONE
+
+        fileWriterDebugTree?.collectLogs(showAppLogs) { logs ->
+            launchMain {
+                adapter.items = logs
+                delay(200)
+                binding.debugMenu.debugLogs.smoothScrollToPosition(adapter.itemCount)
+            }
+        }
+    }
+
+    private fun hideLogs() {
+        binding.debugMenu.debugLogContainer.visibility = View.GONE
+        binding.debugMenu.debugMenuButtons.visibility = View.VISIBLE
     }
 
     private fun shareLogs() = launchMain {
         try {
             Timber.d("Share Logs clicked")
-            phenixCore?.collectLogs()
-            val logs = phenixCore?.logMessages?.single() ?: ""
-            Timber.d("Phenix logs collected")
             filesToLog.clear()
-            fileWriterDebugTree?.writeSdkLogs(logs)
+            fileWriterDebugTree?.writeSdkLogs()
             filesToLog.addAll(fileWriterDebugTree?.getLogFileUris(providerAuthority) ?: emptyList())
             if (filesToLog.isNotEmpty()) {
-                onShow()
+                onEvent(DebugEvent.SHOW_MENU)
             } else {
-                onError()
+                onError(context.getString(R.string.debug_error_share_logs_failed))
             }
         } catch (e: Exception) {
-            onError()
+            onError(context.getString(R.string.debug_error_share_logs_failed))
+        }
+    }
+
+    private fun clearLogs() = launchMain {
+        try {
+            fileWriterDebugTree?.clearLogs()
+            onEvent(DebugEvent.FILES_DELETED)
+        } catch (e: Exception) {
+            onError(context.getString(R.string.debug_error_clear_logs_failed))
         }
     }
 
@@ -156,13 +195,13 @@ class DebugMenu: CoordinatorLayout {
         if (currentTapTime - lastTapTime <= TAP_DELTA) {
             tapCount++
         } else {
-            tapCount = 0
+            tapCount = 1
         }
         lastTapTime = currentTapTime
         if (tapCount == TAP_GOAL) {
             tapCount = 0
             Timber.d("Debug menu unlocked")
-            showDebugMenu()
+            show()
         }
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+ * Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
  */
 
 package com.phenixrts.suite.phenixcore.common
@@ -43,7 +43,7 @@ fun Fragment.launchUI(
     block: suspend CoroutineScope.() -> Unit
 ) = viewLifecycleOwner.lifecycleScope.launch(
     context = CoroutineExceptionHandler { _, e ->
-        Timber.d(e, "Coroutine failed: ${e.localizedMessage}")
+        Timber.e(e, "Coroutine failed: ${e.localizedMessage}")
     }
 ) {
     repeatOnLifecycle(state = lifecycleState, block = block)
@@ -54,7 +54,7 @@ fun FragmentActivity.launchUI(
     block: suspend CoroutineScope.() -> Unit
 ) = lifecycleScope.launch(
     context = CoroutineExceptionHandler { _, e ->
-        Timber.d(e, "Coroutine failed: ${e.localizedMessage}")
+        Timber.e(e, "Coroutine failed: ${e.localizedMessage}")
     }
 ) {
     repeatOnLifecycle(state = lifecycleState, block = block)
@@ -62,7 +62,7 @@ fun FragmentActivity.launchUI(
 
 fun ViewModel.launch(block: suspend CoroutineScope.() -> Unit) = viewModelScope.launch(
     context = CoroutineExceptionHandler { _, e ->
-        Timber.d(e, "Coroutine failed: ${e.localizedMessage}")
+        Timber.e(e, "Coroutine failed: ${e.localizedMessage}")
     },
     block = block,
 )

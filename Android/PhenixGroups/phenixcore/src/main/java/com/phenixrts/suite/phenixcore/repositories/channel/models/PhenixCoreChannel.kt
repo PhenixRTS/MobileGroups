@@ -9,22 +9,19 @@ import android.os.Handler
 import android.os.Looper
 import android.view.SurfaceView
 import android.widget.ImageView
-import com.phenixrts.chat.RoomChatService
-import com.phenixrts.chat.RoomChatServiceFactory
 import com.phenixrts.common.Disposable
 import com.phenixrts.common.RequestStatus
 import com.phenixrts.express.*
-import com.phenixrts.media.video.android.AndroidVideoFrame
 import com.phenixrts.pcast.*
-import com.phenixrts.pcast.android.AndroidReadVideoFrameCallback
 import com.phenixrts.pcast.android.AndroidVideoRenderSurface
 import com.phenixrts.room.RoomService
 import com.phenixrts.suite.phenixcore.common.ConsumableSharedFlow
-import com.phenixrts.suite.phenixcore.common.asPhenixMessage
 import com.phenixrts.suite.phenixcore.common.launchIO
 import com.phenixrts.suite.phenixcore.common.launchMain
+import com.phenixrts.suite.phenixcore.repositories.chat.PhenixChatRepository
 import com.phenixrts.suite.phenixcore.repositories.core.common.THUMBNAIL_DRAW_DELAY
-import com.phenixrts.suite.phenixcore.repositories.core.common.prepareBitmap
+import com.phenixrts.suite.phenixcore.repositories.core.common.isSeekable
+import com.phenixrts.suite.phenixcore.repositories.core.common.onVideoFrameCallback
 import com.phenixrts.suite.phenixcore.repositories.models.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.asSharedFlow
@@ -33,14 +30,14 @@ import java.util.*
 
 private const val TIME_SHIFT_RETRY_DELAY = 1000 * 10L
 private const val TIME_SHIFT_START_WAIT_TIME = 1000 * 20L
-private const val MESSAGE_BATCH_SIZE = 0
+private const val TIME_SHIFT_RETRY_COUNT = 10
 
 internal data class PhenixCoreChannel(
     private val pCastExpress: PCastExpress,
     private val channelExpress: ChannelExpress,
     private val configuration: PhenixConfiguration,
-    val channelAlias: String? = null,
-    val streamID: String? = null
+    private val chatRepository: PhenixChatRepository,
+    val channelAlias: String
 ) {
     private val videoRenderSurface = AndroidVideoRenderSurface()
     private var renderer: Renderer? = null
@@ -48,17 +45,14 @@ internal data class PhenixCoreChannel(
     private var roomService: RoomService? = null
     private var timeShift: TimeShift? = null
     private var bandwidthLimiter: Disposable? = null
-    private var timeShiftDisposables = mutableListOf<Disposable>()
-    private var timeShiftSeekDisposables = mutableListOf<Disposable>()
+    private var timeShiftDisposables = mutableSetOf<Disposable>()
+    private var timeShiftSeekDisposables = mutableSetOf<Disposable>()
     private var isFirstFrameDrawn = false
     private var isRendering = false
     private var timeShiftCreateRetryCount = 0
     private var timeShiftStart = 0L
     private var streamImageView: ImageView? = null
     private var frameReadyConfiguration: PhenixFrameReadyConfiguration? = null
-    private var chatMessageDisposable: Disposable? = null
-    private var chatService: RoomChatService? = null
-    private val rawMessages = mutableListOf<PhenixMessage>()
 
     private val _onUpdated = ConsumableSharedFlow<Unit>()
     private val _onError = ConsumableSharedFlow<PhenixError>()
@@ -77,21 +71,10 @@ internal data class PhenixCoreChannel(
         private set
     var channelState = PhenixChannelState.OFFLINE
         private set
-    val messages = rawMessages.toList()
-
-    private val frameCallback = Renderer.FrameReadyForProcessingCallback { frameNotification ->
-        if (!isSelected) return@FrameReadyForProcessingCallback
-        frameNotification?.read(object : AndroidReadVideoFrameCallback() {
-            override fun onVideoFrameEvent(videoFrame: AndroidVideoFrame?) {
-                videoFrame?.bitmap?.let { bitmap ->
-                    drawFrameBitmap(bitmap.prepareBitmap(frameReadyConfiguration))
-                }
-            }
-        })
-    }
 
     private val timeoutHandler = Handler(Looper.getMainLooper())
     private val timeoutRunnable = Runnable {
+        Timber.d("Time shift creating timed out")
         updateTimeShiftState(PhenixTimeShiftState.FAILED)
     }
 
@@ -99,11 +82,7 @@ internal data class PhenixCoreChannel(
         Timber.d("Joining channel with configuration: $configuration for: ${asString()}")
         channelState = PhenixChannelState.JOINING
         _onUpdated.tryEmit(Unit)
-        if (channelAlias != null) {
-            joinChannel(config)
-        } else {
-            joinStream()
-        }
+        joinChannel(config)
     }
 
     fun selectChannel(selected: Boolean) {
@@ -127,13 +106,14 @@ internal data class PhenixCoreChannel(
         Timber.d("Renderer ${if (imageView == null) "disabled" else "enabled"} on image view for: ${asString()}")
         streamImageView = imageView
         frameReadyConfiguration = configuration
-        if (!isRendering) {
+        if (!isRendering && imageView != null) {
             startRenderer()
         }
         expressSubscriber?.videoTracks?.lastOrNull()?.let { videoTrack ->
-            val callback = if (streamImageView == null) null else frameCallback
+            val callback = if (streamImageView == null) null else onVideoFrameCallback(configuration) { bitmap ->
+                drawFrameBitmap(bitmap)
+            }
             if (callback == null) isFirstFrameDrawn = false
-            renderer?.setFrameReadyCallback(videoTrack, null)
             renderer?.setFrameReadyCallback(videoTrack, callback)
         }
     }
@@ -141,17 +121,18 @@ internal data class PhenixCoreChannel(
     fun renderOnSurface(surfaceView: SurfaceView?) {
         Timber.d("Renderer ${if (surfaceView == null) "disabled" else "enabled"} on surface view for: ${asString()}")
         videoRenderSurface.setSurfaceHolder(surfaceView?.holder)
-        if (!isRendering) {
-            startRenderer()
-        } else if (surfaceView == null) {
+        if (surfaceView == null) {
             renderer?.stop()
             renderer = null
             isRendering = false
+        } else if (!isRendering) {
+            startRenderer()
         }
     }
 
     fun createTimeShift(timestamp: Long) {
-        if (renderer?.isSeekable == false) {
+        if (!renderer.isSeekable()) {
+            Timber.d("Channel has no time shift capability")
             updateTimeShiftState(PhenixTimeShiftState.FAILED)
             return
         }
@@ -167,7 +148,8 @@ internal data class PhenixCoreChannel(
     }
 
     fun startTimeShift(duration: Long) {
-        if (renderer?.isSeekable == false) {
+        if (!renderer.isSeekable()) {
+            Timber.d("Channel has no time shift capability")
             updateTimeShiftState(PhenixTimeShiftState.FAILED)
             return
         }
@@ -228,22 +210,23 @@ internal data class PhenixCoreChannel(
         bandwidthLimiter = null
     }
 
-    fun subscribeForMessages() {
-        chatMessageDisposable?.dispose()
-        chatMessageDisposable = null
-        chatService?.dispose()
-        chatService = RoomChatServiceFactory.createRoomChatService(
-            roomService,
-            MESSAGE_BATCH_SIZE,
-            configuration.mimeTypes.toTypedArray()
-        )
-        chatService?.observableLastChatMessage?.subscribe { chatMessage ->
-            Timber.d("Message received: ${chatMessage.observableMessage.value}, ${chatMessage.observableMimeType.value} for: ${asString()}")
-            if (configuration.mimeTypes.contains(chatMessage.observableMimeType.value)) {
-                rawMessages.add(chatMessage.asPhenixMessage())
-                _onUpdated.tryEmit(Unit)
-            }
-        }?.run { chatMessageDisposable = this }
+    fun subscribeForMessages(configuration: PhenixMessageConfiguration) {
+        if (roomService == null) return
+        chatRepository.subscribeForMessages(channelAlias, roomService!!, configuration)
+    }
+
+    fun release() {
+        releaseTimeShift()
+        releaseBandwidthLimiter()
+        expressSubscriber?.stop()
+        renderer?.stop()
+        expressSubscriber?.dispose()
+        renderer?.dispose()
+        expressSubscriber = null
+        renderer = null
+        streamImageView = null
+        roomService = null
+        chatRepository.disposeChatService(channelAlias)
     }
 
     private fun joinChannel(config: PhenixChannelConfiguration) {
@@ -257,48 +240,30 @@ internal data class PhenixCoreChannel(
             }
             _onUpdated.tryEmit(Unit)
         }, { requestStatus: RequestStatus?, subscriber: ExpressSubscriber?, expressRenderer: Renderer? ->
-            Timber.d("Stream re-started: $requestStatus for: ${asString()}")
-            if (requestStatus == RequestStatus.OK) {
-                expressSubscriber?.stop()
-                renderer?.stop()
-                expressSubscriber?.dispose()
-                renderer?.dispose()
-                expressSubscriber = subscriber
-                renderer = expressRenderer
-                isRendering = renderer != null
-                renderOnImage(streamImageView, frameReadyConfiguration)
-                channelState = PhenixChannelState.STREAMING
-            } else {
-                channelState = PhenixChannelState.NO_STREAM
+            launchIO {
+                Timber.d("Stream re-started: $requestStatus for: ${asString()}")
+                if (requestStatus == RequestStatus.OK) {
+                    renderer?.dispose()
+                    renderer = null
+                    expressSubscriber = subscriber
+                    renderer = expressRenderer
+                    isRendering = false
+                    renderOnImage(streamImageView, frameReadyConfiguration)
+                    channelState = PhenixChannelState.STREAMING
+                } else {
+                    channelState = PhenixChannelState.NO_STREAM
+                }
+                _onUpdated.tryEmit(Unit)
             }
-            _onUpdated.tryEmit(Unit)
         })
-    }
-
-    private fun joinStream() {
-        pCastExpress.subscribe(getStreamOptions(streamID!!)) { requestStatus: RequestStatus?, subscriber: ExpressSubscriber?, expressRenderer: Renderer? ->
-            Timber.d("Stream re-started: $requestStatus for: ${asString()}")
-            if (requestStatus == RequestStatus.OK) {
-                expressSubscriber?.stop()
-                renderer?.stop()
-                expressSubscriber?.dispose()
-                renderer?.dispose()
-                expressSubscriber = subscriber
-                renderer = expressRenderer
-                isRendering = renderer != null
-                renderOnImage(streamImageView, frameReadyConfiguration)
-                channelState = PhenixChannelState.STREAMING
-            } else {
-                channelState = PhenixChannelState.NO_STREAM
-            }
-            _onUpdated.tryEmit(Unit)
-        }
     }
 
     private fun createRenderer() {
         Timber.d("Creating renderer for: ${asString()}")
         renderer?.dispose()
-        renderer = expressSubscriber?.createRenderer()
+        renderer = expressSubscriber?.createRenderer(RendererOptions().apply {
+            aspectRatioMode = AspectRatioMode.LETTERBOX
+        })
         if (renderer == null) {
             _onError.tryEmit(PhenixError.CREATE_RENDERER_FAILED)
         }
@@ -310,6 +275,7 @@ internal data class PhenixCoreChannel(
         }
         Timber.d("Starting renderer for: ${asString()}")
         renderer?.start(videoRenderSurface)?.let { state ->
+            Timber.d("Renderer started with status: $state")
             isRendering = state == RendererStartStatus.OK
             if (state != RendererStartStatus.OK) {
                 _onError.tryEmit(PhenixError.RENDERING_FAILED)
@@ -329,18 +295,11 @@ internal data class PhenixCoreChannel(
         _onUpdated.tryEmit(Unit)
     }
 
-    private fun getStreamOptions(streamId: String): SubscribeOptions =
-        PCastExpressFactory.createSubscribeOptionsBuilder()
-            .withCapabilities(arrayOf("on-demand"))
-            .withStreamId(streamId)
-            .buildSubscribeOptions()
-
     private fun getChannelConfiguration(config: PhenixChannelConfiguration): JoinChannelOptions {
         var builder = RoomExpressFactory.createJoinRoomOptionsBuilder()
             .withRoomAlias(channelAlias)
-        if (configuration.edgeToken.isNullOrBlank()
-            && config.streamToken.isNullOrBlank()
-            && config.channelCapabilities.isNotEmpty()) {
+        val streamToken = config.streamToken ?: configuration.streamToken
+        if (streamToken.isNullOrBlank() && config.channelCapabilities.isNotEmpty()) {
             Timber.d("Adding capabilities: ${config.channelCapabilities}")
             // TODO: This crashes the app for some reason if a room is joined prior joining a channel
             builder = builder.withCapabilities(config.channelCapabilities.toTypedArray())
@@ -353,9 +312,9 @@ internal data class PhenixCoreChannel(
                 aspectRatioMode = AspectRatioMode.LETTERBOX
             })
             .withRenderer(videoRenderSurface)
-        if (!config.streamToken.isNullOrBlank()) {
-            Timber.d("Adding stream token: ${!config.streamToken.isNullOrBlank()}")
-            channelOptionsBuilder = channelOptionsBuilder.withStreamToken(config.streamToken)
+        if (!streamToken.isNullOrBlank()) {
+            Timber.d("Adding stream token: ${!streamToken.isNullOrBlank()}")
+            channelOptionsBuilder = channelOptionsBuilder.withStreamToken(streamToken)
                 .withSkipRetryOnUnauthorized()
         }
         return channelOptionsBuilder.buildJoinChannelOptions()
@@ -380,12 +339,13 @@ internal data class PhenixCoreChannel(
             launchIO {
                 Timber.d("Time shift failure: $status, retryCount: $timeShiftCreateRetryCount for: ${asString()}")
                 releaseTimeShift()
-                if (timeShiftCreateRetryCount < timeShiftStart / TIME_SHIFT_RETRY_DELAY) {
+                if (timeShiftCreateRetryCount < TIME_SHIFT_RETRY_COUNT) {
                     timeShiftCreateRetryCount++
                     updateTimeShiftState(PhenixTimeShiftState.STARTING)
                     delay(TIME_SHIFT_RETRY_DELAY)
                     createTimeShift(timeShiftStart)
                 } else {
+                    Timber.d("Failed to create time shift in $timeShiftCreateRetryCount tries")
                     timeShiftCreateRetryCount = 0
                     updateTimeShiftState(PhenixTimeShiftState.FAILED)
                 }
@@ -402,7 +362,7 @@ internal data class PhenixCoreChannel(
                 isFirstFrameDrawn = true
             }
         } catch (e: Exception) {
-            Timber.d(e, "Failed to draw bitmap for: ${asString()}")
+            Timber.e(e, "Failed to draw bitmap for: ${asString()}")
         }
     }
 
@@ -423,30 +383,14 @@ internal data class PhenixCoreChannel(
 
     override fun toString(): String {
         return "{\"alias\":\"$channelAlias\"," +
-                "\"id\":\"$streamID\"," +
                 "\"timeShiftState\":\"$timeShiftState\"," +
                 "\"timeShiftHead\":\"$timeShiftHead\"," +
                 "\"timeShiftStart\":\"$timeShiftStart\"," +
-                "\"isSeekable\":\"${renderer?.isSeekable}\"," +
+                "\"isSeekable\":\"${renderer.isSeekable()}\"," +
                 "\"channelState\":\"$channelState\"," +
                 "\"isRendering\":\"$isRendering\"," +
                 "\"isAudioEnabled\":\"$isAudioEnabled\"," +
                 "\"isVideoEnabled\":\"$isVideoEnabled\"," +
                 "\"isSelected\":\"$isSelected\"}"
-    }
-
-    fun release() {
-        releaseTimeShift()
-        releaseBandwidthLimiter()
-        chatMessageDisposable?.dispose()
-        chatMessageDisposable = null
-        expressSubscriber?.stop()
-        renderer?.stop()
-        expressSubscriber?.dispose()
-        renderer?.dispose()
-        rawMessages.clear()
-        expressSubscriber = null
-        renderer = null
-        streamImageView = null
     }
 }

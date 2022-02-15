@@ -6,6 +6,7 @@
     <!--  General  -->
     <string name="app_name">Groups</string>
     <string name="popup_ok">OK</string>
+    <string name="files_deleted">Log files deleted</string>
 
     <!--  Call Settings screen  -->
     <string name="show_join_room_button_label">Meeting Code</string>
@@ -50,6 +51,7 @@
     <!-- Errors -->
     <string name="err_chat_message_failed">Failed to send chat message</string>
     <string name="err_create_room_failed">Failed to create new meeting</string>
+    <string name="err_publish_room_failed">Failed to publish media to room</string>
     <string name="err_join_room_failed">Failed to join meeting</string>
     <string name="err_share_logs_failed">Failed to share logs</string>
     <string name="err_network_problems">Experiencing problems connecting to Phenix. Check your network status.</string>

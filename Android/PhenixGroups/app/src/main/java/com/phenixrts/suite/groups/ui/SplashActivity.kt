@@ -13,7 +13,6 @@ import androidx.appcompat.app.AlertDialog
 import com.phenixrts.suite.groups.R
 import com.phenixrts.suite.groups.common.extensions.*
 import com.phenixrts.suite.groups.databinding.ActivitySplashBinding
-import com.phenixrts.suite.groups.models.*
 import com.phenixrts.suite.phenixcore.common.launchUI
 import com.phenixrts.suite.phenixdeeplinks.models.DeepLinkStatus
 import com.phenixrts.suite.phenixdeeplinks.models.PhenixDeepLinkConfiguration
@@ -35,14 +34,13 @@ class SplashActivity : EasyPermissionActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Timber.d("Splash activity created")
         super.onCreate(savedInstanceState)
         binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        timeoutHandler.postDelayed(timeoutRunnable, TIMEOUT_DELAY)
-
         launchUI {
             phenixCore.onError.collect { error ->
-                if (error == PhenixError.FAILED_TO_INITIALIZE) {
+                if (error == PhenixError.FAILED_TO_INITIALIZE || error == PhenixError.MISSING_TOKEN) {
                     Timber.d("Splash: Failed to initialize Phenix Core: $error")
                     showErrorDialog(error.message)
                 }
@@ -64,25 +62,27 @@ class SplashActivity : EasyPermissionActivity() {
         rawConfiguration: Map<String, String>,
         deepLink: String
     ) {
-        Timber.d("Deep link queried: $status, $deepLink")
-        when (status) {
-            DeepLinkStatus.RELOAD -> showAppRestartRequired()
-            DeepLinkStatus.READY -> if (arePermissionsGranted()) {
-                initializePhenixCore(configuration)
-            } else {
-                preferenceProvider.roomAlias = null
-                askForPermissions { granted ->
-                    if (granted) {
-                        initializePhenixCore(configuration)
-                    } else {
-                        onDeepLinkQueried(status, configuration, rawConfiguration, deepLink)
+        launchUI {
+            Timber.d("Deep link queried: $status, $deepLink")
+            when (status) {
+                DeepLinkStatus.RELOAD -> showAppRestartRequired()
+                DeepLinkStatus.READY -> if (arePermissionsGranted()) {
+                    initializePhenixCore(configuration)
+                } else {
+                    preferenceProvider.roomAlias = null
+                    askForPermissions { granted ->
+                        if (granted) {
+                            initializePhenixCore(configuration)
+                        } else {
+                            onDeepLinkQueried(status, configuration, rawConfiguration, deepLink)
+                        }
                     }
                 }
             }
         }
     }
 
-    private fun initializePhenixCore(configuration: PhenixDeepLinkConfiguration) {
+    private fun initializePhenixCore(configuration: PhenixDeepLinkConfiguration) = launchUI {
         timeoutHandler.postDelayed(timeoutRunnable, TIMEOUT_DELAY)
         Timber.d("Initializing phenix core: $configuration")
         phenixCore.init(configuration)

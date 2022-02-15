@@ -5,7 +5,6 @@
 package com.phenixrts.suite.phenixcore.repositories.core.common
 
 internal const val PHENIX_CORE_TIMBER_TAG = "PhenixCore"
-internal const val PHENIX_LOG_LEVEL = "info"
 
 // The timeout after we can assume that the video or audio pipeline is terminated
 internal const val FAILURE_TIMEOUT = 1000 * 3L
