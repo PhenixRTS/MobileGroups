@@ -1,12 +1,16 @@
 //
-//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import UIKit
 
 class PlaceholderTextView: UITextView {
-    private lazy var placeholderLabel: UILabel! = {
-        let label = makePlaceholderLabel()
+    private lazy var placeholderLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.adjustsFontForContentSizeCategory = true
+        label.font = font
+        label.textColor = .placeholderText
 
         addSubview(label)
 
@@ -53,23 +57,5 @@ class PlaceholderTextView: UITextView {
 
     func setPlaceholder(visible: Bool) {
         placeholderLabel.isHidden = visible == false
-    }
-}
-
-// MARK: - UI Element Factory methods
-private extension PlaceholderTextView {
-    func makePlaceholderLabel() -> UILabel {
-        let label = UILabel()
-
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.adjustsFontForContentSizeCategory = true
-        label.font = font
-        if #available(iOS 13.0, *) {
-            label.textColor = .placeholderText
-        } else {
-            label.textColor = .systemGray
-        }
-
-        return label
     }
 }

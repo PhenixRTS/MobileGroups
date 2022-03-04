@@ -1,5 +1,5 @@
 //
-//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import UIKit
@@ -18,11 +18,7 @@ class CameraPinView: UIView {
 
 private extension CameraPinView {
     func setup() {
-        if #available(iOS 13.0, *) {
-            backgroundColor = .systemGray3
-        } else {
-            backgroundColor = .gray
-        }
+        backgroundColor = .systemGray3
 
         let imageView = makeImageView()
 
@@ -42,13 +38,14 @@ private extension CameraPinView {
 // MARK: - UI Element Factory methods
 private extension CameraPinView {
     func makeImageView() -> UIImageView {
-        let image = UIImage(named: "pin")
+        let image = UIImage(systemName: "pin.fill")
         let imageView = UIImageView(image: image)
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.tintColor = .gray
 
         NSLayoutConstraint.activate([
-            imageView.widthAnchor.constraint(lessThanOrEqualToConstant: 80),
-            imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor)
+            imageView.widthAnchor.constraint(equalToConstant: 20),
+            imageView.heightAnchor.constraint(equalToConstant: 20)
         ])
 
         return imageView

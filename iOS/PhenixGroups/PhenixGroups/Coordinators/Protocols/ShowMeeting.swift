@@ -1,10 +1,9 @@
 //
-//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import Foundation
-import PhenixCore
 
 protocol ShowMeeting: AnyObject {
-    func showMeeting(_ joinedRoom: JoinedRoom)
+    func showMeeting()
 }

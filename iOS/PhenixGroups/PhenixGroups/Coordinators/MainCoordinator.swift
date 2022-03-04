@@ -1,68 +1,73 @@
 //
-//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import os.log
 import PhenixCore
-import PhenixDebug
+import PhenixDeeplink
 import UIKit
 
 class MainCoordinator: Coordinator {
-    let navigationController: UINavigationController
+    private static let logger = OSLog(identifier: "ActiveMeetingViewController")
+
+    private let core: PhenixCore
+    private let session: AppSession
+    private let preferences: Preferences
+
     private(set) var childCoordinators = [Coordinator]()
-    private let dependencyContainer: DependencyContainer
-    private let device: UIDevice
 
-    private var preferences: Preferences { dependencyContainer.preferences }
-    private var phenixManager: PhenixManager { dependencyContainer.phenixManager }
-
-    var phenixBackend: URL { phenixManager.backend }
-    var phenixPcast: URL? { phenixManager.pcast }
-    var phenixMaxVideoSubscriptions: Int { phenixManager.maxVideoSubscriptions }
+    let navigationController: UINavigationController
 
     /// If provided before `start()` is executed, will automatically join provided meeting code
     var initialMeetingCode: String?
 
     init(
-        navigationController: UINavigationController,
-        dependencyContainer: DependencyContainer,
-        device: UIDevice = .current
+        core: PhenixCore,
+        session: AppSession,
+        preferences: Preferences,
+        navigationController: UINavigationController
     ) {
+        self.core = core
+        self.session = session
+        self.preferences = preferences
         self.navigationController = navigationController
-        self.dependencyContainer = dependencyContainer
-        self.device = device
     }
 
     func start() {
-        os_log(.debug, log: .coordinator, "Start main coordinator")
+        let viewController = setupNewMeetingScene(withInitialMeetingCode: session.meetingCode)
 
-        let vc = setupNewMeetingScene(withInitialMeetingCode: initialMeetingCode)
-
-        UIView.transition(with: navigationController.view) {
-            self.navigationController.setViewControllers([vc], animated: false)
+        transition {
+            self.navigationController.setViewControllers([viewController], animated: false)
         }
     }
 
+    func validateSessionConfiguration(deeplink model: PhenixDeeplinkModel) throws {
+        try session.validate(model)
+    }
+
     func join(meetingCode: String) {
-        os_log(.debug, log: .coordinator, "Restart main coordinator")
+        os_log(.debug, log: Self.logger, "Join a meeting")
 
-        let nmvc = navigationController.viewControllers
-            .compactMap { $0 as? NewMeetingViewController }
-            .first
+        let viewControllers = navigationController.viewControllers.compactMap { $0 as? NewMeetingViewController }
 
-        nmvc?.initialMeetingCode = meetingCode
-
-        if let amvc = navigationController.topViewController as? ActiveMeetingViewController {
-            amvc.leaveRoom()
+        guard let viewController = viewControllers.first else {
+            return
         }
 
-        self.navigationController.topViewController?.presentedViewController?.dismiss(animated: false)
+        viewController.viewModel.initialMeetingCode = meetingCode
 
-        if let vc = navigationController.topViewController as? NewMeetingViewController {
-            vc.publishInitialMeetingIfNeeded()
+        if let activeMeetingViewController = navigationController.topViewController as? ActiveMeetingViewController {
+            activeMeetingViewController.leaveRoom()
+        }
+
+        navigationController.topViewController?.presentedViewController?.dismiss(animated: false)
+
+        if let viewController = navigationController.topViewController as? NewMeetingViewController {
+            viewController.viewModel.joinMeetingIfNecessary()
         } else {
-            UIView.transition(with: navigationController.view) {
+            transition {
                 self.navigationController.popToRootViewController(animated: false)
+                viewController.viewModel.joinMeetingIfNecessary()
             }
         }
     }
@@ -70,82 +75,119 @@ class MainCoordinator: Coordinator {
 
 private extension MainCoordinator {
     func setupNewMeetingScene(withInitialMeetingCode meetingCode: String? = nil) -> NewMeetingViewController {
-        if preferences.displayName == nil {
-            preferences.displayName = device.name
-        }
+        let viewModel = NewMeetingViewController.ViewModel(core: core, session: session, preferences: preferences)
+        viewModel.initialMeetingCode = meetingCode
 
-        let vc = NewMeetingViewController.instantiate()
-        vc.coordinator = self
-        vc.phenix = phenixManager
-        vc.media = phenixManager.userMediaStreamController
-        vc.preferences = preferences
-        vc.initialMeetingCode = meetingCode
+        let viewController = NewMeetingViewController.instantiate()
+        viewController.coordinator = self
+        viewController.viewModel = viewModel
 
-        let hvc = MeetingHistoryTableViewController.instantiate()
-        vc.historyController = hvc
-        hvc.delegate = vc
-        hvc.viewDelegate = vc.newMeetingView
-        hvc.loadMeetingsHandler = { [weak self] in
-            self?.preferences.meetings.sorted { $0.leaveDate > $1.leaveDate } ?? []
-        }
+        let historyViewDataSource = MeetingHistoryTableViewController.DataSource(preferences: preferences)
 
-        return vc
+        let historyViewController = MeetingHistoryTableViewController.instantiate()
+        viewController.meetingHistoryViewController = historyViewController
+
+        historyViewController.dataSource = historyViewDataSource
+        historyViewController.delegate = viewController
+        historyViewController.viewDelegate = viewController.view as? MeetingHistoryTableViewDelegate
+
+        return viewController
     }
 
-    func moveToMeeting(_ joinedRoom: JoinedRoom) {
+    func moveToMeeting() {
         if navigationController.presentedViewController is JoinMeetingViewController {
             navigationController.presentedViewController?.dismiss(animated: true)
         }
 
-        os_log(.debug, log: .coordinator, "Move to joined room")
+        os_log(.debug, log: Self.logger, "Move to joined room")
 
-        let vc = ActiveMeetingViewController.instantiate()
-        vc.coordinator = self
-        vc.displayName = preferences.displayName
-        vc.phenix = phenixManager
-        vc.media = phenixManager.userMediaStreamController
-        vc.joinedRoom = joinedRoom
+        let viewController = makeActiveMeetingViewController()
+        viewController.coordinator = self
 
-        UIView.transition(with: navigationController.view) {
-            self.navigationController.pushViewController(vc, animated: false)
+        transition {
+            self.navigationController.pushViewController(viewController, animated: false)
         }
     }
 
-    func refreshMeeting(_ joinedRoom: JoinedRoom) {
-        guard let vc = navigationController.topViewController as? ActiveMeetingViewController else {
-            fatalError("Visible view controller is not ActiveMeetingViewController")
-        }
+    func makeActiveMeetingViewController() -> ActiveMeetingViewController {
+        let chatViewController = makeActiveMeetingChatViewController()
+        let memberListViewController = makeActiveMeetingMemberViewController()
+        let infoViewController = makeActiveMeetingInformationViewController()
 
-        os_log(.debug, log: .coordinator, "Refresh joined room")
+        let pageController = PageViewController()
+        pageController.setControllers([memberListViewController, chatViewController, infoViewController])
 
-        vc.joinedRoom = joinedRoom
-        vc.configureRoom()
+        let viewModel = ActiveMeetingViewController.ViewModel(core: core, session: session, preferences: preferences)
+        let viewController = ActiveMeetingViewController.instantiate()
+        viewController.viewModel = viewModel
+        viewController.pageController = pageController
+
+        return viewController
+    }
+
+    func makeActiveMeetingChatViewController() -> ActiveMeetingChatViewController {
+        let dataSource = ActiveMeetingChatViewController.DataSource(preferences: preferences)
+        let viewModel = ActiveMeetingChatViewController.ViewModel(
+            core: core,
+            session: session,
+            preferences: preferences
+        )
+
+        let viewController = ActiveMeetingChatViewController()
+        viewController.viewModel = viewModel
+        viewController.dataSource = dataSource
+
+        return viewController
+    }
+
+    func makeActiveMeetingMemberViewController() -> ActiveMeetingMemberListViewController {
+        let dataSource = ActiveMeetingMemberListViewController.DataSource(core: core)
+        let viewModel = ActiveMeetingMemberListViewController.ViewModel(
+            core: core,
+            session: session
+        )
+
+        let viewController = ActiveMeetingMemberListViewController()
+        viewController.viewModel = viewModel
+        viewController.dataSource = dataSource
+
+        return viewController
+    }
+
+    func makeActiveMeetingInformationViewController() -> ActiveMeetingInformationViewController {
+        let viewModel = ActiveMeetingInformationViewController.ViewModel(session: session, preferences: preferences)
+        let viewController = ActiveMeetingInformationViewController()
+        viewController.viewModel = viewModel
+
+        return viewController
     }
 }
 
 extension MainCoordinator: ShowMeeting {
-    func showMeeting(_ joinedRoom: JoinedRoom) {
-        if navigationController.topViewController is ActiveMeetingViewController {
-            refreshMeeting(joinedRoom)
-        } else {
-            moveToMeeting(joinedRoom)
-        }
+    func showMeeting() {
+        moveToMeeting()
     }
 }
 
 extension MainCoordinator: JoinMeeting {
-    func joinMeeting(displayName: String) {
-        let vc = JoinMeetingViewController.instantiate()
-        vc.coordinator = self
-        vc.phenix = self.phenixManager
-        vc.displayName = displayName
-        navigationController.present(vc, animated: true)
+    func showJoinMeeting() {
+        let viewModel = JoinMeetingViewController.ViewModel(core: core, session: session, preferences: preferences)
+
+        let viewController = JoinMeetingViewController.instantiate()
+        viewController.coordinator = self
+        viewController.viewModel = viewModel
+
+        navigationController.present(viewController, animated: true)
     }
 }
 
 extension MainCoordinator: JoinCancellation {
-    func cancel(_ vc: UIViewController) {
-        vc.dismiss(animated: true)
+    func cancel(_ viewController: UIViewController) {
+        viewController.dismiss(animated: true) { [weak self] in
+            if let meetingViewController = self?.navigationController.topViewController as? NewMeetingViewController {
+                meetingViewController.subscribeForEvents()
+            }
+        }
     }
 }
 
@@ -164,40 +206,13 @@ extension MainCoordinator: MeetingFinished {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
 
-            let animation: () -> Void = {
+            self.transition {
                 self.navigationController.popViewController(animated: false)
-            }
-
-            UIView.transition(with: self.navigationController.view, animations: animation) {
+            } completion: { _ in
                 if let reason = reason {
-                    AppDelegate.present(
-                        alertWithTitle: reason.title,
-                        message: reason.message
-                    )
+                    AppDelegate.present(alertWithTitle: reason.title, message: reason.message)
                 }
             }
-        }
-    }
-}
-
-extension MainCoordinator: ShowDebugMenu {
-    func showDebugMenu() {
-        let viewModel = PhenixDebugViewModel(pcast: phenixManager.phenixPCast)
-        let vc = PhenixDebugViewController(viewModel: viewModel)
-        navigationController.present(vc, animated: true)
-    }
-}
-
-fileprivate extension UIView {
-    class func transition(
-        with view: UIView,
-        duration: TimeInterval = 0.25,
-        options: UIView.AnimationOptions = [.transitionCrossDissolve],
-        animations: @escaping () -> Void,
-        completion: (() -> Void)? = nil
-    ) {
-        UIView.transition(with: view, duration: duration, options: options, animations: animations) { _ in
-            completion?()
         }
     }
 }

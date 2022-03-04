@@ -1,5 +1,5 @@
 //
-//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import UIKit
@@ -11,6 +11,7 @@ protocol Storyboarded {
 extension Storyboarded where Self: UIViewController {
     static func instantiate(from board: UIStoryboard = .main) -> Self {
         let id = String(describing: self)
+        // swiftlint:disable:next force_cast
         return board.instantiateViewController(withIdentifier: id) as! Self
     }
 }

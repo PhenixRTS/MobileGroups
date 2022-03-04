@@ -3,60 +3,54 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		50E1E7314241CA127E4AA4F0 /* Pods_PhenixCoreUnitTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 523835AD0E716DA1A6D2BFDB /* Pods_PhenixCoreUnitTests.framework */; };
-		B50195D42456F27800DDF6AB /* PhenixCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B54D597E2450622A00454066 /* PhenixCore.framework */; };
-		B50195DD2456F30600DDF6AB /* RoomAliasTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50195DC2456F30600DDF6AB /* RoomAliasTests.swift */; };
+		481AFB0D27D5EAF500EC92FA /* OSLog+Initializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481AFB0C27D5EAF500EC92FA /* OSLog+Initializer.swift */; };
+		481E9B5727C519DF00162792 /* AppSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481E9B5627C519DF00162792 /* AppSession.swift */; };
+		481E9B5927C526C000162792 /* Bootstrap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481E9B5827C526C000162792 /* Bootstrap.swift */; };
+		481E9B5B27C527F100162792 /* UIViewController+TopViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481E9B5A27C527F100162792 /* UIViewController+TopViewController.swift */; };
+		481E9B5D27C5378800162792 /* NewMeetingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481E9B5C27C5378800162792 /* NewMeetingViewModel.swift */; };
+		481E9B6327C636C200162792 /* NewMeetingViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481E9B6227C636C200162792 /* NewMeetingViewDelegate.swift */; };
+		481E9B6527C63B4900162792 /* NewMeetingControlViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481E9B6427C63B4900162792 /* NewMeetingControlViewDelegate.swift */; };
+		481E9B6727C653F900162792 /* NewMeetingViewModelDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481E9B6627C653F900162792 /* NewMeetingViewModelDelegate.swift */; };
+		481E9B6927C655D400162792 /* JoinMeetingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481E9B6827C655D400162792 /* JoinMeetingViewModel.swift */; };
+		481E9B6B27C6566C00162792 /* JoinMeetingViewModelDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481E9B6A27C6566C00162792 /* JoinMeetingViewModelDelegate.swift */; };
+		481E9B6D27C65E6E00162792 /* ActiveMeetingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481E9B6C27C65E6E00162792 /* ActiveMeetingViewModel.swift */; };
+		481E9B6F27C6725100162792 /* ActiveMeetingViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481E9B6E27C6725100162792 /* ActiveMeetingViewDelegate.swift */; };
+		481E9B7327C67F1E00162792 /* ActiveMeetingInformationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481E9B7227C67F1E00162792 /* ActiveMeetingInformationViewModel.swift */; };
+		481E9B7D27C7BB2500162792 /* ActiveMeetingChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481E9B7C27C7BB2500162792 /* ActiveMeetingChatViewModel.swift */; };
+		481E9B7F27C7BC9B00162792 /* ChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481E9B7E27C7BC9B00162792 /* ChatMessage.swift */; };
+		481E9B8127C7C34D00162792 /* ActiveMeetingChatTableViewCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481E9B8027C7C34D00162792 /* ActiveMeetingChatTableViewCellModel.swift */; };
+		481E9B8327C7DDCB00162792 /* ActiveMeetingChatViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481E9B8227C7DDCB00162792 /* ActiveMeetingChatViewDelegate.swift */; };
+		481E9B8527C8C5AD00162792 /* ActiveMeetingMemberListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481E9B8427C8C5AD00162792 /* ActiveMeetingMemberListViewModel.swift */; };
+		481E9B8727C8C5BB00162792 /* ActiveMeetingMemberListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481E9B8627C8C5BB00162792 /* ActiveMeetingMemberListView.swift */; };
+		481E9B8927C8D5C000162792 /* PhenixCoreMember+Roles.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481E9B8827C8D5C000162792 /* PhenixCoreMember+Roles.swift */; };
+		481E9B8B27C8DD0B00162792 /* ActiveMeetingMemberListViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481E9B8A27C8DD0B00162792 /* ActiveMeetingMemberListViewDelegate.swift */; };
+		481E9B8D27C8DE6D00162792 /* ActiveMeetingMemberListTableViewCellModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481E9B8C27C8DE6D00162792 /* ActiveMeetingMemberListTableViewCellModel.swift */; };
+		481E9B8F27C8EAEF00162792 /* ActiveMeetingMemberListTableViewCellModelDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481E9B8E27C8EAEF00162792 /* ActiveMeetingMemberListTableViewCellModelDelegate.swift */; };
+		481E9BB927CD01CC00162792 /* ActiveMeetingViewModelDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481E9BB827CD01CC00162792 /* ActiveMeetingViewModelDelegate.swift */; };
 		B50195E0245717DC00DDF6AB /* UITextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50195DF245717DC00DDF6AB /* UITextField.swift */; };
 		B50195E2245717F800DDF6AB /* UILabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50195E1245717F800DDF6AB /* UILabel.swift */; };
 		B50195E42457180F00DDF6AB /* UIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50195E32457180F00DDF6AB /* UIButton.swift */; };
 		B50195EE24585C6200DDF6AB /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50195ED24585C6200DDF6AB /* Preferences.swift */; };
 		B50195FE245AAB4300DDF6AB /* MeetingHistoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50195FD245AAB4300DDF6AB /* MeetingHistoryTableViewController.swift */; };
-		B5019600245AABA600DDF6AB /* MeetingHistoryTableDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50195FF245AABA600DDF6AB /* MeetingHistoryTableDataSource.swift */; };
+		B5019600245AABA600DDF6AB /* MeetingHistoryTableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = B50195FF245AABA600DDF6AB /* MeetingHistoryTableViewDataSource.swift */; };
 		B5019602245AAD9B00DDF6AB /* ChildController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5019601245AAD9B00DDF6AB /* ChildController.swift */; };
-		B510D0D0248E65AD003FAEC0 /* PhenixDisposables.swift in Sources */ = {isa = PBXBuildFile; fileRef = B510D0CF248E65AD003FAEC0 /* PhenixDisposables.swift */; };
 		B510D0E6248FC258003FAEC0 /* ActivityIndicatorController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B510D0E5248FC258003FAEC0 /* ActivityIndicatorController.swift */; };
 		B510D0E8248FCA63003FAEC0 /* ActivityIndicatorProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B510D0E7248FCA63003FAEC0 /* ActivityIndicatorProvider.swift */; };
-		B51141C524FD18B0007584A1 /* RoomMemberDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51141C424FD18B0007584A1 /* RoomMemberDelegate.swift */; };
 		B51141C724FD2229007584A1 /* CATransaction+NoAnimations.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51141C624FD2229007584A1 /* CATransaction+NoAnimations.swift */; };
-		B516172B2588E20D0099E56B /* RoomMemberMediaController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B516172A2588E20D0099E56B /* RoomMemberMediaController.swift */; };
-		B5170FC92559674100255FC0 /* RoomMediaController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5170FC82559674100255FC0 /* RoomMediaController.swift */; };
-		B5170FDD25596D7400255FC0 /* RoomMemberController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5170FDC25596D7400255FC0 /* RoomMemberController.swift */; };
-		B52204F225F6058200E32F86 /* PhenixMediaChanges.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52204F125F6058200E32F86 /* PhenixMediaChanges.swift */; };
-		B52204F825F605FE00E32F86 /* PhenixUserStreamMediaObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52204F725F605FE00E32F86 /* PhenixUserStreamMediaObserver.swift */; };
 		B52FC75F24B850F800B98B46 /* UIImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B52FC75E24B850F800B98B46 /* UIImageView.swift */; };
-		B531ECC325F8A346004524A9 /* PhenixOnlineStatusObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B531ECC225F8A346004524A9 /* PhenixOnlineStatusObserver.swift */; };
-		B531ECCD25F8A52D004524A9 /* PhenixOnlineStatusChanges.swift in Sources */ = {isa = PBXBuildFile; fileRef = B531ECCC25F8A52D004524A9 /* PhenixOnlineStatusChanges.swift */; };
-		B5385A24258B95E700DFBDE1 /* RoomMemberAudioLevelObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5385A23258B95E700DFBDE1 /* RoomMemberAudioLevelObserver.swift */; };
 		B5385A2E258BA03300DFBDE1 /* AudioLevelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5385A2D258BA03300DFBDE1 /* AudioLevelView.swift */; };
 		B53D8F50244DCBA30055CE66 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B53D8F4F244DCBA30055CE66 /* AppDelegate.swift */; };
 		B53D8F57244DCBA30055CE66 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B53D8F55244DCBA30055CE66 /* Main.storyboard */; };
 		B53D8F59244DCBA80055CE66 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B53D8F58244DCBA80055CE66 /* Assets.xcassets */; };
 		B53D8F5C244DCBA80055CE66 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B53D8F5A244DCBA80055CE66 /* LaunchScreen.storyboard */; };
-		B54D59822450622A00454066 /* PhenixCore.h in Headers */ = {isa = PBXBuildFile; fileRef = B54D59802450622A00454066 /* PhenixCore.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		B54D59852450622A00454066 /* PhenixCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B54D597E2450622A00454066 /* PhenixCore.framework */; };
-		B54D59862450622A00454066 /* PhenixCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B54D597E2450622A00454066 /* PhenixCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		B54D598B2450626C00454066 /* PhenixManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D598A2450626C00454066 /* PhenixManager.swift */; };
-		B54D599324507D3700454066 /* PhenixRoomCreation.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D599224507D3700454066 /* PhenixRoomCreation.swift */; };
-		B54D599524507D4200454066 /* PhenixRoomJoining.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D599424507D4200454066 /* PhenixRoomJoining.swift */; };
-		B54D599824519E9000454066 /* OSLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D599724519E9000454066 /* OSLog.swift */; };
-		B54D599C2451B3E500454066 /* OSLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D599B2451B3E500454066 /* OSLog.swift */; };
-		B54D599E2451B5D100454066 /* DependencyContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D599D2451B5D100454066 /* DependencyContainer.swift */; };
-		B54D59A02451B7C900454066 /* Launcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D599F2451B7C900454066 /* Launcher.swift */; };
 		B54D59A32451BCDD00454066 /* NewMeetingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59A22451BCDC00454066 /* NewMeetingViewController.swift */; };
 		B54D59A52451C13400454066 /* NewMeetingControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59A42451C13400454066 /* NewMeetingControlView.swift */; };
-		B54D59A72451D78100454066 /* RoomAlias.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59A62451D78100454066 /* RoomAlias.swift */; };
-		B54D59AD2453040100454066 /* PhenixConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59AC2453040100454066 /* PhenixConfiguration.swift */; };
 		B54D59B2245307F600454066 /* ActiveMeetingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B54D59B1245307F600454066 /* ActiveMeetingViewController.swift */; };
-		B5531CC126932F3800C40783 /* StreamSubscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5531CC026932F3800C40783 /* StreamSubscriptionService.swift */; };
-		B5531CC4269342F500C40783 /* StreamSubscriber.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5531CC3269342F500C40783 /* StreamSubscriber.swift */; };
-		B5531CE926949C2A00C40783 /* StreamSubscription.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5531CE826949C2A00C40783 /* StreamSubscription.swift */; };
-		B5531CEB2694A79600C40783 /* Watchdog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5531CEA2694A79600C40783 /* Watchdog.swift */; };
-		B5531CED2695C66600C40783 /* RoomMemberStateObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5531CEC2695C66600C40783 /* RoomMemberStateObserver.swift */; };
-		B560170C24AB4DDB0091692A /* ActiveMeetingChatDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = B560170B24AB4DDB0091692A /* ActiveMeetingChatDataSource.swift */; };
+		B560170C24AB4DDB0091692A /* ActiveMeetingChatViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = B560170B24AB4DDB0091692A /* ActiveMeetingChatViewDataSource.swift */; };
 		B560170F24AB4E420091692A /* ActiveMeetingChatTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B560170E24AB4E420091692A /* ActiveMeetingChatTableViewCell.swift */; };
 		B560171124AB6B140091692A /* ActiveMeetingChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B560171024AB6B140091692A /* ActiveMeetingChatView.swift */; };
 		B5619D25249776F00072669D /* PageContainerMember.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5619D24249776F00072669D /* PageContainerMember.swift */; };
@@ -64,27 +58,13 @@
 		B5619D292497A0EF0072669D /* TabBarButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5619D282497A0EF0072669D /* TabBarButton.swift */; };
 		B563A4B6247D51FF007101C7 /* ActiveMeetingInformationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B563A4B5247D51FF007101C7 /* ActiveMeetingInformationViewController.swift */; };
 		B566BF702481412900A2DE75 /* ActiveMeetingMemberListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B566BF6F2481412900A2DE75 /* ActiveMeetingMemberListViewController.swift */; };
-		B566BF722481431A00A2DE75 /* ActiveMeetingMemberListDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = B566BF712481431A00A2DE75 /* ActiveMeetingMemberListDataSource.swift */; };
-		B566BF76248143F700A2DE75 /* ActiveMeetingMemberTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B566BF75248143F700A2DE75 /* ActiveMeetingMemberTableViewCell.swift */; };
-		B56F43F826D50C4C00536BDF /* StreamSubscriptionProcessAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = B56F43F726D50C4C00536BDF /* StreamSubscriptionProcessAction.swift */; };
-		B5704D3024642BEB00D9703A /* CurrentDate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D2F24642BEB00D9703A /* CurrentDate.swift */; };
+		B566BF722481431A00A2DE75 /* ActiveMeetingMemberListViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = B566BF712481431A00A2DE75 /* ActiveMeetingMemberListViewDataSource.swift */; };
+		B566BF76248143F700A2DE75 /* ActiveMeetingMemberListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B566BF75248143F700A2DE75 /* ActiveMeetingMemberListTableViewCell.swift */; };
 		B5704D3224642DBA00D9703A /* Encode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D3124642DBA00D9703A /* Encode.swift */; };
 		B5704D342464346500D9703A /* Decode.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D332464346500D9703A /* Decode.swift */; };
 		B5704D682465369000D9703A /* ActiveMeetingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D672465369000D9703A /* ActiveMeetingView.swift */; };
 		B5704D7B2465701400D9703A /* ControlButtonTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5704D7A2465701400D9703A /* ControlButtonTests.swift */; };
-		B57508BA258A369B00056C8C /* MemberStreamAudioLevelProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B57508B9258A369B00056C8C /* MemberStreamAudioLevelProvider.swift */; };
-		B5775DF725A702A70015FE8E /* ShowDebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5775DF625A702A70015FE8E /* ShowDebugMenu.swift */; };
-		B5775E0125A704ED0015FE8E /* PhenixDebugging.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5775E0025A704ED0015FE8E /* PhenixDebugging.swift */; };
-		B5775E0F25A72BC40015FE8E /* UIApplication+Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5775E0E25A72BC40015FE8E /* UIApplication+Version.swift */; };
-		B5775E1525A72C960015FE8E /* Bundle+Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5775E1425A72C960015FE8E /* Bundle+Version.swift */; };
-		B5775E1B25A72CCA0015FE8E /* Bundle+Version.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5775E1A25A72CCA0015FE8E /* Bundle+Version.swift */; };
 		B5777E5F246C25CB000B4CA9 /* LaunchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5777E5E246C25CB000B4CA9 /* LaunchViewController.swift */; };
-		B5777E72246D6015000B4CA9 /* UserMediaStreamController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5777E71246D6015000B4CA9 /* UserMediaStreamController.swift */; };
-		B5793608248549C5001044C2 /* JoinedRoomMembersDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5793607248549C5001044C2 /* JoinedRoomMembersDelegate.swift */; };
-		B579360A248549F2001044C2 /* JoinedRoomDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5793609248549F2001044C2 /* JoinedRoomDelegate.swift */; };
-		B579360C2486AD59001044C2 /* RoomMember.swift in Sources */ = {isa = PBXBuildFile; fileRef = B579360B2486AD59001044C2 /* RoomMember.swift */; };
-		B57F4BF826A5A5A400C44648 /* StreamSubscriptionServiceDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B57F4BF726A5A5A400C44648 /* StreamSubscriptionServiceDelegate.swift */; };
-		B594ABBB2499F52A0042ED1F /* VideoLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B594ABBA2499F52A0042ED1F /* VideoLayer.swift */; };
 		B594ABBD2499FF4F0042ED1F /* CameraPinView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B594ABBC2499FF4F0042ED1F /* CameraPinView.swift */; };
 		B59D19DD24629F69008E2C2D /* JoinMeetingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19DC24629F69008E2C2D /* JoinMeetingViewController.swift */; };
 		B59D19E024629FAE008E2C2D /* JoinMeetingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19DF24629FAE008E2C2D /* JoinMeetingView.swift */; };
@@ -95,67 +75,27 @@
 		B59D19F62462EE65008E2C2D /* Meeting.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19F52462EE65008E2C2D /* Meeting.swift */; };
 		B59D19F82463132C008E2C2D /* MeetingHistoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19F72463132C008E2C2D /* MeetingHistoryTableViewCell.swift */; };
 		B59D19FA24631398008E2C2D /* CellIdentified.swift in Sources */ = {isa = PBXBuildFile; fileRef = B59D19F924631398008E2C2D /* CellIdentified.swift */; };
-		B5B491C525DFAFB300D757C5 /* PhenixDeeplinkModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5B491C425DFAFB300D757C5 /* PhenixDeeplinkModel.swift */; };
 		B5BB082D244F1FB20094F254 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B5BB082C244F1FB20094F254 /* Colors.xcassets */; };
 		B5BB0832244F281F0094F254 /* Coordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BB0831244F281F0094F254 /* Coordinator.swift */; };
 		B5BB0836244F287F0094F254 /* MainCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BB0835244F287F0094F254 /* MainCoordinator.swift */; };
 		B5BB0838244F28E80094F254 /* Storyboarded.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5BB0837244F28E80094F254 /* Storyboarded.swift */; };
-		B5C0C5312526096A00D7543A /* PhenixChat.h in Headers */ = {isa = PBXBuildFile; fileRef = B5C0C52F2526096A00D7543A /* PhenixChat.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		B5C0C5342526096A00D7543A /* PhenixChat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5C0C52D2526096A00D7543A /* PhenixChat.framework */; };
-		B5C0C5352526096A00D7543A /* PhenixChat.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B5C0C52D2526096A00D7543A /* PhenixChat.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		B5C0C55B25260A0200D7543A /* PhenixChatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C0C55A25260A0200D7543A /* PhenixChatService.swift */; };
-		B5C0C57025260F0700D7543A /* PhenixRoomChatMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C0C56F25260F0700D7543A /* PhenixRoomChatMessage.swift */; };
-		B5C0C57C25260FB600D7543A /* PhenixChatServiceDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C0C57B25260FB600D7543A /* PhenixChatServiceDelegate.swift */; };
-		B5C0C5832526108600D7543A /* OSLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C0C5822526108600D7543A /* OSLog.swift */; };
-		B5C0C6122527343600D7543A /* ChatProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C0C6112527343600D7543A /* ChatProvider.swift */; };
 		B5C25EF5245B010600542E1C /* ControlButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C25EF4245B010600542E1C /* ControlButton.swift */; };
 		B5C25EFD245B33D900542E1C /* NewMeetingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5C25EFC245B33D900542E1C /* NewMeetingView.swift */; };
 		B5D4F99F249353BE002FDCB6 /* PageViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D4F99E249353BE002FDCB6 /* PageViewController.swift */; };
-		B5D51C2925FA77F900AD1210 /* MemberStreamVideoStateProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D51C2825FA77F900AD1210 /* MemberStreamVideoStateProvider.swift */; };
-		B5D51C4325FB49EA00AD1210 /* MemberStreamAudioStateProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D51C4225FB49EA00AD1210 /* MemberStreamAudioStateProvider.swift */; };
-		B5D51C4D25FB8AA700AD1210 /* PhenixRequestStatusLocalized.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D51C4C25FB8AA700AD1210 /* PhenixRequestStatusLocalized.swift */; };
-		B5D51C5725FB98DE00AD1210 /* RoomMemberDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5D51C5625FB98DE00AD1210 /* RoomMemberDescription.swift */; };
-		B5DDA24B24B49FB900809648 /* RoomMemberAudioObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DDA24A24B49FB900809648 /* RoomMemberAudioObserver.swift */; };
-		B5DDA24D24B4B11B00809648 /* RoomMemberVideoObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DDA24C24B4B11B00809648 /* RoomMemberVideoObserver.swift */; };
-		B5DE1DE724F7C9E400FE50A5 /* PhenixOptionBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5DE1DE624F7C9E400FE50A5 /* PhenixOptionBuilder.swift */; };
-		B5E4EA48246EC12200F48B38 /* PhenixRoomPublishing.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E4EA47246EC12200F48B38 /* PhenixRoomPublishing.swift */; };
-		B5E4EA722473F17C00F48B38 /* JoinedRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E4EA712473F17C00F48B38 /* JoinedRoom.swift */; };
 		B5E4EA7424741B8400F48B38 /* CameraPlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E4EA7324741B8400F48B38 /* CameraPlaceholderView.swift */; };
 		B5E4EA7E2475379100F48B38 /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E4EA7D2475379100F48B38 /* CameraView.swift */; };
 		B5EB976024AE058400F458B0 /* PlaceholderTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5EB975F24AE058400F458B0 /* PlaceholderTextView.swift */; };
+		C58867DBF624A76A439E3C49 /* Pods_PhenixGroupsUnitTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B663968A50B9D49C339785B /* Pods_PhenixGroupsUnitTests.framework */; };
 		E5615D68AA3F078E666D2911 /* Pods_PhenixGroups.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A2FBDD988943A994D0336EC /* Pods_PhenixGroups.framework */; };
-		E670063F4541A24DBF7C86E2 /* Pods_PhenixCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EFA941014B5CCB73D1134E8F /* Pods_PhenixCore.framework */; };
-		FE6123C49502616BC9299A6F /* Pods_PhenixChat.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 14C0940C47CB1ABA71283874 /* Pods_PhenixChat.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		B50195D52456F27800DDF6AB /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B53D8F44244DCBA30055CE66 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = B54D597D2450622A00454066;
-			remoteInfo = PhenixCore;
-		};
-		B54D59832450622A00454066 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B53D8F44244DCBA30055CE66 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = B54D597D2450622A00454066;
-			remoteInfo = PhenixCore;
-		};
 		B5704D7424656FBE00D9703A /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = B53D8F44244DCBA30055CE66 /* Project object */;
 			proxyType = 1;
 			remoteGlobalIDString = B53D8F4B244DCBA30055CE66;
 			remoteInfo = PhenixGroups;
-		};
-		B5C0C5322526096A00D7543A /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B53D8F44244DCBA30055CE66 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = B5C0C52C2526096A00D7543A;
-			remoteInfo = PhenixChat;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -166,8 +106,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				B5C0C5352526096A00D7543A /* PhenixChat.framework in Embed Frameworks */,
-				B54D59862450622A00454066 /* PhenixCore.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -175,43 +113,57 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0B663968A50B9D49C339785B /* Pods_PhenixGroupsUnitTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PhenixGroupsUnitTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		14C0940C47CB1ABA71283874 /* Pods_PhenixChat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PhenixChat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		21AB40063611501FD55138BA /* Pods-PhenixGroupsUnitTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixGroupsUnitTests.release.xcconfig"; path = "Target Support Files/Pods-PhenixGroupsUnitTests/Pods-PhenixGroupsUnitTests.release.xcconfig"; sourceTree = "<group>"; };
 		22187DE6D39E085980B88B03 /* Pods-PhenixChat.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixChat.release.xcconfig"; path = "Target Support Files/Pods-PhenixChat/Pods-PhenixChat.release.xcconfig"; sourceTree = "<group>"; };
 		3B78AA6938C8BC757DE59AB5 /* Pods-PhenixGroups.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixGroups.debug.xcconfig"; path = "Target Support Files/Pods-PhenixGroups/Pods-PhenixGroups.debug.xcconfig"; sourceTree = "<group>"; };
 		421F0FDC3467DAD2E4A7D711 /* Pods-PhenixCore.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixCore.release.xcconfig"; path = "Target Support Files/Pods-PhenixCore/Pods-PhenixCore.release.xcconfig"; sourceTree = "<group>"; };
+		481AFB0C27D5EAF500EC92FA /* OSLog+Initializer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "OSLog+Initializer.swift"; sourceTree = "<group>"; };
+		481E9B5627C519DF00162792 /* AppSession.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppSession.swift; sourceTree = "<group>"; };
+		481E9B5827C526C000162792 /* Bootstrap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Bootstrap.swift; sourceTree = "<group>"; };
+		481E9B5A27C527F100162792 /* UIViewController+TopViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIViewController+TopViewController.swift"; sourceTree = "<group>"; };
+		481E9B5C27C5378800162792 /* NewMeetingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMeetingViewModel.swift; sourceTree = "<group>"; };
+		481E9B6227C636C200162792 /* NewMeetingViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMeetingViewDelegate.swift; sourceTree = "<group>"; };
+		481E9B6427C63B4900162792 /* NewMeetingControlViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMeetingControlViewDelegate.swift; sourceTree = "<group>"; };
+		481E9B6627C653F900162792 /* NewMeetingViewModelDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMeetingViewModelDelegate.swift; sourceTree = "<group>"; };
+		481E9B6827C655D400162792 /* JoinMeetingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinMeetingViewModel.swift; sourceTree = "<group>"; };
+		481E9B6A27C6566C00162792 /* JoinMeetingViewModelDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinMeetingViewModelDelegate.swift; sourceTree = "<group>"; };
+		481E9B6C27C65E6E00162792 /* ActiveMeetingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingViewModel.swift; sourceTree = "<group>"; };
+		481E9B6E27C6725100162792 /* ActiveMeetingViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingViewDelegate.swift; sourceTree = "<group>"; };
+		481E9B7227C67F1E00162792 /* ActiveMeetingInformationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingInformationViewModel.swift; sourceTree = "<group>"; };
+		481E9B7C27C7BB2500162792 /* ActiveMeetingChatViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingChatViewModel.swift; sourceTree = "<group>"; };
+		481E9B7E27C7BC9B00162792 /* ChatMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatMessage.swift; sourceTree = "<group>"; };
+		481E9B8027C7C34D00162792 /* ActiveMeetingChatTableViewCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingChatTableViewCellModel.swift; sourceTree = "<group>"; };
+		481E9B8227C7DDCB00162792 /* ActiveMeetingChatViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingChatViewDelegate.swift; sourceTree = "<group>"; };
+		481E9B8427C8C5AD00162792 /* ActiveMeetingMemberListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingMemberListViewModel.swift; sourceTree = "<group>"; };
+		481E9B8627C8C5BB00162792 /* ActiveMeetingMemberListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingMemberListView.swift; sourceTree = "<group>"; };
+		481E9B8827C8D5C000162792 /* PhenixCoreMember+Roles.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PhenixCoreMember+Roles.swift"; sourceTree = "<group>"; };
+		481E9B8A27C8DD0B00162792 /* ActiveMeetingMemberListViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingMemberListViewDelegate.swift; sourceTree = "<group>"; };
+		481E9B8C27C8DE6D00162792 /* ActiveMeetingMemberListTableViewCellModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingMemberListTableViewCellModel.swift; sourceTree = "<group>"; };
+		481E9B8E27C8EAEF00162792 /* ActiveMeetingMemberListTableViewCellModelDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingMemberListTableViewCellModelDelegate.swift; sourceTree = "<group>"; };
+		481E9BB827CD01CC00162792 /* ActiveMeetingViewModelDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingViewModelDelegate.swift; sourceTree = "<group>"; };
 		4AA055CD7D86025352F11B8C /* Pods_PhenixCoreIntegrationTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PhenixCoreIntegrationTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		523835AD0E716DA1A6D2BFDB /* Pods_PhenixCoreUnitTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PhenixCoreUnitTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		63765178CF878898F4AE4BBD /* Pods-PhenixGroupsUnitTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixGroupsUnitTests.debug.xcconfig"; path = "Target Support Files/Pods-PhenixGroupsUnitTests/Pods-PhenixGroupsUnitTests.debug.xcconfig"; sourceTree = "<group>"; };
 		6D4289DF1B5F519C3AD7FBE6 /* Pods_Core.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Core.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		8C40D2E6EDD9E71AF631406E /* Pods-PhenixChat.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixChat.debug.xcconfig"; path = "Target Support Files/Pods-PhenixChat/Pods-PhenixChat.debug.xcconfig"; sourceTree = "<group>"; };
 		8E042A23CD3819CFAA3A3D3A /* Pods-PhenixCoreUnitTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixCoreUnitTests.release.xcconfig"; path = "Target Support Files/Pods-PhenixCoreUnitTests/Pods-PhenixCoreUnitTests.release.xcconfig"; sourceTree = "<group>"; };
 		9A2FBDD988943A994D0336EC /* Pods_PhenixGroups.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PhenixGroups.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9CDE1BBEC6A18B07C2BA72CE /* Pods-PhenixCore.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixCore.debug.xcconfig"; path = "Target Support Files/Pods-PhenixCore/Pods-PhenixCore.debug.xcconfig"; sourceTree = "<group>"; };
 		AA30080ACB7EAFD74C5393F0 /* Pods-PhenixCoreUnitTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PhenixCoreUnitTests.debug.xcconfig"; path = "Target Support Files/Pods-PhenixCoreUnitTests/Pods-PhenixCoreUnitTests.debug.xcconfig"; sourceTree = "<group>"; };
-		B50195CF2456F27800DDF6AB /* PhenixCoreUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PhenixCoreUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		B50195D32456F27800DDF6AB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B50195DC2456F30600DDF6AB /* RoomAliasTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomAliasTests.swift; sourceTree = "<group>"; };
 		B50195DE2456FA0800DDF6AB /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		B50195DF245717DC00DDF6AB /* UITextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITextField.swift; sourceTree = "<group>"; };
 		B50195E1245717F800DDF6AB /* UILabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UILabel.swift; sourceTree = "<group>"; };
 		B50195E32457180F00DDF6AB /* UIButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIButton.swift; sourceTree = "<group>"; };
 		B50195ED24585C6200DDF6AB /* Preferences.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Preferences.swift; sourceTree = "<group>"; };
 		B50195FD245AAB4300DDF6AB /* MeetingHistoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingHistoryTableViewController.swift; sourceTree = "<group>"; };
-		B50195FF245AABA600DDF6AB /* MeetingHistoryTableDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingHistoryTableDataSource.swift; sourceTree = "<group>"; };
+		B50195FF245AABA600DDF6AB /* MeetingHistoryTableViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingHistoryTableViewDataSource.swift; sourceTree = "<group>"; };
 		B5019601245AAD9B00DDF6AB /* ChildController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChildController.swift; sourceTree = "<group>"; };
-		B510D0CF248E65AD003FAEC0 /* PhenixDisposables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixDisposables.swift; sourceTree = "<group>"; };
 		B510D0E5248FC258003FAEC0 /* ActivityIndicatorController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicatorController.swift; sourceTree = "<group>"; };
 		B510D0E7248FCA63003FAEC0 /* ActivityIndicatorProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicatorProvider.swift; sourceTree = "<group>"; };
-		B51141C424FD18B0007584A1 /* RoomMemberDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberDelegate.swift; sourceTree = "<group>"; };
 		B51141C624FD2229007584A1 /* CATransaction+NoAnimations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CATransaction+NoAnimations.swift"; sourceTree = "<group>"; };
-		B516172A2588E20D0099E56B /* RoomMemberMediaController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberMediaController.swift; sourceTree = "<group>"; };
-		B5170FC82559674100255FC0 /* RoomMediaController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RoomMediaController.swift; sourceTree = "<group>"; };
-		B5170FDC25596D7400255FC0 /* RoomMemberController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberController.swift; sourceTree = "<group>"; };
-		B52204F125F6058200E32F86 /* PhenixMediaChanges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixMediaChanges.swift; sourceTree = "<group>"; };
-		B52204F725F605FE00E32F86 /* PhenixUserStreamMediaObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixUserStreamMediaObserver.swift; sourceTree = "<group>"; };
 		B52FC75E24B850F800B98B46 /* UIImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIImageView.swift; sourceTree = "<group>"; };
-		B531ECC225F8A346004524A9 /* PhenixOnlineStatusObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixOnlineStatusObserver.swift; sourceTree = "<group>"; };
-		B531ECCC25F8A52D004524A9 /* PhenixOnlineStatusChanges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixOnlineStatusChanges.swift; sourceTree = "<group>"; };
-		B5385A23258B95E700DFBDE1 /* RoomMemberAudioLevelObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberAudioLevelObserver.swift; sourceTree = "<group>"; };
 		B5385A2D258BA03300DFBDE1 /* AudioLevelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioLevelView.swift; sourceTree = "<group>"; };
 		B53D8F4C244DCBA30055CE66 /* Phenix Groups.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Phenix Groups.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B53D8F4F244DCBA30055CE66 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -219,27 +171,10 @@
 		B53D8F58244DCBA80055CE66 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B53D8F5B244DCBA80055CE66 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B53D8F5D244DCBA80055CE66 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B54D597E2450622A00454066 /* PhenixCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PhenixCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		B54D59802450622A00454066 /* PhenixCore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PhenixCore.h; sourceTree = "<group>"; };
-		B54D59812450622A00454066 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B54D598A2450626C00454066 /* PhenixManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixManager.swift; sourceTree = "<group>"; };
-		B54D599224507D3700454066 /* PhenixRoomCreation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixRoomCreation.swift; sourceTree = "<group>"; };
-		B54D599424507D4200454066 /* PhenixRoomJoining.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixRoomJoining.swift; sourceTree = "<group>"; };
-		B54D599724519E9000454066 /* OSLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSLog.swift; sourceTree = "<group>"; };
-		B54D599B2451B3E500454066 /* OSLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSLog.swift; sourceTree = "<group>"; };
-		B54D599D2451B5D100454066 /* DependencyContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DependencyContainer.swift; sourceTree = "<group>"; };
-		B54D599F2451B7C900454066 /* Launcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Launcher.swift; sourceTree = "<group>"; };
 		B54D59A22451BCDC00454066 /* NewMeetingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMeetingViewController.swift; sourceTree = "<group>"; };
 		B54D59A42451C13400454066 /* NewMeetingControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMeetingControlView.swift; sourceTree = "<group>"; };
-		B54D59A62451D78100454066 /* RoomAlias.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomAlias.swift; sourceTree = "<group>"; };
-		B54D59AC2453040100454066 /* PhenixConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixConfiguration.swift; sourceTree = "<group>"; };
 		B54D59B1245307F600454066 /* ActiveMeetingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingViewController.swift; sourceTree = "<group>"; };
-		B5531CC026932F3800C40783 /* StreamSubscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamSubscriptionService.swift; sourceTree = "<group>"; };
-		B5531CC3269342F500C40783 /* StreamSubscriber.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamSubscriber.swift; sourceTree = "<group>"; };
-		B5531CE826949C2A00C40783 /* StreamSubscription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamSubscription.swift; sourceTree = "<group>"; };
-		B5531CEA2694A79600C40783 /* Watchdog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Watchdog.swift; sourceTree = "<group>"; };
-		B5531CEC2695C66600C40783 /* RoomMemberStateObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberStateObserver.swift; sourceTree = "<group>"; };
-		B560170B24AB4DDB0091692A /* ActiveMeetingChatDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingChatDataSource.swift; sourceTree = "<group>"; };
+		B560170B24AB4DDB0091692A /* ActiveMeetingChatViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingChatViewDataSource.swift; sourceTree = "<group>"; };
 		B560170E24AB4E420091692A /* ActiveMeetingChatTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingChatTableViewCell.swift; sourceTree = "<group>"; };
 		B560171024AB6B140091692A /* ActiveMeetingChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingChatView.swift; sourceTree = "<group>"; };
 		B5619D24249776F00072669D /* PageContainerMember.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageContainerMember.swift; sourceTree = "<group>"; };
@@ -247,29 +182,15 @@
 		B5619D282497A0EF0072669D /* TabBarButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarButton.swift; sourceTree = "<group>"; };
 		B563A4B5247D51FF007101C7 /* ActiveMeetingInformationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingInformationViewController.swift; sourceTree = "<group>"; };
 		B566BF6F2481412900A2DE75 /* ActiveMeetingMemberListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingMemberListViewController.swift; sourceTree = "<group>"; };
-		B566BF712481431A00A2DE75 /* ActiveMeetingMemberListDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingMemberListDataSource.swift; sourceTree = "<group>"; };
-		B566BF75248143F700A2DE75 /* ActiveMeetingMemberTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingMemberTableViewCell.swift; sourceTree = "<group>"; };
-		B56F43F726D50C4C00536BDF /* StreamSubscriptionProcessAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamSubscriptionProcessAction.swift; sourceTree = "<group>"; };
-		B5704D2F24642BEB00D9703A /* CurrentDate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentDate.swift; sourceTree = "<group>"; };
+		B566BF712481431A00A2DE75 /* ActiveMeetingMemberListViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingMemberListViewDataSource.swift; sourceTree = "<group>"; };
+		B566BF75248143F700A2DE75 /* ActiveMeetingMemberListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingMemberListTableViewCell.swift; sourceTree = "<group>"; };
 		B5704D3124642DBA00D9703A /* Encode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Encode.swift; sourceTree = "<group>"; };
 		B5704D332464346500D9703A /* Decode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Decode.swift; sourceTree = "<group>"; };
 		B5704D672465369000D9703A /* ActiveMeetingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveMeetingView.swift; sourceTree = "<group>"; };
 		B5704D6F24656FBE00D9703A /* PhenixGroupsUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PhenixGroupsUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B5704D7324656FBE00D9703A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B5704D7A2465701400D9703A /* ControlButtonTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlButtonTests.swift; sourceTree = "<group>"; };
-		B57508B9258A369B00056C8C /* MemberStreamAudioLevelProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberStreamAudioLevelProvider.swift; sourceTree = "<group>"; };
-		B5775DF625A702A70015FE8E /* ShowDebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShowDebugMenu.swift; sourceTree = "<group>"; };
-		B5775E0025A704ED0015FE8E /* PhenixDebugging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixDebugging.swift; sourceTree = "<group>"; };
-		B5775E0E25A72BC40015FE8E /* UIApplication+Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIApplication+Version.swift"; sourceTree = "<group>"; };
-		B5775E1425A72C960015FE8E /* Bundle+Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Version.swift"; sourceTree = "<group>"; };
-		B5775E1A25A72CCA0015FE8E /* Bundle+Version.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Bundle+Version.swift"; sourceTree = "<group>"; };
 		B5777E5E246C25CB000B4CA9 /* LaunchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchViewController.swift; sourceTree = "<group>"; };
-		B5777E71246D6015000B4CA9 /* UserMediaStreamController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserMediaStreamController.swift; sourceTree = "<group>"; };
-		B5793607248549C5001044C2 /* JoinedRoomMembersDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinedRoomMembersDelegate.swift; sourceTree = "<group>"; };
-		B5793609248549F2001044C2 /* JoinedRoomDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinedRoomDelegate.swift; sourceTree = "<group>"; };
-		B579360B2486AD59001044C2 /* RoomMember.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMember.swift; sourceTree = "<group>"; };
-		B57F4BF726A5A5A400C44648 /* StreamSubscriptionServiceDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StreamSubscriptionServiceDelegate.swift; sourceTree = "<group>"; };
-		B594ABBA2499F52A0042ED1F /* VideoLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoLayer.swift; sourceTree = "<group>"; };
 		B594ABBC2499FF4F0042ED1F /* CameraPinView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPinView.swift; sourceTree = "<group>"; };
 		B59D19DC24629F69008E2C2D /* JoinMeetingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinMeetingViewController.swift; sourceTree = "<group>"; };
 		B59D19DF24629FAE008E2C2D /* JoinMeetingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinMeetingView.swift; sourceTree = "<group>"; };
@@ -281,31 +202,13 @@
 		B59D19F72463132C008E2C2D /* MeetingHistoryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingHistoryTableViewCell.swift; sourceTree = "<group>"; };
 		B59D19F924631398008E2C2D /* CellIdentified.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellIdentified.swift; sourceTree = "<group>"; };
 		B5AC268B2552D59A003E2AEA /* Phenix Groups.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Phenix Groups.entitlements"; sourceTree = "<group>"; };
-		B5B491C425DFAFB300D757C5 /* PhenixDeeplinkModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixDeeplinkModel.swift; sourceTree = "<group>"; };
 		B5BB082C244F1FB20094F254 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		B5BB0831244F281F0094F254 /* Coordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coordinator.swift; sourceTree = "<group>"; };
 		B5BB0835244F287F0094F254 /* MainCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainCoordinator.swift; sourceTree = "<group>"; };
 		B5BB0837244F28E80094F254 /* Storyboarded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Storyboarded.swift; sourceTree = "<group>"; };
-		B5C0C52D2526096A00D7543A /* PhenixChat.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = PhenixChat.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		B5C0C52F2526096A00D7543A /* PhenixChat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PhenixChat.h; sourceTree = "<group>"; };
-		B5C0C5302526096A00D7543A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B5C0C55A25260A0200D7543A /* PhenixChatService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixChatService.swift; sourceTree = "<group>"; };
-		B5C0C56F25260F0700D7543A /* PhenixRoomChatMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixRoomChatMessage.swift; sourceTree = "<group>"; };
-		B5C0C57B25260FB600D7543A /* PhenixChatServiceDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixChatServiceDelegate.swift; sourceTree = "<group>"; };
-		B5C0C5822526108600D7543A /* OSLog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OSLog.swift; sourceTree = "<group>"; };
-		B5C0C6112527343600D7543A /* ChatProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatProvider.swift; sourceTree = "<group>"; };
 		B5C25EF4245B010600542E1C /* ControlButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ControlButton.swift; sourceTree = "<group>"; };
 		B5C25EFC245B33D900542E1C /* NewMeetingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewMeetingView.swift; sourceTree = "<group>"; };
 		B5D4F99E249353BE002FDCB6 /* PageViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PageViewController.swift; sourceTree = "<group>"; };
-		B5D51C2825FA77F900AD1210 /* MemberStreamVideoStateProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberStreamVideoStateProvider.swift; sourceTree = "<group>"; };
-		B5D51C4225FB49EA00AD1210 /* MemberStreamAudioStateProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemberStreamAudioStateProvider.swift; sourceTree = "<group>"; };
-		B5D51C4C25FB8AA700AD1210 /* PhenixRequestStatusLocalized.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhenixRequestStatusLocalized.swift; sourceTree = "<group>"; };
-		B5D51C5625FB98DE00AD1210 /* RoomMemberDescription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberDescription.swift; sourceTree = "<group>"; };
-		B5DDA24A24B49FB900809648 /* RoomMemberAudioObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberAudioObserver.swift; sourceTree = "<group>"; };
-		B5DDA24C24B4B11B00809648 /* RoomMemberVideoObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomMemberVideoObserver.swift; sourceTree = "<group>"; };
-		B5DE1DE624F7C9E400FE50A5 /* PhenixOptionBuilder.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhenixOptionBuilder.swift; sourceTree = "<group>"; };
-		B5E4EA47246EC12200F48B38 /* PhenixRoomPublishing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhenixRoomPublishing.swift; sourceTree = "<group>"; };
-		B5E4EA712473F17C00F48B38 /* JoinedRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinedRoom.swift; sourceTree = "<group>"; };
 		B5E4EA7324741B8400F48B38 /* CameraPlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPlaceholderView.swift; sourceTree = "<group>"; };
 		B5E4EA7D2475379100F48B38 /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		B5EB975F24AE058400F458B0 /* PlaceholderTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaceholderTextView.swift; sourceTree = "<group>"; };
@@ -314,30 +217,11 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		B50195CC2456F27800DDF6AB /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				B50195D42456F27800DDF6AB /* PhenixCore.framework in Frameworks */,
-				50E1E7314241CA127E4AA4F0 /* Pods_PhenixCoreUnitTests.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		B53D8F49244DCBA30055CE66 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				E5615D68AA3F078E666D2911 /* Pods_PhenixGroups.framework in Frameworks */,
-				B5C0C5342526096A00D7543A /* PhenixChat.framework in Frameworks */,
-				B54D59852450622A00454066 /* PhenixCore.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		B54D597B2450622A00454066 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				E670063F4541A24DBF7C86E2 /* Pods_PhenixCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -345,14 +229,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		B5C0C52A2526096A00D7543A /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				FE6123C49502616BC9299A6F /* Pods_PhenixChat.framework in Frameworks */,
+				C58867DBF624A76A439E3C49 /* Pods_PhenixGroupsUnitTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -370,8 +247,34 @@
 				8E042A23CD3819CFAA3A3D3A /* Pods-PhenixCoreUnitTests.release.xcconfig */,
 				8C40D2E6EDD9E71AF631406E /* Pods-PhenixChat.debug.xcconfig */,
 				22187DE6D39E085980B88B03 /* Pods-PhenixChat.release.xcconfig */,
+				63765178CF878898F4AE4BBD /* Pods-PhenixGroupsUnitTests.debug.xcconfig */,
+				21AB40063611501FD55138BA /* Pods-PhenixGroupsUnitTests.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		481E9B5E27C62CB600162792 /* NewMeeting */ = {
+			isa = PBXGroup;
+			children = (
+				B54D59A42451C13400454066 /* NewMeetingControlView.swift */,
+				481E9B6427C63B4900162792 /* NewMeetingControlViewDelegate.swift */,
+				B5C25EFC245B33D900542E1C /* NewMeetingView.swift */,
+				B54D59A22451BCDC00454066 /* NewMeetingViewController.swift */,
+				481E9B6227C636C200162792 /* NewMeetingViewDelegate.swift */,
+				481E9B5C27C5378800162792 /* NewMeetingViewModel.swift */,
+				481E9B6627C653F900162792 /* NewMeetingViewModelDelegate.swift */,
+			);
+			path = NewMeeting;
+			sourceTree = "<group>";
+		};
+		481E9B5F27C62CCF00162792 /* MeetingHistory */ = {
+			isa = PBXGroup;
+			children = (
+				B59D19F72463132C008E2C2D /* MeetingHistoryTableViewCell.swift */,
+				B50195FD245AAB4300DDF6AB /* MeetingHistoryTableViewController.swift */,
+				B50195FF245AABA600DDF6AB /* MeetingHistoryTableViewDataSource.swift */,
+			);
+			path = MeetingHistory;
 			sourceTree = "<group>";
 		};
 		83923EBBB69DC0D9B250C925 /* Frameworks */ = {
@@ -383,34 +286,9 @@
 				4AA055CD7D86025352F11B8C /* Pods_PhenixCoreIntegrationTests.framework */,
 				523835AD0E716DA1A6D2BFDB /* Pods_PhenixCoreUnitTests.framework */,
 				14C0940C47CB1ABA71283874 /* Pods_PhenixChat.framework */,
+				0B663968A50B9D49C339785B /* Pods_PhenixGroupsUnitTests.framework */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		B50195D02456F27800DDF6AB /* PhenixCoreUnitTests */ = {
-			isa = PBXGroup;
-			children = (
-				B50195DC2456F30600DDF6AB /* RoomAliasTests.swift */,
-				B50195DA2456F28D00DDF6AB /* Supporting Files */,
-			);
-			path = PhenixCoreUnitTests;
-			sourceTree = "<group>";
-		};
-		B50195DA2456F28D00DDF6AB /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				B50195D32456F27800DDF6AB /* Info.plist */,
-			);
-			path = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		B52204FD25F607CA00E32F86 /* Observers */ = {
-			isa = PBXGroup;
-			children = (
-				B531ECC225F8A346004524A9 /* PhenixOnlineStatusObserver.swift */,
-				B52204F725F605FE00E32F86 /* PhenixUserStreamMediaObserver.swift */,
-			);
-			path = Observers;
 			sourceTree = "<group>";
 		};
 		B53D8F43244DCBA30055CE66 = {
@@ -419,9 +297,6 @@
 				B50195DE2456FA0800DDF6AB /* README.md */,
 				B53D8F4E244DCBA30055CE66 /* PhenixGroups */,
 				B5704D7024656FBE00D9703A /* PhenixGroupsUnitTests */,
-				B54D597F2450622A00454066 /* PhenixCore */,
-				B5C0C52E2526096A00D7543A /* PhenixChat */,
-				B50195D02456F27800DDF6AB /* PhenixCoreUnitTests */,
 				B53D8F4D244DCBA30055CE66 /* Products */,
 				1AC689757336278AA1E132FB /* Pods */,
 				83923EBBB69DC0D9B250C925 /* Frameworks */,
@@ -432,10 +307,7 @@
 			isa = PBXGroup;
 			children = (
 				B53D8F4C244DCBA30055CE66 /* Phenix Groups.app */,
-				B54D597E2450622A00454066 /* PhenixCore.framework */,
-				B50195CF2456F27800DDF6AB /* PhenixCoreUnitTests.xctest */,
 				B5704D6F24656FBE00D9703A /* PhenixGroupsUnitTests.xctest */,
-				B5C0C52D2526096A00D7543A /* PhenixChat.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -445,9 +317,9 @@
 			children = (
 				B5AC268B2552D59A003E2AEA /* Phenix Groups.entitlements */,
 				B53D8F4F244DCBA30055CE66 /* AppDelegate.swift */,
-				B54D599F2451B7C900454066 /* Launcher.swift */,
+				481E9B5627C519DF00162792 /* AppSession.swift */,
+				481E9B5827C526C000162792 /* Bootstrap.swift */,
 				B5BB0830244F27BD0094F254 /* Coordinators */,
-				B5B491C325DFAF9100D757C5 /* Deeplink */,
 				B5BB082F244F27B30094F254 /* Managers */,
 				B59D19EF2462E230008E2C2D /* Models */,
 				B53D8F64244DCBEF0055CE66 /* Resources */,
@@ -487,108 +359,28 @@
 			path = "User Interface";
 			sourceTree = "<group>";
 		};
-		B54D597F2450622A00454066 /* PhenixCore */ = {
-			isa = PBXGroup;
-			children = (
-				B54D59AC2453040100454066 /* PhenixConfiguration.swift */,
-				B54D598A2450626C00454066 /* PhenixManager.swift */,
-				B5DE1DE624F7C9E400FE50A5 /* PhenixOptionBuilder.swift */,
-				B5D51C4C25FB8AA700AD1210 /* PhenixRequestStatusLocalized.swift */,
-				B5777E71246D6015000B4CA9 /* UserMediaStreamController.swift */,
-				B594ABBA2499F52A0042ED1F /* VideoLayer.swift */,
-				B57936052485499A001044C2 /* Joined Room */,
-				B52204FD25F607CA00E32F86 /* Observers */,
-				B54D599124507CD200454066 /* Protocols */,
-				B54D598C2450629C00454066 /* Supporting Files */,
-				B54D599624519E7A00454066 /* Utils */,
-			);
-			path = PhenixCore;
-			sourceTree = "<group>";
-		};
-		B54D598C2450629C00454066 /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				B54D59802450622A00454066 /* PhenixCore.h */,
-				B54D59812450622A00454066 /* Info.plist */,
-			);
-			path = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		B54D599124507CD200454066 /* Protocols */ = {
-			isa = PBXGroup;
-			children = (
-				B5775E0025A704ED0015FE8E /* PhenixDebugging.swift */,
-				B52204F125F6058200E32F86 /* PhenixMediaChanges.swift */,
-				B531ECCC25F8A52D004524A9 /* PhenixOnlineStatusChanges.swift */,
-				B54D599224507D3700454066 /* PhenixRoomCreation.swift */,
-				B54D599424507D4200454066 /* PhenixRoomJoining.swift */,
-				B5E4EA47246EC12200F48B38 /* PhenixRoomPublishing.swift */,
-			);
-			path = Protocols;
-			sourceTree = "<group>";
-		};
-		B54D599624519E7A00454066 /* Utils */ = {
-			isa = PBXGroup;
-			children = (
-				B5775E1A25A72CCA0015FE8E /* Bundle+Version.swift */,
-				B54D599724519E9000454066 /* OSLog.swift */,
-				B510D0CF248E65AD003FAEC0 /* PhenixDisposables.swift */,
-				B54D59A62451D78100454066 /* RoomAlias.swift */,
-				B5D51C5625FB98DE00AD1210 /* RoomMemberDescription.swift */,
-			);
-			path = Utils;
-			sourceTree = "<group>";
-		};
 		B54D59A12451BCBF00454066 /* New Meeting Scene */ = {
 			isa = PBXGroup;
 			children = (
-				B50195FF245AABA600DDF6AB /* MeetingHistoryTableDataSource.swift */,
-				B50195FD245AAB4300DDF6AB /* MeetingHistoryTableViewController.swift */,
-				B54D59A22451BCDC00454066 /* NewMeetingViewController.swift */,
-				B54D59AB2452CA6B00454066 /* Views */,
+				481E9B5F27C62CCF00162792 /* MeetingHistory */,
+				481E9B5E27C62CB600162792 /* NewMeeting */,
 			);
 			path = "New Meeting Scene";
-			sourceTree = "<group>";
-		};
-		B54D59AB2452CA6B00454066 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				B59D19F72463132C008E2C2D /* MeetingHistoryTableViewCell.swift */,
-				B54D59A42451C13400454066 /* NewMeetingControlView.swift */,
-				B5C25EFC245B33D900542E1C /* NewMeetingView.swift */,
-			);
-			path = Views;
 			sourceTree = "<group>";
 		};
 		B54D59B0245307CC00454066 /* Active Meeting Scene */ = {
 			isa = PBXGroup;
 			children = (
-				B54D59B1245307F600454066 /* ActiveMeetingViewController.swift */,
 				B5D4F99D2493538C002FDCB6 /* PageViewController */,
 				B566BF77248152B100A2DE75 /* Scenes */,
-				B5704D662465366D00D9703A /* Views */,
+				B5704D662465366D00D9703A /* ActiveMeeting */,
 			);
 			path = "Active Meeting Scene";
-			sourceTree = "<group>";
-		};
-		B5531CC2269342DF00C40783 /* Subscriptions */ = {
-			isa = PBXGroup;
-			children = (
-				B5531CC3269342F500C40783 /* StreamSubscriber.swift */,
-				B5531CE826949C2A00C40783 /* StreamSubscription.swift */,
-				B56F43F726D50C4C00536BDF /* StreamSubscriptionProcessAction.swift */,
-				B5531CC026932F3800C40783 /* StreamSubscriptionService.swift */,
-				B57F4BF726A5A5A400C44648 /* StreamSubscriptionServiceDelegate.swift */,
-				B5531CEA2694A79600C40783 /* Watchdog.swift */,
-			);
-			path = Subscriptions;
 			sourceTree = "<group>";
 		};
 		B560170D24AB4E270091692A /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				B560170E24AB4E420091692A /* ActiveMeetingChatTableViewCell.swift */,
-				B560171024AB6B140091692A /* ActiveMeetingChatView.swift */,
 				B5EB975F24AE058400F458B0 /* PlaceholderTextView.swift */,
 			);
 			path = Views;
@@ -605,9 +397,14 @@
 		B563A4B2247D496C007101C7 /* Active Meeting Members */ = {
 			isa = PBXGroup;
 			children = (
-				B566BF712481431A00A2DE75 /* ActiveMeetingMemberListDataSource.swift */,
+				B566BF75248143F700A2DE75 /* ActiveMeetingMemberListTableViewCell.swift */,
+				481E9B8C27C8DE6D00162792 /* ActiveMeetingMemberListTableViewCellModel.swift */,
+				481E9B8E27C8EAEF00162792 /* ActiveMeetingMemberListTableViewCellModelDelegate.swift */,
+				481E9B8627C8C5BB00162792 /* ActiveMeetingMemberListView.swift */,
 				B566BF6F2481412900A2DE75 /* ActiveMeetingMemberListViewController.swift */,
-				B566BF73248143C500A2DE75 /* Views */,
+				B566BF712481431A00A2DE75 /* ActiveMeetingMemberListViewDataSource.swift */,
+				481E9B8A27C8DD0B00162792 /* ActiveMeetingMemberListViewDelegate.swift */,
+				481E9B8427C8C5AD00162792 /* ActiveMeetingMemberListViewModel.swift */,
 			);
 			path = "Active Meeting Members";
 			sourceTree = "<group>";
@@ -615,8 +412,14 @@
 		B563A4B3247D4996007101C7 /* Active Meeting Chat */ = {
 			isa = PBXGroup;
 			children = (
-				B560170B24AB4DDB0091692A /* ActiveMeetingChatDataSource.swift */,
+				B560170E24AB4E420091692A /* ActiveMeetingChatTableViewCell.swift */,
+				481E9B8027C7C34D00162792 /* ActiveMeetingChatTableViewCellModel.swift */,
+				B560171024AB6B140091692A /* ActiveMeetingChatView.swift */,
 				B5619D2624977CA60072669D /* ActiveMeetingChatViewController.swift */,
+				B560170B24AB4DDB0091692A /* ActiveMeetingChatViewDataSource.swift */,
+				481E9B8227C7DDCB00162792 /* ActiveMeetingChatViewDelegate.swift */,
+				481E9B7C27C7BB2500162792 /* ActiveMeetingChatViewModel.swift */,
+				481E9B7E27C7BC9B00162792 /* ChatMessage.swift */,
 				B560170D24AB4E270091692A /* Views */,
 			);
 			path = "Active Meeting Chat";
@@ -626,16 +429,9 @@
 			isa = PBXGroup;
 			children = (
 				B563A4B5247D51FF007101C7 /* ActiveMeetingInformationViewController.swift */,
+				481E9B7227C67F1E00162792 /* ActiveMeetingInformationViewModel.swift */,
 			);
 			path = "Active Meeting Information";
-			sourceTree = "<group>";
-		};
-		B566BF73248143C500A2DE75 /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				B566BF75248143F700A2DE75 /* ActiveMeetingMemberTableViewCell.swift */,
-			);
-			path = Views;
 			sourceTree = "<group>";
 		};
 		B566BF77248152B100A2DE75 /* Scenes */ = {
@@ -648,12 +444,16 @@
 			path = Scenes;
 			sourceTree = "<group>";
 		};
-		B5704D662465366D00D9703A /* Views */ = {
+		B5704D662465366D00D9703A /* ActiveMeeting */ = {
 			isa = PBXGroup;
 			children = (
 				B5704D672465369000D9703A /* ActiveMeetingView.swift */,
+				B54D59B1245307F600454066 /* ActiveMeetingViewController.swift */,
+				481E9B6E27C6725100162792 /* ActiveMeetingViewDelegate.swift */,
+				481E9B6C27C65E6E00162792 /* ActiveMeetingViewModel.swift */,
+				481E9BB827CD01CC00162792 /* ActiveMeetingViewModelDelegate.swift */,
 			);
-			path = Views;
+			path = ActiveMeeting;
 			sourceTree = "<group>";
 		};
 		B5704D7024656FBE00D9703A /* PhenixGroupsUnitTests */ = {
@@ -673,16 +473,6 @@
 			path = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		B5775A2925A346760015FE8E /* Providers */ = {
-			isa = PBXGroup;
-			children = (
-				B57508B9258A369B00056C8C /* MemberStreamAudioLevelProvider.swift */,
-				B5D51C4225FB49EA00AD1210 /* MemberStreamAudioStateProvider.swift */,
-				B5D51C2825FA77F900AD1210 /* MemberStreamVideoStateProvider.swift */,
-			);
-			path = Providers;
-			sourceTree = "<group>";
-		};
 		B5777E5D246C2590000B4CA9 /* Launch Scene */ = {
 			isa = PBXGroup;
 			children = (
@@ -691,45 +481,15 @@
 			path = "Launch Scene";
 			sourceTree = "<group>";
 		};
-		B57936052485499A001044C2 /* Joined Room */ = {
-			isa = PBXGroup;
-			children = (
-				B5531CC2269342DF00C40783 /* Subscriptions */,
-				B5E4EA712473F17C00F48B38 /* JoinedRoom.swift */,
-				B5170FC82559674100255FC0 /* RoomMediaController.swift */,
-				B5170FDC25596D7400255FC0 /* RoomMemberController.swift */,
-				B5C0C63025273D6300D7543A /* Member */,
-				B5793606248549B2001044C2 /* Protocols */,
-				B5C0C62B25273A2E00D7543A /* Providers */,
-			);
-			path = "Joined Room";
-			sourceTree = "<group>";
-		};
-		B5793606248549B2001044C2 /* Protocols */ = {
-			isa = PBXGroup;
-			children = (
-				B5793609248549F2001044C2 /* JoinedRoomDelegate.swift */,
-				B5793607248549C5001044C2 /* JoinedRoomMembersDelegate.swift */,
-				B51141C424FD18B0007584A1 /* RoomMemberDelegate.swift */,
-			);
-			path = Protocols;
-			sourceTree = "<group>";
-		};
 		B59D19DB24629F47008E2C2D /* Join Meeting Scene */ = {
 			isa = PBXGroup;
 			children = (
+				B59D19DF24629FAE008E2C2D /* JoinMeetingView.swift */,
 				B59D19DC24629F69008E2C2D /* JoinMeetingViewController.swift */,
-				B59D19DE24629F96008E2C2D /* Views */,
+				481E9B6827C655D400162792 /* JoinMeetingViewModel.swift */,
+				481E9B6A27C6566C00162792 /* JoinMeetingViewModelDelegate.swift */,
 			);
 			path = "Join Meeting Scene";
-			sourceTree = "<group>";
-		};
-		B59D19DE24629F96008E2C2D /* Views */ = {
-			isa = PBXGroup;
-			children = (
-				B59D19DF24629FAE008E2C2D /* JoinMeetingView.swift */,
-			);
-			path = Views;
 			sourceTree = "<group>";
 		};
 		B59D19E22462A75C008E2C2D /* Elements */ = {
@@ -750,7 +510,6 @@
 				B59D19E62462DFDF008E2C2D /* JoinMeeting.swift */,
 				B59D19ED2462E038008E2C2D /* MeetingFinished.swift */,
 				B59D19E42462DFCB008E2C2D /* ShowMeeting.swift */,
-				B5775DF625A702A70015FE8E /* ShowDebugMenu.swift */,
 			);
 			path = Protocols;
 			sourceTree = "<group>";
@@ -761,14 +520,6 @@
 				B59D19F52462EE65008E2C2D /* Meeting.swift */,
 			);
 			path = Models;
-			sourceTree = "<group>";
-		};
-		B5B491C325DFAF9100D757C5 /* Deeplink */ = {
-			isa = PBXGroup;
-			children = (
-				B5B491C425DFAFB300D757C5 /* PhenixDeeplinkModel.swift */,
-			);
-			path = Deeplink;
 			sourceTree = "<group>";
 		};
 		B5BB082E244F27960094F254 /* Scenes */ = {
@@ -786,7 +537,6 @@
 			isa = PBXGroup;
 			children = (
 				B510D0E5248FC258003FAEC0 /* ActivityIndicatorController.swift */,
-				B54D599D2451B5D100454066 /* DependencyContainer.swift */,
 				B50195ED24585C6200DDF6AB /* Preferences.swift */,
 			);
 			path = Managers;
@@ -806,85 +556,17 @@
 			isa = PBXGroup;
 			children = (
 				B510D0E7248FCA63003FAEC0 /* ActivityIndicatorProvider.swift */,
-				B5775E1425A72C960015FE8E /* Bundle+Version.swift */,
 				B51141C624FD2229007584A1 /* CATransaction+NoAnimations.swift */,
 				B59D19F924631398008E2C2D /* CellIdentified.swift */,
 				B5019601245AAD9B00DDF6AB /* ChildController.swift */,
-				B5704D2F24642BEB00D9703A /* CurrentDate.swift */,
 				B5704D332464346500D9703A /* Decode.swift */,
 				B5704D3124642DBA00D9703A /* Encode.swift */,
-				B54D599B2451B3E500454066 /* OSLog.swift */,
+				481AFB0C27D5EAF500EC92FA /* OSLog+Initializer.swift */,
+				481E9B8827C8D5C000162792 /* PhenixCoreMember+Roles.swift */,
 				B5BB0837244F28E80094F254 /* Storyboarded.swift */,
-				B5775E0E25A72BC40015FE8E /* UIApplication+Version.swift */,
+				481E9B5A27C527F100162792 /* UIViewController+TopViewController.swift */,
 			);
 			path = Utils;
-			sourceTree = "<group>";
-		};
-		B5C0C52E2526096A00D7543A /* PhenixChat */ = {
-			isa = PBXGroup;
-			children = (
-				B5C0C55A25260A0200D7543A /* PhenixChatService.swift */,
-				B5C0C57B25260FB600D7543A /* PhenixChatServiceDelegate.swift */,
-				B5C0C56E25260EF800D7543A /* Models */,
-				B5C0C54D252609A800D7543A /* Supporting Files */,
-				B5C0C56625260E6A00D7543A /* Utils */,
-			);
-			path = PhenixChat;
-			sourceTree = "<group>";
-		};
-		B5C0C54D252609A800D7543A /* Supporting Files */ = {
-			isa = PBXGroup;
-			children = (
-				B5C0C52F2526096A00D7543A /* PhenixChat.h */,
-				B5C0C5302526096A00D7543A /* Info.plist */,
-			);
-			path = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		B5C0C56625260E6A00D7543A /* Utils */ = {
-			isa = PBXGroup;
-			children = (
-				B5C0C5822526108600D7543A /* OSLog.swift */,
-			);
-			path = Utils;
-			sourceTree = "<group>";
-		};
-		B5C0C56E25260EF800D7543A /* Models */ = {
-			isa = PBXGroup;
-			children = (
-				B5C0C56F25260F0700D7543A /* PhenixRoomChatMessage.swift */,
-			);
-			path = Models;
-			sourceTree = "<group>";
-		};
-		B5C0C62B25273A2E00D7543A /* Providers */ = {
-			isa = PBXGroup;
-			children = (
-				B5C0C6112527343600D7543A /* ChatProvider.swift */,
-			);
-			path = Providers;
-			sourceTree = "<group>";
-		};
-		B5C0C63025273D6300D7543A /* Member */ = {
-			isa = PBXGroup;
-			children = (
-				B579360B2486AD59001044C2 /* RoomMember.swift */,
-				B516172A2588E20D0099E56B /* RoomMemberMediaController.swift */,
-				B5C0C63125273D7900D7543A /* Observers */,
-				B5775A2925A346760015FE8E /* Providers */,
-			);
-			path = Member;
-			sourceTree = "<group>";
-		};
-		B5C0C63125273D7900D7543A /* Observers */ = {
-			isa = PBXGroup;
-			children = (
-				B5385A23258B95E700DFBDE1 /* RoomMemberAudioLevelObserver.swift */,
-				B5DDA24A24B49FB900809648 /* RoomMemberAudioObserver.swift */,
-				B5DDA24C24B4B11B00809648 /* RoomMemberVideoObserver.swift */,
-				B5531CEC2695C66600C40783 /* RoomMemberStateObserver.swift */,
-			);
-			path = Observers;
 			sourceTree = "<group>";
 		};
 		B5C25EF3245B005400542E1C /* Views */ = {
@@ -911,46 +593,7 @@
 		};
 /* End PBXGroup section */
 
-/* Begin PBXHeadersBuildPhase section */
-		B54D59792450622A00454066 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				B54D59822450622A00454066 /* PhenixCore.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		B5C0C5282526096A00D7543A /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				B5C0C5312526096A00D7543A /* PhenixChat.h in Headers */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXHeadersBuildPhase section */
-
 /* Begin PBXNativeTarget section */
-		B50195CE2456F27800DDF6AB /* PhenixCoreUnitTests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = B50195D72456F27800DDF6AB /* Build configuration list for PBXNativeTarget "PhenixCoreUnitTests" */;
-			buildPhases = (
-				B4D41F0A25CCFDD7B2788D39 /* [CP] Check Pods Manifest.lock */,
-				B50195CB2456F27800DDF6AB /* Sources */,
-				B50195CC2456F27800DDF6AB /* Frameworks */,
-				B50195CD2456F27800DDF6AB /* Resources */,
-				F5AF2881882B30F5B3546E1C /* [CP] Embed Pods Frameworks */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				B50195D62456F27800DDF6AB /* PBXTargetDependency */,
-			);
-			name = PhenixCoreUnitTests;
-			productName = PhenixCoreUnitTests;
-			productReference = B50195CF2456F27800DDF6AB /* PhenixCoreUnitTests.xctest */;
-			productType = "com.apple.product-type.bundle.unit-test";
-		};
 		B53D8F4B244DCBA30055CE66 /* PhenixGroups */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = B53D8F60244DCBA80055CE66 /* Build configuration list for PBXNativeTarget "PhenixGroups" */;
@@ -967,37 +610,17 @@
 			buildRules = (
 			);
 			dependencies = (
-				B54D59842450622A00454066 /* PBXTargetDependency */,
-				B5C0C5332526096A00D7543A /* PBXTargetDependency */,
 			);
 			name = PhenixGroups;
 			productName = PhenixGroups;
 			productReference = B53D8F4C244DCBA30055CE66 /* Phenix Groups.app */;
 			productType = "com.apple.product-type.application";
 		};
-		B54D597D2450622A00454066 /* PhenixCore */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = B54D59872450622A00454066 /* Build configuration list for PBXNativeTarget "PhenixCore" */;
-			buildPhases = (
-				256AA2B59988FFE3F28BF5B6 /* [CP] Check Pods Manifest.lock */,
-				B54D59792450622A00454066 /* Headers */,
-				B54D597A2450622A00454066 /* Sources */,
-				B54D597B2450622A00454066 /* Frameworks */,
-				B54D597C2450622A00454066 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = PhenixCore;
-			productName = PhenixCore;
-			productReference = B54D597E2450622A00454066 /* PhenixCore.framework */;
-			productType = "com.apple.product-type.framework";
-		};
 		B5704D6E24656FBE00D9703A /* PhenixGroupsUnitTests */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = B5704D7824656FBF00D9703A /* Build configuration list for PBXNativeTarget "PhenixGroupsUnitTests" */;
 			buildPhases = (
+				B430DA630B6F5A5D03FE1810 /* [CP] Check Pods Manifest.lock */,
 				B5704D6B24656FBE00D9703A /* Sources */,
 				B5704D6C24656FBE00D9703A /* Frameworks */,
 				B5704D6D24656FBE00D9703A /* Resources */,
@@ -1012,25 +635,6 @@
 			productReference = B5704D6F24656FBE00D9703A /* PhenixGroupsUnitTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		B5C0C52C2526096A00D7543A /* PhenixChat */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = B5C0C5382526096A00D7543A /* Build configuration list for PBXNativeTarget "PhenixChat" */;
-			buildPhases = (
-				3E1A4556AF3F430C09ED25AD /* [CP] Check Pods Manifest.lock */,
-				B5C0C5282526096A00D7543A /* Headers */,
-				B5C0C5292526096A00D7543A /* Sources */,
-				B5C0C52A2526096A00D7543A /* Frameworks */,
-				B5C0C52B2526096A00D7543A /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = PhenixChat;
-			productName = PhenixChat;
-			productReference = B5C0C52D2526096A00D7543A /* PhenixChat.framework */;
-			productType = "com.apple.product-type.framework";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -1041,28 +645,17 @@
 				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = "Phenix Real Time Solutions, Inc";
 				TargetAttributes = {
-					B50195CE2456F27800DDF6AB = {
-						CreatedOnToolsVersion = 11.4;
-					};
 					B53D8F4B244DCBA30055CE66 = {
 						CreatedOnToolsVersion = 11.4;
-					};
-					B54D597D2450622A00454066 = {
-						CreatedOnToolsVersion = 11.4;
-						LastSwiftMigration = 1140;
 					};
 					B5704D6E24656FBE00D9703A = {
 						CreatedOnToolsVersion = 11.4;
 						TestTargetID = B53D8F4B244DCBA30055CE66;
 					};
-					B5C0C52C2526096A00D7543A = {
-						CreatedOnToolsVersion = 12.0;
-						LastSwiftMigration = 1200;
-					};
 				};
 			};
 			buildConfigurationList = B53D8F47244DCBA30055CE66 /* Build configuration list for PBXProject "PhenixGroups" */;
-			compatibilityVersion = "Xcode 9.3";
+			compatibilityVersion = "Xcode 12.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -1075,22 +668,12 @@
 			projectRoot = "";
 			targets = (
 				B53D8F4B244DCBA30055CE66 /* PhenixGroups */,
-				B54D597D2450622A00454066 /* PhenixCore */,
-				B5C0C52C2526096A00D7543A /* PhenixChat */,
-				B50195CE2456F27800DDF6AB /* PhenixCoreUnitTests */,
 				B5704D6E24656FBE00D9703A /* PhenixGroupsUnitTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		B50195CD2456F27800DDF6AB /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		B53D8F4A244DCBA30055CE66 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1102,21 +685,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		B54D597C2450622A00454066 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		B5704D6D24656FBE00D9703A /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		B5C0C52B2526096A00D7543A /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1126,50 +695,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		256AA2B59988FFE3F28BF5B6 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-PhenixCore-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		3E1A4556AF3F430C09ED25AD /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-PhenixChat-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
 		AA9119EFF41517890F780AC5 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -1187,7 +712,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PhenixGroups/Pods-PhenixGroups-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		B4D41F0A25CCFDD7B2788D39 /* [CP] Check Pods Manifest.lock */ = {
+		B430DA630B6F5A5D03FE1810 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1202,7 +727,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-PhenixCoreUnitTests-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-PhenixGroupsUnitTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1267,46 +792,25 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		F5AF2881882B30F5B3546E1C /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-PhenixCoreUnitTests/Pods-PhenixCoreUnitTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-PhenixCoreUnitTests/Pods-PhenixCoreUnitTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PhenixCoreUnitTests/Pods-PhenixCoreUnitTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		B50195CB2456F27800DDF6AB /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				B50195DD2456F30600DDF6AB /* RoomAliasTests.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		B53D8F48244DCBA30055CE66 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				B5BB0832244F281F0094F254 /* Coordinator.swift in Sources */,
 				B5C25EF5245B010600542E1C /* ControlButton.swift in Sources */,
+				481E9B8F27C8EAEF00162792 /* ActiveMeetingMemberListTableViewCellModelDelegate.swift in Sources */,
+				481E9B8D27C8DE6D00162792 /* ActiveMeetingMemberListTableViewCellModel.swift in Sources */,
 				B5385A2E258BA03300DFBDE1 /* AudioLevelView.swift in Sources */,
 				B59D19EE2462E038008E2C2D /* MeetingFinished.swift in Sources */,
+				481E9B6F27C6725100162792 /* ActiveMeetingViewDelegate.swift in Sources */,
+				481E9B6727C653F900162792 /* NewMeetingViewModelDelegate.swift in Sources */,
 				B5D4F99F249353BE002FDCB6 /* PageViewController.swift in Sources */,
-				B54D59A02451B7C900454066 /* Launcher.swift in Sources */,
 				B566BF702481412900A2DE75 /* ActiveMeetingMemberListViewController.swift in Sources */,
 				B59D19E72462DFDF008E2C2D /* JoinMeeting.swift in Sources */,
+				481E9B8527C8C5AD00162792 /* ActiveMeetingMemberListViewModel.swift in Sources */,
 				B59D19E024629FAE008E2C2D /* JoinMeetingView.swift in Sources */,
 				B560170F24AB4E420091692A /* ActiveMeetingChatTableViewCell.swift in Sources */,
 				B54D59A52451C13400454066 /* NewMeetingControlView.swift in Sources */,
@@ -1314,96 +818,60 @@
 				B5704D682465369000D9703A /* ActiveMeetingView.swift in Sources */,
 				B5E4EA7424741B8400F48B38 /* CameraPlaceholderView.swift in Sources */,
 				B5619D25249776F00072669D /* PageContainerMember.swift in Sources */,
-				B5775E0F25A72BC40015FE8E /* UIApplication+Version.swift in Sources */,
+				481E9B7F27C7BC9B00162792 /* ChatMessage.swift in Sources */,
 				B5619D292497A0EF0072669D /* TabBarButton.swift in Sources */,
-				B566BF722481431A00A2DE75 /* ActiveMeetingMemberListDataSource.swift in Sources */,
+				B566BF722481431A00A2DE75 /* ActiveMeetingMemberListViewDataSource.swift in Sources */,
 				B5E4EA7E2475379100F48B38 /* CameraView.swift in Sources */,
 				B53D8F50244DCBA30055CE66 /* AppDelegate.swift in Sources */,
 				B50195FE245AAB4300DDF6AB /* MeetingHistoryTableViewController.swift in Sources */,
+				481E9B6527C63B4900162792 /* NewMeetingControlViewDelegate.swift in Sources */,
 				B5BB0836244F287F0094F254 /* MainCoordinator.swift in Sources */,
+				481E9B5927C526C000162792 /* Bootstrap.swift in Sources */,
 				B59D19F62462EE65008E2C2D /* Meeting.swift in Sources */,
+				481E9B5B27C527F100162792 /* UIViewController+TopViewController.swift in Sources */,
 				B5704D342464346500D9703A /* Decode.swift in Sources */,
 				B59D19EB2462E010008E2C2D /* JoinCancellation.swift in Sources */,
+				481E9B8927C8D5C000162792 /* PhenixCoreMember+Roles.swift in Sources */,
 				B50195E2245717F800DDF6AB /* UILabel.swift in Sources */,
-				B5704D3024642BEB00D9703A /* CurrentDate.swift in Sources */,
-				B54D599C2451B3E500454066 /* OSLog.swift in Sources */,
+				481E9B8727C8C5BB00162792 /* ActiveMeetingMemberListView.swift in Sources */,
 				B59D19F82463132C008E2C2D /* MeetingHistoryTableViewCell.swift in Sources */,
+				481E9B7327C67F1E00162792 /* ActiveMeetingInformationViewModel.swift in Sources */,
+				481E9BB927CD01CC00162792 /* ActiveMeetingViewModelDelegate.swift in Sources */,
 				B5C25EFD245B33D900542E1C /* NewMeetingView.swift in Sources */,
+				481E9B8B27C8DD0B00162792 /* ActiveMeetingMemberListViewDelegate.swift in Sources */,
+				481AFB0D27D5EAF500EC92FA /* OSLog+Initializer.swift in Sources */,
 				B50195E42457180F00DDF6AB /* UIButton.swift in Sources */,
 				B59D19DD24629F69008E2C2D /* JoinMeetingViewController.swift in Sources */,
-				B5775E1525A72C960015FE8E /* Bundle+Version.swift in Sources */,
-				B566BF76248143F700A2DE75 /* ActiveMeetingMemberTableViewCell.swift in Sources */,
+				481E9B5D27C5378800162792 /* NewMeetingViewModel.swift in Sources */,
+				B566BF76248143F700A2DE75 /* ActiveMeetingMemberListTableViewCell.swift in Sources */,
 				B5619D2724977CA60072669D /* ActiveMeetingChatViewController.swift in Sources */,
 				B510D0E6248FC258003FAEC0 /* ActivityIndicatorController.swift in Sources */,
-				B5775DF725A702A70015FE8E /* ShowDebugMenu.swift in Sources */,
+				481E9B6D27C65E6E00162792 /* ActiveMeetingViewModel.swift in Sources */,
 				B5019602245AAD9B00DDF6AB /* ChildController.swift in Sources */,
-				B54D599E2451B5D100454066 /* DependencyContainer.swift in Sources */,
+				481E9B5727C519DF00162792 /* AppSession.swift in Sources */,
 				B563A4B6247D51FF007101C7 /* ActiveMeetingInformationViewController.swift in Sources */,
-				B5019600245AABA600DDF6AB /* MeetingHistoryTableDataSource.swift in Sources */,
+				481E9B6927C655D400162792 /* JoinMeetingViewModel.swift in Sources */,
+				481E9B8327C7DDCB00162792 /* ActiveMeetingChatViewDelegate.swift in Sources */,
+				B5019600245AABA600DDF6AB /* MeetingHistoryTableViewDataSource.swift in Sources */,
 				B52FC75F24B850F800B98B46 /* UIImageView.swift in Sources */,
 				B5777E5F246C25CB000B4CA9 /* LaunchViewController.swift in Sources */,
 				B59D19FA24631398008E2C2D /* CellIdentified.swift in Sources */,
 				B51141C724FD2229007584A1 /* CATransaction+NoAnimations.swift in Sources */,
 				B50195EE24585C6200DDF6AB /* Preferences.swift in Sources */,
 				B59D19E52462DFCB008E2C2D /* ShowMeeting.swift in Sources */,
+				481E9B8127C7C34D00162792 /* ActiveMeetingChatTableViewCellModel.swift in Sources */,
 				B594ABBD2499FF4F0042ED1F /* CameraPinView.swift in Sources */,
 				B54D59B2245307F600454066 /* ActiveMeetingViewController.swift in Sources */,
-				B560170C24AB4DDB0091692A /* ActiveMeetingChatDataSource.swift in Sources */,
+				B560170C24AB4DDB0091692A /* ActiveMeetingChatViewDataSource.swift in Sources */,
 				B5BB0838244F28E80094F254 /* Storyboarded.swift in Sources */,
 				B54D59A32451BCDD00454066 /* NewMeetingViewController.swift in Sources */,
+				481E9B6B27C6566C00162792 /* JoinMeetingViewModelDelegate.swift in Sources */,
 				B5704D3224642DBA00D9703A /* Encode.swift in Sources */,
 				B560171124AB6B140091692A /* ActiveMeetingChatView.swift in Sources */,
-				B5B491C525DFAFB300D757C5 /* PhenixDeeplinkModel.swift in Sources */,
+				481E9B6327C636C200162792 /* NewMeetingViewDelegate.swift in Sources */,
 				B510D0E8248FCA63003FAEC0 /* ActivityIndicatorProvider.swift in Sources */,
 				B50195E0245717DC00DDF6AB /* UITextField.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		B54D597A2450622A00454066 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				B54D599524507D4200454066 /* PhenixRoomJoining.swift in Sources */,
-				B5DDA24B24B49FB900809648 /* RoomMemberAudioObserver.swift in Sources */,
-				B531ECCD25F8A52D004524A9 /* PhenixOnlineStatusChanges.swift in Sources */,
-				B5E4EA722473F17C00F48B38 /* JoinedRoom.swift in Sources */,
-				B52204F225F6058200E32F86 /* PhenixMediaChanges.swift in Sources */,
-				B5D51C5725FB98DE00AD1210 /* RoomMemberDescription.swift in Sources */,
-				B5D51C4D25FB8AA700AD1210 /* PhenixRequestStatusLocalized.swift in Sources */,
-				B5170FC92559674100255FC0 /* RoomMediaController.swift in Sources */,
-				B57F4BF826A5A5A400C44648 /* StreamSubscriptionServiceDelegate.swift in Sources */,
-				B5531CC4269342F500C40783 /* StreamSubscriber.swift in Sources */,
-				B5385A24258B95E700DFBDE1 /* RoomMemberAudioLevelObserver.swift in Sources */,
-				B5531CEB2694A79600C40783 /* Watchdog.swift in Sources */,
-				B5531CED2695C66600C40783 /* RoomMemberStateObserver.swift in Sources */,
-				B5DE1DE724F7C9E400FE50A5 /* PhenixOptionBuilder.swift in Sources */,
-				B5531CE926949C2A00C40783 /* StreamSubscription.swift in Sources */,
-				B5C0C6122527343600D7543A /* ChatProvider.swift in Sources */,
-				B54D598B2450626C00454066 /* PhenixManager.swift in Sources */,
-				B5775E0125A704ED0015FE8E /* PhenixDebugging.swift in Sources */,
-				B5531CC126932F3800C40783 /* StreamSubscriptionService.swift in Sources */,
-				B51141C524FD18B0007584A1 /* RoomMemberDelegate.swift in Sources */,
-				B5775E1B25A72CCA0015FE8E /* Bundle+Version.swift in Sources */,
-				B52204F825F605FE00E32F86 /* PhenixUserStreamMediaObserver.swift in Sources */,
-				B54D599824519E9000454066 /* OSLog.swift in Sources */,
-				B579360C2486AD59001044C2 /* RoomMember.swift in Sources */,
-				B531ECC325F8A346004524A9 /* PhenixOnlineStatusObserver.swift in Sources */,
-				B5793608248549C5001044C2 /* JoinedRoomMembersDelegate.swift in Sources */,
-				B579360A248549F2001044C2 /* JoinedRoomDelegate.swift in Sources */,
-				B54D59AD2453040100454066 /* PhenixConfiguration.swift in Sources */,
-				B516172B2588E20D0099E56B /* RoomMemberMediaController.swift in Sources */,
-				B5777E72246D6015000B4CA9 /* UserMediaStreamController.swift in Sources */,
-				B5E4EA48246EC12200F48B38 /* PhenixRoomPublishing.swift in Sources */,
-				B5D51C4325FB49EA00AD1210 /* MemberStreamAudioStateProvider.swift in Sources */,
-				B54D599324507D3700454066 /* PhenixRoomCreation.swift in Sources */,
-				B54D59A72451D78100454066 /* RoomAlias.swift in Sources */,
-				B5D51C2925FA77F900AD1210 /* MemberStreamVideoStateProvider.swift in Sources */,
-				B56F43F826D50C4C00536BDF /* StreamSubscriptionProcessAction.swift in Sources */,
-				B5DDA24D24B4B11B00809648 /* RoomMemberVideoObserver.swift in Sources */,
-				B594ABBB2499F52A0042ED1F /* VideoLayer.swift in Sources */,
-				B57508BA258A369B00056C8C /* MemberStreamAudioLevelProvider.swift in Sources */,
-				B510D0D0248E65AD003FAEC0 /* PhenixDisposables.swift in Sources */,
-				B5170FDD25596D7400255FC0 /* RoomMemberController.swift in Sources */,
+				481E9B7D27C7BB2500162792 /* ActiveMeetingChatViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1415,39 +883,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		B5C0C5292526096A00D7543A /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				B5C0C57025260F0700D7543A /* PhenixRoomChatMessage.swift in Sources */,
-				B5C0C55B25260A0200D7543A /* PhenixChatService.swift in Sources */,
-				B5C0C57C25260FB600D7543A /* PhenixChatServiceDelegate.swift in Sources */,
-				B5C0C5832526108600D7543A /* OSLog.swift in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		B50195D62456F27800DDF6AB /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = B54D597D2450622A00454066 /* PhenixCore */;
-			targetProxy = B50195D52456F27800DDF6AB /* PBXContainerItemProxy */;
-		};
-		B54D59842450622A00454066 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = B54D597D2450622A00454066 /* PhenixCore */;
-			targetProxy = B54D59832450622A00454066 /* PBXContainerItemProxy */;
-		};
 		B5704D7524656FBE00D9703A /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = B53D8F4B244DCBA30055CE66 /* PhenixGroups */;
 			targetProxy = B5704D7424656FBE00D9703A /* PBXContainerItemProxy */;
-		};
-		B5C0C5332526096A00D7543A /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = B5C0C52C2526096A00D7543A /* PhenixChat */;
-			targetProxy = B5C0C5322526096A00D7543A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -1471,44 +913,6 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		B50195D82456F27800DDF6AB /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = AA30080ACB7EAFD74C5393F0 /* Pods-PhenixCoreUnitTests.debug.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = LU4S6LX25U;
-				INFOPLIST_FILE = "PhenixCoreUnitTests/Supporting Files/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.phenixrts.suite.groups.core.UnitTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
-		B50195D92456F27800DDF6AB /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8E042A23CD3819CFAA3A3D3A /* Pods-PhenixCoreUnitTests.release.xcconfig */;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = LU4S6LX25U;
-				INFOPLIST_FILE = "PhenixCoreUnitTests/Supporting Files/Info.plist";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.phenixrts.suite.groups.core.UnitTests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
 		B53D8F5E244DCBA80055CE66 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -1560,7 +964,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -1615,7 +1019,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -1632,14 +1036,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "PhenixGroups/Phenix Groups.entitlements";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = LU4S6LX25U;
 				INFOPLIST_FILE = "PhenixGroups/Supporting Files/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2021.0.1;
+				MARKETING_VERSION = 2022.0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.phenixrts.suite.groups;
 				PRODUCT_NAME = "Phenix Groups";
 				SWIFT_VERSION = 5.0;
@@ -1654,14 +1058,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = "PhenixGroups/Phenix Groups.entitlements";
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = LU4S6LX25U;
 				INFOPLIST_FILE = "PhenixGroups/Supporting Files/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2021.0.1;
+				MARKETING_VERSION = 2022.0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.phenixrts.suite.groups;
 				PRODUCT_NAME = "Phenix Groups";
 				SWIFT_VERSION = 5.0;
@@ -1669,77 +1073,14 @@
 			};
 			name = Release;
 		};
-		B54D59882450622A00454066 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9CDE1BBEC6A18B07C2BA72CE /* Pods-PhenixCore.debug.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = LU4S6LX25U;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = "PhenixCore/Supporting Files/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.phenixrts.suite.groups.core;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		B54D59892450622A00454066 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 421F0FDC3467DAD2E4A7D711 /* Pods-PhenixCore.release.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = LU4S6LX25U;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = "PhenixCore/Supporting Files/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.phenixrts.suite.groups.core;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
-		};
 		B5704D7624656FBF00D9703A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 63765178CF878898F4AE4BBD /* Pods-PhenixGroupsUnitTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = LU4S6LX25U;
 				INFOPLIST_FILE = "PhenixGroupsUnitTests/Supporting Files/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1755,12 +1096,12 @@
 		};
 		B5704D7724656FBF00D9703A /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 21AB40063611501FD55138BA /* Pods-PhenixGroupsUnitTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = LU4S6LX25U;
 				INFOPLIST_FILE = "PhenixGroupsUnitTests/Supporting Files/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 13.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1774,79 +1115,9 @@
 			};
 			name = Release;
 		};
-		B5C0C5362526096A00D7543A /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8C40D2E6EDD9E71AF631406E /* Pods-PhenixChat.debug.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = LU4S6LX25U;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = "PhenixChat/Supporting Files/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.phenixrts.suite.groups.chat;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		B5C0C5372526096A00D7543A /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 22187DE6D39E085980B88B03 /* Pods-PhenixChat.release.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = LU4S6LX25U;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = "PhenixChat/Supporting Files/Info.plist";
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.phenixrts.suite.groups.chat;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SKIP_INSTALL = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		B50195D72456F27800DDF6AB /* Build configuration list for PBXNativeTarget "PhenixCoreUnitTests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				B50195D82456F27800DDF6AB /* Debug */,
-				B50195D92456F27800DDF6AB /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		B53D8F47244DCBA30055CE66 /* Build configuration list for PBXProject "PhenixGroups" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
@@ -1865,29 +1136,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		B54D59872450622A00454066 /* Build configuration list for PBXNativeTarget "PhenixCore" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				B54D59882450622A00454066 /* Debug */,
-				B54D59892450622A00454066 /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
 		B5704D7824656FBF00D9703A /* Build configuration list for PBXNativeTarget "PhenixGroupsUnitTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				B5704D7624656FBF00D9703A /* Debug */,
 				B5704D7724656FBF00D9703A /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		B5C0C5382526096A00D7543A /* Build configuration list for PBXNativeTarget "PhenixChat" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				B5C0C5362526096A00D7543A /* Debug */,
-				B5C0C5372526096A00D7543A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

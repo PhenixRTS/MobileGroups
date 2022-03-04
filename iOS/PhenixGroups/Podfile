@@ -1,37 +1,22 @@
 source 'https://cdn.cocoapods.org/'
 source 'git@github.com:PhenixRTS/CocoaPodsSpecs.git' # Phenix private repository
 
-platform :ios, '12.0'
+platform :ios, '13.0'
 use_frameworks!
 inhibit_all_warnings!
 
 def phenix
-  pod 'PhenixSdk', '2021.0.15'
+  pod 'PhenixSdk', '2022.0.4'
+  pod 'PhenixCore', :path => '../PhenixCore'
   pod 'PhenixDebug', :path => '../PhenixDebug'
   pod 'PhenixDeeplink', :path => '../PhenixDeeplink'
 end
 
 target 'PhenixGroups' do
   phenix
-  pod 'SwiftLint', '~> 0.42.0'
+  pod 'SwiftLint', '~> 0.49.1'
 end
 
-target 'PhenixCore' do
-  phenix
-end
+target 'PhenixGroupsUnitTests' do
 
-target 'PhenixChat' do
-  phenix
-end
-
-target 'PhenixCoreUnitTests' do
-end
-
-# Removes warnings of dependencies containing an old deployment target version.
-post_install do |installer|
-  installer.pods_project.targets.each do |target|
-    target.build_configurations.each do |config|
-      config.build_settings.delete 'IPHONEOS_DEPLOYMENT_TARGET'
-    end
-  end
 end

@@ -1,5 +1,5 @@
 //
-//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import UIKit
@@ -21,7 +21,7 @@ extension UIViewController: ActivityIndicatorProvider {
         present(controller, animated: true)
     }
 
-    func dismissActivityIndicator(then: (() -> Void)?) {
+    func dismissActivityIndicator(then: (() -> Void)? = nil) {
         guard presentedViewController is ActivityIndicatorController else {
             then?()
             return

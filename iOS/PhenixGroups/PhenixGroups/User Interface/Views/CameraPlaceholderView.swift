@@ -1,12 +1,30 @@
 //
-//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import UIKit
 
 class CameraPlaceholderView: UIView {
-    private var imageView: UIImageView!
-    private var textLabel: UILabel!
+    private lazy var imageView: UIImageView = {
+        let imageView = UIImageView(image: .init(systemName: "person.crop.rectangle.fill"))
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.tintColor = .gray
+
+        NSLayoutConstraint.activate([
+            imageView.widthAnchor.constraint(equalToConstant: 60),
+            imageView.heightAnchor.constraint(equalToConstant: 50)
+        ])
+
+        return imageView
+    }()
+
+    private lazy var textLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.textAlignment = .center
+        label.sizeToFit()
+        return label
+    }()
 
     var text: String? {
         didSet {
@@ -28,16 +46,9 @@ class CameraPlaceholderView: UIView {
 
 private extension CameraPlaceholderView {
     func setup() {
-        if #available(iOS 13.0, *) {
-            backgroundColor = .systemGray3
-        } else {
-            backgroundColor = .gray
-        }
+        backgroundColor = .systemGray3
 
-        let stack = UIStackView(arrangedSubviews: [
-            makeImageView(),
-            makeCaption()
-        ])
+        let stack = UIStackView(arrangedSubviews: [imageView, textLabel])
 
         self.addSubview(stack)
 
@@ -54,31 +65,5 @@ private extension CameraPlaceholderView {
             stack.centerXAnchor.constraint(equalTo: centerXAnchor),
             stack.centerYAnchor.constraint(equalTo: centerYAnchor)
         ])
-    }
-}
-
-// MARK: - UI Element Factory methods
-private extension CameraPlaceholderView {
-    func makeImageView() -> UIImageView {
-        let image = UIImage(named: "camera_placeholder")
-        let imageView = UIImageView(image: image)
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-
-        NSLayoutConstraint.activate([
-            imageView.widthAnchor.constraint(lessThanOrEqualToConstant: 80),
-            imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor)
-        ])
-
-        return imageView
-    }
-
-    func makeCaption() -> UILabel {
-        let label = UILabel()
-        textLabel = label
-        label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.textAlignment = .center
-        label.sizeToFit()
-
-        return label
     }
 }

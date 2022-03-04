@@ -38,16 +38,6 @@
                ReferencedContainer = "container:PhenixGroups.xcodeproj">
             </BuildableReference>
          </TestableReference>
-         <TestableReference
-            skipped = "NO">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "B50195CE2456F27800DDF6AB"
-               BuildableName = "PhenixCoreUnitTests.xctest"
-               BlueprintName = "PhenixCoreUnitTests"
-               ReferencedContainer = "container:PhenixGroups.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
@@ -70,6 +60,13 @@
             ReferencedContainer = "container:PhenixGroups.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "PHENIX_DEEPLINK_URL"
+            value = ""
+            isEnabled = "NO">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

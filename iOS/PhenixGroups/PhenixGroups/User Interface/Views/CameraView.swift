@@ -1,5 +1,5 @@
 //
-//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import PhenixCore
@@ -9,12 +9,12 @@ class CameraView: UIView {
     private var cameraPlaceholderView: CameraPlaceholderView!
     private var cameraLayerView: UIView!
 
-    var cameraLayer: CALayer? {
-        cameraLayerView.layer.sublayers?.first { $0 is VideoLayer }
+    var cameraLayer: CALayer {
+        cameraLayerView.layer
     }
 
-    var showCamera: Bool = true {
-        didSet { cameraLayerView?.isHidden = !showCamera }
+    var showCamera = true {
+        didSet { cameraLayerView.isHidden = !showCamera }
     }
 
     var placeholderText: String? {
@@ -33,16 +33,13 @@ class CameraView: UIView {
 
     override func layoutSubviews() {
         super.layoutSubviews()
-        cameraLayer?.resize(as: cameraLayerView.layer)
-    }
-
-    func setCameraLayer(_ cameraLayer: VideoLayer) {
-        removeCameraLayer()
-        cameraLayerView.layer.add(cameraLayer)
+        cameraLayerView.layer.sublayers?.forEach { layer in
+            layer.resize(as: cameraLayerView.layer)
+        }
     }
 
     func removeCameraLayer() {
-        cameraLayer?.removeFromSuperlayer()
+        cameraLayer.removeFromSuperlayer()
     }
 }
 
@@ -79,10 +76,5 @@ fileprivate extension CALayer {
         CATransaction.withoutAnimations {
             self.frame = otherLayer.bounds
         }
-    }
-
-    func add(_ layer: CALayer) {
-        layer.resize(as: self)
-        addSublayer(layer)
     }
 }

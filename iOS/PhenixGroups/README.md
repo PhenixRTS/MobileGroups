@@ -1,11 +1,7 @@
 # Phenix Groups
 
-## Requirements
-* iOS 12.0+
-* Xcode 11+
-* Swift 5.1+
-
 ## Build
+
 *(Commands must be executed from the project's **root** directory)*
 
 1. Install [Bundler](https://bundler.io) using Terminal:
@@ -13,47 +9,42 @@
 gem install bundler
 ```
 
-2. Install project environment dependencies listed in [Gemfile](/iOS/PhenixGroups/Gemfile):
+2. Install project environment dependencies listed in [Gemfile](Gemfile):
 ```
 bundle install
 ```
-This will install a specific version of the [CocoaPods](https://cocoapods.org), dependency management tool, which this project uses to link 3rd party libraries.
+This will install the [CocoaPods](https://cocoapods.org), which this project uses to link 3rd party frameworks.
 
-3. Install project dependencies listed in [Podfile](/iOS/PhenixGroups/Podfile):
+3. Install project dependencies listed in [Podfile](Podfile):
 ```
 bundle exec pod install
 ```
 
-## Run Project
+## Deep links
 
-1. Open `PhenixGroups.xcworkspace`
+The application can only be opened using a deep link together with configuration parameters.
+Without these parameters, application will automatically fail to open.
 
-2. Set schema to `PhenixGroups`:
+### Examples:
 
-![Schema location](Screenshots/image1.png)
+```
+https://phenixrts.com/group/?authToken=DIGEST:eyJhcHB...&publishToken=DIGEST:eyJhcHB...&roomAudioToken=DIGEST:eyJhcHB...&roomVideoToken=DIGEST:eyJhcHB...#xxx-xxxx-xxx
+```
 
-3. Select the desired device (Simulator or Physical device):
+### Parameters
 
-![Select device](Screenshots/image2.png)
+* `authToken` - Authentification token.
+* `publishToken` - Publishing token.
+* `roomAudioToken` - Stream token for audio-only subscription.
+* `roomVideoToken` - Stream token for video-only subscription.
+* `#xxx-xxxx-xxx` - Room alias (`#` before the room alias is required)
 
-4. Press _Run_:
+### Debugging
 
-![Run project](Screenshots/image3.png)
-## Deep-links
+For easier deep link debugging, developer can use *Environment Variable* `PHENIX_DEEPLINK_URL` to inject a deep link on the application launch from Xcode.
 
-Application can be opened using a deep-link together with configuration parameters.
-Deep-link examples:
-
-* `https://phenixrts.com/group/#abc-cdef-ghi`
-* `https://phenixrts.com/group/?uri=https://phenixrts.com&backend=https://demo.phenixrts.com/pcast&maxVideoMembers=4#abc-cdef-ghi`
-
-### Deep-link parameters
-
-* `uri` - Phenix PCast url.
-* `backend` - Phenix backend url.
-* `maxVideoMembers` - Maximum member count which can subscribe to a room with video.
-* `#xxx-xxxx-xxx` - Phenix room alias.
+Read more information about this in [PhenixDeeplink](../PhenixDeeplink/README.md).
 
 ## Debug menu
 
-To open a debug menu, tap 5 times quickly on the camera surface view in the application.
+To open a debug menu, tap 5 times quickly anywhere in the application.

@@ -1,5 +1,5 @@
 //
-//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 @testable
@@ -148,8 +148,8 @@ class ControlButtonTests: XCTestCase {
     func testCurrentImageReturnsCorrectlyForOnState() {
         // Given
         let button = ControlButton()
-        let image1 = UIImage(named: "mic")
-        let image2 = UIImage(named: "mic_off")
+        let image1 = UIImage(systemName: "mic.fill")
+        let image2 = UIImage(systemName: "mic.slash.fill")
 
         button.controlState = .on
 
@@ -165,8 +165,8 @@ class ControlButtonTests: XCTestCase {
     func testCurrentImageReturnsCorrectlyForOffState() {
         // Given
         let button = ControlButton()
-        let image1 = UIImage(named: "mic")
-        let image2 = UIImage(named: "mic_off")
+        let image1 = UIImage(systemName: "mic.fill")
+        let image2 = UIImage(systemName: "mic.slash.fill")
 
         button.controlState = .off
 
@@ -333,8 +333,8 @@ class ControlButtonTests: XCTestCase {
     func testControlStateChangesDoUpdateImage() {
         // Given
         let button = ControlButton()
-        let image1 = UIImage(named: "mic")
-        let image2 = UIImage(named: "mic_off")
+        let image1 = UIImage(systemName: "mic.fill")
+        let image2 = UIImage(systemName: "mic.slash.fill")
 
         button.setImage(image1, for: .on)
         button.setImage(image2, for: .off)
@@ -344,7 +344,7 @@ class ControlButtonTests: XCTestCase {
 
         // Then
         XCTAssertEqual(button.imageView?.image, image1)
-        
+
         // When
         button.controlState = .off
 

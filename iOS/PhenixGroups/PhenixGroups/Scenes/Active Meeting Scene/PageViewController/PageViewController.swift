@@ -1,5 +1,5 @@
 //
-//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import UIKit
@@ -26,7 +26,10 @@ class PageViewController: UIViewController {
         indicator.frame.size.width = view.frame.width / CGFloat(controllers.count)
     }
 
-    override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
+    override func willTransition(
+        to newCollection: UITraitCollection,
+        with coordinator: UIViewControllerTransitionCoordinator
+    ) {
         super.willTransition(to: newCollection, with: coordinator)
         // Scroll view has a different position for portrait mode and landscape mode and when device rotates,
         // scroll view automatically scrolls, so we need to disable delegate method capturing to prevent of having
@@ -68,9 +71,7 @@ class PageViewController: UIViewController {
             guard let properties = controller as? PageContainerMember else { return }
 
             let button = makeTabButton(icon: properties.pageIcon, title: properties.title ?? "", tag: tag)
-            if controller is ActiveMeetingMemberListViewController {
-                button.observe(titleChangesOf: controller)
-            }
+            button.observe(titleChangesOf: controller)
             tabStackView.addArrangedSubview(button)
             tag += 1
         }
@@ -80,12 +81,7 @@ class PageViewController: UIViewController {
 private extension PageViewController {
     func setup() {
         view.isOpaque = true
-
-        if #available(iOS 13.0, *) {
-            view.backgroundColor = .systemBackground
-        } else {
-            view.backgroundColor = .white
-        }
+        view.backgroundColor = .systemBackground
 
         scrollView = makeScrollView()
         scrollView.delegate = self
@@ -120,7 +116,8 @@ private extension PageViewController {
         scrollView.setContentOffset(point, animated: animated)
     }
 
-    /// Adds view controllers to the current controller as child view controllers and positions them horizontally next to each other in the scroll view
+    /// Adds view controllers to the current controller as child view controllers
+    /// and positions them horizontally next to each other in the scroll view.
     /// - Parameter controllers: List with the child UIViewController's
     func set(childControllers controllers: [UIViewController]) {
         if self.controllers.isEmpty == false {
@@ -186,11 +183,7 @@ private extension PageViewController {
         let button = TabBarButton(type: .system)
 
         button.setImage(icon, for: .normal)
-        if #available(iOS 13.0, *) {
-            button.tintColor = .label
-        } else {
-            button.tintColor = .black
-        }
+        button.tintColor = .label
         button.setTitle(title, for: .normal)
         button.addTarget(self, action: #selector(tabButtonTapped), for: .touchUpInside)
         button.tag = tag
@@ -200,13 +193,7 @@ private extension PageViewController {
 
     func makeIndicator() -> UIView {
         let view = UIView()
-
-        if #available(iOS 13.0, *) {
-            view.backgroundColor = .label
-        } else {
-            view.backgroundColor = .black
-        }
-
+        view.backgroundColor = .label
         return view
     }
 

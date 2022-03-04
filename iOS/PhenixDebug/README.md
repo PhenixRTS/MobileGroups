@@ -1,74 +1,76 @@
 # Phenix Debug
 
-Support framework providing necessary functionality to show debug view which displays the app and the `PhenixSdk` versions and shares run-time logs from the SDK.
+Support framework providing necessary functionality to show debug view which displays the app
+and the `PhenixSdk` versions and shares run-time logs from the SDK.
 
 ## Requirements
-* iOS 12.0+
-* Xcode 11+
-* Swift 5.1+
+* iOS 13.0+
+* Xcode 12.5.1+
+* Swift 5.4+
+* PhenixCore framework
 
 ## Installation
 
 ### CocoaPods (using Development Pods)
 
-[CocoaPods](https://cocoapods.org) is a dependency manager for Cocoa projects. For usage and installation instructions, visit their website.
+[CocoaPods](https://cocoapods.org) is a dependency manager for Swift and Objective-C Cocoa projects.
+For usage and installation instructions, visit their website.
+
 To integrate `PhenixDebug` into your Xcode project using CocoaPods:
 
-1. Move `PhenixDebug` root directory inside the ROOT directory of your iOS project.
+1. Move `PhenixDebug` directory inside your iOS project root directory.
 
 2. Modify your `Podfile`:
 
 ```ruby
-source 'https://cdn.cocoapods.org/'
-source 'git@github.com:PhenixRTS/CocoaPodsSpecs.git' # Phenix private repository
-
 target 'your app name'
   use_frameworks!
-  pod 'PhenixDebug', :path => './PhenixDebug' # PhenixDebug development pod
+  pod 'PhenixCore', :path => 'path/to/PhenixCore'
+  pod 'PhenixDebug', :path => './PhenixDebug'
+end
+```
+
+3. Install `Podfile` dependencies:
+
+```shell
+foo@bar Demo % pod install
 ```
 
 ### Manually
 
-If you prefer not to use [CocoaPods](https://cocoapods.org), you can integrate Phenix Deeplink into your project manually.
+1. Move `PhenixDebug` directory inside your iOS project root directory.
 
-1. Move `PhenixDebug` root directory to your project root directory.
+![Your project root folder containing the PhenixDebug](./docs/resources/image1.png)
 
-![Your project root folder containing the PhenixDebug](./Screenshots/image1.png)
-
-2. Open your project in Xcode.
+2. Open your project.
 
 3. Select the root node of your project.
 
-![Your project root node is selected](./Screenshots/image2.png)
+![Your project root node is selected](./docs/resources/image2.png)
 
-4. Select `Files - Add Files to “{your project name}”...` from the Mac status bar (while Xcode is focused).
+4. Select `File - Add Files to “{your project name}”...` from the macOS status bar (while Xcode is focused).
 
-5. In the file chooser, navigate to the `PhenixDebug` and select `PhenixDebug.xcodeproj`. Then click *Add* to add it as a sub-project.
+5. In the file chooser, navigate to the `PhenixDebug` and select `PhenixDebug.xcodeproj`.
+Then click *Add* to add it as a sub-project.
 
-![PhenixDebug Xcode project file selected](./Screenshots/image3.png)
+![PhenixDebug Xcode project file selected](./docs/resources/image3.png)
 
-6. Select the top level node of your project to open the project editor, click the main app target and then go to the General tab.
+6. Select the top level node of your project to open the project editor,
+click the main app target and then go to the General tab.
 
-![Your project top level node is selected](./Screenshots/image4.png)
+![Your project top level node is selected](./docs/resources/image4.png)
 
 7. Scroll down to the `Frameworks, Libraries and Embedded Content` section.
 
 8. Click on the + button to select and add a new framework or library.
 
-![Add new framework or library](./Screenshots/image5.png)
+![Add new framework or library](./docs/resources/image5.png)
 
 9. Search for the `PhenixDebug.framework`, select it and click *Add* to embed into your project.
 
-![Search for PhenixDebug framework](./Screenshots/image6.png)
-
-10. Make sure that the `PhenixSdk` is also embedded into your project and `PhenixDebug` can access it.
+![Search for PhenixDebug framework](./docs/resources/image6.png)
 
 ## Usage
-
-You can display the `PhenixDebug` provided `PhenixDebugViewController(roomExpress:)` in any place and in any way you like.
-Only remember, that it you will need to provide a `PhenixRoomExpress` instance to it.
-
-### Example
 
 1. In the view controller `viewDidLoad()` method, add a tap gesture to the view:
 
@@ -78,22 +80,21 @@ import PhenixSdk
 import UIKit
 
 class ViewController: UIViewController {
-    @IBOutlet private var surfaceView: UIView!
+    @IBOutlet private var contentView: UIView!
 
     override func viewDidLoad() {
-        ...
+        // other code
 
-        // Configure tap gesture to open debug menu, when user taps 5 times on the video surface view.
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(surfaceViewTappedMultipleTimes))
+        // Configure tap gesture to open debug menu, when user taps 5 times on the contentView.
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(contentViewTappedMultipleTimes))
         tapGesture.numberOfTapsRequired = 5
-        surfaceView.addGestureRecognizer(tapGesture)
+        contentView.addGestureRecognizer(tapGesture)
     }
-
-    ...
 }
 ```
 
-2. Create a method for showing the `PhenixDebugViewController` in the same view controller where you added the tap gesture:
+2. Create a method for showing the `PhenixDebugViewController` in the same view controller
+where you added the tap gesture:
 
 ```swift
 import PhenixDebug
@@ -101,12 +102,11 @@ import PhenixSdk
 import UIKit
 
 class ViewController: UIViewController {
-    ...
+    var core: PhenixCoreDebuggable! // previously obtained
 
-    @objc func surfaceViewTappedMultipleTimes() {
-        let pcast: PhenixPCast = ...  // previously obtained
-        let viewModel = PhenixDebugViewModel(pcast: pcast)
-        let vc = PhenixDebugViewController(viewModel: viewModel)
+    @objc func contentViewTappedMultipleTimes() {
+        let viewModel = DebugViewController.ViewModel(core: core)
+        let vc = DebugViewController(viewModel: viewModel)
         present(vc, animated: true)
     }
 }

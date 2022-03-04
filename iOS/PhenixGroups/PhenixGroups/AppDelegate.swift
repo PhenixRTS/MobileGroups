@@ -1,15 +1,108 @@
 //
-//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
+import os.log
 import PhenixDeeplink
 import UIKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    var window: UIWindow?
-    private(set) var coordinator: MainCoordinator?
+    private static let logger = OSLog(identifier: "AppDelegate")
 
+    private var bootstrap: Bootstrap!
+
+    var window: UIWindow?
+
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    ) -> Bool {
+        // Setup main window
+        let window = UIWindow(frame: UIScreen.main.bounds)
+        self.window = window
+
+        // Setup launcher to initiate the necessary application components
+        bootstrap = Bootstrap(window: window)
+
+        #if DEBUG
+        // Setup deeplink
+        if let model: PhenixDeeplinkModel = PhenixDeeplink.makeDeeplinkFromEnvironment() {
+            // To not freeze the user interface while the core instances
+            // are prepared, move the code to a background queue execution.
+            DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+                self?.process(deeplink: model)
+            }
+        }
+        #endif
+
+        return true
+    }
+
+    func application(
+        _ application: UIApplication,
+        continue userActivity: NSUserActivity,
+        restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void
+    ) -> Bool {
+        guard let model: PhenixDeeplinkModel = PhenixDeeplink.makeDeeplink(userActivity) else {
+            return false
+        }
+
+        process(deeplink: model)
+
+        return true
+    }
+
+    /// Process provided deep link model.
+    ///
+    /// If necessary, the app will initialize the app's core from the deep link model values
+    /// or validate the currently active session against the newly received deep link values.
+    /// - Parameter model: Obtained deep link model
+    private func process(deeplink model: PhenixDeeplinkModel) {
+        let result = bootstrap.setup(with: model)
+
+        switch result {
+        case .success(.setupCompleted):
+            break
+
+        case .success(.setupCompletedPreviously):
+            do {
+                // If the application has already been set up,
+                // we need to compare and check for any changes
+                // in the currently received deep link model and
+                // the current session.
+                // If there are changes, we need to let the user
+                // know that the app must be restarted through
+                // the deep link again.
+                try bootstrap.validateSession(deeplink: model)
+
+                // Try to automatically join the meeting code if provided.
+                if let meetingCode = model.selectedAlias {
+                    bootstrap.handle(meetingCode: meetingCode)
+                }
+            } catch {
+                DispatchQueue.main.async {
+                    Self.terminate(
+                        afterDisplayingAlertWithTitle: "Configuration has changed.",
+                        message: "Please restart the app through the deep link to apply the changes."
+                    )
+                }
+            }
+
+        case .failure(let error):
+            os_log(.debug, log: Self.logger, "Error occurred: %{private}s", error.localizedDescription)
+
+            DispatchQueue.main.async {
+                Self.terminate(
+                    afterDisplayingAlertWithTitle: "Failed to start the app.",
+                    message: "Sorry, unrecoverable error occurred, please restart the app."
+                )
+            }
+        }
+    }
+}
+
+extension AppDelegate {
     /// Provide an alert with information and then terminate the application
     ///
     /// - Parameters:
@@ -19,7 +112,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     ///   where `terminate(afterDisplayingAlertWithTitle:message:file:line:)` is called.
     ///   - line: The line number to print along with `message`. The default is the line number where
     ///   `terminate(afterDisplayingAlertWithTitle:message:file:line:)` is called.
-    static func terminate(afterDisplayingAlertWithTitle title: String, message: String, file: StaticString = #file, line: UInt = #line) {
+    static func terminate(
+        afterDisplayingAlertWithTitle title: String,
+        message: String,
+        file: StaticString = #file,
+        line: UInt = #line
+    ) {
         guard let delegate = UIApplication.shared.delegate as? AppDelegate,
               let window = delegate.window else {
             fatalError(message)
@@ -37,75 +135,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     static func present(alertWithTitle title: String, message: String? = nil) {
         guard let delegate = UIApplication.shared.delegate as? AppDelegate,
               let window = delegate.window else {
-            fatalError("Fatal error. Could not load window instance.")
+            fatalError("Could not load window instance.")
         }
 
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
 
-        if let vc = window.rootViewController?.presentedViewController {
-            vc.present(alert, animated: true)
+        if let viewController = window.rootViewController?.presentedViewController {
+            viewController.present(alert, animated: true)
         } else {
             window.rootViewController?.present(alert, animated: true)
         }
-    }
-
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Setup main window
-        let window = UIWindow(frame: UIScreen.main.bounds)
-        self.window = window
-
-        // Setup deeplink
-        let deeplink = PhenixDeeplinkService<PhenixDeeplinkModel>.makeDeeplink(launchOptions)
-
-        // Setup launcher to initiate the application components
-        let launcher = Launcher(window: window, deeplink: deeplink)
-        launcher.start { coordinator in
-            self.coordinator = coordinator
-        }
-
-        return true
-    }
-
-    func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
-        guard let deeplink = PhenixDeeplinkService<PhenixDeeplinkModel>.makeDeeplink(userActivity) else {
-            return false
-        }
-
-        // If the coodinator does not exist, it means that he app hasn't started yet or is just now starting.
-        // Note: If app receives a URL at the app launch state, after the `application(_:didFinishLaunchingWithOptions:) -> Bool` finishes this method will be executed next, so both methods will try to use deeplink, but on app launch this method does not need to be executed.
-        guard let coordinator = coordinator else {
-            return false
-        }
-
-        let terminate: () -> Void = {
-            Self.terminate(
-                afterDisplayingAlertWithTitle: "Configuration has changed.",
-                message: "Please start the app again to apply the changes."
-            )
-        }
-
-        if let backend = deeplink.backend, backend != coordinator.phenixBackend {
-            terminate()
-            return false
-        }
-
-        if let uri = deeplink.uri, uri != coordinator.phenixPcast {
-            terminate()
-            return false
-        }
-
-        if let maxVideoMembers = deeplink.maxVideoMembers, maxVideoMembers != coordinator.phenixMaxVideoSubscriptions {
-            terminate()
-            return false
-        }
-
-        guard let code = deeplink.alias else {
-            return false
-        }
-
-        coordinator.join(meetingCode: code)
-
-        return true
     }
 }

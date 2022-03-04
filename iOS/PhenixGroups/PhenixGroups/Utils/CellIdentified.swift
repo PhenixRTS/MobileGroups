@@ -1,5 +1,5 @@
 //
-//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import UIKit
@@ -12,6 +12,7 @@ extension CellIdentified where Self: UITableViewCell {
 
 extension UITableView {
     func dequeueReusableCell<T: UITableViewCell & CellIdentified>(for indexPath: IndexPath) -> T {
+        // swiftlint:disable:next force_cast
         dequeueReusableCell(withIdentifier: T.identifier, for: indexPath) as! T
     }
 }

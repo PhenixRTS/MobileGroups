@@ -1,8 +1,11 @@
 //
-//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
+import Combine
 import Foundation
+import PhenixCore
+import UIKit
 
 /// Class saves and retrieves values from device memory
 /// 
@@ -10,29 +13,51 @@ import Foundation
 class Preferences {
     private let userDefaults: UserDefaults
 
-    var displayName: String? {
-        get { userDefaults.string(forKey: .displayName) }
+    private lazy var meetingsSubject: CurrentValueSubject<[Meeting], Never> = {
+        guard let data = userDefaults.data(forKey: .meetings) else {
+            return CurrentValueSubject<[Meeting], Never>([])
+        }
+
+        guard let result: [Meeting] = try? data.decode() else {
+            return CurrentValueSubject<[Meeting], Never>([])
+        }
+
+        return CurrentValueSubject<[Meeting], Never>(result)
+    }()
+
+    var displayName: String {
+        get { userDefaults.string(forKey: .displayName) ?? "Unknown" }
         set { userDefaults.set(newValue, forKey: .displayName) }
     }
 
     var meetings: [Meeting] {
-        get {
-            if let data = userDefaults.data(forKey: .meetings) {
-                if let result: [Meeting] = try? data.decode() {
-                    return result
-                }
-            }
-            return []
+        get { meetingsSubject.value }
+        set {
+            userDefaults.set(try? newValue.encode(), forKey: .meetings)
+            meetingsSubject.send(newValue)
         }
-        set { userDefaults.set(try? newValue.encode(), forKey: .meetings) }
     }
+
+    private(set) lazy var meetingsPublisher = meetingsSubject.eraseToAnyPublisher()
+
+    var currentMeetingCode: String?
+
+    var isCameraEnabled = true
+    var isMicrophoneEnabled = true
 
     init(userDefaults: UserDefaults = .standard) {
         self.userDefaults = userDefaults
+        self.registerDefaults()
+    }
+
+    private func registerDefaults() {
+        userDefaults.register(defaults: [
+            .displayName: UIDevice.current.name
+        ])
     }
 }
 
 fileprivate extension String {
-    static let displayName: String = "com.phenixrts.suite.groups.preferences.displayName"
-    static let meetings: String = "com.phenixrts.suite.groups.preferences.meetings"
+    static let displayName: String = "preferences.displayName"
+    static let meetings: String = "preferences.meetings"
 }

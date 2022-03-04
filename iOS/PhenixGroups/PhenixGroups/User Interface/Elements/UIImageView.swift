@@ -1,12 +1,12 @@
 //
-//  Copyright 2021 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
+//  Copyright 2022 Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.
 //
 
 import UIKit
 
 extension UIImageView {
     static func makeMuteImageView() -> UIImageView {
-        let image = UIImage(named: "mic_off")?.withRenderingMode(.alwaysTemplate)
+        let image = UIImage(systemName: "mic.slash.fill")
         let imageView = UIImageView(image: image)
 
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -22,7 +22,7 @@ extension UIImageView {
     }
 
     static func makeAwayImageView() -> UIImageView {
-        let image = UIImage(named: "moon.zzz.fill")?.withRenderingMode(.alwaysTemplate)
+        let image = UIImage(systemName: "moon.zzz.fill")
         let imageView = UIImageView(image: image)
 
         imageView.translatesAutoresizingMaskIntoConstraints = false
