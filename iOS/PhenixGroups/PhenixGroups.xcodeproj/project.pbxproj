@@ -736,6 +736,7 @@
 		};
 		B50195EB2458125F00DDF6AB /* Catch bad copyrights */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -750,10 +751,11 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "COPYRIGHT=\"Copyright $(date +\"%Y\") Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.\"\n\n# Paths which contains files, which needs to be checked.\nPATH1=\"${SRCROOT}/PhenixGroups\"\nPATH2=\"${SRCROOT}/PhenixCore\"\nPATH3=\"${SRCROOT}/PhenixCoreIntegrationTests\"\nPATH4=\"${SRCROOT}/PhenixCoreUnitTests\"\nPATH5=\"${SRCROOT}/PhenixChat\"\n\nPATHS=(${PATH1} ${PATH2} ${PATH3} ${PATH4} ${PATH5})\n\nfor i in \"${PATHS[@]}\"\ndo\n   echo \"searching ${i} for ${COPYRIGHT}\"\n   find \"${i}\" \\( -name \"*.h\" -or -name \"*.m\" -or -name \"*.swift\" \\) -print0 \\\n       | xargs -0 egrep --with-filename --files-without-match \"($COPYRIGHT)\" \\\n       | perl -p -e \"s/(.*)$/\\$1: warning: Incorrect or no copyright \\$1/\"\ndone\n";
+			shellScript = "COPYRIGHT=\"Copyright $(date +\"%Y\") Phenix Real Time Solutions, Inc. Confidential and Proprietary. All rights reserved.\"\n\n# Paths which contains files, which needs to be checked.\nPATH1=\"${SRCROOT}/PhenixGroups\"\nPATH2=\"${SRCROOT}/PhenixGroupsUnitTests\"\n\nPATHS=(${PATH1} ${PATH2})\n\nfor i in \"${PATHS[@]}\"\ndo\n   echo \"searching ${i} for ${COPYRIGHT}\"\n   find \"${i}\" \\( -name \"*.h\" -or -name \"*.m\" -or -name \"*.swift\" \\) -print0 \\\n       | xargs -0 egrep --with-filename --files-without-match \"($COPYRIGHT)\" \\\n       | perl -p -e \"s/(.*)$/\\$1: warning: Incorrect or no copyright \\$1/\"\ndone\n";
 		};
 		B54D599A2451AF9B00454066 /* Static Analysis for Swift using SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);

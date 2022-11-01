@@ -15,10 +15,12 @@ extension PhenixCore {
         private let queue: DispatchQueue
         private let renderer: PhenixRenderer
         private let initialPointInTime: PointInTime
+        private let maxRetryCount: Int
 
         private var timeShift: PhenixTimeShift?
-        private var createRetryCount = 0
-        private let maxRetryCount: Int
+        private var retriesLeft: Int
+
+        private var noStreamCancellable: AnyCancellable?
 
         private var delayedTimeShiftSetupWorker: DispatchWorkItem?
 
@@ -47,6 +49,9 @@ extension PhenixCore {
             .removeDuplicates()
             .eraseToAnyPublisher()
 
+        /// A variable informing about situations when the stream ends.
+        var noStreamSubject = PassthroughSubject<(), Never>()
+
         let alias: String
         var state: State { playbackStateSubject.value }
 
@@ -58,10 +63,17 @@ extension PhenixCore {
             queue: DispatchQueue
         ) {
             self.queue = queue
-            self.renderer = renderer
-            self.initialPointInTime = pointInTime
-            self.maxRetryCount = maxRetryCount
             self.alias = associatedAlias
+            self.renderer = renderer
+            self.retriesLeft = maxRetryCount
+            self.maxRetryCount = maxRetryCount
+            self.initialPointInTime = pointInTime
+
+            self.noStreamCancellable = self.noStreamSubject
+                .sink { [weak self] _ in
+                    // Prevent of any more retries, because the stream ended.
+                    self?.preventFromRetrying()
+                }
         }
 
         func setup() {
@@ -78,6 +90,7 @@ extension PhenixCore {
             }
 
             setupTimeShift()
+            retriesLeft = maxRetryCount
 
             if timeShift == nil {
                 eventSubject.send(.timeShiftFailed(alias: alias, error: .rendererSeekingFailed))
@@ -274,7 +287,7 @@ extension PhenixCore {
                 return
             }
 
-            os_log(.debug, log: Self.logger, "%{private}s, Set bandwidth limitation to %{private}d", alias, bandwidth)
+            os_log(.debug, log: Self.logger, "%{private}s, Set bandwidth limitation: %{private}d", alias, bandwidth)
             bandwidthLimitationDisposable = timeShift.limitBandwidth(bandwidth)
         }
 
@@ -289,7 +302,7 @@ extension PhenixCore {
             os_log(
                 .debug,
                 log: Self.logger,
-                "%{private}s, Create TimeShift context with %{private}s.",
+                "%{private}s, Setup TimeShift at %{private}s.",
                 alias,
                 initialPointInTime.description
             )
@@ -303,20 +316,31 @@ extension PhenixCore {
             }
 
             guard timeShift != nil else {
-                os_log(.debug, log: Self.logger, "%{private}s, Failed to create TimeShift context.", alias)
+                os_log(.debug, log: Self.logger, "%{private}s, Failed to setup TimeShift", alias)
                 return
             }
 
             os_log(
                 .debug,
                 log: Self.logger,
-                "%{private}s, TimeShift context created, max retry count %{private}s",
+                "%{private}s, Setup TimeShift succeeded, max retry count %{private}s",
                 alias,
                 maxRetryCount.description
             )
 
             subscribeForPlaybackStatusEvents()
             subscribeForPlaybackHeadEvents()
+        }
+
+        /// A method preveting from further TimeShift setups by removing all available retries.
+        ///
+        /// This method should be used, for example, when the remote stream is no longer available.
+        /// In that case, there is no need of multe retries to setup TimeShift.
+        private func preventFromRetrying() {
+            os_log(.debug, log: Self.logger, "%{private}s, Prevent further retries", alias)
+            retriesLeft = 0
+            delayedTimeShiftSetupWorker?.cancel()
+            delayedTimeShiftSetupWorker = nil
         }
 
         private func playbackStatusDidChange(_ changes: PhenixObservableChange<NSNumber>?) {
@@ -383,33 +407,33 @@ extension PhenixCore {
                     return
                 }
 
-                if self.createRetryCount > self.maxRetryCount {
+                os_log(
+                    .debug,
+                    log: Self.logger,
+                    "%{private}s, Playback failed: %{private}s.",
+                    self.alias,
+                    value.status.description
+                )
+
+                os_log(
+                    .debug,
+                    log: Self.logger,
+                    "%{private}s, %{private}s/%{private}s retries left for new TimeShift setup",
+                    self.alias,
+                    self.retriesLeft.description,
+                    self.maxRetryCount.description
+                )
+
+                if self.retriesLeft > 0 {
                     os_log(
                         .debug,
                         log: Self.logger,
-                        "%{private}s, Playback failed after multiple retries. Stops auto retry. (%{private}s/%{private}s)",
+                        "%{private}s, Retry TimeShift setup after %{private}s seconds",
                         self.alias,
-                        self.createRetryCount.description,
-                        (self.maxRetryCount + 1).description
+                        Self.retryDelayTimeInterval.description
                     )
 
-                    self.delayedTimeShiftSetupWorker?.cancel()
-                    self.delayedTimeShiftSetupWorker = nil
-                    self.createRetryCount = 0
-                    self.playbackStateSubject.send(.failed)
-                } else {
-                    os_log(
-                        .debug,
-                        log: Self.logger,
-                        "%{private}s, Playback failed: %{private}s. Auto retry after %{private}s. (%{private}s/%{private}s)",
-                        self.alias,
-                        value.status.description,
-                        Self.retryDelayTimeInterval.description,
-                        self.createRetryCount.description,
-                        (self.maxRetryCount + 1).description
-                    )
-
-                    self.createRetryCount += 1
+                    self.retriesLeft -= 1
                     self.playbackStateSubject.send(.starting)
 
                     let workItem = DispatchWorkItem { [weak self] in
@@ -418,6 +442,11 @@ extension PhenixCore {
 
                     self.delayedTimeShiftSetupWorker = workItem
                     self.queue.asyncAfter(deadline: .now() + Self.retryDelayTimeInterval, execute: workItem)
+                } else {
+                    self.delayedTimeShiftSetupWorker?.cancel()
+                    self.delayedTimeShiftSetupWorker = nil
+
+                    self.playbackStateSubject.send(.failed)
                 }
             }
         }

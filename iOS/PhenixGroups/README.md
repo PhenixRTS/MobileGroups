@@ -28,7 +28,7 @@ Without these parameters, application will automatically fail to open.
 ### Examples:
 
 ```
-https://phenixrts.com/group/?authToken=DIGEST:eyJhcHB...&publishToken=DIGEST:eyJhcHB...&roomAudioToken=DIGEST:eyJhcHB...&roomVideoToken=DIGEST:eyJhcHB...#xxx-xxxx-xxx
+https://phenixrts.com/group/?authToken=<authToken>&publishToken=<publishToken>&roomAudioToken=<roomAudioToken>&roomVideoToken=<roomVideoToken>#<roomAlias>
 ```
 
 ### Parameters
@@ -37,7 +37,11 @@ https://phenixrts.com/group/?authToken=DIGEST:eyJhcHB...&publishToken=DIGEST:eyJ
 * `publishToken` - Publishing token.
 * `roomAudioToken` - Stream token for audio-only subscription.
 * `roomVideoToken` - Stream token for video-only subscription.
-* `#xxx-xxxx-xxx` - Room alias (`#` before the room alias is required)
+* `#` - *(optional)* Selected Room alias (`#` before the room alias is required). If this parameter is provided, application will automatically join user to a specific room alias.
+
+#### Notes
+
+* When creating `publishToken` add `--apply-tag` property with the values of `--tag` property from `roomAudioToken` and `roomVideoToken`.
 
 ### Debugging
 

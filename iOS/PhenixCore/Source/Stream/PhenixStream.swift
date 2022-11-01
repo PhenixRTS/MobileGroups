@@ -28,6 +28,7 @@ public extension PhenixCore {
         private var timeShiftStateSubject = CurrentValueSubject<TimeShift.State, Never>(.idle)
         private var timeShiftHeadSubject = CurrentValueSubject<TimeInterval, Never>(0)
 
+        private var timeShiftNoStreamCancellable: AnyCancellable?
         private var bandwidthLimitationDisposables: [PhenixDisposable] = []
 
         let previewLayer: VideoLayer
@@ -84,7 +85,7 @@ public extension PhenixCore {
             os_log(
                 .debug,
                 log: Self.logger,
-                "%{public}s, Stream subscription state did change, state: %{public}s",
+                "%{public}s, Stream subscription state did change: %{public}s",
                 id,
                 status.description
             )
@@ -192,7 +193,7 @@ public extension PhenixCore {
                 return
             }
 
-            os_log(.debug, log: Self.logger, "%{private}s, Set bandwidth limitation to %{private}d", id, bandwidth)
+            os_log(.debug, log: Self.logger, "%{private}s, Set bandwidth limitation: %{private}d", id, bandwidth)
 
             videoTracks.forEach { track in
                 if let disposable = track.limitBandwidth(bandwidth) {
@@ -212,6 +213,11 @@ public extension PhenixCore {
         func subscribe(_ timeShift: PhenixCore.TimeShift) {
             timeShift.playbackStatePublisher.receive(subscriber: AnySubscriber(timeShiftStateSubject))
             timeShift.playbackHeadPublisher.receive(subscriber: AnySubscriber(timeShiftHeadSubject))
+            timeShiftNoStreamCancellable = statePublisher
+                .filter { $0 == .noStream }
+                .sink { [weak timeShift] _ in
+                    timeShift?.noStreamSubject.send()
+                }
 
             if let bandwidthLimitation = bandwidthLimitation {
                 timeShift.setBandwidthLimitation(bandwidthLimitation)
