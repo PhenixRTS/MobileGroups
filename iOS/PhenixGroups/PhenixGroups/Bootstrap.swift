@@ -70,7 +70,13 @@ final class Bootstrap {
             }
 
             do {
-                let session = try AppSession(deeplink: model)
+                var sessionConfiguration = AppSession.Configuration.default
+
+                if let limit = model.maxVideoMembers {
+                    sessionConfiguration.maxVideoSubscriptions = limit
+                }
+
+                let session = try AppSession(deeplink: model, configuration: sessionConfiguration)
                 let core = setupCore(session: session)
                 let preferences = Preferences()
                 setupDebugView(core: core)

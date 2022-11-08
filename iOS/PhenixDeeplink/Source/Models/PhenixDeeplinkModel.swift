@@ -48,6 +48,9 @@ public struct PhenixDeeplinkModel {
 
     /// List of act times for archived stream playback positions.
     public var acts: [String]?
+
+    /// A limit of maximum member's video stream subscriptions at the same time.
+    public var maxVideoMembers: Int?
 }
 
 // MARK: - PhenixDeeplinkUrlModelProvider
@@ -100,6 +103,10 @@ extension PhenixDeeplinkModel: PhenixDeeplinkUrlModelRepresentable {
             self.acts = query["acts"]?
                 .split(separator: ",")
                 .map(String.init)
+
+            if let value = query["maxVideoMembers"], let maxVideoMembers = Int(value) {
+                self.maxVideoMembers = maxVideoMembers
+            }
         }
 
         self.selectedAlias = components.fragment

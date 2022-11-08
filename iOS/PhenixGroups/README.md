@@ -28,7 +28,7 @@ Without these parameters, application will automatically fail to open.
 ### Examples:
 
 ```
-https://phenixrts.com/group/?authToken=<authToken>&publishToken=<publishToken>&roomAudioToken=<roomAudioToken>&roomVideoToken=<roomVideoToken>#<roomAlias>
+https://phenixrts.com/group/?authToken=<authToken>&publishToken=<publishToken>&roomAudioToken=<roomAudioToken>&roomVideoToken=<roomVideoToken>&maxVideoMembers=<maxVideoMembers>#<roomAlias>
 ```
 
 ### Parameters
@@ -37,6 +37,7 @@ https://phenixrts.com/group/?authToken=<authToken>&publishToken=<publishToken>&r
 * `publishToken` - Publishing token.
 * `roomAudioToken` - Stream token for audio-only subscription.
 * `roomVideoToken` - Stream token for video-only subscription.
+* `maxVideoMembers` - *(optional)* Limits the maximum number of concurrent video subscriptions to member streams. When not set, then video subscriptions are created for maximum 6 member streams.
 * `#` - *(optional)* Selected Room alias (`#` before the room alias is required). If this parameter is provided, application will automatically join user to a specific room alias.
 
 #### Notes

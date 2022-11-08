@@ -13,7 +13,7 @@ final class AppSession {
     }
 
     struct Configuration {
-        let maxVideoSubscriptions: Int
+        var maxVideoSubscriptions: Int
     }
 
     let authToken: String
@@ -59,7 +59,7 @@ final class AppSession {
 }
 
 extension AppSession.Configuration {
-    static let `default` = AppSession.Configuration(maxVideoSubscriptions: 1)
+    static let `default` = AppSession.Configuration(maxVideoSubscriptions: 6)
 }
 
 extension AppSession: Equatable {
